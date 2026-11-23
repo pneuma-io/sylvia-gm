@@ -1,0 +1,112 @@
+{
+  "name": "package-install",
+  "description": "Installing packages through the owner on a fresh profile: install_package's refusals (missing archive, not base64, non-ASCII, an archive that is not a package, a missing install id), the Riichi 0.1.0 archive installed inline and again under the same install id; install_package_file's refusals (missing path, a missing file, a folder, a missing install id), the Riichi quick-test setting package installed from a file; then shut down. A failed file install is left out: Python offers an import repair there, which the port answers rust_port_pending until lane 1 ports it.",
+  "seed_files": [
+    {
+      "path": "imports/riichi-0.1.0.sylvia-gm-package",
+      "copy_from": "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package",
+      "base64_into": "riichi_base64"
+    },
+    {
+      "path": "imports/setting.sylvia-gm-package",
+      "copy_from": "campaign-plans/riichi-quick-test/setting.sylvia-gm-package"
+    },
+    {
+      "path": "imports/folder.sylvia-gm-package",
+      "directory": true
+    }
+  ],
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "install_package",
+      "params": {}
+    },
+    {
+      "method": "install_package",
+      "params": {
+        "archive_base64": "not base64!",
+        "install_id": "install-bad"
+      }
+    },
+    {
+      "method": "install_package",
+      "params": {
+        "archive_base64": "été",
+        "install_id": "install-bad"
+      }
+    },
+    {
+      "method": "install_package",
+      "params": {
+        "archive_base64": "QUJD",
+        "install_id": "install-bad"
+      }
+    },
+    {
+      "method": "install_package",
+      "params": {
+        "archive_base64": "${riichi_base64}"
+      }
+    },
+    {
+      "method": "install_package",
+      "params": {
+        "archive_base64": "${riichi_base64}",
+        "install_id": "install-riichi-010"
+      }
+    },
+    {
+      "method": "install_package",
+      "params": {
+        "archive_base64": "${riichi_base64}",
+        "install_id": "install-riichi-010"
+      }
+    },
+    {
+      "method": "install_package_file",
+      "params": {}
+    },
+    {
+      "method": "install_package_file",
+      "params": {
+        "source_path": "${work}/imports/missing.sylvia-gm-package",
+        "install_id": "install-missing"
+      }
+    },
+    {
+      "method": "install_package_file",
+      "params": {
+        "source_path": "${work}/imports/folder.sylvia-gm-package",
+        "install_id": "install-folder"
+      }
+    },
+    {
+      "method": "install_package_file",
+      "params": {
+        "source_path": "${work}/imports/setting.sylvia-gm-package"
+      }
+    },
+    {
+      "method": "install_package_file",
+      "params": {
+        "source_path": "${work}/imports/setting.sylvia-gm-package",
+        "install_id": "install-setting-file"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}

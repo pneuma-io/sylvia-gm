@@ -139,10 +139,26 @@ pub struct SeedFile {
     /// Create a folder (and its parents) instead of a file.
     #[serde(default)]
     pub directory: bool,
+    /// Copy this checkout file (relative to the checkout root), byte for byte.
+    #[serde(default)]
+    pub copy_from: Option<String>,
+    /// With `copy_from`: also keep the file's bytes as `${<name>}`, in standard base64 without
+    /// a newline, so a step can send the archive inline.
+    #[serde(default)]
+    pub base64_into: Option<String>,
+}
+
+/// A checkout file a session names: relative, inside the checkout, read from the checkout root
+/// (the folder the tool runs from).
+pub(crate) fn checkout_file(relative: &str) -> Result<Vec<u8>, String> {
+    if Path::new(relative).is_absolute() || relative.split(['/', '\\']).any(|part| part == "..") {
+        return Err(format!("checkout file {relative} must be a relative path inside the checkout"));
+    }
+    std::fs::read(relative).map_err(|error| format!("could not read checkout file {relative}: {error}"))
 }
 
 /// Write `seeds` under `work`, replacing placeholders first.
-fn write_seeds(work: &Path, seeds: &[SeedFile], variables: &HashMap<String, Json>) -> Result<(), String> {
+fn write_seeds(work: &Path, seeds: &[SeedFile], variables: &mut HashMap<String, Json>) -> Result<(), String> {
     for seed in seeds {
         let relative = match substitute(&Json::String(seed.path.clone()), variables)? {
             Json::String(text) => text,
@@ -157,14 +173,26 @@ fn write_seeds(work: &Path, seeds: &[SeedFile], variables: &HashMap<String, Json
                 .map_err(|error| format!("could not create {relative}: {error}"))?;
             continue;
         }
-        let bytes = match (&seed.text, &seed.json) {
-            (Some(text), None) => substitute(&Json::String(text.clone()), variables)?
+        let bytes = match (&seed.text, &seed.json, &seed.copy_from) {
+            (Some(text), None, None) => substitute(&Json::String(text.clone()), variables)?
                 .as_str()
                 .map(|text| text.as_bytes().to_vec())
                 .unwrap_or_default(),
-            (None, Some(value)) => sylvia_base::pyjson::canonical_bytes(&substitute(value, variables)?),
-            _ => return Err(format!("seed {relative} needs exactly one of text, json or directory")),
+            (None, Some(value), None) => sylvia_base::pyjson::canonical_bytes(&substitute(value, variables)?),
+            (None, None, Some(source)) => checkout_file(source)?,
+            _ => {
+                return Err(format!(
+                    "seed {relative} needs exactly one of text, json, copy_from or directory"
+                ))
+            }
         };
+        match (&seed.base64_into, &seed.copy_from) {
+            (Some(name), Some(_)) => {
+                variables.insert(name.clone(), sylvia_base::pybase64::b2a_base64(&bytes, false).into());
+            }
+            (Some(_), None) => return Err(format!("seed {relative} has base64_into without copy_from")),
+            (None, _) => {}
+        }
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)
                 .map_err(|error| format!("could not create {relative}'s folder: {error}"))?;
@@ -240,7 +268,7 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
         .map_err(|error| format!("could not create {}: {error}", app_root.display()))?;
     variables.insert("app_root".into(), plain_path(&app_root).into());
     variables.insert("work".into(), plain_work.clone().into());
-    write_seeds(&work, &session.seed_files, &variables)?;
+    write_seeds(&work, &session.seed_files, &mut variables)?;
     if let Some(standin) = &standin {
         variables.insert("standin_url".into(), standin.url.clone().into());
         variables.insert("standin_key".into(), standin::KEY.into());
@@ -502,12 +530,19 @@ fn run_webui_steps(
         let mut request: crate::webui::HttpStep = serde_json::from_value(substituted.clone())
             .map_err(|error| format!("step {index} is not a valid http request: {error}"))?;
         for part in request.multipart.iter_mut().flatten() {
-            if let Some(source) = &part.content_from_step {
-                let bytes = bodies
-                    .get(source)
-                    .ok_or(format!("step {index} uploads the body of step {source}, which has not run"))?;
-                part.content_bytes = Some(bytes.clone());
-            }
+            part.content_bytes = match (&part.content_from_step, &part.content_from_file) {
+                (Some(source), None) => Some(
+                    bodies
+                        .get(source)
+                        .ok_or(format!("step {index} uploads the body of step {source}, which has not run"))?
+                        .clone(),
+                ),
+                (None, Some(file)) => Some(checkout_file(file)?),
+                (None, None) => None,
+                (Some(_), Some(_)) => {
+                    return Err(format!("step {index} names both content_from_step and content_from_file"));
+                }
+            };
         }
         let (response, sent) =
             crate::webui::send(&request, &host.authority, &host.address, Duration::from_secs(step.timeout_s))

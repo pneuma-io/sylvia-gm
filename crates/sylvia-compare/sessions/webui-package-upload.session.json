@@ -1,0 +1,242 @@
+{
+  "name": "webui-package-upload",
+  "description": "Package uploads through the WebUI host on a fresh profile: no file selected, the Riichi 0.1.0 archive and the Riichi quick-test setting package installed from uploads, and an upload without an install id; the campaign index; then Stop. A failed install is left out: Python offers an import repair there, which the port answers rust_port_pending until lane 1 ports it.",
+  "webui": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "date",
+      "server",
+      "diagnostic_id"
+    ],
+    "scrub": [
+      {
+        "pattern": "sylvia_webui_<port>=[A-Za-z0-9_-]{43}",
+        "with": "sylvia_webui_<port>=<session>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "http": {
+        "method": "GET",
+        "path": "/app.html",
+        "headers": [
+          [
+            "Sec-Fetch-Site",
+            "none"
+          ],
+          [
+            "Sec-Fetch-Mode",
+            "navigate"
+          ],
+          [
+            "Sec-Fetch-Dest",
+            "document"
+          ]
+        ]
+      },
+      "save_cookie": true
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/package",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{\"install_id\": \"install-upload-riichi\"}"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/package",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{\"install_id\": \"install-upload-riichi\"}"
+          },
+          {
+            "name": "file",
+            "filename": "riichi.sylvia-gm-package",
+            "headers": [
+              [
+                "Content-Type",
+                "application/octet-stream"
+              ]
+            ],
+            "content_from_file": "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/package",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{\"install_id\": \"install-upload-setting\"}"
+          },
+          {
+            "name": "file",
+            "filename": "setting.sylvia-gm-package",
+            "headers": [
+              [
+                "Content-Type",
+                "application/octet-stream"
+              ]
+            ],
+            "content_from_file": "campaign-plans/riichi-quick-test/setting.sylvia-gm-package"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/package",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{}"
+          },
+          {
+            "name": "file",
+            "filename": "riichi-again.sylvia-gm-package",
+            "headers": [
+              [
+                "Content-Type",
+                "application/octet-stream"
+              ]
+            ],
+            "content_from_file": "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "idx",
+          "method": "campaign_index"
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/stop",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {}
+      }
+    }
+  ]
+}

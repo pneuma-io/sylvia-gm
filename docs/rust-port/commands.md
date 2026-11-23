@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 54 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `claude_connection`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 56 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -109,10 +109,10 @@ Ported: 54 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `provider_stream_status` | `providers.handle_provider_stream_status` | yes | no | |
 | `reconnect_stream` | `sessions.handle_reconnect_stream` | yes | no | |
 | `reconnect_provider_stream` | `providers.handle_reconnect_provider_stream` | yes | no | |
-| `install_package` | `packages.handle_install_package` | no | no | |
+| `install_package` | `packages.handle_install_package` | no | yes | `package-install` |
 | `confirm_character_card_import` | `packages.handle_confirm_character_card_import` | yes | no | |
 | `preview_character_card_file` | `packages.handle_confirm_character_card_import` | no | no | |
-| `install_package_file` | `packages.handle_install_package_file` | no | no | |
+| `install_package_file` | `packages.handle_install_package_file` | no | yes | `package-install`, `webui-package-upload` |
 | `start_guided_campaign` | `campaigns.handle_start_guided_campaign` | yes | yes | `ruleless-turn`, `stop-redirect`, `fail-retry`, `reopen` (No Ruleset; an installed Ruleset is proven by `sylvia-app/tests/guided.rs`), `srd-mechanics-turn` (a saved Plan) |
 | `create_guided_campaign_draft` | `campaigns.handle_create_guided_campaign_draft` | yes | yes | `ruleless-turn`, `stop-redirect`, `fail-retry`, `reopen` (step 2 or 3) |
 | `navigate_guided_campaign_draft` | `campaigns.handle_navigate_guided_campaign_draft` | yes | no | |
