@@ -549,6 +549,54 @@ def corrupt(rng: random.Random, payload: dict) -> dict:
     return payload
 
 
+def targeted_results(cases: list[dict], scenes: list[dict]) -> list[tuple[int, dict]]:
+    """Edits of one valid result per kind that each reach one consistency or order rule of
+    `admit_spatial_result`: bounds, reversed lists, and states that contradict each other."""
+    first: dict[str, dict] = {}
+    for case in cases:
+        if "result" in case and len(compact(case["result"])) <= CORRUPT_LIMIT:
+            kind = case["query"]["kind"]
+            found = case["result"].get("found")
+            key = f"{kind} {found}" if kind in ("circle_route", "path", "placement") else kind
+            first.setdefault(key, case)
+    edits: list[tuple[int, dict]] = []
+
+    def edit(key: str, **changes) -> None:
+        case = first.get(key)
+        if case is None:
+            return
+        edited = copy.deepcopy(case["result"])
+        for name, value in changes.items():
+            edited[name] = value(edited) if callable(value) else value
+        edits.append((case["scene"], edited))
+
+    def geometry_references(scene_index: int, count: int, metadata: bool = False) -> list[dict]:
+        rows = sorted(scenes[scene_index]["geometry"], key=lambda item: item["id"])[:count]
+        return [{"kind": "geometry", "id": row["id"], **({"metadata": row["metadata"]} if metadata else {})}
+                for row in reversed(rows)]
+
+    if "exposure" in first:
+        scene_index = first["exposure"]["scene"]
+        edit("exposure", exposure=1.5)
+        edit("exposure", exposure=1.0)
+        edit("exposure", occluders=geometry_references(scene_index, 2, metadata=True))
+    edit("circle_route True", points=lambda r: r["points"] + [r["points"][-1]] * (258 - len(r["points"])))
+    edit("circle_route True", points=lambda r: r["points"] + [r["points"][-1]] * (259 - len(r["points"])))
+    edit("circle_route True", truncated=True)
+    edit("circle_overlap", hit=False, entry=None, exit=None, starts_inside=True, ends_inside=False)
+    edit("circle_overlap", hit=False, entry=None, exit=None, starts_inside=False, ends_inside=True)
+    if "sweep" in first:
+        scene_index = first["sweep"]["scene"]
+        edit("sweep", supported=True, clear=False, reason="blocked", blockers=[])
+        edit("sweep", supported=True, clear=False, reason="blocked", blockers=geometry_references(scene_index, 2))
+    edit("placement False", supported=False, reason="no_placement")
+    edit("placement False", supported=True, reason="candidate_limit")
+    edit("placement False", supported=False, reason="unsupported_geometry")
+    edit("path True", cells=[])
+    edit("path False", found=True, cost=1.0)
+    return edits
+
+
 def session_cases(rng: random.Random, scenes: list[dict]) -> list[dict]:
     """Engine sessions: queries, scene replacements (advancing, stale, another map), queries on an
     earlier snapshot, and repeated queries answered from the cache."""
@@ -644,6 +692,9 @@ def main() -> int:
             broken = corrupt(result_rng, case["result"])
             record = admit_result(scenes[case["scene"]], broken)
             results.append({"scene": case["scene"], "input": broken, **kept(record, "payload", PAYLOAD_INLINE)})
+    for scene_index, edited in targeted_results(cases, scenes):
+        record = admit_result(scenes[scene_index], edited)
+        results.append({"scene": scene_index, "input": edited, **kept(record, "payload", PAYLOAD_INLINE)})
     cases = [case if number in whole or number % SAMPLE_EVERY == 0 else kept(case, "result", RESULT_INLINE)
              for number, case in enumerate(cases)]
     sessions = session_cases(random.Random(4810), scenes)
