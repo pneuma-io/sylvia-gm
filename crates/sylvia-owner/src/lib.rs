@@ -15,6 +15,7 @@
 
 pub mod chat_start;
 pub mod commands;
+pub mod creation_catalog;
 pub mod desktop_update;
 pub mod diagnostics;
 pub mod dictation;

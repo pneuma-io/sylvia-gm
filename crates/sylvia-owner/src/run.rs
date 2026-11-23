@@ -19,9 +19,10 @@
 //! ownership lock, before migrations), the `desktop_update_*` methods, the update reservation
 //! and both update gates. Not ported yet: the recovery-only owner Python starts when an
 //! interrupted update meets a native update context, and confirming an update restart; both
-//! need update preparation. Also not ported: the legacy Builder chat migration at launch (until
-//! then a profile that needs it is refused, `refuse_legacy_builder_chats`), the provider resolver
-//! and session loop (lane 4).
+//! need update preparation. Also not ported: the provider resolver and session loop (lane 4).
+//!
+//! At launch a profile holding former campaign-creation content chats has them migrated
+//! (`migrate_legacy_builder_chats`, lane 1) against the owner's campaign creation catalog.
 
 use crate::desktop_update::drafts::DraftStore;
 use crate::desktop_update::launch::Installation;
@@ -464,13 +465,14 @@ async fn serve(
     // `_preinstall_bundled_srd(bus)` and `_preinstall_bundled_riichi(bus)`, then
     // `if application_owner.legacy_builder_contexts(): migrate_legacy_builder_chats(...)`.
     let bundled = Arc::clone(&owner.context.bundled);
+    let storage_root = owner.context.storage_root.clone();
     let prepared = owner
         .context
         .store
         .call(move |store| {
             store.prepare_new_campaign_storage()?;
             crate::preinstall::preinstall_bundled(store, &bundled)?;
-            refuse_legacy_builder_chats(store)
+            crate::creation_catalog::migrate_legacy_builder_chats(store, &bundled, &storage_root)
         })
         .await;
     if let Err(error) = prepared {
@@ -948,20 +950,6 @@ fn save_local_report(owner: &Owner, params: &JsonMap) -> DispatchResult {
     }
     let preview_id = required_text(params, "preview_id")?;
     owner.diagnostics.save(&preview_id, &destination).map_err(Failure::from)
-}
-
-/// Until `migrate_legacy_builder_chats` is ported (lane 1's `builder_session_migration` and
-/// `builder_references`, then lane 5's `_campaign_creation_catalog`), a profile holding former
-/// campaign-creation content chats is refused rather than served unmigrated. Profiles without
-/// them start as before; the read creates no session tables in a fresh database.
-fn refuse_legacy_builder_chats(store: &mut sylvia_store::AuthorityStore) -> sylvia_store::StoreResult<()> {
-    if store.legacy_builder_contexts()?.is_empty() {
-        Ok(())
-    } else {
-        Err(StoreError::NotPorted(
-            "the legacy Builder chat migration at launch (migrate_legacy_builder_chats)",
-        ))
-    }
 }
 
 fn startup_failed() -> i32 {
