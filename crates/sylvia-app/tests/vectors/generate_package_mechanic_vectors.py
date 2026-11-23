@@ -229,6 +229,18 @@ def install_patches() -> None:
 
 
 DOCUMENTS: dict[str, str] = {}
+# Targeted cases share a few states; each is kept once, by the SHA-256 of its JSON.
+STATES: dict[str, dict] = {}
+
+
+def state_reference(state: dict) -> dict:
+    digest = hashlib.sha256(json.dumps(state, sort_keys=True).encode("utf-8")).hexdigest()
+    STATES[digest] = state
+    return {"$state": digest}
+
+
+def state_of(value: dict) -> dict:
+    return STATES[value["$state"]] if "$state" in value else value
 
 
 def stored(data: bytes) -> dict:
@@ -268,7 +280,7 @@ def context_of(value: dict):
     resolution = value["choice_resolution"]
     return MechanicContext(
         campaign_id=value["campaign_id"], turn_id=value["turn_id"], action_id=value["action_id"],
-        state=owned_payload(value["state"]), parameters=owned_payload(value["parameters"]),
+        state=owned_payload(state_of(value["state"])), parameters=owned_payload(value["parameters"]),
         participants=owned_payload(value["participants"]),
         choice_resolution=None if resolution is None else MechanicsChoiceResolution(
             choice_id=resolution["choice_id"], option_id=resolution["option_id"],
@@ -463,6 +475,40 @@ def arena_scene() -> dict:
             item["metadata"] = {**item["metadata"], "player": {"label": shown[item["id"]], "kind": "creature"}}
     scene["geometry"][0]["metadata"] = {"player": {"label": "Wall", "kind": "wall"}}
     scene["zones"][0]["metadata"] = {"player": {"label": "Pool", "kind": "hazard"}}
+    # Off a cell centre, so a path preview's first point is the mover's own position.
+    next(item for item in scene["entities"] if item["id"] == "orc")["position"] = [5.4, 5.6, 0]
+    return scene
+
+
+def range_scene() -> dict:
+    """A shooter, a target and two walls mirrored across the line of fire, so both near-miss
+    sides fade at the same parameter."""
+    scene = arena_scene()
+    scene["map"]["id"] = "range"
+    shown = lambda label: {"player": {"label": label, "kind": "creature"}}  # noqa: E731
+    scene["entities"] = [
+        {"id": "s", "map_id": "range", "position": [2, 5, 0], "footprint": {"kind": "circle", "radius": 0.5}, "height": 2,
+         "facing": [1, 0], "active": True, "movement": "blocking", "visibility": "clear", "metadata": shown("Shooter")},
+        {"id": "t", "map_id": "range", "position": [10, 5, 0], "footprint": {"kind": "circle", "radius": 0.5}, "height": 2,
+         "facing": [-1, 0], "active": True, "movement": "blocking", "visibility": "clear", "metadata": shown("Target")},
+    ]
+    wall = lambda identity, low, high: {  # noqa: E731
+        "id": identity, "map_id": "range", "volume": {"kind": "box", "min": [6, low, 0], "max": [7, high, 3]},
+        "active": True, "movement": "blocking", "visibility": "opaque", "metadata": {"player": {"label": "Wall", "kind": "wall"}},
+        "destroyed": {"active": False, "movement": "passable", "visibility": "clear"}}
+    scene["geometry"] = [wall("wall.n", 5.3, 6), wall("wall.s", 4, 4.7)]
+    scene["zones"] = []
+    scene["terrain"] = []
+    return scene
+
+
+def elsewhere_scene() -> dict:
+    """The arena on another map."""
+    scene = arena_scene()
+    scene["map"]["id"] = "elsewhere"
+    for collection in ("geometry", "entities", "zones"):
+        for item in scene[collection]:
+            item["map_id"] = "elsewhere"
     return scene
 
 
@@ -496,7 +542,8 @@ def targeted() -> list[dict]:
     state = {
         f"{package_id}.state": {"counter": 1, "items": ["a", "b", "c"], "mode": "duel", "active_actor": "orc",
                                 "entities": ["orc"], "resources": {"charge": 3}, "stress": 0,
-                                "scene": copy.deepcopy(QUERY_SCENE), "plain": {"map": 1}, "arena": arena_scene()},
+                                "scene": copy.deepcopy(QUERY_SCENE), "plain": {"map": 1}, "arena": arena_scene(),
+                                "range": range_scene(), "elsewhere": elsewhere_scene()},
         f"{package_id}.entities": {
             "orc": {"hp": 5, "max_hp": 9, "name": "Orc", "conditions": ["prone"], "id": "orc"},
             "elf": {"hp": 7, "max_hp": 7, "name": "Elf", "conditions": []},
@@ -508,6 +555,9 @@ def targeted() -> list[dict]:
             "b1": {"hp": 3, "kind": "hostile", "position": {"band": "near"}},
             "b2": {"hp": 8, "kind": "ally", "position": {"band": "FAR"}},
             "b3": {"hp": 1, "kind": "hostile", "position": {}},
+            "b4": {"hp": 2, "kind": "hostile", "position": {"band": "near"}},
+            "g6": {"hp": 5, "kind": "hostile", "position": {"x": 2, "y": 3}},
+            "g7": {"hp": 5, "kind": "hostile", "position": {"x": 8, "y": 1}},
             "bx": {"hp": 1, "position": {"band": 5}},
         },
         f"{package_id}.combat": {"round": 2, "turn_index": 0, "leader": "orc"},
@@ -517,7 +567,7 @@ def targeted() -> list[dict]:
 
     def context(parameters=None, *, choice=None, state_value=None, participants_value=None, ids=("c1", "t1", "a1")):
         return {"campaign_id": ids[0], "turn_id": ids[1], "action_id": ids[2],
-                "state": state if state_value is None else state_value, "parameters": parameters or {},
+                "state": state_reference(state if state_value is None else state_value), "parameters": parameters or {},
                 "participants": participants if participants_value is None else participants_value,
                 "choice_resolution": choice}
 
@@ -759,10 +809,17 @@ def targeted() -> list[dict]:
         "contact cover": shot(contacts=[{"kind": "geometry", "id": "wall.b", "point": [2.5, 5, 1], "cue": "cover"}]),
         "miss with contacts": shot(miss=True), "unknown snapshot": shot(snapshot={"snapshot_id": "nope"}),
         "snapshot missing": shot(snapshot="none"), "other scene": shot(scene="state.scene"),
+        "another map": shot(scene="state.elsewhere"), "scene unavailable": shot(scene="state.absent"),
+        "65 contacts": shot(contacts=[{"kind": "entity", "id": "elf", "point": [11.5, 9.6, 1], "cue": "character"}] * 65),
+        "64 contacts": shot(contacts=[{"kind": "entity", "id": "elf", "point": [11.5, 9.6, 1], "cue": "character"}] * 64),
     }
     for label, effect in shots.items():
         case(f"shot {label}", synthetic("fire", [snap, effect]), "fire", target)
     case("shot without a snapshot query", synthetic("fire", [shot()]), "fire", target)
+    range_snap = {"spatial_query": {"scene": "state.range", "operation": "snapshot"}, "store_as": "_snap"}
+    case("shot mirrored walls", synthetic("fire", [range_snap, shot(scene="state.range", source_id="s", target_id="t",
+                                                                    origin=[2, 5, 1], destination=[10, 5, 1], miss=True,
+                                                                    contacts=[])]), "fire", target)
     case("shots over the limit", synthetic("fire", [snap, {"set": {"field": "_xs", "value": list(range(257))}},
                                                     {"for_each": {"collection": "_xs", "as": "_i", "do": [shot()]}}]), "fire", target)
     # Areas (C3b): grid squares or distance bands, from the declared entity parameters.
@@ -776,16 +833,18 @@ def targeted() -> list[dict]:
         "grid sphere": {"shape": "sphere", "size": 10, "origin": "g1"},
         "grid cube": {"shape": "cube", "size": 10, "origin": "g1"},
         "grid cone": {"shape": "cone", "size": 15, "origin": "g1"},
+        "grid band name": {"shape": "sphere", "size": "FAR", "origin": "g1"},
         "grid line": {"shape": "line", "size": 20, "origin": "g1"},
         "grid band size": {"shape": "sphere", "size": "near", "origin": "g1"},
         "grid unknown shape": {"shape": "star", "size": 10, "origin": "g1"},
         "grid float size": {"shape": "Sphere", "size": 7.9, "origin": "g1"},
         "grid filter": {"shape": "sphere", "size": 30, "origin": "g1", "filter": "kind == 'hostile' and hp > 3"},
         "grid bad filter": {"shape": "sphere", "size": 30, "origin": "g1", "filter": "nope("},
+        "grid empty filter": {"shape": "sphere", "size": 30, "origin": "g1", "filter": ""},
         "grid unknown origin": {"shape": "sphere", "size": 30, "origin": "ghost"},
         "grid self without attacker": {"shape": "sphere", "size": 30},
     }.items():
-        doc, values = blast_tool(spec)
+        doc, values = blast_tool(spec, entities=("g1", "g2", "g3", "g4", "g5", "g6", "g7"))
         case(f"aoe {label}", doc, "blast", values)
     for label, spec in {
         "band burst": {"shape": "burst", "size": "near", "origin": "b1"},
@@ -794,8 +853,12 @@ def targeted() -> list[dict]:
         "band filter": {"shape": "burst", "size": 3, "origin": "b1", "filter": "kind == 'ally'"},
         "band bool size": {"shape": "burst", "size": True, "origin": "b3"},
     }.items():
-        doc, values = blast_tool(spec, entities=("b1", "b2", "b3", "g1"))
+        doc, values = blast_tool(spec, entities=("b1", "b2", "b3", "b4", "g1"))
         case(f"aoe {label}", doc, "blast", values)
+    doc, values = blast_tool({"shape": "line", "size": 1, "origin": "b1"}, entities=("b1", "b2", "b3", "b4"))
+    case("aoe band line from near", doc, "blast", values)
+    doc, values = blast_tool({"shape": "sphere", "size": 30, "origin": "g1"}, entities=("b1", "b2", "b3", "b4", "g2", "g3"))
+    case("aoe few grid positions", doc, "blast", values)
     doc, values = blast_tool({"shape": "burst", "size": 2, "origin": "bx"}, entities=("bx", "b1"))
     case("aoe band not text", doc, "blast", values)
     doc, values = blast_tool({"shape": "sphere", "size": 30},
@@ -866,6 +929,7 @@ def main() -> int:
     for item in recorded:
         replayed.append(run(item))
     OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "documents": dict(sorted(DOCUMENTS.items())),
+                                    "states": dict(sorted(STATES.items())),
                                     "cases": cases,
                                     "recorded_inputs": recorded, "recorded": replayed},
                                    ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))

@@ -368,6 +368,13 @@ def targeted() -> list[dict]:
                                                  {"set": {"field": "_cost", "value": 1}}]}}
     case("path preview without a route", {"preflight": ["router"], "preflight_path": preflight_path}, extra=unrouted,
          state_value=arena_state)
+    for label, points in (("one point", [[1, 1, 0]]), ("two points", [[1, 1, 0], [2, 1.5, 0]]),
+                          ("outside bounds", [[1, 1, 0], [99, 1, 0]])):
+        made = {"router": {**router, "effects": [
+            {"set": {"field": "_route", "value": {"found": True, "truncated": False, "points": points}}},
+            {"set": {"field": "_cost", "value": 1.5}}]}}
+        case(f"path preview {label}", {"preview": path_card, "preflight": ["router"], "preflight_path": preflight_path},
+             extra=made, state_value=arena_state)
     arena_path = {"store_as": "_walk", "spatial_query": {"scene": "state.arena", "operation": "path", "query": {
         "map_id": "keep", "start": [5, 5], "goal": [15, 10], "allow_diagonal": True, "corner_policy": "forbid_cutting",
         "include_entities": True, "moving_entity_id": "orc", "max_steps": 1000}}}
@@ -375,8 +382,8 @@ def targeted() -> list[dict]:
         "map_id": "keep", "origin": [1, 1, 1], "destination": [12, 10, 1], "include": ["entities", "geometry"],
         "max_intersections": 8}}}
     arena_exposure = {"store_as": "_seen", "spatial_query": {"scene": "state.arena", "operation": "exposure", "query": {
-        "map_id": "keep", "observer": {"point": [1, 1, 1.5]}, "target": {"entity_id": "elf"},
-        "samples": {"horizontal": 3, "vertical": 2}, "include": ["geometry"]}}}
+        "map_id": "keep", "observer": {"point": [4, 8, 1]}, "target": {"entity_id": "elf"},
+        "samples": {"horizontal": 3, "vertical": 2}, "include": ["entities", "geometry"]}}}
     arena_zones = {"store_as": "_zones", "spatial_query": {"scene": "state.arena", "operation": "crossed_zones", "query": {
         "map_id": "keep", "path": [[0, 0, 0], [15, 10, 0.2]], "max_crossings": 10}}}
     case("map preview path", {"queries": [arena_path], "map_preview": {"path": "_walk"}}, state_value=arena_state)

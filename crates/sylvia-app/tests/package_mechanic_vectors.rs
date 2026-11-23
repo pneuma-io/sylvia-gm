@@ -56,13 +56,21 @@ fn request_json(request: &MechanicsChoiceRequest) -> Json {
            "options": request.options.iter().map(|o| json!([o.option_id, o.label])).collect::<Vec<_>>()})
 }
 
-fn context(value: &Json) -> MechanicContext {
+/// A context's state, kept once in the vector file's `states` table when it is a reference.
+fn state<'v>(value: &'v Json, states: &'v Json) -> &'v Json {
+    match value.get("$state").and_then(Json::as_str) {
+        Some(digest) => &states[digest],
+        None => value,
+    }
+}
+
+fn context(value: &Json, states: &Json) -> MechanicContext {
     let resolution = &value["choice_resolution"];
     MechanicContext {
         campaign_id: value["campaign_id"].as_str().unwrap().into(),
         turn_id: value["turn_id"].as_str().unwrap().into(),
         action_id: value["action_id"].as_str().unwrap().into(),
-        state: value["state"].as_object().unwrap().clone(),
+        state: state(&value["state"], states).as_object().unwrap().clone(),
         parameters: value["parameters"].as_object().unwrap().clone(),
         participants: value["participants"].as_object().unwrap().clone(),
         choice_resolution: (!resolution.is_null()).then(|| MechanicsChoiceResolution {
@@ -96,6 +104,7 @@ fn outcome_json(outcome: &MechanicOutcome) -> Json {
 
 struct Runtimes<'v> {
     documents: &'v serde_json::Map<String, Json>,
+    states: &'v Json,
     riichi: Vec<u8>,
     root: std::path::PathBuf,
 }
@@ -130,7 +139,8 @@ fn record(case: &Json, runtimes: &Runtimes<'_>) -> Json {
             return json!({"materialize": [class, message]})
         }
     };
-    match with_identity_shuffle_for_vectors(|| mechanic.execute(&context(&case["context"]))) {
+    match with_identity_shuffle_for_vectors(|| mechanic.execute(&context(&case["context"], runtimes.states)))
+    {
         Ok(outcome) => {
             let record = outcome_json(&outcome);
             let encoded = sylvia_base::pyjson::canonical_bytes(&record);
@@ -180,6 +190,7 @@ fn package_mechanics_run_as_python() {
         serde_json::from_str(include_str!("vectors/catalog_tool_vectors.json")).expect("valid JSON");
     let runtimes = Runtimes {
         documents: vectors["documents"].as_object().unwrap(),
+        states: &vectors["states"],
         riichi: hex(catalog["riichi"]["runtime_hex"].as_str().unwrap()),
         root: Path::new(env!("CARGO_MANIFEST_DIR")).join("../.."),
     };
