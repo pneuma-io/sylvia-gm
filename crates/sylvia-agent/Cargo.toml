@@ -19,6 +19,9 @@ getrandom.workspace = true
 hex.workspace = true
 indexmap.workspace = true
 regex.workspace = true
+# Python `re` lookaround and back references in the Builder's search_files patterns
+# (docs/rust-port/sites/regex-sites.md). Added by lane 1.
+fancy-regex.workspace = true
 futures-util.workspace = true
 serde.workspace = true
 serde_json.workspace = true

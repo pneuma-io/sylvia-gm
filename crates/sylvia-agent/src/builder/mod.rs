@@ -14,6 +14,7 @@ pub mod prompt;
 pub mod question_answers;
 pub mod skills;
 pub mod title;
+pub mod tools;
 
 use std::sync::OnceLock;
 use sylvia_base::{pyjson, CodedError, Json};
