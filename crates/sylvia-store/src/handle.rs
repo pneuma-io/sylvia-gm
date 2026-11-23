@@ -21,6 +21,7 @@ pub struct StoreHandle {
     jobs: mpsc::Sender<Job>,
     lanes: OwnerLanes,
     narration: std::sync::Arc<crate::narration::NarrationState>,
+    tool_cache: std::sync::Arc<crate::tool_cache::ToolCache>,
 }
 
 /// Joins the store thread; returned once by [`StoreHandle::spawn`].
@@ -37,12 +38,15 @@ impl StoreHandle {
         F: FnOnce() -> StoreResult<AuthorityStore> + Send + 'static,
     {
         let (jobs, receiver) = mpsc::channel::<Job>();
+        let tool_cache = std::sync::Arc::<crate::tool_cache::ToolCache>::default();
+        let shared = std::sync::Arc::clone(&tool_cache);
         let (opened, opened_receiver) = mpsc::sync_channel::<StoreResult<()>>(1);
         let thread = std::thread::Builder::new()
             .name("sylvia-store".into())
             .spawn(move || {
                 let mut store = match open() {
-                    Ok(store) => {
+                    Ok(mut store) => {
+                        store.share_tool_cache(shared);
                         let _ = opened.send(Ok(()));
                         store
                     }
@@ -59,8 +63,12 @@ impl StoreHandle {
             .map_err(StoreError::from)?;
         match opened_receiver.recv() {
             Ok(Ok(())) => {
-                let handle =
-                    Self { jobs, lanes: OwnerLanes::default(), narration: std::sync::Arc::default() };
+                let handle = Self {
+                    jobs,
+                    lanes: OwnerLanes::default(),
+                    narration: std::sync::Arc::default(),
+                    tool_cache,
+                };
                 Ok((handle, StoreThread { thread: Some(thread) }))
             }
             Ok(Err(error)) => {
@@ -78,6 +86,12 @@ impl StoreHandle {
     /// what it guards), shared by every clone.
     pub fn narration(&self) -> &crate::narration::NarrationState {
         &self.narration
+    }
+
+    /// The owner's package tool caches (`AuthorityOwner._tools` and `_runtime_payloads`), the same
+    /// ones the store thread's [`AuthorityStore::tool_cache`] holds.
+    pub fn tool_cache(&self) -> &crate::tool_cache::ToolCache {
+        &self.tool_cache
     }
 
     /// The owner's lane registries: `AuthorityOwner._lanes` and `SessionApplication._lanes`.
