@@ -1,12 +1,14 @@
 //! `application/builder_references.py`, its capture half: `capture_launch_references` and
 //! `capture_content_references`, which resolve a Builder chat's content choices once and retain
-//! the Plan text and immutable package identities. The reference readers follow separately.
+//! the Plan text and immutable package identities; and its reader half: `launch_references`,
+//! `candidate_for_references`, `launch_candidate`, `with_character_examples`,
+//! `reader_for_references` and `reference_reader` with [`BuilderReferences`].
 //!
 //! The owner is [`ReferenceOwner`]: `LibraryOwner`'s reads and `install_package_archive`.
 //! `AuthorityStore` implements both, and its installs are `package_library`'s.
 
 use crate::bundled_packages::BundledPackages;
-use crate::campaign_plan_sources::validate_retained_campaign_plan;
+use crate::campaign_plan_sources::{campaign_plan_sources, validate_retained_campaign_plan};
 use crate::library_sources::LibraryOwner;
 use crate::package_library::install_package_archive;
 use std::path::Path;
@@ -15,7 +17,7 @@ use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{PackageLockEntry, PackageRole};
 use sylvia_domain::campaign_plan::ValidatedCampaignPlan;
 use sylvia_domain::error::{DomainError, DomainResult};
-use sylvia_domain::package_library::{campaign_setting_entries, PackageCandidate};
+use sylvia_domain::package_library::{campaign_setting_entries, canonical_json_bytes, PackageCandidate};
 use sylvia_domain::pyops::{py_contains, py_eq, py_get_attr, py_item, py_iter, py_str, py_truthy};
 use sylvia_domain::session::{SessionContext, SessionMessageKind};
 use sylvia_store::{AuthorityStore, StoreError};
@@ -449,4 +451,318 @@ pub fn capture_content_references<O: ReferenceOwner>(
     result.insert("packages".into(), Json::Array(packages));
     result.insert("plan".into(), plan);
     Ok(result)
+}
+
+// ── The reader half ──────────────────────────────────────────────────────────────────────────
+
+/// `launch_references(context)`: the saved reference snapshot, read without consulting the
+/// originating campaign. Python's set membership test hashes the tool name, so an unhashable
+/// one is its `TypeError`.
+pub fn launch_references(context: &SessionContext) -> DomainResult<Option<JsonMap>> {
+    let kind_is = |content: &JsonMap, kind: &str| {
+        content.get("kind").is_some_and(|value| py_eq(value, &Json::from(kind)))
+    };
+    for message in &context.messages {
+        if message.kind() == SessionMessageKind::Evidence
+            && kind_is(message.content(), "builder_launch_context")
+        {
+            return Ok(message.content().get("references").and_then(Json::as_object).cloned());
+        }
+    }
+    let tools = Json::Array(vec![Json::from("select_builder_ruleset"), Json::from("select_builder_setting")]);
+    for message in context.messages.iter().rev() {
+        let content = message.content();
+        if message.kind() != SessionMessageKind::Evidence || !kind_is(content, "builder_tool_result") {
+            continue;
+        }
+        let tool_name = content.get("tool_name").unwrap_or(&Json::Null);
+        // Saved message content is frozen, so Python names the frozen container types.
+        let frozen = match tool_name {
+            Json::Array(_) => Some("FrozenJsonList"),
+            Json::Object(_) => Some("FrozenJsonDict"),
+            _ => None,
+        };
+        if let Some(kind) = frozen {
+            return Err(DomainError::type_error(format!("unhashable type: '{kind}'")));
+        }
+        if !py_contains(tool_name, &tools)? {
+            continue;
+        }
+        if let Some(Json::Object(result)) = content.get("result") {
+            if result.get("success") == Some(&Json::Bool(true)) {
+                if let Some(Json::Object(references)) = result.get("references") {
+                    return Ok(Some(references.clone()));
+                }
+            }
+        }
+    }
+    Ok(None)
+}
+
+/// `references.get("packages", [])`, iterated as Python iterates it.
+fn reference_packages(references: &JsonMap) -> DomainResult<Vec<Json>> {
+    match references.get("packages") {
+        None => Ok(Vec::new()),
+        Some(packages) => py_iter(packages),
+    }
+}
+
+/// `candidate_for_references(owner, references)`: the captured package identities checked
+/// before a selected source is used.
+pub fn candidate_for_references<O: LibraryOwner>(
+    owner: &O,
+    references: Option<&JsonMap>,
+) -> Result<Option<PackageCandidate>, O::Error> {
+    let Some(references) = references else { return Ok(None) };
+    let candidate_id = references.get("candidate_id").unwrap_or(&Json::Null);
+    if candidate_id.is_null() {
+        return Ok(None);
+    }
+    let candidate = owner.package_candidate(&py_str(candidate_id))?;
+    let mut retained: Vec<[Json; 3]> = Vec::new();
+    for item in reference_packages(references)? {
+        let identity = [
+            py_item(&item, "id")?.clone(),
+            py_item(&item, "version")?.clone(),
+            py_item(&item, "content_sha256")?.clone(),
+        ];
+        for value in &identity {
+            sylvia_domain::pyops::py_require_hashable(value)?;
+        }
+        if !retained.iter().any(|seen| seen.iter().zip(&identity).all(|(a, b)| py_eq(a, b))) {
+            retained.push(identity);
+        }
+    }
+    let mut actual: Vec<[Json; 3]> = Vec::new();
+    for entry in candidate.package_lock().entries() {
+        let identity =
+            [Json::from(entry.package_id()), Json::from(entry.version()), Json::from(entry.sha256())];
+        if !actual.contains(&identity) {
+            actual.push(identity);
+        }
+    }
+    let same = retained.len() == actual.len()
+        && retained
+            .iter()
+            .all(|left| actual.iter().any(|right| left.iter().zip(right).all(|(a, b)| py_eq(a, b))));
+    if !same {
+        return Err(DomainError::command_rejected(
+            "Saved Builder package references do not match the retained closure",
+        )
+        .into());
+    }
+    Ok(Some(candidate))
+}
+
+/// `launch_candidate(owner, context)`: the retained closure, checked against the original launch
+/// snapshot.
+pub fn launch_candidate<O: LibraryOwner>(
+    owner: &O,
+    context: &SessionContext,
+) -> Result<Option<PackageCandidate>, O::Error> {
+    let references = launch_references(context)?;
+    candidate_for_references(owner, references.as_ref())
+}
+
+/// `with_character_examples(owner, storage_root, references, purpose=...)`: compatible built-in
+/// authored examples snapshotted, never the player's saved library.
+pub fn with_character_examples<O: LibraryOwner>(
+    owner: &O,
+    bundled: &BundledPackages,
+    storage_root: &Path,
+    references: &JsonMap,
+    purpose: &str,
+) -> Result<JsonMap, O::Error> {
+    let candidate = candidate_for_references(owner, Some(references))?;
+    let mut setting = None;
+    for item in reference_packages(references)? {
+        if py_eq(py_item(&item, "prefix")?, &Json::from("setting")) {
+            setting = Some(item);
+            break;
+        }
+    }
+    let (Some(candidate), Some(setting)) = (candidate, setting) else {
+        return Ok(references.clone());
+    };
+    let setting_id = py_str(py_item(&setting, "id")?);
+    let Some(sources) = campaign_plan_sources(owner, candidate.package_lock(), Some(&setting_id))? else {
+        return Ok(references.clone());
+    };
+    let primary = candidate
+        .package_lock()
+        .entries()
+        .iter()
+        .find(|entry| entry.role() == PackageRole::Primary)
+        .ok_or_else(|| DomainError::uncaught("StopIteration", ""))?
+        .clone();
+    let mut examples = Vec::new();
+    for declaration in sources.character_declarations()? {
+        if declaration.kind != purpose {
+            continue;
+        }
+        let starters = crate::bundled_starter_characters::bundled_starter_participants(
+            storage_root,
+            bundled,
+            &primary,
+            &declaration,
+            &sources.setting,
+            sources.setting_character_schema.as_ref(),
+        )?;
+        for starter in starters {
+            let mut draft = JsonMap::new();
+            draft.insert("schema_id".into(), Json::from(declaration.schema_id.as_str()));
+            draft.insert("summary".into(), Json::from(starter.summary.as_str()));
+            draft.insert(
+                "authored_profile".into(),
+                starter.authored_profile.clone().map_or(Json::Null, Json::from),
+            );
+            draft.insert("participant".into(), Json::Object(starter.participant.clone()));
+            let state = crate::compatible_character_copy::authored_character_state(
+                &starter.entity_state,
+                &declaration,
+            )?;
+            draft.insert("entity_state".into(), Json::Object(state));
+            draft.insert("setting_data".into(), Json::Object(starter.setting_data.clone()));
+            let draft = Json::Object(draft);
+            let mut example = JsonMap::new();
+            example.insert(
+                "path".into(),
+                Json::from(format!("character-examples/{}.json", starter.artifact_id)),
+            );
+            example.insert("name".into(), Json::from(starter.name.as_str()));
+            example.insert("summary".into(), Json::from(starter.summary.as_str()));
+            example.insert("schema_id".into(), Json::from(declaration.schema_id.as_str()));
+            example.insert("content_sha256".into(), Json::from(sha256_hex(canonical_json_bytes(&draft))));
+            example.insert("draft".into(), draft);
+            examples.push(Json::Object(example));
+        }
+    }
+    let mut result = references.clone();
+    result.insert("character_examples".into(), Json::Array(examples));
+    Ok(result)
+}
+
+/// One exact saved package file a reader serves: the package identity and its own path.
+#[derive(Debug, Clone)]
+struct ReferenceFile {
+    package_id: String,
+    version: String,
+    content_sha256: String,
+    path: String,
+}
+
+/// `BuilderReferences`: a bounded source index and reader fixed to the chat's original content
+/// choices.
+pub struct BuilderReferences<'a, O> {
+    owner: &'a O,
+    /// The portable paths, sorted.
+    pub paths: Vec<String>,
+    generated: std::collections::HashMap<String, String>,
+    files: std::collections::HashMap<String, ReferenceFile>,
+}
+
+impl<O: LibraryOwner> BuilderReferences<'_, O> {
+    /// `read(path)`: a generated file, or an exact saved package file.
+    pub fn read(&self, path: &str) -> Result<String, O::Error> {
+        if let Some(text) = self.generated.get(path) {
+            return Ok(text.clone());
+        }
+        let Some(file) = self.files.get(path) else {
+            return Err(DomainError::value("Builder reference path is unavailable").into());
+        };
+        self.owner.package_text_file(
+            &file.package_id,
+            &file.version,
+            &file.content_sha256,
+            &file.path,
+            sylvia_domain::package_archive::PACKAGE_MEMBER_BYTE_LIMIT as i64,
+        )
+    }
+}
+
+/// `json.dumps(value, indent=2, ensure_ascii=False)`.
+fn indented(value: &Json) -> String {
+    sylvia_base::pyjson::dumps(value, sylvia_base::pyjson::Dump::INDENT2.ascii(false))
+}
+
+/// `json.loads(canonical_json_bytes(value))`.
+fn thawed(value: &Json) -> Json {
+    let text = String::from_utf8(canonical_json_bytes(value)).expect("canonical JSON is UTF-8");
+    sylvia_base::pyjson::loads(&text).expect("canonical JSON reads back")
+}
+
+/// `reader_for_references(owner, references)`: a bounded reader for an already captured source
+/// snapshot.
+pub fn reader_for_references<'a, O: LibraryOwner>(
+    owner: &'a O,
+    references: Option<&JsonMap>,
+) -> Result<Option<BuilderReferences<'a, O>>, O::Error> {
+    let Some(references) = references else { return Ok(None) };
+    let mut files = std::collections::HashMap::new();
+    let mut keys: Vec<String> = Vec::new();
+    for package in reference_packages(references)? {
+        let (id, version, sha256) = (
+            py_str(py_item(&package, "id")?),
+            py_str(py_item(&package, "version")?),
+            py_str(py_item(&package, "content_sha256")?),
+        );
+        for path in owner.package_file_paths(
+            &id,
+            &version,
+            &sha256,
+            sylvia_domain::package_archive::PACKAGE_MEMBER_COUNT_LIMIT as i64,
+        )? {
+            let key = format!("{}/{path}", py_str(py_item(&package, "prefix")?));
+            let file = ReferenceFile {
+                package_id: id.clone(),
+                version: version.clone(),
+                content_sha256: sha256.clone(),
+                path,
+            };
+            if files.insert(key.clone(), file).is_none() {
+                keys.push(key);
+            }
+        }
+    }
+    let mut generated = std::collections::HashMap::new();
+    let mut generated_keys: Vec<String> = Vec::new();
+    let mut put = |generated: &mut std::collections::HashMap<String, String>, key: String, text: String| {
+        if generated.insert(key.clone(), text).is_none() {
+            generated_keys.push(key);
+        }
+    };
+    if let Some(examples) = references.get("character_examples") {
+        for example in py_iter(examples)? {
+            let text = indented(&thawed(py_item(&example, "draft")?)) + "\n";
+            put(&mut generated, py_str(py_item(&example, "path")?), text);
+        }
+    }
+    if let Some(snapshot) = references.get("character_profile").filter(|value| !value.is_null()) {
+        let profile = crate::character_profiles::profile_from_snapshot(snapshot)?;
+        put(&mut generated, "character-profile/profile.json".into(), indented(&profile.profile));
+    }
+    if let Some(Json::Object(plan)) = references.get("plan") {
+        let payload = indented(&thawed(
+            plan.get("payload").ok_or_else(|| DomainError::uncaught("KeyError", "'payload'"))?,
+        ));
+        let markdown = py_str(
+            plan.get("readable_markdown")
+                .ok_or_else(|| DomainError::uncaught("KeyError", "'readable_markdown'"))?,
+        );
+        put(&mut generated, "campaign-plan/plan.json".into(), payload);
+        put(&mut generated, "campaign-plan/plan.md".into(), markdown);
+    }
+    let mut paths: Vec<String> = keys.into_iter().chain(generated_keys).collect();
+    paths.sort();
+    Ok(Some(BuilderReferences { owner, paths, generated, files }))
+}
+
+/// `reference_reader(owner, context)`: only exact saved package files and the original Plan,
+/// through portable paths.
+pub fn reference_reader<'a, O: LibraryOwner>(
+    owner: &'a O,
+    context: &SessionContext,
+) -> Result<Option<BuilderReferences<'a, O>>, O::Error> {
+    let references = launch_references(context)?;
+    reader_for_references(owner, references.as_ref())
 }

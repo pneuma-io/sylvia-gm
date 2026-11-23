@@ -38,6 +38,7 @@ pub mod campaign_rift;
 pub mod campaign_starting_world;
 pub mod character_profiles;
 pub mod character_rules;
+pub mod compatible_character_copy;
 pub mod decision_scope;
 pub mod initial_character_state;
 pub mod interview_content;
