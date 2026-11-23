@@ -63,7 +63,11 @@ def plain(value: object, depth: int = 0) -> object:
         return {"__class__": type(value).__name__,
                 **{f.name: plain(getattr(value, f.name), depth + 1)
                    for f in dataclasses.fields(value)}}
-    if isinstance(value, Mapping):
+    if callable(getattr(value, "model_dump", None)):
+        # An SDK object (the OpenAI client's stream deltas): its fields, as the parsers read them.
+        return plain(value.model_dump(), depth + 1)
+    if isinstance(value, Mapping) or callable(getattr(value, "items", None)):
+        # Frozen JSON objects (tuples of pairs with `items`) are objects, not lists.
         return {str(k): plain(v, depth + 1) for k, v in value.items()}
     if isinstance(value, (list, tuple)):
         return [plain(item, depth + 1) for item in value]
@@ -71,8 +75,6 @@ def plain(value: object, depth: int = 0) -> object:
         return {"__set__": sorted((plain(item, depth + 1) for item in value), key=repr)}
     if value is None or isinstance(value, (str, bool, int, float)):
         return value
-    if callable(getattr(value, "items", None)):
-        return {str(k): plain(v, depth + 1) for k, v in value.items()}
     if hasattr(value, "__iter__"):
         return [plain(item, depth + 1) for item in value]
     return {"__repr__": repr(value), "__class__": type(value).__name__}
@@ -200,20 +202,45 @@ class Traced:
 
 
 class AuditedProvider:
-    """The adapter's provider: `set_audit_context` payloads are logged."""
+    """The adapter's provider: `set_audit_context` payloads, every request and every streamed
+    chunk are logged."""
 
     def __init__(self, target: object) -> None:
         object.__setattr__(self, "_target", target)
 
     def __getattr__(self, name: str) -> object:
         value = getattr(object.__getattribute__(self, "_target"), name)
-        if name != "set_audit_context":
-            return value
+        if name == "set_audit_context":
+            def recorded(context: object) -> object:
+                log({"event": "audit_context", "context": plain(context)})
+                return value(context)
+            return recorded
+        if name == "generate_stream":
+            def stream(messages, tools=None, timeout=120.0, **options):  # type: ignore[no-untyped-def]
+                log({"event": "provider_stream", "messages": plain(messages), "tools": plain(tools),
+                     "timeout": timeout, "options": plain(options)})
+                inner = value(messages, tools=tools, timeout=timeout, **options)
 
-        def recorded(context: object) -> object:
-            log({"event": "audit_context", "context": plain(context)})
-            return value(context)
-        return recorded
+                async def chunks():  # type: ignore[no-untyped-def]
+                    try:
+                        async for chunk in inner:
+                            log({"event": "provider_chunk", "chunk": plain(chunk)})
+                            yield chunk
+                    except BaseException as error:
+                        log({"event": "provider_chunk_error", "class": type(error).__name__,
+                             "message": str(error)})
+                        raise
+                return chunks()
+            return stream
+        if name == "generate":
+            async def generate(messages, tools=None, stream=False, timeout=60.0, **options):  # type: ignore[no-untyped-def]
+                log({"event": "provider_generate", "messages": plain(messages), "tools": plain(tools),
+                     "timeout": timeout, "options": plain(options)})
+                response = await value(messages, tools=tools, stream=stream, timeout=timeout, **options)
+                log({"event": "provider_response", "response": plain(response)})
+                return response
+            return generate
+        return value
 
 
 original_init = _provider_session.ProviderSessionAdapter.__init__
@@ -248,6 +275,10 @@ class Uuids:
 
 
 _provider_turn_phases.uuid = Uuids()  # type: ignore[assignment]
+_provider_session.uuid = Uuids()  # type: ignore[assignment]
+from sylvia_gm.agent import _working_context  # noqa: E402
+
+_working_context.uuid4 = Uuids.uuid4  # type: ignore[assignment]
 
 
 def tool(name: str, behavior: str = "optional", category: str = "mechanic",
@@ -289,6 +320,31 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
          "progress": {"sequence_execution_stopped": True}},
         {"name": "queue tools", "lock": True, "progress": {"sequence_execution_stopped": False}},
     ],
+    "stream_provider_round": [
+        {"name": "narration facts", "set": {"pending_narration_facts": [
+            {"tool": "roll_dice", "result": {"total": 14}}, {"note": "no tool"}]},
+         "obligations": {"provisional_tool_prose_pending": False}},
+        {"name": "narration facts with provisional prose", "set": {"pending_narration_facts": [
+            {"tool": "roll_dice"}]}, "obligations": {"provisional_tool_prose_pending": True}},
+        {"name": "application controls", "set": {"current_application_controls": [
+            {"role": "system", "content": "SYLVIA_GM_OPTIONAL_REFERENCE_RECOVERY: retry."}]}},
+        {"name": "Campaign File narration pending",
+         "obligations": {"campaign_file_narration_pending": True}},
+        {"name": "held disposition retried", "set": {"buffered_narration": "Held."},
+         "obligations": {"campaign_file_narration_pending": False,
+                         "force_campaign_file_update": True}},
+        {"name": "player boundary", "set": {"decision_boundary": boundary("player"),
+                                            "pending_narration_facts": [{"tool": "attack"}]},
+         "decisions": {"player_boundary_narration": True}},
+        {"name": "GM boundary", "set": {"decision_boundary": boundary("gm")},
+         "decisions": {"player_boundary_narration": False}},
+        {"name": "preparation", "set": {"decision_boundary": boundary(
+            "player", {"package_id": "sylvia.prep", "intent": "choose_kit"})}},
+        {"name": "corrections", "set": {
+            "private_deliberation_correction_message": {"role": "system", "content": "Fix A."},
+            "required_tool_call_correction_message": {"role": "system", "content": "Fix B."}}},
+        {"name": "cancelled", "cancelled": True},
+    ],
     "prepare_provider_round": [
         {"name": "player boundary", "tools": True, "answer": {
             "campaign_preparation_boundary": boundary("player"),
@@ -327,6 +383,8 @@ def run_variant(function, self, state, provider_input, turn_id, variant):  # typ
         setattr(state.obligations, key, value)
     for key, value in variant.get("progress", {}).items():  # type: ignore[union-attr]
         setattr(state.progress, key, value)
+    for key, value in variant.get("decisions", {}).items():  # type: ignore[union-attr]
+        setattr(state.decisions, key, value)
     if variant.get("tools"):
         state.current_catalog = (*state.current_catalog, *EXTRA_TOOLS)
     supplier = provider_input.catalog_supplier
@@ -379,7 +437,11 @@ def traced_call(function, self, state, provider_input, turn_id, variant):  # typ
     try:
         result = function(self, state, provider_input, turn_id=turn_id)
         if result is not None and hasattr(result, "__next__"):
-            result = list(result)
+            events = []
+            for event in result:
+                log({"event": "phase_event", "value": plain(event)})
+                events.append(event)
+            result = events
     except BaseException as error:
         ACTIVE["value"] = False
         log({"event": "phase_end", "raised": {"class": type(error).__name__,

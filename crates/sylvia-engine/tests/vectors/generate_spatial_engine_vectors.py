@@ -12,12 +12,19 @@ source.
 
 Each case is a scene and a query, both admitted by Python first (inadmissible random draws are
 discarded). The record is `_engine._resolve_<kind>(_engine._compile(scene), query.as_payload())`
-or the exception it raises. Placement is S3c's and not here.
+or the exception it raises. `results` admits engine results (named by their case) and corrupted
+copies with `admit_spatial_result`; `sessions` run `SpatialEngine` queries, scene replacements and
+earlier snapshots.
+
+To keep the per-platform files small, a result over 128 bytes (a payload over 256) is kept as
+`result_sha256` (`payload_sha256`): the SHA-256 of Python's compact JSON in its own key order.
+Every tenth engine case, and every case a result-admission entry names, keeps its whole result.
 """
 
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import math
@@ -25,7 +32,8 @@ import random
 import sys
 from pathlib import Path
 
-from sylvia_gm.spatial import SpatialValidationError, admit_spatial_query, admit_spatial_scene
+from sylvia_gm.spatial import (SpatialEngine, SpatialValidationError, admit_spatial_query, admit_spatial_result,
+                               admit_spatial_scene)
 from sylvia_gm.spatial import _engine
 
 HERE = Path(__file__).resolve().parent
@@ -41,6 +49,7 @@ RESOLVERS = {
     "crossed_zones": _engine._resolve_zones, "area": _engine._resolve_area,
     "body_proximity": _engine._resolve_body_proximity, "circle_overlap": _engine._resolve_circle_overlap,
     "sweep": _engine._resolve_sweep, "circle_route": _engine._resolve_circle_route,
+    "placement": _engine._resolve_placement,
 }
 
 
@@ -379,6 +388,74 @@ def corner_scene() -> dict:
     return scene
 
 
+def boxes_scene() -> dict:
+    """Box solids and box movers only, with decimal coordinates whose exact fraction differs
+    from their float's (0.1, 0.3, 2.675), for both placement arithmetics."""
+
+    def box_wall(identity, lower, upper, metadata=None, active=True, movement="blocking"):
+        item = wall(identity, lower, upper, metadata=metadata, active=active, movement=movement)
+        item["map_id"] = "depot"
+        return item
+
+    def crate(identity, position, half, height=1, metadata=None, active=True, movement="blocking"):
+        item = entity(identity, position, {"kind": "box", "half_extents": half}, height=height, metadata=metadata,
+                      active=active, movement=movement)
+        item["map_id"] = "depot"
+        return item
+
+    return {
+        "format": 1,
+        "map": {"id": "depot", "revision": 2, "bounds": {"min": [0, 0, 0], "max": [12.3, 9.7, 4]},
+                "grid": {"cell_size": 0.1, "unit": "m", "origin": [0, 0]},
+                "layers": [{"id": "floor", "min_elevation": 0, "max_elevation": 4}]},
+        "geometry": [
+            box_wall("g.shelf", [2.1, 1.1, 0], [2.675, 6.3, 2.2], metadata={"material": "steel"}),
+            box_wall("g.bin", [5.3, 0.3, 0], [6.1, 1.7, 1.1]),
+            box_wall("g.beam", [0, 7.3, 2.9], [12.3, 7.6, 3.3], metadata={"material": "wood"}),
+            box_wall("g.ghost", [8, 8, 0], [9, 9, 1], active=False),
+            box_wall("g.rug", [9.1, 2.2, 0], [11.3, 4.4, 0.01], movement="passable"),
+        ],
+        "entities": [
+            crate("m.box", [1.05, 0.55, 0], [0.45, 0.35], height=0.7),
+            crate("m.tall", [7.15, 5.45, 0], [0.3, 0.3], height=3.1),
+            crate("c.one", [3.35, 3.35, 0], [0.25, 0.25], metadata={"side": "red"}),
+            crate("c.two", [4.1, 2.2, 0.3], [0.55, 0.15], height=0.4),
+            crate("c.off", [10.1, 6.6, 0], [0.4, 0.4], active=False),
+            {**entity("c.round", [11.2, 8.8, 0], {"kind": "circle", "radius": 0.3}, movement="passable"), "map_id": "depot"},
+        ],
+        "zones": [
+            {"id": "z.bay", "map_id": "depot", "shape": {"kind": "box", "min": [0.1, 0.1, 0], "max": [5.3, 5.3, 4]}, "metadata": {"use": "store"}},
+            {"id": "z.dock", "map_id": "depot", "shape": {"kind": "box", "min": [6.2, 0.3, 0], "max": [12.3, 7.2, 3]}, "metadata": {}},
+            {"id": "z.pad", "map_id": "depot", "shape": {"kind": "cylinder", "center": [10, 8.5, 0], "radius": 1, "height": 1},
+             "metadata": {"use": "store"}},
+        ],
+        "terrain": [],
+    }
+
+
+def placement_query(rng, scene: dict) -> dict:
+    """A placement query on the depot: the box movers, both arithmetics, zones and filters."""
+    bounds = scene["map"]["bounds"]
+    moving = rng.choice(["m.box", "m.tall", "c.two", "c.round"] if rng.random() < 0.1 else ["m.box", "m.tall", "c.two"])
+    origin = [round(rng.uniform(bounds["min"][i], bounds["max"][i]), rng.choice([1, 2, 3])) for i in range(3)]
+    if rng.random() < 0.3:
+        origin[2] = 0
+    query = {"kind": "placement", "map_id": "depot", "moving_entity_id": moving, "origin": origin,
+             "exclude_entity_ids": rng.sample([value for value in ("c.one", "c.two", "m.tall") if value != moving], rng.randint(0, 1)),
+             "metadata_filter": rng.choice([{"key": "", "value": "", "missing_matches": False},
+                                            {"key": "material", "value": "steel", "missing_matches": True},
+                                            {"key": "side", "value": "red", "missing_matches": False}]),
+             "max_candidates": rng.choice([1, 3, 20, 500, 100000])}
+    if rng.random() < 0.35:
+        query["containing_zone_id"] = rng.choice(["z.bay", "z.dock", "z.pad"])
+    if rng.random() < 0.5:
+        target = rng.choice([("geometry", "g.shelf"), ("geometry", "g.bin"), ("geometry", "g.beam"), ("entity", "c.one"),
+                             ("entity", "c.two"), ("entity", "c.round"), ("geometry", "g.rug")])
+        query["reference_face"] = {"target": {"kind": target[0], "id": target[1]},
+                                   "face": rng.choice(["east", "west", "north", "south", "up", "down"])}
+    return query
+
+
 NO_FILTER = {"key": "", "value": "", "missing_matches": False}
 QUERY_FIXTURE = fixtures.QUERY_SCENE
 ROW = row_scene()
@@ -409,10 +486,171 @@ def exhausted_paths(rng, scenes, cases):
         added += 1
 
 
+def compact(value: object) -> bytes:
+    """The text a large record is hashed by: Python's compact JSON in its own key order."""
+    return json.dumps(value, ensure_ascii=True, separators=(",", ":"), allow_nan=False).encode("ascii")
+
+
+def digest(value: object) -> str:
+    return hashlib.sha256(compact(value)).hexdigest()
+
+
+# Larger records are kept as the SHA-256 of their compact JSON, so the per-platform files stay
+# small: inputs stay whole, and the Rust test hashes its own output the same way.
+RESULT_INLINE = 128
+# Every tenth engine case keeps its whole result, so a difference can be read, not only seen.
+SAMPLE_EVERY = 10
+PAYLOAD_INLINE = 256
+CORRUPT_LIMIT = 2048
+
+
+def kept(record: dict, key: str, limit: int) -> dict:
+    if key in record and len(compact(record[key])) > limit:
+        record = dict(record)
+        record[f"{key}_sha256"] = digest(record.pop(key))
+    return record
+
+
+def admit_result(scene_value: dict, payload: object) -> dict:
+    scene = admit_spatial_scene(scene_value)
+    try:
+        admitted = admit_spatial_result(scene, payload)
+    except SpatialValidationError as error:
+        return {"error": ["SpatialValidationError", str(error), error.code, error.path]}
+    except Exception as error:  # noqa: BLE001 - every exception Python lets through
+        return {"error": [type(error).__name__, str(error)]}
+    return {"payload": admitted.as_payload(), "kind": admitted.kind, "snapshot_id": admitted.snapshot_id}
+
+
+RESULT_POOL = [None, True, False, 0, 1, -1, 0.5, 2, 1.5, 1e6, 1000001, "", "x", "orc", "wall.b", "geometry", "entity", "zone",
+               [], [0, 0], [0, 0, 0], [1, 2, 3], [[0, 0]], {}, {"kind": "geometry"}]
+
+
+def corrupt(rng: random.Random, payload: dict) -> dict:
+    payload = copy.deepcopy(payload)
+    for _ in range(rng.randint(1, 2)):
+        path = fixtures.random_path(rng, payload, [])
+        if not path:
+            continue
+        target = payload
+        for step in path[:-1]:
+            target = target[step]
+        action = rng.random()
+        if action < 0.15 and isinstance(target, dict):
+            del target[path[-1]]
+        elif action < 0.25 and isinstance(target, list):
+            target.append(copy.deepcopy(target[path[-1]]))
+        elif action < 0.3 and isinstance(target, dict):
+            target["extra"] = 1
+        elif action < 0.4 and isinstance(target, list) and len(target) > 1:
+            target.reverse()
+        else:
+            target[path[-1]] = copy.deepcopy(rng.choice(RESULT_POOL))
+    return payload
+
+
+def targeted_results(cases: list[dict], scenes: list[dict]) -> list[tuple[int, dict]]:
+    """Edits of one valid result per kind that each reach one consistency or order rule of
+    `admit_spatial_result`: bounds, reversed lists, and states that contradict each other."""
+    first: dict[str, dict] = {}
+    for case in cases:
+        if "result" in case and len(compact(case["result"])) <= CORRUPT_LIMIT:
+            kind = case["query"]["kind"]
+            found = case["result"].get("found")
+            key = f"{kind} {found}" if kind in ("circle_route", "path", "placement") else kind
+            first.setdefault(key, case)
+    edits: list[tuple[int, dict]] = []
+
+    def edit(key: str, **changes) -> None:
+        case = first.get(key)
+        if case is None:
+            return
+        edited = copy.deepcopy(case["result"])
+        for name, value in changes.items():
+            edited[name] = value(edited) if callable(value) else value
+        edits.append((case["scene"], edited))
+
+    def geometry_references(scene_index: int, count: int, metadata: bool = False) -> list[dict]:
+        rows = sorted(scenes[scene_index]["geometry"], key=lambda item: item["id"])[:count]
+        return [{"kind": "geometry", "id": row["id"], **({"metadata": row["metadata"]} if metadata else {})}
+                for row in reversed(rows)]
+
+    if "exposure" in first:
+        scene_index = first["exposure"]["scene"]
+        edit("exposure", exposure=1.5)
+        edit("exposure", exposure=1.0)
+        edit("exposure", occluders=geometry_references(scene_index, 2, metadata=True))
+    edit("circle_route True", points=lambda r: r["points"] + [r["points"][-1]] * (258 - len(r["points"])))
+    edit("circle_route True", points=lambda r: r["points"] + [r["points"][-1]] * (259 - len(r["points"])))
+    edit("circle_route True", truncated=True)
+    edit("circle_overlap", hit=False, entry=None, exit=None, starts_inside=True, ends_inside=False)
+    edit("circle_overlap", hit=False, entry=None, exit=None, starts_inside=False, ends_inside=True)
+    if "sweep" in first:
+        scene_index = first["sweep"]["scene"]
+        edit("sweep", supported=True, clear=False, reason="blocked", blockers=[])
+        edit("sweep", supported=True, clear=False, reason="blocked", blockers=geometry_references(scene_index, 2))
+    edit("placement False", supported=False, reason="no_placement")
+    edit("placement False", supported=True, reason="candidate_limit")
+    edit("placement False", supported=False, reason="unsupported_geometry")
+    edit("path True", cells=[])
+    edit("path False", found=True, cost=1.0)
+    return edits
+
+
+def session_cases(rng: random.Random, scenes: list[dict]) -> list[dict]:
+    """Engine sessions: queries, scene replacements (advancing, stale, another map), queries on an
+    earlier snapshot, and repeated queries answered from the cache."""
+    sessions = []
+    for index in (0, 1, 8):
+        base = scenes[index]
+        engine = SpatialEngine(base)
+        snapshots = [engine.snapshot]
+        steps = []
+        for _ in range(60):
+            action = rng.random()
+            if action < 0.15:
+                replacement = copy.deepcopy(base)
+                choice = rng.random()
+                if choice < 0.6:
+                    replacement["map"]["revision"] = engine.snapshot.geometry_revision + rng.choice([1, 2, 5])
+                    if replacement["entities"]:
+                        replacement["entities"][0]["position"][0] = round(replacement["entities"][0]["position"][0] + rng.choice([-0.5, 0.5]), 3)
+                elif choice < 0.8:
+                    replacement["map"]["revision"] = engine.snapshot.geometry_revision
+                else:
+                    replacement["map"]["revision"] = engine.snapshot.geometry_revision + 1
+                    replacement["map"]["id"] = "elsewhere"
+                    for collection in ("geometry", "entities", "zones"):
+                        for item in replacement[collection]:
+                            item["map_id"] = "elsewhere"
+                try:
+                    admitted = engine.replace_scene(replacement)
+                    snapshots.append(admitted)
+                    steps.append({"replace": replacement, "snapshot_id": admitted.snapshot_id})
+                except SpatialValidationError as error:
+                    steps.append({"replace": replacement, "error": ["SpatialValidationError", str(error), error.code, error.path]})
+                continue
+            query = placement_query(rng, base) if index == 8 else random_query(rng, base)
+            if steps and rng.random() < 0.2:
+                previous = [step for step in steps if "query" in step]
+                if previous:
+                    query = previous[-1]["query"]
+            snapshot_index = rng.randrange(len(snapshots)) if rng.random() < 0.3 else None
+            try:
+                result = engine.query(query, snapshot=None if snapshot_index is None else snapshots[snapshot_index])
+                record = kept({"payload": result.as_payload()}, "payload", PAYLOAD_INLINE)
+            except SpatialValidationError as error:
+                record = {"error": ["SpatialValidationError", str(error), error.code, error.path]}
+            steps.append({"query": query, "snapshot": snapshot_index, **record})
+        sessions.append({"scene": index, "steps": steps})
+    return sessions
+
+
 def main() -> int:
     global SNAPS
     rng = random.Random(4807)
-    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2)), ROW, TIE, CAGE, CORNER]
+    scenes = [fixtures.QUERY_SCENE, HALL, pillars(10, random.Random(1)), pillars(18, random.Random(2)), ROW, TIE, CAGE, CORNER,
+              boxes_scene()]
     snaps = [boundary_values(scene) for scene in scenes]
     cases = []
     for query in fixtures.query_targeted():
@@ -424,7 +662,14 @@ def main() -> int:
         if record is not None:
             cases.append({"scene": index, "query": query, **record})
     exhausted_paths(rng, scenes[:4], cases)
-    while len(cases) < 9000:
+    depot = len(scenes) - 1
+    place_rng = random.Random(4808)
+    while sum(case["query"]["kind"] == "placement" for case in cases) < 1500:
+        query = placement_query(place_rng, scenes[depot])
+        record = run(scenes[depot], query)
+        if record is not None:
+            cases.append({"scene": depot, "query": query, **record})
+    while len(cases) < 10500:
         index = rng.randrange(len(scenes))
         SNAPS = snaps[index] if rng.random() < 0.6 else None
         query = random_query(rng, scenes[index])
@@ -432,12 +677,36 @@ def main() -> int:
         if record is not None:
             cases.append({"scene": index, "query": query, **record})
     SNAPS = None
-    OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "platform": PLATFORM, "scenes": scenes, "cases": cases},
-                                   ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
+    result_rng = random.Random(4809)
+    results = []
+    whole = set()
+    for number, case in enumerate(cases):
+        if "result" not in case:
+            continue
+        if result_rng.random() < 0.1:
+            # An engine result admitted as it is: the input is that case's result, kept whole.
+            whole.add(number)
+            record = admit_result(scenes[case["scene"]], case["result"])
+            results.append({"scene": case["scene"], "case": number, **kept(record, "payload", PAYLOAD_INLINE)})
+        if result_rng.random() < 0.2 and len(compact(case["result"])) <= CORRUPT_LIMIT:
+            broken = corrupt(result_rng, case["result"])
+            record = admit_result(scenes[case["scene"]], broken)
+            results.append({"scene": case["scene"], "input": broken, **kept(record, "payload", PAYLOAD_INLINE)})
+    for scene_index, edited in targeted_results(cases, scenes):
+        record = admit_result(scenes[scene_index], edited)
+        results.append({"scene": scene_index, "input": edited, **kept(record, "payload", PAYLOAD_INLINE)})
+    cases = [case if number in whole or number % SAMPLE_EVERY == 0 else kept(case, "result", RESULT_INLINE)
+             for number, case in enumerate(cases)]
+    sessions = session_cases(random.Random(4810), scenes)
+    OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "platform": PLATFORM, "scenes": scenes, "cases": cases,
+                                    "results": results, "sessions": sessions},
+                                   ensure_ascii=True, allow_nan=False, separators=(",", ":")) + "\n").encode("ascii"))
     kinds = {}
     for case in cases:
         kinds[case["query"]["kind"]] = kinds.get(case["query"]["kind"], 0) + 1
     print(f"{len(cases)} engine cases ({PLATFORM}): {kinds}")
+    admitted = sum("payload" in item for item in results)
+    print(f"{len(results)} result cases ({admitted} admitted), {sum(len(x['steps']) for x in sessions)} session steps")
     return 0
 
 

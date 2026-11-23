@@ -43,6 +43,15 @@ pub struct ProviderSessionAdapter {
     pub(crate) rank: Option<Arc<RankFn>>,
     /// `uuid.uuid4().hex`, for the turn's inference and discovery identities.
     pub(crate) ids: Arc<dyn Fn() -> String + Send + Sync>,
+    /// `self._timeout`: each provider request's timeout, in seconds.
+    pub(crate) timeout: f64,
+    /// `self._working_contexts`: the latest working context of each session, whose
+    /// continuation notes the next round starts from.
+    pub(crate) working:
+        std::sync::Mutex<HashMap<String, Arc<crate::working_context::WorkingContextProvider>>>,
+    /// `self._legacy_alias_changes`: each immutable lock's retired or remapped aliases.
+    pub(crate) legacy_alias_changes:
+        std::sync::Mutex<HashMap<String, indexmap::IndexMap<String, Option<String>>>>,
 }
 
 /// The ranker a turn's adapter keeps ([`RankReferences`], owned).
@@ -115,6 +124,9 @@ impl ProviderSessionAdapter {
             turn: None,
             rank: None,
             ids: Arc::new(crate::working_context::uuid4_hex),
+            timeout,
+            working: std::sync::Mutex::default(),
+            legacy_alias_changes: std::sync::Mutex::default(),
         })
     }
 

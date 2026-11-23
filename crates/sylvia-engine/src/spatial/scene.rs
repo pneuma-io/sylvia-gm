@@ -9,8 +9,8 @@ use sylvia_domain::package_library::canonical_json_bytes;
 pub(super) const MAX_ABSOLUTE_COORDINATE: f64 = 1_000_000.0;
 const MAX_AXIS_CELLS: i64 = 2_048;
 pub(super) const MAX_TOTAL_CELLS: i64 = 4_000_000;
-const MAX_GEOMETRY: usize = 20_000;
-const MAX_ENTITIES: usize = 5_000;
+pub(super) const MAX_GEOMETRY: usize = 20_000;
+pub(super) const MAX_ENTITIES: usize = 5_000;
 const MAX_ZONES: usize = 5_000;
 const MAX_TERRAIN: usize = 100_000;
 const MAX_JSON_DEPTH: usize = 24;
@@ -295,7 +295,7 @@ fn visibility(value: &Json, code: &'static str, path: &str) -> Admit<String> {
 /// `_metadata(value, ...)`. Python raises the byte-limit refusal inside a `try` that catches
 /// `ValueError`, which `SpatialValidationError` is, so an oversized object is reported as
 /// invalid metadata with the caller's code.
-fn metadata(value: &Json, code: &'static str, path: &str) -> Admit<Json> {
+pub(super) fn metadata(value: &Json, code: &'static str, path: &str) -> Admit<Json> {
     if !value.is_object() {
         return reject("Spatial metadata must be an object", code, path);
     }

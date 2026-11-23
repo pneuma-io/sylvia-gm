@@ -273,7 +273,7 @@ pub struct CheckpointWrite {
 #[derive(Debug)]
 pub struct CheckpointBridge {
     sender: mpsc::UnboundedSender<CheckpointWrite>,
-    pending: Mutex<mpsc::UnboundedReceiver<CheckpointWrite>>,
+    pending: tokio::sync::Mutex<mpsc::UnboundedReceiver<CheckpointWrite>>,
 }
 
 impl Default for CheckpointBridge {
@@ -286,7 +286,7 @@ impl CheckpointBridge {
     /// `CheckpointBridge()`.
     pub fn new() -> Self {
         let (sender, pending) = mpsc::unbounded_channel();
-        Self { sender, pending: Mutex::new(pending) }
+        Self { sender, pending: tokio::sync::Mutex::new(pending) }
     }
 
     /// `save(payload)`: queue the write and wait until the owner accepted it.
@@ -300,14 +300,20 @@ impl CheckpointBridge {
 
     /// The next queued write, if any (`pending.get_nowait()`).
     pub fn take(&self) -> Option<CheckpointWrite> {
-        self.pending.lock().unwrap_or_else(std::sync::PoisonError::into_inner).try_recv().ok()
+        self.pending.try_lock().ok()?.try_recv().ok()
+    }
+
+    /// Wait for the next write.
+    pub async fn next(&self) -> Option<CheckpointWrite> {
+        self.pending.lock().await.recv().await
     }
 }
 
 /// `save(payload)`: the owner's atomic checkpoint append.
 pub type SaveCheckpoint = Arc<dyn Fn(JsonMap) -> BoxFuture<'static, ProviderResult<()>> + Send + Sync>;
 /// `prepare_continuation(messages, tools_offered)`: the provider message list for a request.
-pub type PrepareContinuation = Arc<dyn Fn(Vec<JsonMap>, bool) -> ProviderResult<Vec<JsonMap>> + Send + Sync>;
+pub type PrepareContinuation =
+    Arc<dyn Fn(Vec<JsonMap>, bool) -> BoxFuture<'static, ProviderResult<Vec<JsonMap>>> + Send + Sync>;
 
 /// `cancelled()`: whether the turn's control was cancelled.
 pub type Cancelled = Arc<dyn Fn() -> bool + Send + Sync>;
@@ -1078,7 +1084,7 @@ impl WorkingContextProvider {
         }
         let offered = request_tools.is_some_and(|tools| !tools.is_empty());
         match &self.prepare_continuation {
-            Some(prepare) => prepare(projected.to_vec(), offered),
+            Some(prepare) => prepare(projected.to_vec(), offered).await,
             None => Ok(projected.to_vec()),
         }
     }

@@ -112,10 +112,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/desktop_update/replacement.py:152` | `_inventory` | .casefold() | `names.add(name.casefold())` | `preparation_vectors` |
 | `application/desktop_update/replacement.py:273` | `PortableReplacement._restore_receipt` | .casefold() | `if len({entry.path.casefold() for entry in files}) != len(files):` | |
 | `application/desktop_update/transport.py:238` | `content_length` | .isdigit() | `or not length.isdigit()` | `update_vectors` |
-| `interfaces/owner_process.py:313` | `_package_version_priority` | .casefold() | `return (0, 0, 0, 0, 0, (), version.casefold())` | |
-| `interfaces/owner_process.py:316` | `_package_version_priority` | .casefold() | `(0, f"{int(part):020d}") if part.isdigit() else (1, part.casefold())` | |
-| `interfaces/owner_process.py:316` | `_package_version_priority` | .isdigit() | `(0, f"{int(part):020d}") if part.isdigit() else (1, part.casefold())` | |
-| `interfaces/owner_process.py:326` | `_package_version_priority` | .casefold() | `version.casefold(),` | |
+| `interfaces/owner_process.py:313` | `_package_version_priority` | .casefold() | `return (0, 0, 0, 0, 0, (), version.casefold())` | `sylvia-owner` creation_catalog_vectors |
+| `interfaces/owner_process.py:316` | `_package_version_priority` | .casefold() | `(0, f"{int(part):020d}") if part.isdigit() else (1, part.casefold())` | `sylvia-owner` creation_catalog_vectors |
+| `interfaces/owner_process.py:316` | `_package_version_priority` | .isdigit() | `(0, f"{int(part):020d}") if part.isdigit() else (1, part.casefold())` | `sylvia-owner` creation_catalog_vectors |
+| `interfaces/owner_process.py:326` | `_package_version_priority` | .casefold() | `version.casefold(),` | `sylvia-owner` creation_catalog_vectors |
 | `interfaces/owner_process.py:1176` | `_selection_from_reference` | .casefold() | `folded = reference.casefold()` | |
 | `interfaces/owner_process.py:1188` | `_selection_from_reference` | .casefold() | `candidates = {model_id.casefold(), upstream_id.casefold()}` | |
 | `interfaces/owner_process.py:1190` | `_selection_from_reference` | .casefold() | `candidates.add(model_name.casefold())` | |

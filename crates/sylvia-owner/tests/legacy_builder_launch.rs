@@ -1,10 +1,11 @@
 //! Launch on profiles with and without former campaign-creation content chats
 //! (`vectors/generate_legacy_builder_profiles.py`, built with Python's own test set-up).
 //!
-//! Until the migration is ported, the owner refuses a profile that has them, rather than serving
-//! those chats unmigrated, and starts every other profile as before. The read that finds them
-//! must find exactly what Python's `legacy_builder_contexts()` finds, and must not create session
-//! tables in a fresh database.
+//! The owner migrates a profile that has them at launch (lane 1's `migrate_legacy_builder_chats`
+//! against the campaign creation catalog), and starts every other profile as before. The read
+//! that finds them must find exactly what Python's `legacy_builder_contexts()` finds, and must
+//! not create session tables in a fresh database. The migration's own results are proven in
+//! `creation_catalog_vectors`.
 
 use flate2::read::GzDecoder;
 use serde_json::{json, Value as Json};
@@ -17,9 +18,13 @@ fn vectors() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/legacy_builder")
 }
 
+/// A fresh work folder; an old one that cannot be removed fails here, with its path.
 fn folder(name: &str) -> PathBuf {
     let root = std::env::temp_dir().join(format!("sylvia-legacy-builder-{name}-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&root);
+    if root.exists() {
+        std::fs::remove_dir_all(&root)
+            .unwrap_or_else(|error| panic!("cannot clear {}: {error}", root.display()));
+    }
     std::fs::create_dir_all(&root).unwrap();
     root
 }
@@ -68,7 +73,7 @@ fn launch(database: &Path) -> (String, String, bool) {
 }
 
 #[test]
-fn the_read_finds_what_python_finds_and_launch_refuses_only_those_profiles() {
+fn the_read_finds_what_python_finds_and_launch_migrates_those_profiles() {
     let record: Json =
         serde_json::from_str(&std::fs::read_to_string(vectors().join("profiles.json")).unwrap()).unwrap();
     for (name, expected) in record["profiles"].as_object().unwrap() {
@@ -80,18 +85,12 @@ fn the_read_finds_what_python_finds_and_launch_refuses_only_those_profiles() {
         assert_eq!(legacy_ids(&database), python, "{name}: the chats Python's read finds");
 
         let (first, stderr, _) = launch(&database);
-        if python.is_empty() {
-            assert!(first.contains(r#""type":"ready""#), "{name}: starts as before: {first} {stderr}");
-        } else {
-            assert!(first.is_empty(), "{name}: a refused launch writes nothing: {first}");
-            assert!(
-                stderr.contains("not yet ported: the legacy Builder chat migration at launch"),
-                "{name}: says why: {stderr}"
-            );
-            // Refused, not half-migrated: the chats are still there to migrate later.
-            assert_eq!(legacy_ids(&database), python, "{name}: the chats are kept");
-            let (again, _, _) = launch(&database);
-            assert!(again.is_empty(), "{name}: refused again");
+        assert!(first.contains(r#""type":"ready""#), "{name}: starts: {first} {stderr}");
+        // A migrated profile holds no former content chats, and starts again as any other.
+        assert_eq!(legacy_ids(&database), Vec::<String>::new(), "{name}: the chats are migrated");
+        if !python.is_empty() {
+            let (again, stderr, _) = launch(&database);
+            assert!(again.contains(r#""type":"ready""#), "{name}: starts again: {again} {stderr}");
         }
         let _ = std::fs::remove_dir_all(&root);
     }
