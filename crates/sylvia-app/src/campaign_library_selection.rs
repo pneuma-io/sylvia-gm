@@ -6,7 +6,7 @@
 //! `read_required_plan_characters`, `require_completed_plan_characters`,
 //! `resolve_campaign_plan_selection` (with `_plan_party_template`),
 //! `resolve_campaign_library_selection` and `plan_with_interview_intent`. The party
-//! materialization (`materialize_library_party`, `materialize_template_party`) follows separately.
+//! materialization: `materialize_library_party` and `materialize_template_party`.
 //!
 //! The owner is [`SelectionOwner`]: the reference owner plus `exact_participant_declarations` and
 //! `export_package_candidate`. `AuthorityStore` implements it; its export answers
@@ -23,7 +23,13 @@ use crate::bundled_starter_characters::available_reusable_participants;
 use crate::campaign_plan_sources::{
     campaign_plan_sources, validate_retained_campaign_plan, CampaignPlanToolAuthority,
 };
-use crate::campaign_rift::{rift_public_template, validate_rift_template, RIFT_TEMPLATE_ID};
+use crate::campaign_rift::{
+    materialize_rift_selection, rift_public_template, validate_rift_party_handoff, validate_rift_template,
+    RiftChoices, RiftPartyPolicy, RIFT_RULESET_ID, RIFT_TEMPLATE_ID,
+};
+use crate::campaign_starting_world::materialize_starting_world;
+use crate::character_rules::campaign_character_state;
+use crate::initial_character_state::{initialize_campaign_character_state, verify_placed_character};
 use crate::interview_content::require_active_ruleset;
 use crate::plan_snapshot::{retained_plan_snapshot, PlanSnapshotOwner};
 use crate::reusable_participants::parse_setting_character;
@@ -32,14 +38,14 @@ use serde_json::json;
 use std::path::Path;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::pystr;
-use sylvia_domain::authority::{PackageLockEntry, PackageRole};
+use sylvia_domain::authority::{PackageLockEntry, PackageRole, Participant, ParticipantFields, StateValue};
 use sylvia_domain::campaign_plan::{
     parse_starting_party_policy, CampaignPlanCharacterReference, StartingPartyPolicy, ValidatedCampaignPlan,
 };
 use sylvia_domain::package_library::{
     canonical_json_bytes, PackageCandidate, ParticipantArtifactDeclaration,
 };
-use sylvia_domain::pyops::{py_eq, py_str};
+use sylvia_domain::pyops::{py_eq, py_item, py_str};
 use sylvia_store::{AuthorityStore, StoreError};
 
 use crate::library_sources::LibraryOwner;
@@ -713,4 +719,302 @@ fn append_instructions(payload: &mut Json, text: &str) {
     let instructions = &mut payload["gm_guidance"]["instructions"];
     let current = instructions.as_str().expect("validated instructions are text").to_owned();
     *instructions = Json::from(current + text);
+}
+
+// ── The party ────────────────────────────────────────────────────────────────────────────────
+
+/// `materialize_template_party`'s result: the participants, the initial state, the selected
+/// party record and the Plan with the player's instructions.
+pub type TemplateParty = (Vec<Participant>, Vec<StateValue>, Vec<Json>, ValidatedCampaignPlan);
+
+/// `materialize_template_party(owner, selection, operation_id=..., player_character_id=...,
+/// companion_ids=..., intent=...)`: a party chosen from the Plan's party template plus compatible
+/// saved files.
+pub fn materialize_template_party<O: SelectionOwner>(
+    owner: &O,
+    bundled: &BundledPackages,
+    selection: &CampaignLibrarySelection<'_, O>,
+    operation_id: &str,
+    player_character_id: &str,
+    companion_ids: &[String],
+    intent: &JsonMap,
+) -> Result<TemplateParty, O::Error> {
+    let Some(template) = &selection.party_template else {
+        return Err(rejected("The selected Plan has no party template").into());
+    };
+    let primary = selection
+        .candidate
+        .package_lock()
+        .entries()
+        .iter()
+        .find(|entry| entry.role() == PackageRole::Primary && entry.package_id() == RIFT_RULESET_ID);
+    let declaration = match primary {
+        Some(primary) => owner
+            .exact_participant_declarations(primary.package_id(), primary.version(), primary.sha256())?
+            .into_iter()
+            .find(|item| item.kind == "player_character"),
+        None => None,
+    };
+    let (Some(primary), Some(declaration)) = (primary, declaration) else {
+        return Err(rejected("The party template's D&D campaign package is unavailable").into());
+    };
+    let namespace = sha256_hex(operation_id.as_bytes())[..24].to_owned();
+    let reusable: Vec<ReusableParticipant> = selection
+        .participants
+        .iter()
+        .filter(|item| item.schema_id == declaration.schema_id)
+        .cloned()
+        .collect();
+    let template = canonical(template);
+    let starting_party = selection.plan.plan.payload["starting_party"].clone();
+    let mut template_party = materialize_rift_selection(
+        bundled,
+        &RiftChoices {
+            participant_namespace: &namespace,
+            lane: "quick_start",
+            archetype_id: player_character_id,
+            companion_ids,
+            customization_notes: "",
+            package: primary,
+            participant_declaration: &declaration,
+            starting_party_policy: RiftPartyPolicy::Payload(&starting_party),
+            reusable_participants: &reusable,
+            template: Some(&template),
+            selected_plan: Some(&selection.plan.plan),
+            setting_character_schema: selection.sources.setting_character_schema.as_ref(),
+        },
+    )?;
+    let plan = plan_with_interview_intent(selection, intent, Some(&template_party.campaign_plan_markdown))?;
+    template_party.campaign_plan = plan.payload.clone();
+    template_party.campaign_plan_markdown = plan.readable_markdown.clone();
+    let Some(starting_party) = plan.payload.get("starting_party").filter(|value| value.is_object()) else {
+        return Err(rejected("The validated Campaign Plan starting party is unavailable").into());
+    };
+    validate_rift_party_handoff(&template_party, starting_party)?;
+    let Some(Json::Array(selected_party)) = template_party.canonical_input.get("selected_party").cloned()
+    else {
+        return Err(rejected("The materialized party record is invalid").into());
+    };
+    Ok((template_party.participants, template_party.initial_state, selected_party, plan))
+}
+
+/// `mapping[item.artifact_id] = item`, keeping the first insertion's position.
+fn put<'a>(artifacts: &mut Vec<(String, &'a ReusableParticipant)>, item: &'a ReusableParticipant) {
+    match artifacts.iter_mut().find(|(id, _)| *id == item.artifact_id) {
+        Some(slot) => slot.1 = item,
+        None => artifacts.push((item.artifact_id.clone(), item)),
+    }
+}
+
+/// `materialize_library_party`'s result: the participants, the initial state and the selected
+/// party record.
+pub type LibraryParty = (Vec<Participant>, Vec<StateValue>, Vec<Json>);
+
+/// `materialize_library_party(owner, selection, operation_id=..., player_character_id=...,
+/// companion_ids=...)`: selected characters copied into the Plan's authored world without
+/// replacing its NPCs.
+pub fn materialize_library_party<O: SelectionOwner>(
+    owner: &O,
+    selection: &CampaignLibrarySelection<'_, O>,
+    operation_id: &str,
+    player_character_id: &str,
+    companion_ids: &[String],
+) -> Result<LibraryParty, O::Error> {
+    let plan_payload = Json::Object(selection.plan.plan.payload.clone());
+    let policy = parse_starting_party_policy(&plan_payload["starting_party"])?;
+    // `{item.artifact_id: item for item in ...}`: a later file replaces an earlier one.
+    let mut artifacts: Vec<(String, &ReusableParticipant)> = Vec::new();
+    let mut required: Vec<(String, &ReusableParticipant)> = Vec::new();
+    for item in &selection.required_participants {
+        put(&mut required, item);
+    }
+    if required_character_references(&policy)
+        .iter()
+        .any(|(_, reference)| !required.iter().any(|(id, _)| *id == reference.character_id))
+    {
+        return Err(rejected("A required Setting character has no playable artifact available").into());
+    }
+    if let Some(fixed) = &policy.fixed_player_character {
+        if player_character_id != fixed.character_id {
+            return Err(rejected("This Plan requires its fixed Player Character").into());
+        }
+    }
+    let required_companions: Vec<&str> =
+        policy.required_companions.iter().map(|reference| reference.character_id.as_str()).collect();
+    let mut selected: Vec<&str> = Vec::new();
+    for id in companion_ids {
+        if !selected.contains(&id.as_str()) {
+            selected.push(id);
+        }
+    }
+    let custom = selected.iter().filter(|id| !required_companions.contains(id)).count() as i64;
+    if selected.len() != companion_ids.len()
+        || !required_companions.iter().all(|id| selected.contains(id))
+        || !(policy.custom_companion_minimum <= custom && custom <= policy.custom_companion_maximum)
+    {
+        return Err(rejected("The selected Companions do not meet this Plan's starting party policy").into());
+    }
+    for item in &selection.participants {
+        put(&mut artifacts, item);
+    }
+    for (_, item) in &required {
+        put(&mut artifacts, item);
+    }
+    let ruleset = &selection.sources.ruleset;
+    let mut declarations: Vec<(String, ParticipantArtifactDeclaration)> = Vec::new();
+    for item in owner.exact_participant_declarations(
+        &ruleset.package_id,
+        &ruleset.version,
+        &ruleset.content_sha256,
+    )? {
+        match declarations.iter_mut().find(|(schema, _)| *schema == item.schema_id) {
+            Some(slot) => slot.1 = item,
+            None => declarations.push((item.schema_id.clone(), item)),
+        }
+    }
+    let declaration_for = |schema_id: &str| -> DomainResult<&ParticipantArtifactDeclaration> {
+        declarations
+            .iter()
+            .find(|(schema, _)| schema == schema_id)
+            .map(|(_, declaration)| declaration)
+            .ok_or_else(|| DomainError::uncaught("KeyError", pystr::repr(schema_id)))
+    };
+    let artifact_for =
+        |id: &str| artifacts.iter().find(|(artifact, _)| artifact == id).map(|(_, item)| *item);
+    let mut participants: Vec<Participant> = Vec::new();
+    let mut entities = JsonMap::new();
+    let mut selected_party: Vec<Json> = Vec::new();
+    let choices = std::iter::once((player_character_id, "player_character"))
+        .chain(companion_ids.iter().map(|id| (id.as_str(), "companion")));
+    for (artifact_id, role) in choices {
+        let item = artifact_for(artifact_id)
+            .filter(|item| item.role == role && item.authored_profile.is_some())
+            .ok_or_else(|| rejected("A selected character is unavailable, unfinished or incompatible"))?;
+        if !item.entity_state.is_empty() && selection.entity_reference.is_none() {
+            return Err(rejected("This Ruleset has no declared character state location").into());
+        }
+        let participant_id =
+            format!("participant-{}", &sha256_hex(format!("{operation_id}\0{artifact_id}").as_bytes())[..24]);
+        let declaration = declaration_for(&item.schema_id)?;
+        participants.push(Participant::new(ParticipantFields {
+            participant_id: participant_id.clone(),
+            kind: declaration.kind.clone(),
+            package_id: item.package_id.clone(),
+            package_version: item.package_version.clone(),
+            data: item.participant.clone(),
+            package_sha256: Some(item.package_sha256.clone()),
+            schema_id: Some(item.schema_id.clone()),
+            schema_sha256: Some(item.schema_sha256.clone()),
+            validation_status: "validated".into(),
+            adaptation_id: None,
+        })?);
+        entities.insert(participant_id.clone(), Json::Object(item.entity_state.clone()));
+        let mut character_file = object(json!({
+            "source_id": item.artifact_id,
+            "content_sha256": item.content_sha256,
+            "profile_status": item.profile_status(),
+            "authored_profile": item.authored_profile,
+            "setting_data": item.setting_data,
+        }));
+        if let Some(migration) = &item.source_migration {
+            character_file.insert("source_migration".into(), Json::Object(migration.clone()));
+        }
+        selected_party.push(json!({
+            "participant_id": participant_id,
+            "party_role": role,
+            "name": item.name,
+            "summary": item.summary,
+            "character_file": character_file,
+        }));
+    }
+    let names: JsonMap = selected_party
+        .iter()
+        .map(|item| (py_str(&item["participant_id"]), Json::from(py_str(&item["name"]))))
+        .collect();
+    let reference = selection.entity_reference.as_ref().map(|reference| Json::Object(reference.clone()));
+    let mut state = materialize_starting_world(
+        &selection.plan.plan,
+        reference.as_ref(),
+        &Json::Object(entities),
+        Some(&Json::Object(names)),
+    )?;
+    // Placements preserve injuries but must retain the exact Ruleset's character contract.
+    if let Some(reference) = &selection.entity_reference {
+        let reference_json = Json::Object(reference.clone());
+        let key = py_str(py_item(&reference_json, "key")?);
+        let parts: Vec<&str> = key.split('.').collect();
+        let mut mutable_state: Vec<((String, String), Json)> = state
+            .iter()
+            .map(|value| ((value.namespace().to_owned(), value.key().to_owned()), canonical(value.value())))
+            .collect();
+        let namespace = py_item(&reference_json, "namespace")?.clone();
+        let at = mutable_state
+            .iter()
+            .position(|((ns, key), _)| py_eq(&Json::from(ns.as_str()), &namespace) && key == parts[0])
+            .ok_or_else(|| {
+                DomainError::uncaught(
+                    "KeyError",
+                    format!("({}, {})", sylvia_base::pystr::repr_json(&namespace), pystr::repr(parts[0])),
+                )
+            })?;
+        let mut by_entity = &mut mutable_state[at].1;
+        for part in &parts[1..] {
+            by_entity = match by_entity {
+                Json::Object(map) => {
+                    map.get_mut(*part).ok_or_else(|| DomainError::uncaught("KeyError", pystr::repr(part)))?
+                }
+                Json::Array(_) => {
+                    return Err(
+                        DomainError::type_error("list indices must be integers or slices, not str").into()
+                    )
+                }
+                Json::String(_) => {
+                    return Err(DomainError::type_error("string indices must be integers, not 'str'").into())
+                }
+                other => {
+                    let class = sylvia_domain::pyops::py_type_name(other);
+                    return Err(
+                        DomainError::type_error(format!("'{class}' object is not subscriptable")).into()
+                    );
+                }
+            };
+        }
+        let campaign_state = |package_id: &str| campaign_character_state(&plan_payload, package_id);
+        for (participant, selected) in participants.iter().zip(&selected_party) {
+            let artifact =
+                artifact_for(&py_str(&selected["character_file"]["source_id"])).expect("selected above");
+            let declaration = declaration_for(participant.schema_id().expect("validated"))?;
+            let data = Json::Object(participant.data().clone());
+            let setting_data = Json::Object(artifact.setting_data.clone());
+            let Json::Object(entities) = &mut *by_entity else {
+                return Err(DomainError::type_error("The character state location is not a mapping").into());
+            };
+            let current =
+                entities.get(participant.participant_id()).and_then(Json::as_object).cloned().ok_or_else(
+                    || DomainError::uncaught("KeyError", pystr::repr(participant.participant_id())),
+                )?;
+            let initialized = initialize_campaign_character_state(
+                &data,
+                &current,
+                declaration,
+                &Json::Object(campaign_state(participant.package_id())?),
+                Some(&setting_data),
+            )?;
+            verify_placed_character(&data, &initialized, declaration, Some(&setting_data))?;
+            entities.insert(participant.participant_id().to_owned(), Json::Object(initialized));
+        }
+        state = mutable_state
+            .into_iter()
+            .map(|((namespace, key), value)| StateValue::new(namespace, key, value))
+            .collect::<DomainResult<_>>()?;
+    }
+    let mut placed_payload = canonical(&plan_payload);
+    placed_payload["initial_state"]["mechanics"] = Json::Array(
+        state
+            .iter()
+            .map(|value| json!({"namespace": value.namespace(), "key": value.key(), "value": canonical(value.value())}))
+            .collect(),
+    );
+    selection.sources.validate(&placed_payload, &selection.plan.plan.readable_markdown)?;
+    Ok((participants, state, selected_party))
 }
