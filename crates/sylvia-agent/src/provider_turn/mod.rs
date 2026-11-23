@@ -5,6 +5,7 @@
 //! - [`round`]: one provider round (`prepare_round_catalog`, `prepare_provider_round`,
 //!   `stream_provider_round`).
 //! - [`tool_checks`]: the tool batch's checks, refusals and settled results (T3a).
+//! - [`tool_batch`]: one round's tool batch, admitted and run (T3b-1).
 //!
 //! Python's phases are generators the session loop consumes: each event is handled before the
 //! phase resumes. Here a phase is given a [`TurnEvents`] sink and awaits it where Python yields,
@@ -13,6 +14,7 @@
 pub mod decisions;
 pub mod round;
 pub mod state;
+pub mod tool_batch;
 pub mod tool_checks;
 
 use crate::session_loop::ProviderEvent;

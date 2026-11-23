@@ -21,7 +21,7 @@ pub fn requires_reasoning_with_tools(model: Option<&ModelInfo>, has_tools: bool)
 }
 
 /// Python `==` of two decoded JSON values: numbers compare by value (`1 == 1.0`, `True == 1`).
-fn python_equal(a: &Json, b: &Json) -> bool {
+pub(crate) fn python_equal(a: &Json, b: &Json) -> bool {
     let number = |value: &Json| match value {
         Json::Bool(flag) => Some(f64::from(u8::from(*flag))),
         Json::Number(number) => number.as_f64(),

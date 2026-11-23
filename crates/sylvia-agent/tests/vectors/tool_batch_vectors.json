@@ -1425,23 +1425,19 @@
     {
      "event": "call",
      "name": "record_mechanics_diagnostic",
-     "args": [
-      {
-       "kind": "mechanics_rejection",
-       "privacy": "safe_metadata_only",
-       "session_id": "session-1",
-       "turn_id": "turn-1",
-       "action_id": "call-1",
-       "tool_name": "update_campaign_file",
-       "rejection_code": "missing_required_arguments",
-       "validation_field_paths": [
-        "state_change",
-        "summary"
-       ],
-       "state_changed": false
-      }
-     ],
-     "kwargs": {},
+     "args": [],
+     "kwargs": {
+      "session_id": "session-1",
+      "turn_id": "turn-1",
+      "action_id": "call-1",
+      "tool_name": "update_campaign_file",
+      "rejection_code": "missing_required_arguments",
+      "validation_field_paths": [
+       "state_change",
+       "summary"
+      ],
+      "state_changed": false
+     },
      "result": null
     }
    ],
@@ -2890,5 +2886,1967 @@
     }
    }
   }
- ]
+ ],
+ "arguments": {
+  "normalize": [
+   {
+    "name": "caster from its state",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "caster_state": "p-1"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "caster_state": "p-1",
+      "caster": "p-1"
+     }
+    }
+   },
+   {
+    "name": "caster already given",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "caster": "x",
+     "caster_state": "p-1"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "caster": "x",
+      "caster_state": "p-1"
+     }
+    }
+   },
+   {
+    "name": "caster state unknown",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "caster_state": "p-9"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "caster_state": "p-9"
+     }
+    }
+   },
+   {
+    "name": "spell by name",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "Fire Bolt"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "hunters_mark"
+     }
+    }
+   },
+   {
+    "name": "spell with apostrophe and spaces",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "Hunter’s   Mark"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "hunters_mark"
+     }
+    }
+   },
+   {
+    "name": "spell by alias",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "mage armour"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "mage_armor"
+     }
+    }
+   },
+   {
+    "name": "spell with dashes",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "-Mage-Armor_"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "mage_armor"
+     }
+    }
+   },
+   {
+    "name": "alias to an unknown value",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "bad"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "bad"
+     }
+    }
+   },
+   {
+    "name": "spell unknown",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "sleep"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "sleep"
+     }
+    }
+   },
+   {
+    "name": "spell not text",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": 3
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": 3
+     }
+    }
+   },
+   {
+    "name": "dotted capital I",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "FİRE BOLT"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "FİRE BOLT"
+     }
+    }
+   },
+   {
+    "name": "ambiguous spell",
+    "schema": {
+     "properties": {
+      "spell": {
+       "enum": [
+        "a_b",
+        "a-b"
+       ]
+      }
+     }
+    },
+    "parameters": {
+     "spell": "a b"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "a b"
+     }
+    }
+   },
+   {
+    "name": "enum of letters",
+    "schema": {
+     "properties": {
+      "spell": {
+       "enum": "abc"
+      }
+     }
+    },
+    "parameters": {
+     "spell": "B"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "spell": "b"
+     }
+    }
+   },
+   {
+    "name": "target state from target",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "target": "e-2"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "target": "e-2",
+      "target_state": "e-2"
+     }
+    }
+   },
+   {
+    "name": "target state unknown",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "target": "zz"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "target": "zz"
+     }
+    }
+   },
+   {
+    "name": "target state given",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "target": "e-2",
+     "target_state": "keep"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "target": "e-2",
+      "target_state": "keep"
+     }
+    }
+   },
+   {
+    "name": "non-participant source",
+    "schema": {
+     "properties": {
+      "caster": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant",
+       "enum": [
+        "p-1"
+       ]
+      },
+      "caster_state": {
+       "type": "string"
+      },
+      "spell": {
+       "type": "string",
+       "enum": [
+        "fire_bolt",
+        "hunters_mark",
+        "mage_armor"
+       ],
+       "x-sylvia-gm-value-aliases": {
+        "mage armour": "mage_armor",
+        "bad": "nope",
+        "fire_bolt": "hunters_mark"
+       }
+      },
+      "target": {
+       "type": "string",
+       "x-sylvia-gm-reference": "participant"
+      },
+      "target_state": {
+       "type": "string"
+      },
+      "other": {
+       "type": "string"
+      },
+      "other_state": {
+       "type": "string"
+      },
+      "count_state": {
+       "type": "integer"
+      }
+     }
+    },
+    "parameters": {
+     "other": "e-2"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "other": "e-2"
+     }
+    }
+   },
+   {
+    "name": "no properties",
+    "schema": {
+     "type": "object"
+    },
+    "parameters": {
+     "caster_state": "p-1"
+    },
+    "state": {
+     "sylvia.x.entities": {
+      "p-1": {},
+      "e-2": {}
+     },
+     "sylvia.x.combat": {
+      "p-9": {}
+     },
+     "sylvia.y.entities": [
+      "not",
+      "a",
+      "map"
+     ]
+    },
+    "expected": {
+     "ok": {
+      "caster_state": "p-1"
+     }
+    }
+   }
+  ],
+  "derive": [
+   {
+    "name": "constant",
+    "parameters": {},
+    "derivations": {
+     "kind_out": {
+      "kind": "constant",
+      "value": "ability_check"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "kind_out": "ability_check"
+     }
+    }
+   },
+   {
+    "name": "constant without value",
+    "parameters": {},
+    "derivations": {
+     "kind_out": {
+      "kind": "constant"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "kind_out": null
+     }
+    }
+   },
+   {
+    "name": "copy",
+    "parameters": {
+     "actor": "p-1"
+    },
+    "derivations": {
+     "actor_state": {
+      "kind": "copy",
+      "source": "actor"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "actor": "p-1",
+      "actor_state": "p-1"
+     }
+    }
+   },
+   {
+    "name": "source missing",
+    "parameters": {},
+    "derivations": {
+     "actor_state": {
+      "kind": "copy",
+      "source": "actor"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "MechanicsRejected",
+      "message": "Missing input 'actor' needed to derive 'actor_state'.",
+      "code": "mechanics_derivation_source_missing",
+      "field_paths": [
+       "actor"
+      ]
+     }
+    }
+   },
+   {
+    "name": "source not text",
+    "parameters": {},
+    "derivations": {
+     "actor_state": {
+      "kind": "copy",
+      "source": 4
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "MechanicsRejected",
+      "message": "Missing input '4' needed to derive 'actor_state'.",
+      "code": "mechanics_derivation_source_missing",
+      "field_paths": []
+     }
+    }
+   },
+   {
+    "name": "enum map",
+    "parameters": {
+     "skill": "stealth"
+    },
+    "derivations": {
+     "ability": {
+      "kind": "enum_map",
+      "source": "skill",
+      "mapping": {
+       "stealth": "dexterity"
+      }
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "skill": "stealth",
+      "ability": "dexterity"
+     }
+    }
+   },
+   {
+    "name": "enum map miss",
+    "parameters": {
+     "skill": "arcana"
+    },
+    "derivations": {
+     "ability": {
+      "kind": "enum_map",
+      "source": "skill",
+      "mapping": {
+       "stealth": "dexterity"
+      }
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Authority could not map 'skill' to 'ability'",
+      "code": "mechanics_derivation_mapping_missing"
+     }
+    }
+   },
+   {
+    "name": "enum map of a number",
+    "parameters": {
+     "skill": 1
+    },
+    "derivations": {
+     "ability": {
+      "kind": "enum_map",
+      "source": "skill",
+      "mapping": {
+       "1": "x"
+      }
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Authority could not map 'skill' to 'ability'",
+      "code": "mechanics_derivation_mapping_missing"
+     }
+    }
+   },
+   {
+    "name": "enum map of a list",
+    "parameters": {
+     "skill": [
+      "a"
+     ]
+    },
+    "derivations": {
+     "ability": {
+      "kind": "enum_map",
+      "source": "skill",
+      "mapping": {
+       "a": "x"
+      }
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "TypeError",
+      "message": "unhashable type: 'list'",
+      "code": null
+     }
+    }
+   },
+   {
+    "name": "membership present",
+    "parameters": {
+     "actor": "p-1",
+     "skill": "stealth"
+    },
+    "derivations": {
+     "factor": {
+      "kind": "participant_membership",
+      "source": "skill",
+      "participant": "actor",
+      "field": "skill_proficiencies",
+      "present": "normal",
+      "absent": "none"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "actor": "p-1",
+      "skill": "stealth",
+      "factor": "normal"
+     }
+    }
+   },
+   {
+    "name": "membership absent",
+    "parameters": {
+     "actor": "p-1",
+     "skill": "arcana"
+    },
+    "derivations": {
+     "factor": {
+      "kind": "participant_membership",
+      "source": "skill",
+      "participant": "actor",
+      "field": "skill_proficiencies",
+      "present": "normal",
+      "absent": "none"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "actor": "p-1",
+      "skill": "arcana",
+      "factor": "none"
+     }
+    }
+   },
+   {
+    "name": "membership by number",
+    "parameters": {
+     "actor": "p-1",
+     "skill": 2.0
+    },
+    "derivations": {
+     "factor": {
+      "kind": "participant_membership",
+      "source": "skill",
+      "participant": "actor",
+      "field": "skill_proficiencies",
+      "present": true,
+      "absent": false
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "actor": "p-1",
+      "skill": 2.0,
+      "factor": true
+     }
+    }
+   },
+   {
+    "name": "membership field missing",
+    "parameters": {
+     "actor": "p-1",
+     "skill": "stealth"
+    },
+    "derivations": {
+     "factor": {
+      "kind": "participant_membership",
+      "source": "skill",
+      "participant": "actor",
+      "field": "tools",
+      "present": 1,
+      "absent": 0
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "actor": "p-1",
+      "skill": "stealth",
+      "factor": 0
+     }
+    }
+   },
+   {
+    "name": "participant unknown",
+    "parameters": {
+     "actor": "p-2",
+     "skill": "stealth"
+    },
+    "derivations": {
+     "factor": {
+      "kind": "participant_membership",
+      "source": "skill",
+      "participant": "actor",
+      "field": "skill_proficiencies"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "The selected participant is unavailable",
+      "code": "mechanics_participant_unavailable"
+     }
+    }
+   },
+   {
+    "name": "membership invalid",
+    "parameters": {
+     "skill": "stealth"
+    },
+    "derivations": {
+     "factor": {
+      "kind": "participant_membership",
+      "source": "skill",
+      "participant": 3
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Package participant derivation is invalid",
+      "code": "invalid_mechanics_derivation"
+     }
+    }
+   },
+   {
+    "name": "unsupported kind",
+    "parameters": {
+     "skill": "stealth"
+    },
+    "derivations": {
+     "x": {
+      "kind": "lookup",
+      "source": "skill"
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Package mechanics derivation is unsupported",
+      "code": "invalid_mechanics_derivation"
+     }
+    }
+   },
+   {
+    "name": "in order",
+    "parameters": {
+     "actor": "p-1",
+     "skill": "stealth"
+    },
+    "derivations": {
+     "a": {
+      "kind": "copy",
+      "source": "actor"
+     },
+     "b": {
+      "kind": "copy",
+      "source": "a"
+     },
+     "c": {
+      "kind": "constant",
+      "value": [
+       1
+      ]
+     }
+    },
+    "participants": [
+     {
+      "__class__": "Participant",
+      "participant_id": "p-1",
+      "kind": "player_character",
+      "package_id": "sylvia.x",
+      "package_version": "1",
+      "data": {
+       "skill_proficiencies": [
+        "stealth",
+        2
+       ],
+       "name": "Pip"
+      },
+      "package_sha256": null,
+      "schema_id": null,
+      "schema_sha256": null,
+      "validation_status": "quarantined",
+      "adaptation_id": null
+     }
+    ],
+    "expected": {
+     "ok": {
+      "actor": "p-1",
+      "skill": "stealth",
+      "a": "p-1",
+      "b": "p-1",
+      "c": [
+       1
+      ]
+     }
+    }
+   }
+  ],
+  "missing": [
+   {
+    "parameters": {
+     "a": 1
+    },
+    "schema": {
+     "required": [
+      "a",
+      "b",
+      3
+     ]
+    },
+    "expected": [
+     "b",
+     "3"
+    ]
+   },
+   {
+    "parameters": {},
+    "schema": {
+     "required": "ab"
+    },
+    "expected": []
+   },
+   {
+    "parameters": {},
+    "schema": {},
+    "expected": []
+   },
+   {
+    "parameters": {
+     "3": 1
+    },
+    "schema": {
+     "required": [
+      3
+     ]
+    },
+    "expected": []
+   }
+  ],
+  "overlap": [
+   {
+    "first": "Old Tom",
+    "second": "old tom",
+    "expected": true
+   },
+   {
+    "first": "Tom",
+    "second": "Tomas",
+    "expected": false
+   },
+   {
+    "first": "Tom",
+    "second": "Old Tom of the Hill",
+    "expected": true
+   },
+   {
+    "first": "Tom_",
+    "second": "Tom",
+    "expected": false
+   },
+   {
+    "first": "Tom",
+    "second": "Tom’s boat",
+    "expected": true
+   },
+   {
+    "first": "",
+    "second": "x",
+    "expected": false
+   },
+   {
+    "first": "A  B",
+    "second": "a b",
+    "expected": true
+   },
+   {
+    "first": "Zoë",
+    "second": "zoe",
+    "expected": false
+   },
+   {
+    "first": "ab ab",
+    "second": "b a",
+    "expected": false
+   },
+   {
+    "first": "aa a",
+    "second": "a a",
+    "expected": false
+   },
+   {
+    "first": "İstanbul",
+    "second": "i̇stanbul",
+    "expected": true
+   },
+   {
+    "first": "Straße",
+    "second": "STRASSE",
+    "expected": true
+   },
+   {
+    "first": "Tom2",
+    "second": "Tom",
+    "expected": false
+   },
+   {
+    "first": "café",
+    "second": "café",
+    "expected": false
+   }
+  ]
+ }
 }

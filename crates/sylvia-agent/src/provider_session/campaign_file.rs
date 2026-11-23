@@ -1,13 +1,19 @@
 //! `agent/_provider_session.py`, the Campaign File and response-block helpers the tool batch uses:
 //! which call arguments establish a change, the provider's response blocks admitted into held
-//! blocks, the speakers a disposition can name, and the entities a mechanic's arguments name.
+//! blocks, the speakers a disposition can name, the entities a mechanic's arguments name, and
+//! the held blocks projected with player-visible speaker labels (`_project_response_blocks`).
 
 use super::request::contains_serialized_tool_call;
 use super::tools::CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT;
+use crate::argument_contracts::py_str;
 use serde_json::Value as Json;
 use std::collections::{BTreeMap, BTreeSet};
+use sylvia_base::pystr::repr;
 use sylvia_base::{pystr, CodedError, CodedResult, JsonMap};
-use sylvia_domain::authority::{validate_authority_identity, CampaignContinuityView, Participant};
+use sylvia_domain::authority::{
+    response_blocks_text, validate_authority_identity, validate_response_blocks, CampaignContinuityView,
+    Participant,
+};
 
 /// `_CAMPAIGN_FILE_ASSESSMENT_ARGUMENTS`.
 pub const CAMPAIGN_FILE_ASSESSMENT_ARGUMENTS: [&str; 2] = ["state_change", "state_change_summary"];
@@ -194,4 +200,130 @@ pub fn unsupported_response_speaker_ids(
         })
         .collect();
     unsupported.into_iter().collect()
+}
+
+/// `" ".join(name.casefold().split())`.
+fn speaker_key(name: &str) -> String {
+    pystr::casefold(name).split(pystr::is_space).filter(|part| !part.is_empty()).collect::<Vec<_>>().join(" ")
+}
+
+/// Python's `\w` for a `str` pattern: `str.isalnum()` or `_`.
+fn is_word(character: char) -> bool {
+    character == '_' || pystr::is_alnum(character)
+}
+
+/// `re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None`: `inner` occurs in
+/// `outer` with no word character on either side.
+fn contains_as_words(outer: &str, inner: &str) -> bool {
+    // Every start position, as `re.search` tries them (occurrences may overlap).
+    outer.char_indices().map(|(start, _)| start).chain(std::iter::once(outer.len())).any(|start| {
+        outer[start..].starts_with(inner) && {
+            let before = outer[..start].chars().next_back();
+            let after = outer[start + inner.len()..].chars().next();
+            !before.is_some_and(is_word) && !after.is_some_and(is_word)
+        }
+    })
+}
+
+/// `_speaker_names_overlap(first, second)`: whether either casefolded name contains the other
+/// as whole words.
+pub fn speaker_names_overlap(first: &str, second: &str) -> bool {
+    let (first, second) = (speaker_key(first), speaker_key(second));
+    !first.is_empty()
+        && !second.is_empty()
+        && (contains_as_words(&first, &second) || contains_as_words(&second, &first))
+}
+
+/// `_project_response_blocks(blocks, snapshot, party_roles=...)`: the held blocks with each
+/// speaker resolved to the label fresh player-visible campaign authority gives it, and their
+/// text.
+pub fn project_response_blocks(
+    blocks: &[JsonMap],
+    participants: &[Participant],
+    continuity: &CampaignContinuityView,
+    party_roles: Option<&std::collections::HashMap<String, String>>,
+) -> CodedResult<(String, Vec<JsonMap>)> {
+    let mut names: indexmap::IndexMap<String, String> = indexmap::IndexMap::new();
+    // Names the campaign does not show the player (hidden people, player-controlled
+    // characters). A model-given speaker_name never shows one of these.
+    let mut withheld: Vec<String> = Vec::new();
+    for participant in participants {
+        let data = participant.data();
+        let participant_id = participant.participant_id();
+        let party_role = match party_roles {
+            None => data.get("party_role").cloned(),
+            Some(roles) => roles.get(participant_id).cloned().map(Json::String),
+        };
+        let role = party_role.as_ref().and_then(Json::as_str);
+        // Companions share the Ruleset's character schema; party role owns control.
+        let player_controlled = role == Some("player_character")
+            || data.get("control_owner").and_then(Json::as_str) == Some("player")
+            || (participant.kind() == "player_character" && role != Some("companion"));
+        let visible = data.get("visibility").and_then(Json::as_str) != Some("gm_private");
+        if let Some(name) =
+            data.get("name").and_then(Json::as_str).filter(|name| !pystr::strip(name).is_empty())
+        {
+            if !player_controlled && visible {
+                names.insert(participant_id.to_owned(), name.to_owned());
+            } else {
+                withheld.push(name.to_owned());
+            }
+        }
+    }
+    let mut records: Vec<_> = continuity.records.iter().collect();
+    records.sort_by_key(|record| record.admitted_revision);
+    let mut latest = indexmap::IndexMap::new();
+    for record in records.into_iter().filter(|record| record.kind == "entity") {
+        latest.insert(record.record_id.clone(), record);
+    }
+    for (entity_id, record) in latest {
+        let payload = &record.payload;
+        names.shift_remove(&entity_id);
+        let known = payload.get("visibility").and_then(Json::as_str) == Some("player_known");
+        if let Some(name) = payload.get("name").and_then(Json::as_str) {
+            if !known {
+                withheld.push(name.to_owned());
+            }
+            if record.status == "active" && known && !pystr::strip(name).is_empty() {
+                names.insert(entity_id, name.to_owned());
+            }
+        }
+    }
+    let mut projected = Vec::with_capacity(blocks.len());
+    for block in blocks {
+        let field = |key: &str| {
+            block.get(key).cloned().ok_or_else(|| CodedError::rejected(repr(key)).with_error_type("KeyError"))
+        };
+        let mut safe = JsonMap::new();
+        safe.insert("kind".into(), field("kind")?);
+        safe.insert("text".into(), field("text")?);
+        if block.get("kind").and_then(Json::as_str) == Some("npc_dialogue") {
+            let speaker_id = py_str(&field("speaker_id")?);
+            let mut label = names.get(&speaker_id).cloned();
+            if label.is_none() && speaker_id == "anonymous" {
+                if let Some(speaker_name) = block.get("speaker_name") {
+                    let given = validated_speaker_name(speaker_name)?;
+                    if !withheld.iter().any(|hidden| speaker_names_overlap(&given, hidden)) {
+                        label = Some(given);
+                    }
+                }
+            }
+            let label =
+                label.filter(|label| !label.is_empty()).unwrap_or_else(|| "Unknown speaker".to_owned());
+            safe.insert("speaker_label".into(), Json::String(label));
+        }
+        projected.push(Json::Object(safe));
+    }
+    let admitted = validate_response_blocks(&Json::Array(projected)).map_err(domain_error)?;
+    let text = response_blocks_text(&Json::Array(admitted.iter().cloned().map(Json::Object).collect()))
+        .map_err(domain_error)?;
+    Ok((text, admitted))
+}
+
+/// A domain exception as the coded error a caller sees: a refusal in its class, anything else
+/// unexpected.
+fn domain_error(error: sylvia_domain::error::DomainError) -> CodedError {
+    error.rejection().unwrap_or_else(|| {
+        CodedError::new("internal_error", error.message()).with_error_type(error.python_class())
+    })
 }

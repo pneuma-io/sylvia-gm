@@ -14,6 +14,14 @@ use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
 
+/// An `AuthorityOwner` method lane 3 has not ported yet.
+fn pending(method: &str) -> CodedError {
+    CodedError::new(
+        crate::dispatch::PORT_PENDING,
+        format!("The Rust owner does not answer AuthorityOwner.{method} yet."),
+    )
+}
+
 impl TurnOwner for OwnerReads {
     fn model_decision_boundary<'a>(
         &'a self,
@@ -46,12 +54,40 @@ impl TurnOwner for OwnerReads {
         OwnerReads::record_admin_full_audit(self, Json::Object(payload))
     }
 
-    fn record_mechanics_diagnostic(&self, _diagnostic: JsonMap) -> CodedResult<()> {
-        // Lane 3 keeps the diagnostics beside the Full Audit trace in `NarrationState`.
-        Err(CodedError::new(
-            crate::dispatch::PORT_PENDING,
-            "The Rust owner does not answer AuthorityOwner.record_mechanics_diagnostic yet.",
-        ))
+    fn campaign_panels<'a>(&'a self, _campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        Box::pin(async { Err(pending("campaign_panels")) })
+    }
+
+    fn action_sequence<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _sequence_id: &'a Json,
+    ) -> BoxFuture<'a, CodedResult<Json>> {
+        Box::pin(async { Err(pending("action_sequence")) })
+    }
+
+    fn compose_action_sequence_from_agent<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _session_id: &'a str,
+        _arguments: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<Json>> {
+        Box::pin(async { Err(pending("_compose_action_sequence_from_agent")) })
+    }
+
+    fn execute_action_sequence_from_agent<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _session_id: &'a str,
+        _arguments: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<Json>> {
+        Box::pin(async { Err(pending("_execute_action_sequence_from_agent")) })
+    }
+
+    fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()> {
+        // Kept beside the Full Audit trace in lane 3's `NarrationState` (#442).
+        self.store().narration().record_mechanics_diagnostic(diagnostic);
+        Ok(())
     }
 
     fn provider_continuation<'a>(

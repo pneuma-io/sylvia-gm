@@ -13,6 +13,8 @@ Sections:
   it made, the warnings it recorded and what it returned or raised. An SRD Lite tool's input
   schema is written as `{"__srd_input_schema__": <tool index>}`; the Rust test reads it from the
   package record, as this generator does.
+- `arguments`: `_normalize_state_references`, `_derive_mechanics_parameters` (every kind and
+  refusal) and `_missing_required_arguments` directly, and `_speaker_names_overlap` on name pairs.
 
 Reference tooling only; retired with the Python source.
 """
@@ -121,14 +123,9 @@ class Owner:
         return result
 
     def record_mechanics_diagnostic(self, **fields: object) -> None:
-        # `AuthorityOwner.record_mechanics_diagnostic` builds this payload from its arguments.
-        payload = {"kind": "mechanics_rejection", "privacy": "safe_metadata_only",
-                   "session_id": fields["session_id"], "turn_id": fields["turn_id"],
-                   "action_id": fields["action_id"], "tool_name": fields["tool_name"],
-                   "rejection_code": fields["rejection_code"],
-                   "validation_field_paths": list(fields["validation_field_paths"]),
-                   "state_changed": fields["state_changed"]}
-        self._call("record_mechanics_diagnostic", [payload], None)
+        # Logged as the tracer logs it: the keyword arguments, in Python's order.
+        self.calls.append({"event": "call", "name": "record_mechanics_diagnostic", "args": [],
+                           "kwargs": plain(fields), "result": None})
 
     def campaign_preparation_boundary(self, campaign_id: str) -> object:
         return self._call("campaign_preparation_boundary", [campaign_id],
@@ -374,8 +371,133 @@ def helper_cases() -> list[dict]:
     return [slim(case) for case in cases]
 
 
+# --- arguments: a mechanic call's derived, normalized and missing arguments; speaker names ---
+
+def outcome_of(function, *arguments):
+    from sylvia_gm.domain.errors import MechanicsRejected as Mechanics
+    try:
+        return {"ok": plain(function(*arguments))}
+    except Exception as error:  # noqa: BLE001 - the error is the vector
+        entry = {"class": type(error).__name__, "message": str(error),
+                 "code": getattr(error, "code", None)}
+        if isinstance(error, Mechanics):
+            entry["field_paths"] = list(error.field_paths)
+        return {"raised": entry}
+
+
+def argument_cases() -> dict[str, list[dict]]:
+    from sylvia_gm.agent._provider_session import (
+        _derive_mechanics_parameters,
+        _missing_required_arguments,
+        _normalize_state_references,
+        _speaker_names_overlap,
+    )
+    from sylvia_gm.domain.authority import Participant
+
+    schema = {"properties": {
+        "caster": {"type": "string", "x-sylvia-gm-reference": "participant", "enum": ["p-1"]},
+        "caster_state": {"type": "string"},
+        "spell": {"type": "string", "enum": ["fire_bolt", "hunters_mark", "mage_armor"],
+                  "x-sylvia-gm-value-aliases": {"mage armour": "mage_armor", "bad": "nope",
+                                                "fire_bolt": "hunters_mark"}},
+        "target": {"type": "string", "x-sylvia-gm-reference": "participant"},
+        "target_state": {"type": "string"},
+        "other": {"type": "string"},
+        "other_state": {"type": "string"},
+        "count_state": {"type": "integer"},
+    }}
+    ambiguous = {"properties": {"spell": {"enum": ["a_b", "a-b"]}}}
+    letters = {"properties": {"spell": {"enum": "abc"}}}
+    state = {"sylvia.x.entities": {"p-1": {}, "e-2": {}}, "sylvia.x.combat": {"p-9": {}},
+             "sylvia.y.entities": ["not", "a", "map"]}
+    normalize = []
+    for name, used_schema, parameters in (
+        ("caster from its state", schema, {"caster_state": "p-1"}),
+        ("caster already given", schema, {"caster": "x", "caster_state": "p-1"}),
+        ("caster state unknown", schema, {"caster_state": "p-9"}),
+        ("spell by name", schema, {"spell": "Fire Bolt"}),
+        ("spell with apostrophe and spaces", schema, {"spell": "Hunter’s   Mark"}),
+        ("spell by alias", schema, {"spell": "mage armour"}),
+        ("spell with dashes", schema, {"spell": "-Mage-Armor_"}),
+        ("alias to an unknown value", schema, {"spell": "bad"}),
+        ("spell unknown", schema, {"spell": "sleep"}),
+        ("spell not text", schema, {"spell": 3}),
+        ("dotted capital I", schema, {"spell": "FİRE BOLT"}),
+        ("ambiguous spell", ambiguous, {"spell": "a b"}),
+        ("enum of letters", letters, {"spell": "B"}),
+        ("target state from target", schema, {"target": "e-2"}),
+        ("target state unknown", schema, {"target": "zz"}),
+        ("target state given", schema, {"target": "e-2", "target_state": "keep"}),
+        ("non-participant source", schema, {"other": "e-2"}),
+        ("no properties", {"type": "object"}, {"caster_state": "p-1"}),
+    ):
+        normalize.append({"name": name, "schema": used_schema, "parameters": parameters,
+                          "state": state,
+                          "expected": outcome_of(_normalize_state_references, parameters,
+                                                 used_schema, state)})
+    participants = [Participant(participant_id="p-1", kind="player_character",
+                                package_id="sylvia.x", package_version="1",
+                                data={"skill_proficiencies": ["stealth", 2], "name": "Pip"})]
+    derive = []
+    for name, parameters, derivations in (
+        ("constant", {}, {"kind_out": {"kind": "constant", "value": "ability_check"}}),
+        ("constant without value", {}, {"kind_out": {"kind": "constant"}}),
+        ("copy", {"actor": "p-1"}, {"actor_state": {"kind": "copy", "source": "actor"}}),
+        ("source missing", {}, {"actor_state": {"kind": "copy", "source": "actor"}}),
+        ("source not text", {}, {"actor_state": {"kind": "copy", "source": 4}}),
+        ("enum map", {"skill": "stealth"},
+         {"ability": {"kind": "enum_map", "source": "skill", "mapping": {"stealth": "dexterity"}}}),
+        ("enum map miss", {"skill": "arcana"},
+         {"ability": {"kind": "enum_map", "source": "skill", "mapping": {"stealth": "dexterity"}}}),
+        ("enum map of a number", {"skill": 1},
+         {"ability": {"kind": "enum_map", "source": "skill", "mapping": {"1": "x"}}}),
+        ("enum map of a list", {"skill": ["a"]},
+         {"ability": {"kind": "enum_map", "source": "skill", "mapping": {"a": "x"}}}),
+        ("membership present", {"actor": "p-1", "skill": "stealth"},
+         {"factor": {"kind": "participant_membership", "source": "skill", "participant": "actor",
+                     "field": "skill_proficiencies", "present": "normal", "absent": "none"}}),
+        ("membership absent", {"actor": "p-1", "skill": "arcana"},
+         {"factor": {"kind": "participant_membership", "source": "skill", "participant": "actor",
+                     "field": "skill_proficiencies", "present": "normal", "absent": "none"}}),
+        ("membership by number", {"actor": "p-1", "skill": 2.0},
+         {"factor": {"kind": "participant_membership", "source": "skill", "participant": "actor",
+                     "field": "skill_proficiencies", "present": True, "absent": False}}),
+        ("membership field missing", {"actor": "p-1", "skill": "stealth"},
+         {"factor": {"kind": "participant_membership", "source": "skill", "participant": "actor",
+                     "field": "tools", "present": 1, "absent": 0}}),
+        ("participant unknown", {"actor": "p-2", "skill": "stealth"},
+         {"factor": {"kind": "participant_membership", "source": "skill", "participant": "actor",
+                     "field": "skill_proficiencies"}}),
+        ("membership invalid", {"skill": "stealth"},
+         {"factor": {"kind": "participant_membership", "source": "skill", "participant": 3}}),
+        ("unsupported kind", {"skill": "stealth"}, {"x": {"kind": "lookup", "source": "skill"}}),
+        ("in order", {"actor": "p-1", "skill": "stealth"},
+         {"a": {"kind": "copy", "source": "actor"}, "b": {"kind": "copy", "source": "a"},
+          "c": {"kind": "constant", "value": [1]}}),
+    ):
+        derive.append({"name": name, "parameters": parameters, "derivations": derivations,
+                       "participants": plain(participants),
+                       "expected": outcome_of(_derive_mechanics_parameters, parameters,
+                                              derivations, participants)})
+    missing = [{"parameters": parameters, "schema": used_schema,
+                "expected": list(_missing_required_arguments(parameters, used_schema))}
+               for parameters, used_schema in (
+                   ({"a": 1}, {"required": ["a", "b", 3]}),
+                   ({}, {"required": "ab"}), ({}, {}), ({"3": 1}, {"required": [3]}))]
+    overlap = [{"first": first, "second": second,
+                "expected": _speaker_names_overlap(first, second)}
+               for first, second in (
+                   ("Old Tom", "old tom"), ("Tom", "Tomas"), ("Tom", "Old Tom of the Hill"),
+                   ("Tom_", "Tom"), ("Tom", "Tom’s boat"), ("", "x"), ("A  B", "a b"),
+                   ("Zoë", "zoe"), ("ab ab", "b a"), ("aa a", "a a"),
+                   ("İstanbul", "i̇stanbul"), ("Straße", "STRASSE"),
+                   ("Tom2", "Tom"), ("café", "café"))]
+    return {"normalize": normalize, "derive": derive, "missing": missing, "overlap": overlap}
+
+
 def main() -> None:
-    vectors = {"safe_error": safe_error_cases(), "helpers": helper_cases()}
+    vectors = {"safe_error": safe_error_cases(), "helpers": helper_cases(),
+               "arguments": argument_cases()}
     out = Path(__file__).with_name("tool_batch_vectors.json")
     out.write_bytes((json.dumps(vectors, indent=1, ensure_ascii=False) + "\n").encode())
     print(f"wrote {out.name}: {sum(len(cases) for cases in vectors.values())} cases")
