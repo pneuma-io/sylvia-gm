@@ -168,6 +168,20 @@ pub trait PlanSnapshotOwner {
     fn export_package_candidate(&self, candidate_id: &str) -> Result<Vec<u8>, Self::Error>;
 }
 
+/// The store's reads, its export through lane 3's `export_package_candidate_on`.
+impl PlanSnapshotOwner for sylvia_store::AuthorityStore {
+    type Error = sylvia_store::StoreError;
+    fn package_candidates(&self) -> Result<Vec<PackageCandidate>, sylvia_store::StoreError> {
+        sylvia_store::AuthorityStore::package_candidates(self)
+    }
+    fn export_package_candidate(&self, candidate_id: &str) -> Result<Vec<u8>, sylvia_store::StoreError> {
+        // `owner.export_package_candidate(candidate_id, target)`: the bytes written.
+        let mut archive = Vec::new();
+        crate::authority::portable::export_package_candidate_on(self, candidate_id, &mut archive)?;
+        Ok(archive)
+    }
+}
+
 /// `retained_plan_snapshot(owner, payload)`: capture the Plan's original packages; current
 /// source versions do not replace them.
 pub fn retained_plan_snapshot<O: PlanSnapshotOwner>(

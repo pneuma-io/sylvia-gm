@@ -9,10 +9,8 @@
 //! materialization: `materialize_library_party` and `materialize_template_party`.
 //!
 //! The owner is [`SelectionOwner`]: the reference owner plus `exact_participant_declarations` and
-//! `export_package_candidate`. `AuthorityStore` implements it; its export answers
-//! `rust_port_pending` until lane 3's `export_package_candidate` lands, and the selection reaches
-//! it only when an installed candidate matches the Plan's closure, which is the branch that does
-//! not need a snapshot.
+//! `export_package_candidate`. `AuthorityStore` implements it, its export through lane 3's
+//! `export_package_candidate_on`.
 //!
 //! Python's `except` clauses name exception families; [`OwnerError::as_domain`] reads an owner
 //! error's class for them.
@@ -144,13 +142,11 @@ impl SelectionOwner for AuthorityStore {
     ) -> Result<Vec<ParticipantArtifactDeclaration>, StoreError> {
         AuthorityStore::exact_participant_declarations(self, package_id, version, sha256)
     }
-    fn export_package_candidate(&self, _candidate_id: &str) -> Result<Vec<u8>, StoreError> {
-        Err(DomainError::command_rejected_with(
-            "Package candidate export is not yet ported (lane 3's export_package_candidate)",
-            "rust_port_pending",
-            Vec::new(),
-        )
-        .into())
+    fn export_package_candidate(&self, candidate_id: &str) -> Result<Vec<u8>, StoreError> {
+        // `owner.export_package_candidate(candidate_id, io.BytesIO())`: the bytes written.
+        let mut archive = Vec::new();
+        crate::authority::portable::export_package_candidate_on(self, candidate_id, &mut archive)?;
+        Ok(archive)
     }
 }
 
