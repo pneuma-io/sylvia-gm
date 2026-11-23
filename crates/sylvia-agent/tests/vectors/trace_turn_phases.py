@@ -31,6 +31,12 @@ keyword arguments (`turn_id`, a refusal's `error`) are passed through as given.
 Each call is then run again on copies of its state and input with the variants
 `VARIANTS[phase]` names: some turn locals set, and some owner reads answered with given values
 (logged as ordinary calls), so the Rust tests reach branches a recorded turn does not.
+
+The pseudo-phase `list_tools` traces `StatelessMcpMechanics._list_tools` instead (T3m-1):
+`listing_start` (its arguments), every owner call the listing makes, and `listing_end` (the
+tools, or what it raised). The first listing with a session is run again with the variants
+`listing_variants` gives: owner answers overridden (an override may be a refusal, raised), a
+different session or the fixed list.
 Reference tooling only; retired with the Python source.
 """
 
@@ -207,6 +213,13 @@ class Traced:
             answer = OVERRIDES[name]
 
             def overridden(*args: object, **kwargs: object) -> object:
+                if isinstance(answer, BaseException):
+                    # An override may also be a refusal, raised as the owner would raise it.
+                    log({"event": "call", "name": name, "args": plain(list(args)),
+                         "kwargs": plain(kwargs), "override": True,
+                         "raised": {"class": type(answer).__name__, "message": str(answer),
+                                    "code": getattr(answer, "code", None)}})
+                    raise answer
                 log({"event": "call", "name": name, "args": plain(list(args)),
                      "kwargs": plain(kwargs), "result": plain(answer), "override": True})
                 return answer
@@ -688,8 +701,205 @@ def wrap(name: str) -> None:
     setattr(_provider_turn_phases, name, traced)
 
 
+#: The pseudo-phase that traces `StatelessMcpMechanics._list_tools` (T3m-1).
+LISTING = "list_tools"
+
+
+@dataclasses.dataclass(frozen=True)
+class PlanStub:
+    """An accepted Campaign Plan for a listing variant: the listing reads only its content."""
+
+    content: dict[str, object]
+
+
+def catalog_tool(name: str, schema: dict[str, object], description: str = "",
+                 behavior: str = "optional") -> object:
+    from sylvia_gm.application.authority import CatalogTool
+    return CatalogTool(package_id="sylvia.test", package_version="1.0.0", package_sha256="0" * 64,
+                       name=name, capability=f"test.{name}", input_schema=schema,
+                       execute=lambda *_: None, description=description,
+                       model_behavior=ModelToolBehavior(behavior))
+
+
+def probe_tools() -> list[object]:
+    """Catalog tools for `_model_input_schema`'s and the exposure's edges."""
+    spell = {"type": "string", "enum": ["fire_bolt", "magic_missile", "shield", "mm_alias", "wish"],
+             "x-sylvia-gm-castable-spells": True,
+             "x-sylvia-gm-spell-scope": ["magic_missile", "fire_bolt", "shield", "wish"],
+             "x-sylvia-gm-value-aliases": {"mm_alias": "magic_missile"}}
+    return [
+        catalog_tool("probe_schema", {
+            "title": None,
+            "x-sylvia-gm-exposure": {"any_of": [{"weird": 1}]},
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "properties": {
+                "target": {"type": "string", "enum": ["old"], "x-sylvia-gm-reference": "participant"},
+                "who": {"type": "string", "x-sylvia-gm-reference": "participant"},
+                "derived_actor": {"type": "string", "x-sylvia-gm-derived": {"kind": "actor"}},
+                "null_derived": {"type": "string", "x-sylvia-gm-derived": None},
+                "secret": {"type": "string", "x-sylvia-gm-model-hidden": True},
+                "loosely_hidden": {"type": "string", "x-sylvia-gm-model-hidden": 1},
+                "need": {"type": "integer", "x-sylvia-gm-model-required": True},
+                "spell": spell,
+                "plain_enum": {"type": "string", "enum": ["a"], "x-sylvia-gm-spell-scope": ["a"]},
+            },
+            "required": ["secret", "target", "zzz", 1, "derived_actor"],
+            "additionalProperties": False,
+        }, behavior="required_ruleset_decision"),
+        catalog_tool("probe_unasked_spell", {
+            "type": "object", "properties": {},
+            "x-sylvia-gm-exposure": {"any_of": [{"spells": ["wish"]}]},
+        }, description="Shown only when a wish is in play."),
+        catalog_tool("probe_state_spell", {
+            "type": "object", "properties": {},
+            "x-sylvia-gm-exposure": {"any_of": [{"spells": ["probe_lasting_effect"]}]},
+        }),
+        catalog_tool("probe_entity_field", {
+            "type": "object", "properties": {"x": {"type": "string"}}, "required": "x",
+            "x-sylvia-gm-exposure": {"any_of": [{"entity_field": "probe.level", "op": "gte1"},
+                                                {"entity_field": "probe.flag", "op": "true"}]},
+        }),
+        catalog_tool("probe_absent_field", {
+            "type": "object", "properties": {}, "required": {"x": 1},
+            "x-sylvia-gm-exposure": {"any_of": [{"entity_field": "probe.missing", "op": "not_null"}]},
+        }),
+        catalog_tool("probe_no_spells", {
+            "type": "object",
+            "properties": {"spell": {"type": "string", "enum": ["wish"],
+                                     "x-sylvia-gm-castable-spells": True}},
+        }),
+    ]
+
+
+def listing_snapshot(owner: object, campaign_id: str) -> tuple[object, object]:
+    """The model context with castable spells: a spellbook, prepared spells and probe entities."""
+    snapshot, boundary_ = owner.model_context_snapshot(campaign_id)  # type: ignore[attr-defined]
+    participants = tuple(
+        dataclasses.replace(participant, data={**participant.data,
+                                                "wizard_spellbook": ["magic_missile", 7, "shield"]})
+        if index == 0 else participant
+        for index, participant in enumerate(snapshot.participants))
+    state = {**snapshot.state,
+             "sylvia.probe.entities": {"e1": {"prepared_spells": ["fire_bolt", None]}, "e2": "x",
+                                       "e3": {"prepared_spells": "shield"}},
+             "sylvia.other.entities": ["not", "a", "map"]}
+    return dataclasses.replace(snapshot, participants=participants, state=state), boundary_
+
+
+def listing_variants(owner: object, campaign_id: str) -> list[dict[str, object]]:
+    from sylvia_gm.domain.errors import CommandRejected
+    real = owner.catalog(campaign_id)  # type: ignore[attr-defined]
+    probes = (*real, *probe_tools())
+    state = owner.snapshot(campaign_id)  # type: ignore[attr-defined]
+    lasting = dataclasses.replace(state, state={
+        **state.state, "sylvia.probe.effects": {"effect": {"source": "probe_lasting_effect"}},
+        "sylvia.probe.entities": {"e1": {"probe": {"level": 2}}, "e2": {"probe": {"flag": True}},
+                                  "e3": {"probe": {"level": True}}}})
+    options = {"campaign_revision": 3, "character_update_schema": {
+        "type": "object", "properties": {"hp": {"type": "integer"}}, "required": ["hp"]},
+        "operations": ["record_memory", "record_entity", "update_scene", "update_plan_progress",
+                       "reveal_secret", "update_character", "update_inventory"],
+        "scene_act_ids": ["act-1", "act-2"], "plan_item_ids": ["objective:a", "act:1"],
+        "eligible_secret_ids": ["secret-1"]}
+    rejected = CommandRejected("Accepted Campaign Plan is unavailable")
+    return [
+        {"name": "probe_tools", "answer": {"catalog": probes,
+                                           "model_context_snapshot": listing_snapshot(owner, campaign_id)}},
+        {"name": "probe_exposure", "answer": {"catalog": probes, "snapshot": lasting}},
+        {"name": "no_session_no_plan", "session_id": None,
+         "answer": {"accepted_campaign_plan": rejected}},
+        {"name": "readable_plan", "session_id": None,
+         "answer": {"accepted_campaign_plan": PlanStub({"campaign_plan_markdown": "# Plan"})}},
+        {"name": "structured_plan", "session_id": None,
+         "answer": {"accepted_campaign_plan": PlanStub({"campaign_plan": {}})}},
+        {"name": "every_note", "answer": {"campaign_narrative_options": options}},
+        {"name": "no_notes", "answer": {"campaign_narrative_options": {**options, "operations": []}}},
+        {"name": "invalid_notes",
+         "answer": {"campaign_narrative_options": {**options, "scene_act_ids": "act-1"}}},
+        {"name": "catalog_refused",
+         "answer": {"catalog": CommandRejected("Campaign is transitioning", code="probe_code")}},
+        {"name": "invalid_properties",
+         "answer": {"catalog": (catalog_tool("bad", {"type": "object", "properties": []}),)}},
+        {"name": "invalid_property",
+         "answer": {"catalog": (catalog_tool("bad", {"type": "object", "properties": {"a": 1}}),)}},
+        {"name": "invalid_derivation", "answer": {"catalog": (catalog_tool("bad", {
+            "type": "object", "properties": {"a": {"x-sylvia-gm-derived": "actor"}}}),)}},
+        {"name": "fixed", "fixed": True},
+    ]
+
+
+LISTING_DONE = {"value": False}
+
+
+def described(error: BaseException) -> dict[str, object]:
+    """What a listing raised: its class and message, an `MCPError`'s data code, and for an
+    exception group the exceptions it holds."""
+    data = getattr(error, "data", None)
+    found: dict[str, object] = {
+        "class": type(error).__name__, "message": str(error),
+        "code": data.get("code") if isinstance(data, dict) else getattr(error, "code", None)}
+    if isinstance(error, BaseExceptionGroup):
+        found["exceptions"] = [described(inner) for inner in error.exceptions]
+    return found
+
+
+def wrap_listing() -> None:
+    from sylvia_gm.agent import _stateless_mcp
+
+    original = _stateless_mcp.StatelessMcpMechanics._list_tools  # noqa: SLF001
+
+    async def run(self, campaign_id, variant, **kwargs):  # type: ignore[no-untyped-def]
+        log({"event": "listing_start", "variant": variant, "campaign_id": campaign_id, **kwargs})
+        ACTIVE["value"] = True
+        try:
+            tools = await original(self, campaign_id, **kwargs)
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "listing_end", "raised": described(error)})
+            if variant is None:
+                raise
+            return None
+        finally:
+            ACTIVE["value"] = False
+        log({"event": "listing_end", "tools": plain(tools)})
+        return tools
+
+    async def traced(self, campaign_id, *, purpose, discovery_id, session_id, fixed=False):  # type: ignore[no-untyped-def]
+        owner = self._owner  # noqa: SLF001
+        self._owner = Traced(owner)  # noqa: SLF001
+        try:
+            kwargs = {"purpose": purpose, "discovery_id": discovery_id, "session_id": session_id,
+                      "fixed": fixed}
+            tools = await run(self, campaign_id, None, **kwargs)
+            if session_id is not None and not fixed and not LISTING_DONE["value"]:
+                LISTING_DONE["value"] = True
+                try:
+                    variants = listing_variants(owner, campaign_id)
+                except BaseException:
+                    import traceback
+                    log({"event": "listing_error", "traceback": traceback.format_exc()})
+                    raise
+                for variant in variants:
+                    OVERRIDES.clear()
+                    OVERRIDES.update(variant.get("answer", {}))  # type: ignore[arg-type]
+                    changed = {**kwargs, "discovery_id": f"{discovery_id}-{variant['name']}",
+                               **{key: variant[key] for key in ("session_id", "fixed")
+                                  if key in variant}}
+                    await run(self, campaign_id, variant["name"], **changed)
+                    OVERRIDES.clear()
+            return tools
+        finally:
+            self._owner = owner  # noqa: SLF001
+
+    _stateless_mcp.StatelessMcpMechanics._list_tools = traced  # noqa: SLF001
+
+
 for phase in PHASES:
-    wrap(phase)
+    if phase == LISTING:
+        wrap_listing()
+    else:
+        wrap(phase)
 
 _ = SimpleNamespace  # keep the import for future variants
 

@@ -30,4 +30,5 @@ pub mod provider_turn;
 pub mod request_data;
 pub mod session_loop;
 pub mod stateless_mcp;
+pub mod tool_exposure;
 pub mod working_context;

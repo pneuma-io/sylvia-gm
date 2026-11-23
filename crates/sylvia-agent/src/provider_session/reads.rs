@@ -173,4 +173,20 @@ pub trait TurnOwner: OpeningReads {
         kind: SessionMessageKind,
         content: &'a JsonMap,
     ) -> BoxFuture<'a, CodedResult<SessionMessage>>;
+
+    /// `catalog(campaign_id)`, or `catalog(campaign_id, include_unexposed=True)`: the
+    /// campaign's admitted tools, as the MCP listing reads them.
+    fn catalog<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        include_unexposed: bool,
+    ) -> BoxFuture<'a, CodedResult<Vec<crate::stateless_mcp::listing::CatalogEntry>>>;
+
+    /// `accepted_campaign_plan(campaign_id).content`: refused with `CommandRejected("Accepted
+    /// Campaign Plan is unavailable")` when there is none.
+    fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `campaign_narrative_options(session_id)`: the Campaign File note types one DM session
+    /// may write, and their choices.
+    fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
 }
