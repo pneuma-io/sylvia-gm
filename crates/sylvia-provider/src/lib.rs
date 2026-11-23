@@ -32,6 +32,7 @@ pub mod catalog;
 pub mod chat;
 pub mod chatgpt;
 pub mod chatgpt_account;
+pub mod chatgpt_provider;
 pub mod claude;
 pub mod claude_install;
 pub mod claude_kept;

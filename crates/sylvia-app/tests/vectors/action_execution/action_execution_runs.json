@@ -1,0 +1,740 @@
+{
+ "python": "3.12.11",
+ "owner_id": "action-runs",
+ "runs": [
+  {
+   "name": "legal move",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-move",
+    "idempotency_key": "key-move",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 2,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:1:54"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-move",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Next seat drew a tile.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 3
+    }
+   }
+  },
+  {
+   "name": "replay with its key",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-move",
+    "idempotency_key": "key-move",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 2,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:1:54"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-move",
+     "status": "committed",
+     "result": {
+      "context": {
+       "match_result": null,
+       "message": "Next seat drew a tile.",
+       "result": null
+      },
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "take_action"
+     },
+     "resulting_revision": 3
+    }
+   }
+  },
+  {
+   "name": "replay with a new transport key",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-move",
+    "idempotency_key": "key-move-2",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 2,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:1:54"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-move",
+     "status": "committed",
+     "result": {
+      "context": {
+       "match_result": null,
+       "message": "Next seat drew a tile.",
+       "result": null
+      },
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "take_action"
+     },
+     "resulting_revision": 3
+    }
+   }
+  },
+  {
+   "name": "reused key, other parameters",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-other",
+    "idempotency_key": "key-move",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "other"
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Idempotency key payload does not match"
+   }
+  },
+  {
+   "name": "reused action, other parameters",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-move",
+    "idempotency_key": "key-move-3",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 2,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "other"
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Action identity payload does not match"
+   }
+  },
+  {
+   "name": "invalid identity",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": " spaced",
+    "idempotency_key": "key-6",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Command authority identity is invalid"
+   }
+  },
+  {
+   "name": "another owner",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-7",
+    "idempotency_key": "key-7",
+    "owner_id": "someone-else",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "WrongOwner",
+    "code": "wrong_owner",
+    "message": "Command owner does not hold this application authority"
+   }
+  },
+  {
+   "name": "the Builder writer",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-8",
+    "idempotency_key": "key-8",
+    "owner_id": "action-runs",
+    "writer": "builder",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "WrongWriter",
+    "code": "wrong_writer",
+    "message": "Command writer is not authoritative"
+   }
+  },
+  {
+   "name": "stale revision",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-9",
+    "idempotency_key": "key-9",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 2,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Expected campaign revision is stale"
+   }
+  },
+  {
+   "name": "unknown TURN",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-10",
+    "idempotency_key": "key-10",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-missing",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "TURN is unavailable"
+   }
+  },
+  {
+   "name": "unknown package",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-11",
+    "idempotency_key": "key-11",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.unknown",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "tool_unavailable",
+    "message": "Package tool is inactive or unavailable"
+   }
+  },
+  {
+   "name": "unknown tool",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-12",
+    "idempotency_key": "key-12",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "no_such_tool",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "tool_unavailable",
+    "message": "Package tool is inactive or unavailable"
+   }
+  },
+  {
+   "name": "parameters outside the schema",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-13",
+    "idempotency_key": "key-13",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": 7
+    }
+   },
+   "outcome": {
+    "error": "MechanicsRejected",
+    "code": "mechanics_validation_failed",
+    "message": "Tool parameters do not match the exposed operation schema",
+    "mechanics": {
+     "field_paths": [
+      "choice"
+     ],
+     "validation_issues": [
+      {
+       "path": "choice",
+       "kind": "wrong_type",
+       "expected_type": "string",
+       "actual_type": "integer",
+       "parent_path": "$"
+      }
+     ],
+     "state_changed": false,
+     "refusal_reasons": []
+    }
+   }
+  },
+  {
+   "name": "missing parameter",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-14",
+    "idempotency_key": "key-14",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {}
+   },
+   "outcome": {
+    "error": "MechanicsRejected",
+    "code": "mechanics_validation_failed",
+    "message": "Tool parameters do not match the exposed operation schema",
+    "mechanics": {
+     "field_paths": [
+      "choice"
+     ],
+     "validation_issues": [
+      {
+       "path": "choice",
+       "kind": "missing_required_field",
+       "expected_type": "string",
+       "parent_path": "$"
+      }
+     ],
+     "state_changed": false,
+     "refusal_reasons": []
+    }
+   }
+  },
+  {
+   "name": "extra parameter",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-15",
+    "idempotency_key": "key-15",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "x",
+     "extra": true
+    }
+   },
+   "outcome": {
+    "error": "MechanicsRejected",
+    "code": "mechanics_validation_failed",
+    "message": "Tool parameters do not match the exposed operation schema",
+    "mechanics": {
+     "field_paths": [
+      "extra"
+     ],
+     "validation_issues": [
+      {
+       "path": "extra",
+       "kind": "unexpected_field",
+       "actual_type": "boolean",
+       "parent_path": "$"
+      }
+     ],
+     "state_changed": false,
+     "refusal_reasons": []
+    }
+   }
+  },
+  {
+   "name": "a move no longer available",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-16",
+    "idempotency_key": "key-16",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:1:54"
+    }
+   },
+   "outcome": {
+    "error": "RulesetPreconditionRejected",
+    "code": "ruleset_precondition_failed",
+    "message": "This action is no longer legal.",
+    "mechanics": {
+     "field_paths": [],
+     "validation_issues": [],
+     "state_changed": false,
+     "refusal_reasons": [
+      "This action is no longer legal."
+     ]
+    }
+   }
+  },
+  {
+   "name": "a second start_game",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-17",
+    "idempotency_key": "key-17",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "start_game",
+    "parameters": {
+     "player": "aki",
+     "match_format": "east_only"
+    }
+   },
+   "outcome": {
+    "error": "RulesetPreconditionRejected",
+    "code": "ruleset_precondition_failed",
+    "message": "Finish the current match first.",
+    "mechanics": {
+     "field_paths": [],
+     "validation_issues": [],
+     "state_changed": false,
+     "refusal_reasons": [
+      "Finish the current match first."
+     ]
+    }
+   }
+  },
+  {
+   "name": "further legal move 1",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-18",
+    "idempotency_key": "key-18",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 3,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:2:0"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-18",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Next seat drew a tile.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 4
+    }
+   }
+  },
+  {
+   "name": "further legal move 2",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-19",
+    "idempotency_key": "key-19",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 4,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:3:0"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-19",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Across opponent discarded 3m.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 5
+    }
+   }
+  },
+  {
+   "name": "further legal move 3",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-20",
+    "idempotency_key": "key-20",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 5,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:4:0"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-20",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Next seat drew a tile.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 6
+    }
+   }
+  },
+  {
+   "name": "further legal move 4",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-21",
+    "idempotency_key": "key-21",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 6,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:5:0"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-21",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Left opponent discarded 4m.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 7
+    }
+   }
+  },
+  {
+   "name": "further legal move 5",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-22",
+    "idempotency_key": "key-22",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 7,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:6:0"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-22",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Next seat drew a tile.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 8
+    }
+   }
+  },
+  {
+   "name": "further legal move 6",
+   "command": {
+    "campaign_id": "campaign-table",
+    "action_id": "action-23",
+    "idempotency_key": "key-23",
+    "owner_id": "action-runs",
+    "writer": "dm",
+    "expected_revision": 8,
+    "turn_id": "turn-table",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:7:0"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-table",
+     "action_id": "action-23",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "take_action",
+      "context": {
+       "message": "Next seat drew a tile.",
+       "result": null,
+       "match_result": null
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 9
+    }
+   }
+  },
+  {
+   "name": "the Builder campaign",
+   "command": {
+    "campaign_id": "campaign-workshop",
+    "action_id": "action-24",
+    "idempotency_key": "key-24",
+    "owner_id": "action-runs",
+    "writer": "builder",
+    "expected_revision": 0,
+    "turn_id": "turn-workshop",
+    "package_id": "pneuma.riichi-mahjong",
+    "tool_name": "take_action",
+    "parameters": {
+     "choice": "choice:8:0"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "tool_unavailable",
+    "message": "Package tool is inactive or unavailable"
+   }
+  }
+ ]
+}

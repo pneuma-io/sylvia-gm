@@ -439,6 +439,11 @@ fn build_context<'a>(
     }
     for parameter in &tool.parameters {
         let name = parameter.name_text();
+        if parameter.from_state.truthy() {
+            if let Some(bridge) = ctx.state_bridge.as_deref_mut() {
+                bridge.register_state_parameter(&name, &parameter.from_state.to_str());
+            }
+        }
         let id = match params.get(&name) {
             Some(Value::Str(id)) if !id.is_empty() => Some(id.to_string()),
             _ => None,

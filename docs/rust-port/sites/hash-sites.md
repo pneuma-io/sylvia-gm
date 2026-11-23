@@ -22,9 +22,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/bundled_packages.py:210` | `_srd_drafts` | hashlib.sha256 | `if item.byte_count != len(value) or item.sha256 != hashlib.sha256(value).hexdigest():` |  `sylvia-app` bundled_vectors |
 | `application/bundled_starter_characters.py:89` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(source.encode()).hexdigest(),` | |
 | `application/bundled_starter_characters.py:90` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(setting_character_schema or {})).hexdigest(),` |  `sylvia-app` starter_vectors |
-| `application/campaign_library_selection.py:319` | `resolve_campaign_plan_selection` | hashlib.sha256 | `install_id=f"plan-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` | |
-| `application/campaign_library_selection.py:422` | `materialize_template_party` | hashlib.sha256 | `participant_namespace=hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24],` | |
-| `application/campaign_library_selection.py:555` | `materialize_library_party` | hashlib.sha256 | `+ hashlib.sha256(f"{operation_id}\0{artifact_id}".encode()).hexdigest()[:24]` | |
+| `application/campaign_library_selection.py:319` | `resolve_campaign_plan_selection` | hashlib.sha256 | `install_id=f"plan-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` |  `sylvia-app` selection_vectors |
+| `application/campaign_library_selection.py:422` | `materialize_template_party` | hashlib.sha256 | `participant_namespace=hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24],` |  `sylvia-app` party_vectors |
+| `application/campaign_library_selection.py:555` | `materialize_library_party` | hashlib.sha256 | `+ hashlib.sha256(f"{operation_id}\0{artifact_id}".encode()).hexdigest()[:24]` |  `sylvia-app` party_vectors |
 | `application/character_card_import.py:168` | `_asset_uri` | hashlib.sha256 | `return "card://default/" + hashlib.sha256(uri.encode()).hexdigest()` | |
 | `application/character_card_import.py:171` | `_asset_uri` | hashlib.sha256 | `return "card://inline/" + hashlib.sha256(uri.encode()).hexdigest()` | |
 | `application/character_card_import.py:238` | `preview_character_card` | hashlib.sha256 | `digest = hashlib.sha256(source).hexdigest()` | |

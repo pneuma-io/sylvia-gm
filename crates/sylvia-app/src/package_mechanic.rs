@@ -421,11 +421,9 @@ impl PackageMechanic {
                 None,
             ));
         }
-        // No spatial engine opened (its effects are not yet ported), so no published name is a
-        // spatial private variable.
-        let visible_context = match &result.public_context {
-            None => Value::dict(result.context.clone()),
-            Some(published @ Value::Dict(_)) => published.clone(),
+        let published = match &result.public_context {
+            None => result.context.clone(),
+            Some(Value::Dict(published)) => (**published).clone(),
             Some(other) => {
                 return Err(MechanicFailure::Failed {
                     class: "AttributeError",
@@ -434,6 +432,11 @@ impl PackageMechanic {
                 })
             }
         };
+        // Spatial results, and what was copied from them, stay private.
+        let private = bridge.spatial().private_variables();
+        let visible_context: Dict = published.into_iter().filter(|(key, _)| !private.contains(key)).collect();
+        let visible_context = Value::dict(visible_context);
+        let evidence: Vec<JsonMap> = bridge.spatial().evidence().to_vec();
         let mut payload = Dict::new();
         payload.insert("status".into(), Value::str("committed"));
         payload.insert("tool".into(), Value::str(result.tool_name.as_str()));
@@ -442,6 +445,12 @@ impl PackageMechanic {
         payload.insert("narrative_directives".into(), Value::list(result.narrative_directives.clone()));
         payload.insert("logs".into(), result.logs.clone());
         let mut safe_result = object(json_safe(&Value::dict(payload))?);
+        if !evidence.is_empty() {
+            safe_result.insert(
+                "spatial_evidence".into(),
+                Json::Array(evidence.iter().cloned().map(Json::Object).collect()),
+            );
+        }
         let metadata = match crate::package_runtime::tool_metadata_of(&inner.runtime, name) {
             Ok(metadata) => metadata,
             Err(PackageRuntimeFailure::Uncaught { class, message }) => {
@@ -507,6 +516,12 @@ impl PackageMechanic {
                 consequence.insert(key.clone(), item.clone());
             }
             consequences.push(object(json_safe(&Value::dict(consequence))?));
+        }
+        for item in evidence {
+            let mut consequence = JsonMap::new();
+            consequence.insert("kind".into(), Json::from("spatial_query"));
+            consequence.insert("evidence".into(), Json::Object(item));
+            consequences.push(consequence);
         }
         Ok(MechanicOutcome {
             result: safe_result,
@@ -662,6 +677,85 @@ impl StateBridge for PlayerViewBridge {
     fn combat(&self) -> &Dict {
         &self.combat
     }
+
+    fn supports_spatial(&self) -> bool {
+        true
+    }
+
+    fn spatial_snapshot(&mut self, scene_path: &str) -> Result<Value, ExecError> {
+        let scene = self.player_scene(scene_path)?;
+        Ok(Value::from_json(&self.inner.spatial_mut().snapshot(scene_path, &scene)?))
+    }
+
+    fn spatial_query(
+        &mut self,
+        scene_path: &str,
+        operation: &str,
+        query: &Value,
+        snapshot: &Value,
+    ) -> Result<Value, ExecError> {
+        let Value::Dict(_) = query else {
+            return Err(ExecError::package_runtime("Spatial query input must be an object"));
+        };
+        let query = json_safe(query)?;
+        let scene = self.player_scene(scene_path)?;
+        let Json::Object(query) = query else { unreachable!("a dict") };
+        let snapshot = match snapshot {
+            Value::None => Json::Null,
+            Value::Dict(_) => json_safe(snapshot)?,
+            _ => {
+                self.inner.spatial_mut().engine(scene_path, &scene)?;
+                return Err(ExecError::package_runtime("Spatial snapshot reference is invalid"));
+            }
+        };
+        Ok(Value::from_json(
+            &self.inner.spatial_mut().query(scene_path, &scene, operation, &query, &snapshot)?,
+        ))
+    }
+
+    fn spatial_mutation(&mut self, scene_path: &str, request: &Value) -> Result<Value, ExecError> {
+        let Value::Dict(_) = request else {
+            return Err(ExecError::package_runtime("Spatial mutation input must be an object"));
+        };
+        let request = json_safe(request)?;
+        let scene = self.player_scene(scene_path)?;
+        let (advanced, result) = self.inner.spatial_mut().mutation(scene_path, &scene, &request)?;
+        let field = scene_path.strip_prefix("state.").unwrap_or(scene_path);
+        self.write_field("state", field, Value::from_json(&Json::Object(advanced)))?;
+        Ok(Value::from_json(&result))
+    }
+
+    fn register_spatial_private_variable(&mut self, name: &str) {
+        self.inner.spatial_mut().register_private(name);
+    }
+
+    fn register_state_parameter(&mut self, name: &str, source: &str) {
+        self.inner.spatial_mut().register_state_parameter(name, source);
+    }
+
+    fn register_spatial_aggregate(&mut self, name: &str, source: &Value) {
+        self.inner.spatial_mut().register_aggregate(name, source);
+    }
+}
+
+impl PlayerViewBridge {
+    /// `bridge._spatial_engine(scene_path)` alone: open (or advance) the scene's engine.
+    fn open_scene(&mut self, scene_path: &str) -> Result<(), ExecError> {
+        let scene = self.player_scene(scene_path)?;
+        self.inner.spatial_mut().engine(scene_path, &scene)?;
+        Ok(())
+    }
+
+    /// `_spatial_engine(scene_path)`'s read in the player view: the scene read through the
+    /// player-known boundary, then filtered to its player-known membership again, keeping the
+    /// mechanical metadata of the rows kept.
+    fn player_scene(&self, scene_path: &str) -> Result<Json, ExecError> {
+        let field = sylvia_engine::exec::spatial_bridge::scene_field(scene_path)?;
+        let value = sylvia_engine::exec::spatial_bridge::scene_value(&self.read_field("state", field)?)?;
+        crate::tactical_grid::player_known_spatial_scene(&value, true)
+            .map(Json::Object)
+            .map_err(sylvia_engine::exec::spatial_bridge::spatial_error)
+    }
 }
 
 /// `evaluate_condition(expression, context)`.
@@ -675,17 +769,42 @@ fn text<'j>(map: &'j JsonMap, key: &str) -> Control<&'j str> {
 }
 
 /// `_prepare_player_control_values(policy, context, bridge)`: the declared physical queries and
-/// local scalar calculations, without effects or dice. The physical queries are spatial and are
-/// not yet ported.
-fn prepare_player_control_values(policy: &PlayerControls, ctx: &mut ExecutionContext<'_>) -> Control<()> {
-    if let Some(query) = policy.queries.first() {
-        if ctx.vars.contains_key(text(query, "store_as")?) {
+/// local scalar calculations, without effects or dice. Each query's resolved input is returned,
+/// for a map preview.
+fn prepare_player_control_values(
+    policy: &PlayerControls,
+    ctx: &mut ExecutionContext<'_>,
+) -> Control<JsonMap> {
+    let mut resolved_queries = JsonMap::new();
+    for declaration in &policy.queries {
+        let Some(Json::Object(body)) = declaration.get("spatial_query") else {
+            return Err(ControlError::Other);
+        };
+        let name = text(declaration, "store_as")?;
+        if ctx.vars.contains_key(name) {
             // "Player query would replace a bound variable".
             return Err(ControlError::Other);
         }
-        return Err(ControlError::PortPending(
-            "not yet ported: the player controls' spatial queries (lane 2's spatial effect handlers)".into(),
-        ));
+        let query = sylvia_engine::exec::effects::resolve_spatial_input(
+            &Value::from_json(body.get("query").unwrap_or(&Json::Null)),
+            ctx,
+        );
+        let Value::Dict(query_map) = &query else {
+            // "Player query is unavailable".
+            return Err(ControlError::Other);
+        };
+        let operation = text(body, "operation")?;
+        if operation == "path"
+            && !matches!(query_map.get("max_steps"), Some(Value::Int(steps)) if (1..=4096).contains(steps))
+        {
+            // "Player path query exceeds the selection limit".
+            return Err(ControlError::Other);
+        }
+        let bridge = ctx.state_bridge.as_deref_mut().ok_or(ControlError::Other)?;
+        let result = bridge.spatial_query(text(body, "scene")?, operation, &query, &Value::None)?;
+        ctx.vars.insert(name.to_owned(), result);
+        ctx.state_bridge.as_deref_mut().ok_or(ControlError::Other)?.register_spatial_private_variable(name);
+        resolved_queries.insert(name.to_owned(), json_safe(&query).map_err(|_| ControlError::Other)?);
     }
     for calculation in &policy.calculations {
         let Some(Json::Object(body)) = calculation.get("set") else { return Err(ControlError::Other) };
@@ -716,7 +835,7 @@ fn prepare_player_control_values(policy: &PlayerControls, ctx: &mut ExecutionCon
         }
         ctx.vars.insert(name.to_owned(), value);
     }
-    Ok(())
+    Ok(resolved_queries)
 }
 
 /// `_player_preflight(runtime, policy, parameters, bridge)`: the policy's deterministic owners
@@ -772,12 +891,7 @@ fn player_preflight(
             }
         }
     }
-    if policy.preflight_path.is_some() && player_view {
-        return Err(ControlError::PortPending(
-            "not yet ported: the player controls' preflight path preview (lane 2's spatial effect handlers)"
-                .into(),
-        ));
-    }
+    let _ = player_view;
     Ok(scalars)
 }
 
@@ -1009,7 +1123,21 @@ impl PlayerActionPreviewer {
         };
         let bound = runtime_parameters(tool, &dict_of(parameters), &bridge, false)?;
         let preflight = player_preflight(&host, policy, &bound, &mut bridge, true)?;
+        // Python opens the scenes' engines before projecting a path or map preview, which
+        // lane 2's C3b ports with `spatial_preview.py`.
+        if let Some(path) = &policy.preflight_path {
+            bridge.open_scene(text(path, "scene")?)?;
+            return Err(ControlError::PortPending(
+                "not yet ported: the player controls' preflight path preview (lane 2's spatial effect handlers)".into(),
+            ));
+        }
         if policy.map_preview.is_some() {
+            for item in &policy.queries {
+                let Some(Json::Object(body)) = item.get("spatial_query") else {
+                    return Err(ControlError::Other);
+                };
+                bridge.open_scene(text(body, "scene")?)?;
+            }
             return Err(ControlError::PortPending(
                 "not yet ported: the player controls' map preview (lane 2's spatial effect handlers)".into(),
             ));

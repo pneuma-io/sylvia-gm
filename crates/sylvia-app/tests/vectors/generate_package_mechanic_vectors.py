@@ -54,7 +54,8 @@ RECORDING_ENV = "SYLVIA_MECHANIC_RECORDING"
 FIXTURE = "tests/fixtures/rulesets/signal-and-static"
 SRD = "rulesets/srd-lite"
 RIICHI = "rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package"
-SPATIAL = ("spatial_query", "spatial_mutation", "shot_effect", "aoe")
+# The effects the port refuses by name until its C3b.
+SPATIAL = ("shot_effect", "aoe")
 INLINE_LIMIT = 4096
 RECORDED_TESTS = [
     "tests/test_srd_lite_foundation.py", "tests/test_srd_action_budget.py",
@@ -451,6 +452,9 @@ def scene_vars() -> list:
 
 
 def targeted() -> list[dict]:
+    sys.path.insert(0, str(ROOT / "crates/sylvia-engine/tests/vectors"))
+    from generate_spatial_scene_vectors import QUERIES, QUERY_SCENE
+
     record, base = fixture_base()
     package_id = record["id"]
     cases: list[dict] = []
@@ -476,7 +480,8 @@ def targeted() -> list[dict]:
 
     state = {
         f"{package_id}.state": {"counter": 1, "items": ["a", "b", "c"], "mode": "duel", "active_actor": "orc",
-                                "entities": ["orc"], "resources": {"charge": 3}, "stress": 0},
+                                "entities": ["orc"], "resources": {"charge": 3}, "stress": 0,
+                                "scene": copy.deepcopy(QUERY_SCENE), "plain": {"map": 1}},
         f"{package_id}.entities": {
             "orc": {"hp": 5, "max_hp": 9, "name": "Orc", "conditions": ["prone"], "id": "orc"},
             "elf": {"hp": 7, "max_hp": 7, "name": "Elf", "conditions": []},
@@ -613,10 +618,104 @@ def targeted() -> list[dict]:
     mutation = {"scene": "state.scene", "map_id": "m", "expected_revision": 1, "target": {"kind": "entity", "id": "x"},
                 "patch": {"active": False}}
     case("spatial mutation", synthetic("move", [{"spatial_mutation": mutation, "store_as": "_m"}]), "move", target)
+    # Spatial queries and mutations through the bridge (C3a).
+    def query_effect(kind, store_as="_q", **changes):
+        body = {key: value for key, value in QUERIES[kind].items() if key != "kind"}
+        body.update(changes)
+        return {"spatial_query": {"scene": "state.scene", "operation": kind, "query": body}, "store_as": store_as}
+
+    for kind in QUERIES:
+        case(f"query {kind}", synthetic("look", [query_effect(kind), {"set": {"field": "_seen", "value": "1"}}]),
+             "look", target)
+    case("query cached", synthetic("look", [query_effect("ray"), query_effect("ray", "_r")]), "look", target)
+    case("query snapshot twice", synthetic("look", [
+        {"spatial_query": {"scene": "state.scene", "operation": "snapshot"}, "store_as": "_s1"},
+        {"spatial_query": {"scene": "state.scene", "operation": "snapshot"}, "store_as": "_s2"}]), "look", target)
+    snapped = {"spatial_query": {"scene": "state.scene", "operation": "ray", "snapshot": "{_snap}",
+                                 "query": {k: v for k, v in QUERIES["ray"].items() if k != "kind"}}, "store_as": "_q"}
+    case("query on a snapshot", synthetic("look", [
+        {"spatial_query": {"scene": "state.scene", "operation": "snapshot"}, "store_as": "_snap"}, snapped]), "look", target)
+    case("query on an unknown snapshot", synthetic("look", [
+        {"set": {"field": "_snap", "value": {"snapshot_id": "nope"}}}, snapped]), "look", target)
+    case("query on no snapshot", synthetic("look", [snapped]), "look", target)
+    case("query missing scene", synthetic("look", [
+        {"spatial_query": {"scene": "state.absent", "operation": "snapshot"}, "store_as": "_q"}]), "look", target)
+    case("query invalid", synthetic("look", [query_effect("sweep", moving_entity_id="nobody")]), "look", target)
+    move = {"scene": "state.scene", "map_id": "keep", "expected_revision": 3, "target": {"kind": "entity", "id": "orc"},
+            "patch": {"position": [6.5, 6.5, 0]}}
+    case("mutation then query", synthetic("move", [{"spatial_mutation": move, "store_as": "_m"}, query_effect("ray"),
+                                                   {"set": {"field": "_after", "value": "state.scene.map.revision"}}]),
+         "move", target)
+    case("mutation stale", synthetic("move", [{"spatial_mutation": {**move, "expected_revision": 2}, "store_as": "_m"}]),
+         "move", target)
+    case("overlap survives a move", synthetic("move", [query_effect("circle_overlap", "_o1"),
+                                                       {"spatial_mutation": move, "store_as": "_m"},
+                                                       query_effect("circle_overlap", "_o2")]), "move", target)
+    case("overlap int and float origin", synthetic("look", [
+        query_effect("circle_overlap", "_o1"), query_effect("circle_overlap", "_o2", origin=[5.5, 5.5, 0.0])]), "look", target)
+    case("overlap negative zero origin", synthetic("look", [
+        query_effect("circle_overlap", "_o1"), query_effect("circle_overlap", "_o2", origin=[5.5, 5.5, -0.0])]), "look", target)
+    case("scene changed by a write", synthetic("look", [
+        query_effect("ray"), {"set": {"field": "state.scene.map.revision", "value": 4}}, query_effect("ray", "_r")]),
+         "look", target)
+    case("overlap moved fixed body", synthetic("move", [
+        query_effect("circle_overlap", "_o1"),
+        {"spatial_mutation": {**move, "target": {"kind": "entity", "id": "elf"}, "patch": {"position": [11, 10, 0]}},
+         "store_as": "_m"},
+        query_effect("circle_overlap", "_o2")]), "move", target)
+    case("private copies", synthetic("look", [
+        query_effect("path", start=[5, 5]),
+        {"set": {"field": "_copy", "value": "_q"}}, {"set": {"field": "_cells", "value": "_q.cells"}},
+        {"set": {"field": "_count", "value": "len(_q.cells)"}}, {"set": {"field": "_found", "value": "_q.found"}},
+        {"set": {"field": "_twice", "value": "_cells"}},
+        {"for_each": {"collection": "_q.cells", "as": "_cell", "do": [{"set": {"field": "_last_x", "value": "_cell[0]"}}]}},
+        {"list_push": {"list": "_bag", "value": "_q"}}, {"list_push": {"list": "_plain", "value": "1"}},
+        {"list_pop": {"list": "_bag"}, "store_as": "_popped"},
+        {"set": {"field": "_entities", "value": "state.scene.entities"}},
+        {"set": {"field": "_near", "value": "xstate.scene"}},
+        {"set": {"field": "_plain_map", "value": "state.plain"}},
+        {"publish": {"fields": {"count": "_count", "cells": "_cells"}}}]), "look", target)
+    case("private copies unpublished", synthetic("look", [
+        query_effect("path", start=[5, 5]), {"set": {"field": "_copy", "value": "_q"}},
+        {"set": {"field": "_count", "value": "len(_q.cells)"}}, {"set": {"field": "_twice", "value": "_copy"}},
+        {"set": {"field": "_cells", "value": "_q.cells"}}, {"for_each": {"collection": "_cells", "as": "_cell", "do": []}},
+        {"list_push": {"list": "_bag", "value": "_q"}}, {"list_push": {"list": "_box", "value": "_q"}},
+        {"list_pop": {"list": "_box"}, "store_as": "_popped"},
+        {"set": {"field": "_entities", "value": "state.scene.entities"}}, {"set": {"field": "_spaced", "value": "merge(state.scene , state.plain)"}},
+        {"set": {"field": "_near", "value": "xstate.scene"}}, {"set": {"field": "_plain_map", "value": "state.plain"}}]),
+         "look", target)
+    state_bound = [TARGET, {"name": "scene_map", "type": "object", "from_state": "state.scene.map"},
+                   {"name": "plain_map", "type": "object", "from_state": "state.plain"}]
+    case("private state parameters", synthetic("look", [query_effect("ray"), {"set": {"field": "_copy_map", "value": "scene_map"}},
+                                                        {"set": {"field": "_copy_plain", "value": "plain_map"}}],
+                                                 parameters=state_bound), "look", target)
+    case("state parameters without a scene", synthetic("look", [{"set": {"field": "_x", "value": 1}}], parameters=state_bound),
+         "look", target)
+    many = {"for_each": {"collection": "_xs", "as": "_i", "do": [
+        {"spatial_query": {"scene": "state.scene", "operation": "ray",
+                           "query": {**{k: v for k, v in QUERIES["ray"].items() if k != "kind"}, "destination": ["{_i}", 10, 1.5]}},
+         "store_as": "_q"}]}}
+    case("evidence limit", synthetic("look", [{"set": {"field": "_xs", "value": [2 + i / 10 for i in range(130)]}}, many]),
+         "look", target)
+    case("evidence one over the limit", synthetic("look", [{"set": {"field": "_xs", "value": [2 + i / 10 for i in range(129)]}}, many]),
+         "look", target)
+    case("evidence just under the limit", synthetic("look", [{"set": {"field": "_xs", "value": [2 + i / 10 for i in range(128)]}}, many]),
+         "look", target)
     shot = {"scene": "state.scene", "snapshot": "_q", "source_id": "a", "target_id": "b", "origin": [0, 0],
             "destination": [1, 1], "delay_ms": 0, "miss": False, "contacts": []}
     case("shot effect", synthetic("shoot", [{"shot_effect": shot}]), "shoot", target)
     case("aoe", synthetic("blast", [{"aoe": {"shape": "sphere", "size": 10}, "do": []}]), "blast", target)
+    # Code not yet ported passes through every layer: an `aoe` (C3b) inside a nested call, a
+    # procedure, a loop and a conditional.
+    blast = {"aoe": {"shape": "sphere", "size": 10}, "do": []}
+    case("pending nested", synthetic("outer", [{"call": "inner", "params": {}}],
+                                     extra={"inner": {"description": "Inner.", "parameters": [], "effects": [blast]}}),
+         "outer", target)
+    case("pending procedure", synthetic("hit", [{"trigger": "on_blast"}],
+                                        procedures={"on_blast": {"trigger": "on_blast", "steps": [blast]}}), "hit", target)
+    case("pending for_each", synthetic("look", [{"set": {"field": "_xs", "value": [1, 2]}},
+                                                {"for_each": {"collection": "_xs", "as": "_i", "do": [blast]}}]), "look", target)
+    case("pending conditional", synthetic("look", [{"condition": "true", "on_true": [blast]}]), "look", target)
     # Choices.
     choose = {"request_choice": {"choice_id": "c1", "prompt": "Choose for {target.name}", "options": CHOICE_OPTIONS},
               "store_as": "_choice"}

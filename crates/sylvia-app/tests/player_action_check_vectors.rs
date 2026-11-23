@@ -105,7 +105,7 @@ fn compare(name: &str, actual: &Json, wanted: &Json, failures: &mut Vec<String>)
         for key in
             ["name", "kind", "package_id", "declaration", "runtime", "parameters", "state", "participants"]
         {
-            map.remove(key);
+            map.shift_remove(key);
         }
         if let Some(Json::String(reached)) = map.get("pending").cloned() {
             map.insert("pending".into(), Json::String(pending_message(&reached)));

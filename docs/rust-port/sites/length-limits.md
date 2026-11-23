@@ -18,7 +18,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | --- | --- | --- | --- | --- |
 | `application/bundled_campaign_plans.py:116` | `read_plan_catalogue` | len() against a limit | `if not isinstance(rows, list) or not 1 <= len(rows) <= 256:` |  `sylvia-app` plan_catalogue_vectors |
 | `application/bundled_starter_characters.py:117` | `bundled_starter_participants` | len() against a limit | `if len(_ROSTERS) >= 32:` | |
-| `application/campaign_library_selection.py:640` | `plan_with_interview_intent` | len() against a limit | `if not isinstance(value, str) or len(value) > 131_072:` | |
+| `application/campaign_library_selection.py:640` | `plan_with_interview_intent` | len() against a limit | `if not isinstance(value, str) or len(value) > 131_072:` |  `sylvia-app` selection_vectors |
 | `application/character_card_import.py:128` | `_png_json` | len() against a limit | `if len(encoded) > 350000:` | |
 | `application/character_card_import.py:154` | `_asset_uri` | len() against a limit | `if len(uri) > 4096 or "\x00" in uri or any(c.isspace() for c in uri):` | |
 | `application/character_card_import.py:193` | `preview_character_card` | len() against a limit | `if not isinstance(source, bytes) or not source or len(source) > MAX_CARD_BYTES:` | |

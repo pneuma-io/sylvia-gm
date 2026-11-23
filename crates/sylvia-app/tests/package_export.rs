@@ -1,7 +1,8 @@
 //! Package candidate exports against Python (`tests/vectors/package_export/package_export_runs.json`,
 //! written by `generate_package_export_runs.py`): every installed candidate of four Python-made
-//! profiles, and one that does not exist. Each result, or refusal, must be Python's, and the bytes
-//! written must be Python's archive, byte for byte.
+//! profiles, and one that does not exist, through both forms (`export_package_candidate` on the
+//! store handle, and `export_package_candidate_on` inside one store call). Each result, or
+//! refusal, must be Python's, and the bytes written must be Python's archive, byte for byte.
 
 use flate2::read::GzDecoder;
 use serde_json::json;
@@ -75,9 +76,35 @@ async fn package_exports_match_python() {
                 "written_sha256": run["written_sha256"],
                 "written_bytes": run["written_bytes"],
             });
-            let (got, want) = (got.to_string(), want.to_string());
+            // The synchronous form, inside one store call as lane 1's selection owner calls it.
+            let id = candidate_id.to_owned();
+            let (sync_outcome, sync_written) = handle
+                .call(move |store| {
+                    let mut written = Vec::new();
+                    let outcome = match portable::export_package_candidate_on(store, &id, &mut written) {
+                        Ok(result) => json!({ "ok": result }),
+                        Err(error) => {
+                            let coded =
+                                error.rejection().unwrap_or_else(|| panic!("an unexpected failure: {error}"));
+                            json!({"error": coded.error_type.unwrap_or("CommandRejected"), "code": coded.code, "message": coded.message})
+                        }
+                    };
+                    Ok((outcome, written))
+                })
+                .await
+                .unwrap();
+            let sync = json!({
+                "outcome": sync_outcome,
+                "written_sha256": sylvia_base::hash::sha256_hex(&sync_written),
+                "written_bytes": sync_written.len(),
+            });
+            let (got, sync, want) = (got.to_string(), sync.to_string(), want.to_string());
             if got != want {
                 failures.push(format!("{name} {candidate_id}\n  Rust   {got}\n  Python {want}"));
+            }
+            if sync != want {
+                failures
+                    .push(format!("{name} {candidate_id} (synchronous)\n  Rust   {sync}\n  Python {want}"));
             }
         }
         drop(handle);

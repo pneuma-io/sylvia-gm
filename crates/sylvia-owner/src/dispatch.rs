@@ -147,6 +147,10 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "campaign_creation_catalog" => {
+            commands::campaigns::handle_campaign_creation_catalog(context, params).await
+        }
+        "campaign_party_options" => commands::campaigns::handle_campaign_party_options(context, params).await,
         "advance_guided_campaign_draft" => {
             commands::campaigns::handle_advance_guided_campaign_draft(context, params).await
         }
@@ -163,6 +167,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
+        }
+        "export_package_candidate" | "export_package_candidate_file" => {
+            commands::packages::handle_export_package_candidate(context, params).await
         }
         "recover_campaign" => commands::campaigns::handle_recover_campaign(context, params).await,
         "recover_campaign_file" => commands::campaigns::handle_recover_campaign_file(context, params).await,

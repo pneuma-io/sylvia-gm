@@ -194,6 +194,33 @@ fn no_ruleset_plan(display_name: &str, premise: &str) -> String {
 /// `handle_start_guided_campaign` for a Draft with no Ruleset or an installed one. A saved
 /// Campaign Plan (`plan_id`) needs lane 1's library selection and party materialisation, so it is
 /// refused as not yet ported.
+/// `handle_campaign_party_options`: a saved Plan's party choices, revalidated through lane 1's
+/// library selection (`resolve_campaign_library_selection(...).party_options()`) in one store
+/// call.
+pub async fn handle_campaign_party_options(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let ruleset_selection = required(params, "ruleset_selection")?;
+    let setting_id = required(params, "setting_id")?;
+    let plan_id = required(params, "plan_id")?;
+    let bundled = std::sync::Arc::clone(&ctx.bundled);
+    let storage_root = ctx.storage_root.clone();
+    let options = ctx
+        .store
+        .call(move |store| {
+            let selection = sylvia_app::campaign_library_selection::resolve_campaign_library_selection(
+                store,
+                &bundled,
+                &storage_root,
+                &ruleset_selection,
+                &setting_id,
+                &plan_id,
+            )?;
+            selection.party_options(&bundled).map_err(sylvia_store::StoreError::from)
+        })
+        .await
+        .map_err(store_error)?;
+    Ok(Json::Object(options))
+}
+
 pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let operation_id = required(params, "operation_id")?;
     let campaign_id = required(params, "campaign_id")?;
@@ -748,7 +775,7 @@ async fn recover_campaign(
 
 /// `_required_artifact_id(payload, key)`: a nonempty string matching
 /// `[A-Za-z0-9][A-Za-z0-9._-]{0,127}` in full.
-fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<String> {
+pub(crate) fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<String> {
     let value = required(params, key)?;
     let mut characters = value.chars();
     let first_ok = characters.next().is_some_and(|first| first.is_ascii_alphanumeric());
@@ -770,7 +797,7 @@ fn optional_bool(params: &JsonMap, key: &str) -> CodedResult<bool> {
 }
 
 /// `Path.resolve(strict=True)`, without Windows' `\\?\` prefix, which pathlib does not show.
-fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
+pub(crate) fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
     let resolved = std::fs::canonicalize(path)?;
     let text = resolved.to_string_lossy();
     Ok(if let Some(rest) = text.strip_prefix(r"\\?\UNC\") {
@@ -819,7 +846,7 @@ fn guided_draft_value(draft: &sylvia_domain::authority::GuidedCampaignDraft) -> 
 }
 
 /// `_required_text(params, key)` as a handler's error.
-fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
+pub(crate) fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
     crate::dispatch::required_text(params, key).map_err(|failure| match failure {
         crate::dispatch::Failure::Rejected(error) => error,
         _ => unreachable!("a missing parameter is a rejection"),
@@ -895,6 +922,31 @@ fn campaign_entry_value(entry: &sylvia_store::authority::CampaignIndexEntry) -> 
 pub async fn handle_campaign_index(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
     let entries = ctx.store.call(|store| store.campaign_index_entries()).await.map_err(store_error)?;
     Ok(Json::Array(entries.iter().map(campaign_entry_value).collect()))
+}
+
+/// `handle_campaign_creation_catalog`: `_campaign_creation_catalog(storage_root, owner,
+/// include_participants=...)`, the content a new campaign can be made from. `include_participants`
+/// defaults to `True` (`_optional_bool(..., default=True)`); anything present must be a boolean.
+pub async fn handle_campaign_creation_catalog(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let include_participants = match params.get("include_participants") {
+        None => true,
+        Some(Json::Bool(value)) => *value,
+        Some(_) => return Err(protocol("include_participants must be a boolean")),
+    };
+    let (storage_root, bundled) = (ctx.storage_root.clone(), std::sync::Arc::clone(&ctx.bundled));
+    let catalog = ctx
+        .store
+        .call(move |store| {
+            crate::creation_catalog::campaign_creation_catalog(
+                &storage_root,
+                store,
+                &bundled,
+                include_participants,
+            )
+        })
+        .await
+        .map_err(store_error)?;
+    Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
 }
 
 #[cfg(test)]

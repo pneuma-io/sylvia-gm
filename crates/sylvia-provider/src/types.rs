@@ -307,7 +307,9 @@ impl LiveContext {
         self.0.lock().expect("live context lock").clone()
     }
 
-    /// Rewrite the figures as one change: readers only ever see whole figures.
+    /// Rewrite the figures as one change: readers only ever see whole figures. The closure runs
+    /// under the cell's lock (a `std::sync::Mutex`, not re-entrant), so it must not read the same
+    /// model's figures.
     pub fn update(&self, change: impl FnOnce(&mut ContextFigures)) {
         change(&mut self.0.lock().expect("live context lock"));
     }
@@ -338,30 +340,30 @@ pub struct ModelInfo {
     pub premium: bool,
     /// Effective context capacity used for request admission (derived, may be `None`).
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub context_window: Option<i64>,
     pub declared_context_window: Option<i64>,
     pub declared_context_source: String,
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub runtime_context_window: Option<i64>,
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub runtime_context_source: String,
     pub configured_context_window: Option<i64>,
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub context_window_source: String,
     pub declared_context_observed_at: Option<String>,
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub runtime_context_observed_at: Option<String>,
     pub configured_context_observed_at: Option<String>,
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub context_observed_at: Option<String>,
     /// Set at construction; after construction, read it through the accessor of the same name, which sees a runtime's
-    /// observed figure.
+    /// observed figure. Once a live cell exists, writing this field has no effect on the accessor.
     pub configured_runtime_mismatch: bool,
     pub configured_declared_mismatch: bool,
     /// Sylvia's completion allowance; `None` for runtime-managed output.
@@ -529,76 +531,171 @@ impl ModelInfo {
 
 impl PartialEq for ModelInfo {
     fn eq(&self, other: &Self) -> bool {
+        // Every field by name, so a new one fails to compile until it is compared here; the
+        // seven context figures are read through one snapshot, and `live` itself is not compared.
+        let ModelInfo {
+            id,
+            name,
+            provider_name,
+            provider_key,
+            provider_mode,
+            recommended,
+            premium,
+            context_window,
+            declared_context_window,
+            declared_context_source,
+            runtime_context_window,
+            runtime_context_source,
+            configured_context_window,
+            context_window_source,
+            declared_context_observed_at,
+            runtime_context_observed_at,
+            configured_context_observed_at,
+            context_observed_at,
+            configured_runtime_mismatch,
+            configured_declared_mismatch,
+            max_output_tokens,
+            builder_output_tokens,
+            cost_per_1k_tokens,
+            transport,
+            provider_model_id,
+            supports_streaming,
+            supports_tools,
+            supported_reasoning_efforts,
+            default_reasoning_effort,
+            reasoning_control,
+            reasoning_source,
+            speed_options,
+            speed_control,
+            speed_source,
+            live: _,
+        } = self;
+        let _ = (
+            configured_runtime_mismatch,
+            context_observed_at,
+            context_window,
+            context_window_source,
+            runtime_context_observed_at,
+            runtime_context_source,
+            runtime_context_window,
+        );
         self.context_figures() == other.context_figures()
-            && self.id == other.id
-            && self.name == other.name
-            && self.provider_name == other.provider_name
-            && self.provider_key == other.provider_key
-            && self.provider_mode == other.provider_mode
-            && self.recommended == other.recommended
-            && self.premium == other.premium
-            && self.declared_context_window == other.declared_context_window
-            && self.declared_context_source == other.declared_context_source
-            && self.configured_context_window == other.configured_context_window
-            && self.declared_context_observed_at == other.declared_context_observed_at
-            && self.configured_context_observed_at == other.configured_context_observed_at
-            && self.configured_declared_mismatch == other.configured_declared_mismatch
-            && self.max_output_tokens == other.max_output_tokens
-            && self.builder_output_tokens == other.builder_output_tokens
-            && self.cost_per_1k_tokens == other.cost_per_1k_tokens
-            && self.transport == other.transport
-            && self.provider_model_id == other.provider_model_id
-            && self.supports_streaming == other.supports_streaming
-            && self.supports_tools == other.supports_tools
-            && self.supported_reasoning_efforts == other.supported_reasoning_efforts
-            && self.default_reasoning_effort == other.default_reasoning_effort
-            && self.reasoning_control == other.reasoning_control
-            && self.reasoning_source == other.reasoning_source
-            && self.speed_options == other.speed_options
-            && self.speed_control == other.speed_control
-            && self.speed_source == other.speed_source
+            && *id == other.id
+            && *name == other.name
+            && *provider_name == other.provider_name
+            && *provider_key == other.provider_key
+            && *provider_mode == other.provider_mode
+            && *recommended == other.recommended
+            && *premium == other.premium
+            && *declared_context_window == other.declared_context_window
+            && *declared_context_source == other.declared_context_source
+            && *configured_context_window == other.configured_context_window
+            && *declared_context_observed_at == other.declared_context_observed_at
+            && *configured_context_observed_at == other.configured_context_observed_at
+            && *configured_declared_mismatch == other.configured_declared_mismatch
+            && *max_output_tokens == other.max_output_tokens
+            && *builder_output_tokens == other.builder_output_tokens
+            && *cost_per_1k_tokens == other.cost_per_1k_tokens
+            && *transport == other.transport
+            && *provider_model_id == other.provider_model_id
+            && *supports_streaming == other.supports_streaming
+            && *supports_tools == other.supports_tools
+            && *supported_reasoning_efforts == other.supported_reasoning_efforts
+            && *default_reasoning_effort == other.default_reasoning_effort
+            && *reasoning_control == other.reasoning_control
+            && *reasoning_source == other.reasoning_source
+            && *speed_options == other.speed_options
+            && *speed_control == other.speed_control
+            && *speed_source == other.speed_source
     }
 }
 
 impl std::fmt::Debug for ModelInfo {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // Every field by name, as in `PartialEq`; the context figures as they are now.
+        let ModelInfo {
+            id,
+            name,
+            provider_name,
+            provider_key,
+            provider_mode,
+            recommended,
+            premium,
+            context_window,
+            declared_context_window,
+            declared_context_source,
+            runtime_context_window,
+            runtime_context_source,
+            configured_context_window,
+            context_window_source,
+            declared_context_observed_at,
+            runtime_context_observed_at,
+            configured_context_observed_at,
+            context_observed_at,
+            configured_runtime_mismatch,
+            configured_declared_mismatch,
+            max_output_tokens,
+            builder_output_tokens,
+            cost_per_1k_tokens,
+            transport,
+            provider_model_id,
+            supports_streaming,
+            supports_tools,
+            supported_reasoning_efforts,
+            default_reasoning_effort,
+            reasoning_control,
+            reasoning_source,
+            speed_options,
+            speed_control,
+            speed_source,
+            live: _,
+        } = self;
+        let _ = (
+            configured_runtime_mismatch,
+            context_observed_at,
+            context_window,
+            context_window_source,
+            runtime_context_observed_at,
+            runtime_context_source,
+            runtime_context_window,
+        );
         let figures = self.context_figures();
         formatter
             .debug_struct("ModelInfo")
-            .field("id", &self.id)
-            .field("name", &self.name)
-            .field("provider_name", &self.provider_name)
-            .field("provider_key", &self.provider_key)
-            .field("provider_mode", &self.provider_mode)
-            .field("recommended", &self.recommended)
-            .field("premium", &self.premium)
+            .field("id", id)
+            .field("name", name)
+            .field("provider_name", provider_name)
+            .field("provider_key", provider_key)
+            .field("provider_mode", provider_mode)
+            .field("recommended", recommended)
+            .field("premium", premium)
             .field("context_window", &figures.context_window)
-            .field("declared_context_window", &self.declared_context_window)
-            .field("declared_context_source", &self.declared_context_source)
+            .field("declared_context_window", declared_context_window)
+            .field("declared_context_source", declared_context_source)
             .field("runtime_context_window", &figures.runtime_context_window)
             .field("runtime_context_source", &figures.runtime_context_source)
-            .field("configured_context_window", &self.configured_context_window)
+            .field("configured_context_window", configured_context_window)
             .field("context_window_source", &figures.context_window_source)
-            .field("declared_context_observed_at", &self.declared_context_observed_at)
+            .field("declared_context_observed_at", declared_context_observed_at)
             .field("runtime_context_observed_at", &figures.runtime_context_observed_at)
-            .field("configured_context_observed_at", &self.configured_context_observed_at)
+            .field("configured_context_observed_at", configured_context_observed_at)
             .field("context_observed_at", &figures.context_observed_at)
             .field("configured_runtime_mismatch", &figures.configured_runtime_mismatch)
-            .field("configured_declared_mismatch", &self.configured_declared_mismatch)
-            .field("max_output_tokens", &self.max_output_tokens)
-            .field("builder_output_tokens", &self.builder_output_tokens)
-            .field("cost_per_1k_tokens", &self.cost_per_1k_tokens)
-            .field("transport", &self.transport)
-            .field("provider_model_id", &self.provider_model_id)
-            .field("supports_streaming", &self.supports_streaming)
-            .field("supports_tools", &self.supports_tools)
-            .field("supported_reasoning_efforts", &self.supported_reasoning_efforts)
-            .field("default_reasoning_effort", &self.default_reasoning_effort)
-            .field("reasoning_control", &self.reasoning_control)
-            .field("reasoning_source", &self.reasoning_source)
-            .field("speed_options", &self.speed_options)
-            .field("speed_control", &self.speed_control)
-            .field("speed_source", &self.speed_source)
+            .field("configured_declared_mismatch", configured_declared_mismatch)
+            .field("max_output_tokens", max_output_tokens)
+            .field("builder_output_tokens", builder_output_tokens)
+            .field("cost_per_1k_tokens", cost_per_1k_tokens)
+            .field("transport", transport)
+            .field("provider_model_id", provider_model_id)
+            .field("supports_streaming", supports_streaming)
+            .field("supports_tools", supports_tools)
+            .field("supported_reasoning_efforts", supported_reasoning_efforts)
+            .field("default_reasoning_effort", default_reasoning_effort)
+            .field("reasoning_control", reasoning_control)
+            .field("reasoning_source", reasoning_source)
+            .field("speed_options", speed_options)
+            .field("speed_control", speed_control)
+            .field("speed_source", speed_source)
             .finish()
     }
 }
