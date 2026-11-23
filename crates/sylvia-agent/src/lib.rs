@@ -14,6 +14,7 @@
 //! - [`session_loop`] holds parts of `agent/_session_loop.py`.
 //! - [`activity`] holds `agent/_activity.py`.
 //! - [`inference_identity`] holds `agent/_inference_identity.py`.
+//! - [`native_continuation`] holds `agent/_native_continuation.py`.
 //! - [`working_context`] holds `agent/_working_context.py`.
 //! - [`request_data`] holds `agent/_request_data.py`.
 
@@ -21,6 +22,7 @@ pub mod activity;
 pub mod argument_contracts;
 pub mod campaign_memory;
 pub mod inference_identity;
+pub mod native_continuation;
 pub mod provider_resolver;
 pub mod provider_session;
 pub mod provider_turn;

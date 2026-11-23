@@ -384,3 +384,188 @@ fn replace_fresh_state(messages: &mut [Tagged], refreshed: Tagged) {
         messages[index] = refreshed;
     }
 }
+
+/// `stream_provider_round(self, state, provider_input, turn_id=...)`: the round's controls,
+/// its request through the session's working context, and what the stream assembled; private
+/// reasoning, the native continuation and a normalized forced call are emitted as events.
+pub async fn stream_provider_round(
+    adapter: &std::sync::Arc<ProviderSessionAdapter>,
+    state: &mut ProviderTurnState,
+    input: &SessionProviderInput,
+    turn_id: &str,
+    events: &mut dyn super::TurnEvents,
+) -> super::TurnResult<()> {
+    use crate::provider_session::control_texts::{
+        campaign_file_disposition_message, campaign_file_updated_narration_message, campaign_preparation_message,
+        gm_decision_control_message, player_boundary_narration_message,
+    };
+    use crate::provider_session::request::{forced_single_tool_call_from_json, native_content_for_text_operation};
+    use crate::provider_session::texts::{gm_text, system};
+    use crate::session_loop::ProviderEvent;
+    use sylvia_base::pyjson::{self, Dump};
+
+    if !state.locals.pending_narration_facts.get()?.is_empty() {
+        let facts = Json::Array(state.locals.pending_narration_facts.value()?.into_iter().map(Json::Object).collect());
+        let data = pyjson::dumps(&facts, Dump::CANONICAL);
+        let provisional =
+            if d::provisional_tool_prose_needs_review(state)? { gm_text("narration_facts_provisional") } else { "" };
+        let content = format!(
+            "{}{data}{}{provisional}{}",
+            gm_text("narration_facts_prefix"),
+            gm_text("narration_facts_continue"),
+            gm_text("narration_facts_suffix")
+        );
+        state.locals.inference_messages.get_mut()?.push(Tagged::plain(system(content)));
+    }
+    let controls = std::mem::take(state.locals.current_application_controls.get_mut()?);
+    state.locals.inference_messages.get_mut()?.extend(controls.into_iter().map(Tagged::plain));
+    if d::campaign_file_needs_narration(state)? {
+        let message = campaign_file_updated_narration_message(
+            state.locals.opening_footing.get()?.as_ref(),
+            state.locals.current_player_action.get()?.as_deref(),
+        );
+        state.locals.inference_messages.get_mut()?.push(Tagged::plain(message));
+    } else if d::held_disposition_must_be_retried(state)? {
+        let message = campaign_file_disposition_message(
+            state.locals.opening_footing.get()?.as_ref(),
+            state.locals.current_player_action.get()?.as_deref(),
+        );
+        state.locals.inference_messages.get_mut()?.push(Tagged::plain(message));
+    }
+    // The player's exact message keeps its natural user role.
+    if let Some(boundary) = state.locals.decision_boundary.value()? {
+        let message = if boundary.preparation.is_some() {
+            campaign_preparation_message(&boundary)
+        } else if d::round_is_at_player_boundary(state)? {
+            let committed: Vec<String> = state
+                .locals
+                .pending_narration_facts
+                .get()?
+                .iter()
+                .filter_map(|fact| fact.get("tool").and_then(Json::as_str).map(str::to_owned))
+                .collect();
+            player_boundary_narration_message(
+                &boundary,
+                state.locals.current_player_action.get()?.as_deref(),
+                &committed,
+                *state.obligations.player_intent_pending.get()?,
+            )
+        } else {
+            gm_decision_control_message(&boundary)
+        };
+        state.locals.inference_messages.get_mut()?.push(Tagged::plain(message));
+    }
+    if let Some(message) = state.locals.private_deliberation_correction_message.value()? {
+        state.locals.inference_messages.get_mut()?.push(Tagged::plain(message));
+        state.locals.private_deliberation_correction_message.set(None);
+    }
+    if let Some(message) = state.locals.required_tool_call_correction_message.value()? {
+        state.locals.inference_messages.get_mut()?.push(Tagged::plain(message));
+        state.locals.required_tool_call_correction_message.set(None);
+    }
+    let atomic = d::campaign_file_requires_atomic_completion(state, input)?;
+    let required = d::round_requires_tool_call(state, atomic)?;
+    state.locals.provider_tool_call_required.set(required);
+    let history_allowed = d::round_allows_history_tool(state)?;
+    let mut stream = adapter
+        .stream_round(
+            state.locals.inference_messages.value()?,
+            state.locals.tools.value()?,
+            input,
+            required.then_some("required"),
+            history_allowed,
+        )
+        .await?;
+    while let Some(chunk) = stream.next().await? {
+        if let Some(reason) = &chunk.finish_reason {
+            let reason = reason.as_text().map_or_else(|| py_str(&reason.to_json()), str::to_owned);
+            state.locals.round_finish_reason.set(Some(reason));
+        }
+        if let Some(metadata) = &chunk.chat_completion_metadata {
+            state.locals.native_chat_metadata.set(Some(metadata.clone()));
+        }
+        if let Some(content) = &chunk.anthropic_content {
+            state
+                .locals
+                .native_assistant_content
+                .set(Some(content.iter().map(|block| block.as_object().cloned().unwrap_or_default()).collect()));
+        }
+        if !chunk.reasoning_content.is_empty() {
+            state.locals.assistant_reasoning.get_mut()?.push(chunk.reasoning_content.clone());
+            // Only provider-classified reasoning enters the private inspection sink.
+            events
+                .emit(ProviderEvent::PrivateReasoning {
+                    text: chunk.reasoning_content.clone(),
+                    response_id: Some(state.locals.inference_id.value()?),
+                })
+                .await?;
+        }
+        if !chunk.content.is_empty() {
+            state.locals.assistant_text.get_mut()?.push(chunk.content.clone());
+        }
+        if let Some(delta) = &chunk.tool_call_delta {
+            let fragment = sylvia_provider::tool_delta::parse_tool_call_delta(delta);
+            let index = i64::try_from(fragment.index).unwrap_or(i64::MAX);
+            let assembly = state.locals.assemblies.get_mut()?.entry(index).or_default();
+            assembly.call_id.push_str(&fragment.call_id);
+            assembly.name.push_str(&fragment.name);
+            assembly.arguments.push_str(&fragment.arguments);
+            let current = assembly.clone();
+            state.locals.assembly.set(current);
+        }
+    }
+    drop(stream);
+    // The provider's original fields, before any application normalization: private owner
+    // storage only, never canonical tool evidence.
+    let mut native = JsonMap::new();
+    if let Some(metadata) = state.locals.native_chat_metadata.value()? {
+        native.insert("chat_completion_metadata".into(), Json::Object(metadata));
+    }
+    if let Some(content) = state.locals.native_assistant_content.value()? {
+        native.insert("anthropic_content".into(), Json::Array(content.into_iter().map(Json::Object).collect()));
+    }
+    if !state.locals.assistant_reasoning.get()?.is_empty() {
+        native.insert("reasoning_content".into(), state.locals.assistant_reasoning.get()?.concat().into());
+    }
+    if !native.is_empty() {
+        for (key, value) in state.locals.context_fields.value()? {
+            native.insert(key, value);
+        }
+        let event = ProviderEvent::private_continuation(&native, &state.locals.inference_id.value()?)?;
+        events.emit(event).await?;
+    }
+    if state.locals.assemblies.get()?.is_empty() && *state.locals.provider_tool_call_required.get()? {
+        let encoded = state.locals.assistant_text.get()?.concat();
+        let normalized = forced_single_tool_call_from_json(&encoded, state.locals.aliases.get()?, || adapter.uuid_hex());
+        // `loader_text_call` answers only for Sylvia's tool loader, which serves ledger mode
+        // alone, so a legacy round never has one.
+        if let Some(normalized) = normalized {
+            let native_content = state.locals.native_assistant_content.value()?;
+            let normalized_native = native_content_for_text_operation(native_content.as_ref(), &encoded, &normalized)?;
+            if native_content.is_none() || normalized_native.is_some() {
+                state.locals.native_assistant_content.set(normalized_native);
+                state.locals.assemblies.get_mut()?.insert(0, normalized.clone());
+                state.locals.assistant_text.get_mut()?.clear();
+                let inference_id = state.locals.inference_id.value()?;
+                let mut payload = JsonMap::new();
+                payload.insert("kind".into(), "provider_forced_tool_json_normalized".into());
+                payload.insert("turn_id".into(), turn_id.into());
+                payload.insert("inference_id".into(), inference_id.as_str().into());
+                payload.insert(
+                    "basis_message_id".into(),
+                    state.locals.basis_message_id.value()?.map_or(Json::Null, Json::from),
+                );
+                payload.insert("tool_name".into(), normalized.name.as_str().into());
+                events
+                    .emit(ProviderEvent::Evidence { message_id: format!("{inference_id}-forced-tool-json-normalized"), payload })
+                    .await?;
+            }
+        }
+    }
+    if !state.locals.assemblies.get()?.is_empty() {
+        // Even a rejected assembly is substantive progress, so a later empty round starts a
+        // fresh empty sequence.
+        state.locals.empty_completion_corrections_used.set(0);
+    }
+    Ok(())
+}

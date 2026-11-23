@@ -5,13 +5,13 @@
 //! Lane 3 implements this trait over the store in `sylvia-app`. The shapes are Python's: the
 //! arguments it passes and the values it reads back.
 
-use sylvia_base::{CodedResult, JsonMap};
+use sylvia_base::{CodedResult, Json, JsonMap};
 use sylvia_domain::authority::{
     CampaignConstructionBasis, CampaignDisplaySnapshot, CampaignSnapshot, CanonicalReplay,
     ModelDecisionBoundary,
 };
 use sylvia_domain::package_library::PackageLockRecord;
-use sylvia_domain::session::SessionContext;
+use sylvia_domain::session::{SessionContext, SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
 
 /// The reads the request assembly makes, in Python's shapes.
@@ -106,4 +106,35 @@ pub trait TurnOwner: OpeningReads {
 
     /// `record_admin_full_audit(payload)`: kept only while Admin Full Audit is on.
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()>;
+
+    /// `provider_continuation(session_id, response_id, provider_id=..., model_id=...)`: one
+    /// selected provider exchange's private continuation, as stored.
+    fn provider_continuation<'a>(
+        &'a self,
+        session_id: &'a str,
+        response_id: &'a str,
+        provider_id: &'a str,
+        model_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<Json>>>;
+
+    /// `package_record(package_id, version, sha256)`.
+    fn package_record<'a>(
+        &'a self,
+        package_id: &'a str,
+        version: &'a str,
+        sha256: &'a str,
+    ) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `package_lock_lineage(campaign_id)`: every lock the campaign has had, oldest first.
+    fn package_lock_lineage<'a>(&'a self, campaign_id: &'a str)
+        -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>>;
+
+    /// `append_agent_message(session_id=..., message_id=..., kind=..., content=...)`.
+    fn append_agent_message<'a>(
+        &'a self,
+        session_id: &'a str,
+        message_id: &'a str,
+        kind: SessionMessageKind,
+        content: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<SessionMessage>>;
 }

@@ -339,6 +339,23 @@ impl Recorded {
         read["result"].clone()
     }
 
+    /// The next call's result, or the refusal Python's call raised.
+    pub fn next_result(&self, name: &str, args: J) -> CodedResult<J> {
+        let raised = {
+            let reads = self.reads.lock().unwrap();
+            reads.first().and_then(|read| read.get("raised")).cloned()
+        };
+        let result = self.next(name, args);
+        match raised {
+            Some(raised) => Err(sylvia_base::CodedError::new(
+                raised["code"].as_str().unwrap_or("internal_error"),
+                raised["message"].as_str().unwrap_or(""),
+            )
+            .with_error_type("CommandRejected")),
+            None => Ok(result),
+        }
+    }
+
     /// Every recorded call was made, and each as Python made it.
     pub fn check(&self, name: &str) {
         let failures = self.failures.lock().unwrap().clone();
@@ -460,5 +477,40 @@ impl TurnOwner for Recorded {
         let result = self.next("record_admin_full_audit", serde_json::json!([payload]));
         assert!(result.is_null(), "the recorder returns None");
         Ok(())
+    }
+    fn provider_continuation<'a>(
+        &'a self,
+        session_id: &'a str,
+        response_id: &'a str,
+        provider_id: &'a str,
+        model_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<J>>> {
+        let result =
+            self.next("provider_continuation", serde_json::json!([session_id, response_id, provider_id, model_id]));
+        ready((!result.is_null()).then_some(result))
+    }
+    fn package_record<'a>(
+        &'a self,
+        package_id: &'a str,
+        version: &'a str,
+        sha256: &'a str,
+    ) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        let result = self.next_result("package_record", serde_json::json!([package_id, version, sha256]));
+        Box::pin(async move { result.map(|value| map(&value)) })
+    }
+    fn package_lock_lineage<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>> {
+        let result = self.next("package_lock_lineage", serde_json::json!([campaign_id]));
+        ready(result.as_array().unwrap().iter().map(lock_record).collect())
+    }
+    fn append_agent_message<'a>(
+        &'a self,
+        session_id: &'a str,
+        message_id: &'a str,
+        kind: SessionMessageKind,
+        content: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<SessionMessage>> {
+        let result =
+            self.next("append_agent_message", serde_json::json!([session_id, message_id, kind.as_str(), content]));
+        ready(session_message(&result))
     }
 }

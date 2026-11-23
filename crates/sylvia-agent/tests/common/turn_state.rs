@@ -3,7 +3,7 @@
 //! Python's. Only assigned locals appear in a dump; message lists carry their ledger tags under
 //! `<name>__tags`.
 
-use super::{boundary, map, maps, participant, session_message, strings, tool};
+use super::{boundary, map, maps, participant, session_message, strings, text, tool};
 use indexmap::{IndexMap, IndexSet};
 use serde_json::{json, Value as J};
 use sylvia_agent::provider_session::tagged::Tagged;
@@ -495,3 +495,39 @@ mod erased {
         }
     }
 }
+
+/// Python's turn locals after the phase: as before, with the changes applied.
+pub fn expected_after(before: &J, changed: &J) -> J {
+    let mut expected = before.clone();
+    for (group, values) in changed.as_object().unwrap() {
+        for (key, value) in values.as_object().unwrap() {
+            expected[group][key] = value.clone();
+        }
+    }
+    expected
+}
+
+/// The Rust locals (written back) against Python's, key by key.
+pub fn compare(name: &str, ours: &J, theirs: &J) {
+    for group in ["obligations", "progress", "decisions", "locals"] {
+        let (a, b) = (ours[group].as_object().unwrap(), theirs[group].as_object().unwrap());
+        for (key, value) in b {
+            if group == "locals" && READ_ONLY.contains(&key.as_str()) {
+                continue;
+            }
+            match a.get(key) {
+                Some(ours) if text(ours) == text(value) => {}
+                Some(ours) => panic!(
+                    "{name}: {group}.{key} differs\n  expected {}\n  got      {}",
+                    &text(value)[..text(value).len().min(2000)],
+                    &text(ours)[..text(ours).len().min(2000)]
+                ),
+                None => panic!("{name}: {group}.{key} is unassigned in Rust"),
+            }
+        }
+        for key in a.keys() {
+            assert!(b.contains_key(key), "{name}: Rust assigned {group}.{key}, which Python left unassigned");
+        }
+    }
+}
+
