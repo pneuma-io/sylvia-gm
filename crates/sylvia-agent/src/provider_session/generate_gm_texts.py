@@ -20,7 +20,12 @@ produce them, never retyped:
   (`_gm_decision_control_message`), `player_boundary` (`_player_boundary_narration_message`),
   `campaign_file_disposition` (`_campaign_file_disposition_message`) and
   `campaign_file_updated_narration` (`_campaign_file_updated_narration_message`);
-- `preparation_scope_invalid`: `_preparation_keeps_intent_pending`'s refusal.
+- `preparation_scope_invalid`: `_preparation_keeps_intent_pending`'s refusal;
+- `narration_facts_prefix`, `narration_facts_continue`, `narration_facts_provisional` and
+  `narration_facts_suffix`: the `SYLVIA_GM_EXACT_NARRATION_FACTS` message
+  `stream_provider_round` builds inline, its string constants read from the Python source
+  with `ast` (the facts' JSON comes between the first two; the provisional-prose sentence is
+  added only when that prose needs review).
 
 Reference tooling for the port; retired with the Python source.
 """
@@ -111,6 +116,37 @@ def control_texts() -> dict[str, str]:
     return texts
 
 
+def narration_facts() -> dict[str, str]:
+    """The narration-facts message's constants, in order, from `stream_provider_round`."""
+    import ast
+
+    source = (ROOT / "src/sylvia_gm/agent/_provider_turn_phases.py").read_text(encoding="utf-8")
+    function = next(node for node in ast.walk(ast.parse(source))
+                    if isinstance(node, ast.FunctionDef) and node.name == "stream_provider_round")
+
+    def flat(node: ast.AST) -> list[ast.AST]:
+        if isinstance(node, ast.BinOp):
+            return flat(node.left) + flat(node.right)
+        return [node]
+
+    for node in ast.walk(function):
+        if not isinstance(node, ast.Dict):
+            continue
+        keys = [key.value if isinstance(key, ast.Constant) else None for key in node.keys]
+        if "content" not in keys:
+            continue
+        parts = flat(node.values[keys.index("content")])
+        prefix, data, middle, provisional, suffix = parts
+        assert isinstance(data, ast.Call) and isinstance(provisional, ast.IfExp)
+        assert isinstance(provisional.orelse, ast.Constant) and provisional.orelse.value == ""
+        values = [ast.literal_eval(part) for part in (prefix, middle, provisional.body, suffix)]
+        assert all(isinstance(value, str) for value in values)
+        assert values[0].startswith("SYLVIA_GM_EXACT_NARRATION_FACTS ")
+        return dict(zip(("narration_facts_prefix", "narration_facts_continue",
+                         "narration_facts_provisional", "narration_facts_suffix"), values))
+    raise SystemExit("the narration-facts message was not found")
+
+
 def main() -> None:
     prompts = {(mechanics, tools): session._dm_system_prompt(  # noqa: SLF001
         campaign_has_mechanics=mechanics, tools_available=tools)
@@ -127,6 +163,7 @@ def main() -> None:
             session._response_format_contract_message()["content"],  # noqa: SLF001
         "opening_task_prefix": opening[: -len("{}")],
         **control_texts(),
+        **narration_facts(),
     }
     text = json.dumps(exported, ensure_ascii=True, indent=1, allow_nan=False) + chr(10)
     assert json.loads(text) == exported

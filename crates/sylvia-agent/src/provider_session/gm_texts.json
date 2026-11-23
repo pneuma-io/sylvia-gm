@@ -17,5 +17,9 @@
  "campaign_file_disposition_suffix": "",
  "campaign_file_updated_narration_prefix": "SYLVIA_GM_CAMPAIGN_FILE_UPDATED_NARRATION (application-owned control, not player speech): Your Campaign File update was accepted and its structured result is in the matched tool result, but it did not include a response. Return only the complete in-world GM response for that admitted outcome. Do not call another tool, mention the workflow, or add lasting facts outside the accepted update. Every character will be shown to the player. The exact task data is last:\n",
  "campaign_file_updated_narration_suffix": "",
- "preparation_scope_invalid": "Preparation scope must preserve an unresolved action; await_player_choice is only valid when this request ends at preparation and no earlier action is pending."
+ "preparation_scope_invalid": "Preparation scope must preserve an unresolved action; await_player_choice is only valid when this request ends at preparation and no earlier action is pending.",
+ "narration_facts_prefix": "SYLVIA_GM_EXACT_NARRATION_FACTS (committed mechanics and application-owned continuation control):\n",
+ "narration_facts_continue": "\nContinue this same GM turn from these committed results. ",
+ "narration_facts_provisional": "In this exchange, assistant prose emitted alongside a tool call before its result is an unsettled draft, not established fiction; revise or discard it wherever the result or the player's declared limits require. ",
+ "narration_facts_suffix": "Use another exposed operation only if the current intent still requires one; otherwise decide the outcome and finish with the Campaign File disposition."
 }

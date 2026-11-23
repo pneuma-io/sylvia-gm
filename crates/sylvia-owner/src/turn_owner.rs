@@ -1,30 +1,27 @@
 //! `TurnOwner` for the owner's reads: the GM turn's owner calls, as delegation.
 //!
-//! Each method is the owner's whole operation (lane 3's `sylvia_app::authority::turn_reads`,
-//! #414). A call lane 3 has not ported yet answers `rust_port_pending`, naming the
-//! `AuthorityOwner` method, so a turn that reaches it stops there as the other unported steps do.
+//! Each method is the owner's whole operation (lane 3's: `sylvia_app::authority::turn_reads`,
+//! #414 and #420, and the store's own operations). A call added later that lane 3 has not
+//! ported yet answers `rust_port_pending`, naming the `AuthorityOwner` method.
 
 use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_app::authority::turn_reads;
-use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_base::{CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
-use sylvia_provider::factory::PORT_PENDING;
+use sylvia_domain::session::{SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
-
-/// The refusal for an owner call not ported yet.
-fn pending(method: &str) -> CodedError {
-    CodedError::new(PORT_PENDING, format!("The Rust owner cannot run AuthorityOwner.{method} yet."))
-}
 
 impl TurnOwner for OwnerReads {
     fn model_decision_boundary<'a>(
         &'a self,
-        _campaign_id: &'a str,
+        campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<ModelDecisionBoundary>>> {
-        Box::pin(async { Err(pending("model_decision_boundary")) })
+        Box::pin(async move {
+            turn_reads::model_decision_boundary(self.store(), campaign_id).await.map_err(store_error)
+        })
     }
 
     fn campaign_preparation_boundary<'a>(
@@ -47,5 +44,58 @@ impl TurnOwner for OwnerReads {
 
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()> {
         OwnerReads::record_admin_full_audit(self, Json::Object(payload))
+    }
+
+    fn provider_continuation<'a>(
+        &'a self,
+        session_id: &'a str,
+        response_id: &'a str,
+        provider_id: &'a str,
+        model_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<Json>>> {
+        Box::pin(async move {
+            turn_reads::provider_continuation(self.store(), session_id, response_id, provider_id, model_id)
+                .await
+                .map_err(store_error)
+        })
+    }
+
+    fn package_record<'a>(
+        &'a self,
+        package_id: &'a str,
+        version: &'a str,
+        sha256: &'a str,
+    ) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        Box::pin(async move {
+            self.store().package_record(package_id, version, sha256).await.map_err(store_error)
+        })
+    }
+
+    fn package_lock_lineage<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>> {
+        Box::pin(async move {
+            let campaign_id = campaign_id.to_owned();
+            self.store()
+                .call(move |store| store.package_lock_lineage(&campaign_id))
+                .await
+                .map_err(store_error)
+        })
+    }
+
+    fn append_agent_message<'a>(
+        &'a self,
+        session_id: &'a str,
+        message_id: &'a str,
+        kind: SessionMessageKind,
+        content: &'a JsonMap,
+    ) -> BoxFuture<'a, CodedResult<SessionMessage>> {
+        Box::pin(async move {
+            self.store()
+                .append_agent_message(session_id, message_id, kind, content)
+                .await
+                .map_err(store_error)
+        })
     }
 }

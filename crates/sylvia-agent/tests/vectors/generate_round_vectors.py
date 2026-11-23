@@ -4,6 +4,10 @@ Run from the repository root with the snapshot's interpreter, after building the
 tool (`cargo build -p sylvia-compare`):
 
     .venv/Scripts/python.exe -I crates/sylvia-agent/tests/vectors/generate_round_vectors.py
+    .venv/Scripts/python.exe -I crates/sylvia-agent/tests/vectors/generate_round_vectors.py         --phases stream_provider_round --output stream_vectors.json
+
+The first writes `round_vectors.json` (T2b's preparation phases); the second, T2c's
+`stream_vectors.json`, where each case also holds the GM provider's requests and chunks.
 
 It records the `ruleless-turn` session with the frozen Python owner, through `sylvia-compare`
 and the stand-in model, tracing `prepare_round_catalog` and `prepare_provider_round`
@@ -36,14 +40,14 @@ DURATION = re.compile(r'"(elapsed_ms|quiet_ms)": \d+')
 PHASES = "prepare_round_catalog,prepare_provider_round"
 
 
-def record() -> list[dict[str, object]]:
+def record(phases: str) -> list[dict[str, object]]:
     TRACE.unlink(missing_ok=True)
     compare = ROOT / "target" / "debug" / ("sylvia-compare.exe" if sys.platform == "win32"
                                           else "sylvia-compare")
     if not compare.is_file():
         raise SystemExit(f"build the comparison tool first: {compare}")
     # A fixed hash seed keeps the owner's set and dict iteration the same on every run.
-    env = {**os.environ, "SYLVIA_TURN_PHASES_TRACE": str(TRACE), "SYLVIA_TURN_PHASES": PHASES,
+    env = {**os.environ, "SYLVIA_TURN_PHASES_TRACE": str(TRACE), "SYLVIA_TURN_PHASES": phases,
            "PYTHONHASHSEED": "0"}
     with tempfile.TemporaryDirectory() as folder:
         subprocess.run(
@@ -82,11 +86,18 @@ def cases(rows: list[dict[str, object]]) -> list[dict[str, object]]:
 
 
 def main() -> None:
-    found = cases(record())
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--phases", default=PHASES)
+    parser.add_argument("--output", default=OUTPUT.name)
+    arguments = parser.parse_args()
+    output = HERE / arguments.output
+    found = cases(record(arguments.phases))
     text = json.dumps({"cases": found}, ensure_ascii=False, indent=1, allow_nan=False) + "\n"
     text = TIME.sub("2026-01-01T00:00:00+00:00", text)
     text = DURATION.sub(lambda match: f'"{match.group(1)}": 0', text)
-    OUTPUT.write_bytes(text.encode("utf-8"))
+    output.write_bytes(text.encode("utf-8"))
     print(len(found), "cases,", len(text), "bytes")
     for case in found:
         print(" ", case["phase"], "|", case["variant"], "->",

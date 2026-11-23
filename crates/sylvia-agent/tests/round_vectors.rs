@@ -10,7 +10,7 @@
 mod common;
 
 use common::turn_state;
-use common::{model, session_context, session_record, text, tool, Recorded};
+use common::{model, session_context, session_record, tool, Recorded};
 use serde_json::Value as J;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::campaign_memory::KnowledgeReference;
@@ -56,41 +56,6 @@ impl Provider for Audited {
 fn no_facts(_query: &str, references: &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> {
     assert!(references.is_empty(), "the recorded campaign has no facts");
     Ok(Vec::new())
-}
-
-/// Python's turn locals after the phase: as before, with the changes applied.
-fn expected_after(before: &J, changed: &J) -> J {
-    let mut expected = before.clone();
-    for (group, values) in changed.as_object().unwrap() {
-        for (key, value) in values.as_object().unwrap() {
-            expected[group][key] = value.clone();
-        }
-    }
-    expected
-}
-
-/// The Rust locals (written back) against Python's, key by key.
-fn compare(name: &str, ours: &J, theirs: &J) {
-    for group in ["obligations", "progress", "decisions", "locals"] {
-        let (a, b) = (ours[group].as_object().unwrap(), theirs[group].as_object().unwrap());
-        for (key, value) in b {
-            if group == "locals" && turn_state::READ_ONLY.contains(&key.as_str()) {
-                continue;
-            }
-            match a.get(key) {
-                Some(ours) if text(ours) == text(value) => {}
-                Some(ours) => panic!(
-                    "{name}: {group}.{key} differs\n  expected {}\n  got      {}",
-                    &text(value)[..text(value).len().min(2000)],
-                    &text(ours)[..text(ours).len().min(2000)]
-                ),
-                None => panic!("{name}: {group}.{key} is unassigned in Rust"),
-            }
-        }
-        for key in a.keys() {
-            assert!(b.contains_key(key), "{name}: Rust assigned {group}.{key}, which Python left unassigned");
-        }
-    }
 }
 
 #[tokio::test]
@@ -183,7 +148,11 @@ async fn round_preparation_matches_python() {
         }
         owner.check(&name);
         assert!(ids.lock().unwrap().is_empty(), "{name}: Rust drew fewer uuid4 values than Python");
-        compare(&name, &turn_state::dump(&state), &expected_after(&case["before"], &case["after"]));
+        turn_state::compare(
+            &name,
+            &turn_state::dump(&state),
+            &turn_state::expected_after(&case["before"], &case["after"]),
+        );
         let audits: Vec<J> = events
             .iter()
             .filter(|event| event["event"] == "audit_context")

@@ -3,7 +3,7 @@
 //! Python's. Only assigned locals appear in a dump; message lists carry their ledger tags under
 //! `<name>__tags`.
 
-use super::{boundary, map, maps, participant, session_message, strings, tool};
+use super::{boundary, map, maps, participant, session_message, strings, text, tool};
 use indexmap::{IndexMap, IndexSet};
 use serde_json::{json, Value as J};
 use sylvia_agent::provider_session::tagged::Tagged;
@@ -115,6 +115,50 @@ pub fn load(dump: &J) -> ProviderTurnState {
                     })
                     .collect(),
             ),
+            "assembly" => {
+                let text = |key: &str| value[key].as_str().unwrap().to_owned();
+                l.assembly.set(ToolCallAssembly {
+                    call_id: text("call_id"),
+                    name: text("name"),
+                    arguments: text("arguments"),
+                });
+            }
+            "catalog_tool" => l.catalog_tool.set(tool(value)),
+            "empty_collection_paths" => l.empty_collection_paths.set(strings(value)),
+            "facts" => l.facts.set(value.as_object().cloned()),
+            "finish_reason" => l.finish_reason.set(text()),
+            "missing" => l.missing.set(strings(value)),
+            "mutation_attempted_before_call" => l.mutation_attempted_before_call.set(flag(value)),
+            "narration" => l.narration.set(text()),
+            "ooc_ack_missing" => l.ooc_ack_missing.set(flag(value)),
+            "ordered" => l.ordered.set(
+                value
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|v| {
+                        let text = |key: &str| v[key].as_str().unwrap().to_owned();
+                        ToolCallAssembly {
+                            call_id: text("call_id"),
+                            name: text("name"),
+                            arguments: text("arguments"),
+                        }
+                    })
+                    .collect(),
+            ),
+            "parameters" => l.parameters.set(map(value)),
+            "parameters_establish_changes" => l.parameters_establish_changes.set(flag(value)),
+            "pending_boundary" => l.pending_boundary.set((!value.is_null()).then(|| boundary(value))),
+            "provider_tool_call_required" => l.provider_tool_call_required.set(flag(value)),
+            "required_tool_failures" => l.required_tool_failures.set(set_of(value)),
+            "revised_narration" => l.revised_narration.set(value.clone()),
+            "revised_narration_supplied" => l.revised_narration_supplied.set(flag(value)),
+            "revised_raw_blocks" => l.revised_raw_blocks.set(opt_maps(value)),
+            "round_has_non_narrative_call" => l.round_has_non_narrative_call.set(flag(value)),
+            "selected_raw_blocks" => l.selected_raw_blocks.set(opt_maps(value)),
+            "settled_narration" => l.settled_narration.set(value.as_str().map(str::to_owned)),
+            "unsupported_speakers" => l.unsupported_speakers.set(flag(value)),
+            "update" => l.update.set(map(value)),
             "assistant_reasoning" => l.assistant_reasoning.set(strings(value)),
             "assistant_text" => l.assistant_text.set(strings(value)),
             "basis_message_id" => l.basis_message_id.set(value.as_str().map(str::to_owned)),
@@ -316,6 +360,44 @@ pub fn dump(state: &ProviderTurnState) -> J {
                 .collect(),
         )
     });
+    put(
+        &mut out,
+        "assembly",
+        &l.assembly,
+        |v| json!({"__class__": "_ToolCallAssembly", "call_id": v.call_id, "name": v.name, "arguments": v.arguments}),
+    );
+    put(&mut out, "catalog_tool", &l.catalog_tool, tool_json);
+    put(&mut out, "empty_collection_paths", &l.empty_collection_paths, |v| to(v));
+    put(&mut out, "facts", &l.facts, |v| to(v));
+    put(&mut out, "finish_reason", &l.finish_reason, |v| to(v));
+    put(&mut out, "missing", &l.missing, |v| to(v));
+    put(&mut out, "narration", &l.narration, |v| to(v));
+    put(&mut out, "ordered", &l.ordered, |v| {
+        J::Array(
+            v.iter()
+                .map(|a| json!({"__class__": "_ToolCallAssembly", "call_id": a.call_id, "name": a.name, "arguments": a.arguments}))
+                .collect(),
+        )
+    });
+    put(&mut out, "parameters", &l.parameters, |v| to(v));
+    put(&mut out, "pending_boundary", &l.pending_boundary, |v| v.as_ref().map_or(J::Null, boundary_json));
+    put(&mut out, "required_tool_failures", &l.required_tool_failures, set_json);
+    put(&mut out, "revised_narration", &l.revised_narration, |v| v.clone());
+    put(&mut out, "revised_raw_blocks", &l.revised_raw_blocks, |v| to(v));
+    put(&mut out, "selected_raw_blocks", &l.selected_raw_blocks, |v| to(v));
+    put(&mut out, "settled_narration", &l.settled_narration, |v| to(v));
+    put(&mut out, "update", &l.update, |v| to(v));
+    for (name, slot) in [
+        ("mutation_attempted_before_call", &l.mutation_attempted_before_call),
+        ("ooc_ack_missing", &l.ooc_ack_missing),
+        ("parameters_establish_changes", &l.parameters_establish_changes),
+        ("provider_tool_call_required", &l.provider_tool_call_required),
+        ("revised_narration_supplied", &l.revised_narration_supplied),
+        ("round_has_non_narrative_call", &l.round_has_non_narrative_call),
+        ("unsupported_speakers", &l.unsupported_speakers),
+    ] {
+        put(&mut out, name, slot, |v| J::Bool(*v));
+    }
     put(&mut out, "assistant_reasoning", &l.assistant_reasoning, |v| to(v));
     put(&mut out, "assistant_text", &l.assistant_text, |v| to(v));
     put(&mut out, "basis_message_id", &l.basis_message_id, |v| to(v));
@@ -492,6 +574,41 @@ mod erased {
     impl ToJson for Tagged {
         fn to_json(&self) -> J {
             J::Object(self.message.clone())
+        }
+    }
+}
+
+/// Python's turn locals after the phase: as before, with the changes applied.
+pub fn expected_after(before: &J, changed: &J) -> J {
+    let mut expected = before.clone();
+    for (group, values) in changed.as_object().unwrap() {
+        for (key, value) in values.as_object().unwrap() {
+            expected[group][key] = value.clone();
+        }
+    }
+    expected
+}
+
+/// The Rust locals (written back) against Python's, key by key.
+pub fn compare(name: &str, ours: &J, theirs: &J) {
+    for group in ["obligations", "progress", "decisions", "locals"] {
+        let (a, b) = (ours[group].as_object().unwrap(), theirs[group].as_object().unwrap());
+        for (key, value) in b {
+            if group == "locals" && READ_ONLY.contains(&key.as_str()) {
+                continue;
+            }
+            match a.get(key) {
+                Some(ours) if text(ours) == text(value) => {}
+                Some(ours) => panic!(
+                    "{name}: {group}.{key} differs\n  expected {}\n  got      {}",
+                    &text(value)[..text(value).len().min(2000)],
+                    &text(ours)[..text(ours).len().min(2000)]
+                ),
+                None => panic!("{name}: {group}.{key} is unassigned in Rust"),
+            }
+        }
+        for key in a.keys() {
+            assert!(b.contains_key(key), "{name}: Rust assigned {group}.{key}, which Python left unassigned");
         }
     }
 }
