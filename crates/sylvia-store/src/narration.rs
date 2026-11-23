@@ -3,7 +3,10 @@
 //! `canonical_replay`; and, under the same lock as in Python, the admin full audit state
 //! (`_admin_full_audit_enabled`, `_inspector_trace`, `_pending_audit_usage`) with
 //! `admin_full_audit_enabled`, `set_admin_full_audit`, `record_admin_full_audit` and
-//! `_credit_audit_usage`. One instance per owner, shared by [`crate::StoreHandle::narration`].
+//! `_credit_audit_usage`; and `_mechanics_diagnostics`, the bounded safe metadata the turn keeps
+//! for each mechanics rejection, with `record_mechanics_diagnostic` and
+//! `admin_full_audit_status`. One instance per owner, shared by
+//! [`crate::StoreHandle::narration`].
 //!
 //! **Narration is not ported yet.** When it is, its commands write here: each narration attempt
 //! into [`NarrationInner::attempts`] (`begin_narration_attempt`, then its prose buffer and
@@ -43,7 +46,12 @@ pub struct NarrationInner {
     pub inspector_trace: Vec<Json>,
     /// `_pending_audit_usage`, by exchange identity, in insertion order.
     pub pending_audit_usage: Vec<(String, Json)>,
+    /// `_mechanics_diagnostics`: the last [`MECHANICS_DIAGNOSTICS_KEPT`], oldest first.
+    pub mechanics_diagnostics: Vec<Json>,
 }
+
+/// How many safe mechanics diagnostics the owner keeps (`del ...[:-200]`).
+pub const MECHANICS_DIAGNOSTICS_KEPT: usize = 200;
 
 /// The owner's narration state, one per owner.
 #[derive(Debug, Default)]
@@ -158,6 +166,39 @@ impl NarrationState {
             }
             inner.inspector_trace.push(payload);
             Ok(())
+        })
+    }
+
+    /// `record_mechanics_diagnostic(...)`, after its caller built the payload: keep it, and only
+    /// the last [`MECHANICS_DIAGNOSTICS_KEPT`]. Kept whether or not Full Audit is on, and a Full
+    /// Audit change leaves them.
+    pub fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) {
+        self.with(|inner| {
+            inner.mechanics_diagnostics.push(Json::Object(diagnostic));
+            let kept = inner.mechanics_diagnostics.len();
+            if kept > MECHANICS_DIAGNOSTICS_KEPT {
+                inner.mechanics_diagnostics.drain(..kept - MECHANICS_DIAGNOSTICS_KEPT);
+            }
+        })
+    }
+
+    /// The kept diagnostics, oldest first (`tuple(self._mechanics_diagnostics)`).
+    pub fn mechanics_diagnostics(&self) -> Vec<Json> {
+        self.with(|inner| inner.mechanics_diagnostics.clone())
+    }
+
+    /// `admin_full_audit_status()`: whether Full Audit is on, how many traces it holds, and the
+    /// kept diagnostics, read under one lock.
+    pub fn admin_full_audit_status(&self) -> JsonMap {
+        self.with(|inner| {
+            let mut status = JsonMap::new();
+            status.insert("enabled".into(), inner.admin_full_audit_enabled.into());
+            status.insert("trace_count".into(), inner.inspector_trace.len().into());
+            status.insert(
+                "safe_mechanics_diagnostics".into(),
+                Json::Array(inner.mechanics_diagnostics.clone()),
+            );
+            status
         })
     }
 
