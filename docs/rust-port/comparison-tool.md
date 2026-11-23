@@ -256,8 +256,10 @@ every Python run:
   session's check has target number 1, so the outcome does not. Only the roll's own values are
   ignored: `_d20_test`/`d20_test` `results` and `total`, the adjusted total, the result card's
   `equation` roll and total and its `details` value. The `scrub` rules replace the same values
-  inside the JSON text of tool results and narration facts. Everything else about the check
-  must match: the outcome, the modifiers, the card and the resulting state.
+  inside the JSON text of tool results and narration facts. The roll's digits also change the
+  size of the request that carries them, so that one request's `Content-Length` value is an
+  `ignore_pointers` entry; its body is still compared. Everything else about the check must
+  match: the outcome, the modifiers, the card and the resulting state.
 
 `stop-redirect`, `fail-retry` and `reopen` follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop
