@@ -384,3 +384,49 @@ pub async fn handle_claude_connection(ctx: &DispatchContext, params: &JsonMap) -
     }
     Ok(Json::Object(result))
 }
+
+/// `handle_chatgpt_connection`: `chatgpt_settings_action(storage_root, action, model)`, with a
+/// `CodexConnectionError` replied as `OwnerProtocolError`. The resolver reloads after `add_model`,
+/// and after any action that refreshed the saved models' effort or speed options.
+pub async fn handle_chatgpt_connection(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_provider::config::chatgpt_settings::{chatgpt_settings_action, ChatGPTSettingsError};
+    use sylvia_provider::config::host_browser::open_in_browser;
+    let action = params.get("action").cloned().unwrap_or(Json::Null);
+    let adding = action.as_str() == Some("add_model");
+    let resolver = if adding { Some(std::sync::Arc::clone(providers(ctx)?)) } else { ctx.providers.clone() };
+    let model = params.get("model").cloned().unwrap_or(Json::Null);
+    let storage_root = ctx.storage_root.clone();
+    let outcome = tokio::task::spawn_blocking(move || {
+        let default_config = default_config_path();
+        let env = Environment::current();
+        let sources = ConfigSources { default_config: &default_config, seal: &PlatformSeal, env: &env };
+        chatgpt_settings_action(
+            sources,
+            &storage_root,
+            &action,
+            &model,
+            None,
+            &open_in_browser,
+            &now_isoformat,
+        )
+    })
+    .await
+    .map_err(|error| CodedError::new("internal_error", error.to_string()))?;
+    let result = match outcome {
+        Ok(result) => result,
+        Err(ChatGPTSettingsError::Codex(error)) if error.is_connection_error() => {
+            return Err(CodedError::rejected(error.message()).with_error_type("OwnerProtocolError"))
+        }
+        Err(ChatGPTSettingsError::Codex(error)) => {
+            return Err(CodedError::new("internal_error", error.message()).with_error_type(error.class_name()))
+        }
+        Err(ChatGPTSettingsError::Config(failure)) => return Err(config_error(failure)),
+    };
+    let refreshed = result.get("saved_models_refreshed").is_some_and(sylvia_provider::pyobj::truthy);
+    if adding || refreshed {
+        if let Some(resolver) = resolver {
+            resolver.reload().await?;
+        }
+    }
+    Ok(Json::Object(result))
+}
