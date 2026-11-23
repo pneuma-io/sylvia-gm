@@ -68,6 +68,7 @@ dictation = ["dep:ct2rs", "dep:ort", "dep:tokenizers", "dep:flate2", "dep:cpal"]
 
 [dependencies]
 sylvia-base.workspace = true
+indexmap.workspace = true
 serde_json.workspace = true
 hex.workspace = true
 tokio.workspace = true
