@@ -2,11 +2,10 @@
 //! with `_execute_action`, `_admit`, `_admitted_tool`, `_locked_package`, `_semantic_hash`,
 //! `_participant_context_payload`, `_owned_mechanic_outcome` and `_safe_tool_failure_outcome`.
 //!
-//! This is the plain commit path (lane 4's T3, step 1): a mechanic that commits, fails, or is
-//! refused by its Ruleset. Not ported yet, so refused as `rust_port_pending`: an answer that is an
-//! awaiting-choice receipt (a mechanic asking for a choice, or a replay of one), which comes with
-//! choice resolution; a mechanic's participant mutations; a player action's origin and the
-//! Campaign File batches, which come with their own families.
+//! A mechanic commits, fails, is refused by its Ruleset, or asks for a choice, which
+//! [`resolve_mechanics_choice`] answers (lane 4's T3, steps 1 and 2); its state and participant
+//! mutations are checked and committed (step 3). Not ported yet, so refused as
+//! `rust_port_pending`: a player action's origin and the Campaign File batches (step 4).
 //!
 //! Errors keep Python's classes for lane 4's MCP surface: what `_execute_action` and lane 2's
 //! mechanic raise come back as [`ActionError::Domain`], unchanged (a `MechanicsRejected` keeps its

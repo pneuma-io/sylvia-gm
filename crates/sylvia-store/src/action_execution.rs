@@ -1,6 +1,8 @@
 //! The store reads and writes an action's execution makes before its commit, from
-//! `sqlite_authority.py`: `action_basis`, `declared_package_tool`, `mechanic_mutations_are_owned`,
-//! and `bind_transport_alias`. The pending mechanics choices are [`crate::mechanics_choices`].
+//! `sqlite_authority.py`: `action_basis`, `declared_package_tool`, `mechanic_mutations_are_owned`
+//! (with `_validate_participant_mutations` and `sqlite_packages.participant_owner_is_current`, which
+//! `commit_action` checks again), and `bind_transport_alias`. The pending mechanics choices are
+//! [`crate::mechanics_choices`].
 
 use crate::actions::{load_payload, owner_for_mutation, rejected, MutationActor};
 use crate::campaigns::{named_rows, Named};
@@ -9,6 +11,7 @@ use crate::pytext::{py_int, py_str};
 use crate::schema::CAMPAIGN_SCHEMA_VERSION;
 use crate::store::AuthorityStore;
 use rusqlite::types::Value;
+use sylvia_base::Json;
 use sylvia_domain::authority::{
     ActionReceipt, ActionStatus, CampaignRecord, MechanicOutcome, PackageLock, Participant, TurnStatus,
 };
@@ -92,8 +95,9 @@ impl AuthorityStore {
     }
 
     /// `mechanic_mutations_are_owned(...)`: whether every captured state mutation's namespace is
-    /// the acting package's to write. A campaign schema behind the current one is advanced first
-    /// when there are mutations, as Python does. Participant mutations come with their own family.
+    /// the acting package's to write, and every live character replacement keeps its owning exact
+    /// Ruleset and schema (`_validate_participant_mutations`). A campaign schema behind the current
+    /// one is advanced first when there are either, as Python does.
     pub fn mechanic_mutations_are_owned(
         &self,
         campaign_id: &str,
@@ -102,10 +106,7 @@ impl AuthorityStore {
         package_sha256: &str,
         outcome: &MechanicOutcome,
     ) -> StoreResult<bool> {
-        if !outcome.participant_mutations.is_empty() {
-            return Err(StoreError::NotPorted("participant mutations (T3 step 3)"));
-        }
-        if !outcome.mutations.is_empty() {
+        if !outcome.mutations.is_empty() || !outcome.participant_mutations.is_empty() {
             let connection = self.connect()?;
             connection.execute_batch("BEGIN IMMEDIATE")?;
             let advanced = self.ensure_campaign_schema(&connection).and_then(|()| {
@@ -119,17 +120,17 @@ impl AuthorityStore {
         }
         let connection = self.connect_read_only()?;
         let actor = MutationActor { campaign_id, package_id, package_version, package_sha256 };
-        for mutation in &outcome.mutations {
-            match owner_for_mutation(&connection, &actor, &mutation.namespace) {
-                Ok(_) => {}
-                // `except CommandRejected: return False`.
-                Err(StoreError::Coded(error)) if error.error_type == Some("CommandRejected") => {
-                    return Ok(false)
-                }
-                Err(error) => return Err(error),
-            }
+        let checked = outcome
+            .mutations
+            .iter()
+            .try_for_each(|mutation| owner_for_mutation(&connection, &actor, &mutation.namespace).map(drop))
+            .and_then(|()| validate_participant_mutations(&connection, &actor, outcome));
+        match checked {
+            Ok(()) => Ok(true),
+            // `except CommandRejected: return False`, which takes its subclasses too.
+            Err(StoreError::Coded(error)) if is_command_rejected(error.error_type) => Ok(false),
+            Err(error) => Err(error),
         }
-        Ok(true)
     }
 
     /// `bind_transport_alias(...)`: a new transport key reserved for a durable action's replay.
@@ -193,4 +194,94 @@ impl AuthorityStore {
         }
         outcome
     }
+}
+
+/// Whether a Python class is `CommandRejected` or one of its subclasses (`errors.py`). Every
+/// store rejection carries its class (`DomainError::rejection` always sets it), so an untyped
+/// coded error is not one, and propagates.
+fn is_command_rejected(error_type: Option<&str>) -> bool {
+    matches!(error_type, Some("CommandRejected" | "MechanicsRejected" | "RulesetPreconditionRejected"))
+}
+
+/// `_validate_participant_mutations(connection, campaign_id, package_id, package_version,
+/// package_sha256, outcome)`: each live replacement's participant must be validated, still owned
+/// by the acting exact Ruleset through its schema's lineage, and the new data must match the
+/// participant's exact schema.
+pub(crate) fn validate_participant_mutations(
+    connection: &rusqlite::Connection,
+    actor: &MutationActor<'_>,
+    outcome: &MechanicOutcome,
+) -> StoreResult<()> {
+    for mutation in &outcome.participant_mutations {
+        let (columns, rows) = named_rows(
+            connection,
+            "SELECT p.*, d.schema_json FROM participants p              JOIN package_participant_artifacts d ON d.package_id = p.package_id              AND d.version = p.package_version AND d.content_sha256 = p.package_sha256              AND d.kind = p.kind AND d.schema_id = p.schema_id              AND d.schema_sha256 = p.schema_sha256              WHERE p.campaign_id = ? AND p.participant_id = ?",
+            &[&actor.campaign_id, &mutation.participant_id],
+        )?;
+        let row = rows.into_iter().next().map(|values| Named { columns: &columns, values });
+        let owned = match &row {
+            None => false,
+            Some(row) => {
+                matches!(row.get("validation_status")?, Value::Text(status) if status == "validated")
+                    && participant_owner_is_current(
+                        connection,
+                        actor.campaign_id,
+                        (
+                            &row.text("package_id")?,
+                            &row.text("package_version")?,
+                            &row.text("package_sha256")?,
+                        ),
+                        (actor.package_id, actor.package_version, actor.package_sha256),
+                        (&row.text("kind")?, &row.text("schema_id")?, &row.text("schema_sha256")?),
+                    )?
+            }
+        };
+        let Some(row) = row.filter(|_| owned) else {
+            return Err(rejected(
+                "Live character updates require the owning exact Ruleset and schema",
+                "participant_mutation_unowned",
+            ));
+        };
+        let schema = load_payload(&row.text("schema_json")?)?;
+        sylvia_domain::schema_admission::validate_json_value(
+            &Json::Object(mutation.data.clone()),
+            &schema,
+            &format!("Participant {}", mutation.participant_id),
+        )?;
+    }
+    Ok(())
+}
+
+/// `sqlite_packages.participant_owner_is_current(connection, campaign_id=..., source_identity=...,
+/// actor_identity=..., kind=..., schema_id=..., schema_sha256=...)`: the acting package is the
+/// current exact authority along the participant's committed lineage, and every package on that
+/// lineage still declares the participant's unchanged character contract.
+fn participant_owner_is_current(
+    connection: &rusqlite::Connection,
+    campaign_id: &str,
+    source: (&str, &str, &str),
+    actor: (&str, &str, &str),
+    (kind, schema_id, schema_sha256): (&str, &str, &str),
+) -> StoreResult<bool> {
+    let entries = crate::catalog_reads::compatible_binding_entries(connection, campaign_id, source)?;
+    let Some(first) = entries.first() else { return Ok(false) };
+    if (first.package_id(), first.version(), first.sha256()) != actor {
+        return Ok(false);
+    }
+    let Some(declaration) = crate::packages::exact_participant_declarations(connection, source)?
+        .into_iter()
+        .find(|item| item.kind == kind && item.schema_id == schema_id && item.schema_sha256 == schema_sha256)
+    else {
+        return Ok(false);
+    };
+    for entry in &entries {
+        let declared = crate::packages::exact_participant_declarations(
+            connection,
+            (entry.package_id(), entry.version(), entry.sha256()),
+        )?;
+        if !declared.contains(&declaration) {
+            return Ok(false);
+        }
+    }
+    Ok(true)
 }
