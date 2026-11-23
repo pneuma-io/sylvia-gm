@@ -450,8 +450,14 @@ async fn guided_campaign_contribution(
     let bundled = Arc::clone(bundled);
     let content = store
         .call(move |store| {
-            // Python's owner has no content storage root (`local_owner` never passes one).
-            resolve_interview_content(store, &bundled, None, &Json::Object(selections))
+            // `AuthorityOwner.open` gives the owner `content_storage_root=database_path.resolve().parent`,
+            // which `_guided_campaign_contribution` hands on (a saved Plan is read from it).
+            resolve_interview_content(
+                store,
+                &bundled,
+                store.database_path().parent(),
+                &Json::Object(selections),
+            )
         })
         .await?;
     if owner_kind == "campaign_plan" {
