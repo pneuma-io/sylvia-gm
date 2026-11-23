@@ -24,6 +24,8 @@ store. Reference tooling only.
 
 from __future__ import annotations
 
+import dataclasses
+import enum
 import gzip
 import json
 import sqlite3
@@ -44,6 +46,7 @@ BASES = {
     "cast": STORE / "stored_authority" / "cast.sqlite3.gz",
     "campaigns": STORE / "campaigns" / "seed.sqlite3.gz",
     "session_pages": STORE / "session_pages" / "seed.sqlite3.gz",
+    "riichi_started": HERE / "snapshots" / "riichi_started.sqlite3.gz",
 }
 
 SECRETS = [
@@ -72,11 +75,27 @@ def plans(lock: list[tuple[str, str, str]]) -> list[dict[str, object]]:
 
 
 def plain(value: object) -> object:
+    if dataclasses.is_dataclass(value) and not isinstance(value, type):
+        return {field.name: plain(getattr(value, field.name)) for field in dataclasses.fields(value)}
+    if isinstance(value, enum.Enum):
+        return value.value
     if isinstance(value, Mapping):
         return {str(key): plain(item) for key, item in value.items()}
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
         return [plain(item) for item in value]
     return value
+
+
+def tool_json(tool: object) -> dict[str, object]:
+    """One catalog tool as the model and the player see it, and whether its player-action
+    checker and previewer exist (Python's callables have no value to compare)."""
+    fields = ("package_id", "package_version", "package_sha256", "name", "capability", "input_schema",
+              "description", "model_behavior", "model_behavior_state_predicates", "player_controls",
+              "decision_title", "permanently_refused")
+    out = {field: plain(getattr(tool, field)) for field in fields}
+    out["checks_player_action"] = tool.check_player_action is not None  # type: ignore[attr-defined]
+    out["previews_player_action"] = tool.preview_player_action is not None  # type: ignore[attr-defined]
+    return out
 
 
 def outcome(read) -> dict[str, object]:  # noqa: ANN001
@@ -102,8 +121,11 @@ def main() -> None:
                 for campaign_id in campaigns:
                     runs.append({"base": base, "read": "ruleset_gm_operating_guide", "campaign_id": campaign_id,
                                  "outcome": outcome(lambda: owner.ruleset_gm_operating_guide(campaign_id))})
-                    runs.append({"base": base, "read": "catalog", "campaign_id": campaign_id,
-                                 "outcome": outcome(lambda: [tool.name for tool in owner.catalog(campaign_id)])})
+                    for unexposed in (False, True):
+                        runs.append({"base": base, "read": "catalog", "campaign_id": campaign_id,
+                                     "include_unexposed": unexposed,
+                                     "outcome": outcome(lambda: [tool_json(tool) for tool in owner.catalog(
+                                         campaign_id, include_unexposed=unexposed)])})
                     runs.append({"base": base, "read": "model_context_owner", "campaign_id": campaign_id,
                                  "outcome": outcome(lambda: owner.model_context_owner(campaign_id))})
                 for session_id in [*sessions, "session-missing"]:

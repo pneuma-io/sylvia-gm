@@ -1,10 +1,10 @@
 //! The GM context's content reads against Python (`tests/vectors/content_reads/
 //! content_read_runs.json`, written by `generate_content_read_runs.py`): every
-//! `ruleset_gm_operating_guide`, `catalog`, `model_context_owner`, `campaign_knowledge_catalog`
-//! and `campaign_knowledge_catalog_for_plan` read on three Python-made profiles must be Python's
-//! value, in Python's order, or Python's refusal. A catalog Python fills (Riichi's DM campaign,
-//! whose two tools are admitted) waits on lane 2's tool materialization and must be refused as
-//! not ported; every other catalog is Python's.
+//! `ruleset_gm_operating_guide`, `catalog` (with and without `include_unexposed`),
+//! `model_context_owner`, `campaign_knowledge_catalog` and `campaign_knowledge_catalog_for_plan`
+//! read on four Python-made profiles must be Python's value, in Python's order, or Python's
+//! refusal. Each catalog tool is compared by what the model and the player see of it, and by
+//! whether its player-action checker and previewer exist.
 
 use flate2::read::GzDecoder;
 use serde_json::json;
@@ -12,19 +12,65 @@ use std::io::Read;
 use std::path::Path;
 use sylvia_app::authority::content_reads;
 use sylvia_base::Json;
-use sylvia_store::{AuthorityStore, StoreError, StoreHandle, StoreResult};
+use sylvia_base::JsonMap;
+use sylvia_store::{AuthorityStore, StoreHandle, StoreResult};
 
 fn base(name: &str) -> Vec<u8> {
     let relative = match name {
         "cast" => "stored_authority/cast.sqlite3.gz",
         "campaigns" => "campaigns/seed.sqlite3.gz",
         "session_pages" => "session_pages/seed.sqlite3.gz",
+        // The snapshot generator's base: the cast base with a Riichi game in play.
+        "riichi_started" => "../../../sylvia-app/tests/vectors/snapshots/riichi_started.sqlite3.gz",
         other => panic!("unknown base {other}"),
     };
     let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../sylvia-store/tests/vectors").join(relative);
     let mut bytes = Vec::new();
     GzDecoder::new(std::fs::File::open(path).unwrap()).read_to_end(&mut bytes).unwrap();
     bytes
+}
+
+/// The generator's `tool_json`: a catalog tool as the model and the player see it.
+fn tool_json(tool: &content_reads::CatalogTool) -> Json {
+    let predicates: Vec<Json> = tool
+        .model_behavior_state_predicates
+        .iter()
+        .map(|predicate| {
+            json!({"namespace": predicate.namespace, "key": predicate.key, "equals": predicate.equals,
+                   "negated": predicate.negated})
+        })
+        .collect();
+    let controls = &tool.player_controls;
+    let maps = |items: &[JsonMap]| Json::Array(items.iter().cloned().map(Json::Object).collect());
+    let player_controls = json!({
+        "confirmation": controls.confirmation,
+        "response": controls.response,
+        "preview": controls.preview.clone().map_or(Json::Null, Json::Object),
+        "actor_parameter": controls.actor_parameter,
+        "checks": maps(&controls.checks),
+        "queries": maps(&controls.queries),
+        "calculations": maps(&controls.calculations),
+        "map_preview": controls.map_preview.clone().map_or(Json::Null, Json::Object),
+        "available": controls.available,
+        "preflight": controls.preflight,
+        "preflight_path": controls.preflight_path.clone().map_or(Json::Null, Json::Object),
+    });
+    json!({
+        "package_id": tool.package_id,
+        "package_version": tool.package_version,
+        "package_sha256": tool.package_sha256,
+        "name": tool.name,
+        "capability": tool.capability,
+        "input_schema": tool.input_schema,
+        "description": tool.description,
+        "model_behavior": tool.model_behavior.as_str(),
+        "model_behavior_state_predicates": predicates,
+        "player_controls": player_controls,
+        "decision_title": tool.decision_title,
+        "permanently_refused": tool.permanently_refused,
+        "checks_player_action": tool.check_player_action.is_some(),
+        "previews_player_action": tool.preview_player_action.is_some(),
+    })
 }
 
 fn outcome(read: StoreResult<Json>) -> Json {
@@ -43,9 +89,8 @@ async fn content_reads_match_python() {
         Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/vectors/content_reads/content_read_runs.json");
     let record: Json = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 117);
+    assert_eq!(runs.len(), 154);
     let mut failures = Vec::new();
-    let mut not_ported = Vec::new();
     let mut current: Option<(String, StoreHandle, sylvia_store::StoreThread)> = None;
     for (index, run) in runs.iter().enumerate() {
         let name = run["base"].as_str().unwrap();
@@ -82,15 +127,11 @@ async fn content_reads_match_python() {
                     .await
                     .map(|guide| guide.map_or(Json::Null, Json::from)),
             ),
-            "catalog" => match content_reads::catalog(handle, campaign, false).await {
-                Err(StoreError::NotPorted(_)) => {
-                    not_ported.push(format!("{name} {campaign}"));
-                    continue;
-                }
-                read => {
-                    outcome(read.map(|tools| tools.into_iter().map(|tool| Json::from(tool.name)).collect()))
-                }
-            },
+            "catalog" => outcome(
+                content_reads::catalog(handle, campaign, run["include_unexposed"].as_bool().unwrap())
+                    .await
+                    .map(|tools| tools.iter().map(tool_json).collect()),
+            ),
             "model_context_owner" => outcome(
                 content_reads::model_context_owner(handle, campaign)
                     .await
@@ -131,14 +172,13 @@ async fn content_reads_match_python() {
         runs.len(),
         failures.join("\n")
     );
-    assert_eq!(not_ported, ["cast campaign-table"]);
-    // The one refused catalog is the one Python filled.
-    let filled: Vec<&Json> = runs
+    // Riichi's catalogs are the ones Python fills: both campaigns with every tool listed, and its
+    // DM campaigns with the admitted tools.
+    let filled = runs
         .iter()
         .filter(|run| {
             run["read"] == "catalog" && run["outcome"]["ok"].as_array().is_some_and(|tools| !tools.is_empty())
         })
-        .collect();
-    assert_eq!(filled.len(), 1);
-    assert_eq!(filled[0]["campaign_id"], "campaign-table");
+        .count();
+    assert_eq!(filled, 6);
 }
