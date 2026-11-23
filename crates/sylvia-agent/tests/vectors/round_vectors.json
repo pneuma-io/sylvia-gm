@@ -242,15 +242,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "ee322949f32546c9bd526a518a341e29"
+     "hex": "f6fadfa7e5c14b629362da5cc13da58a"
     },
     {
      "event": "uuid",
-     "hex": "6ac3520a235949bc948a989e99be6164"
+     "hex": "2c63888f28f04481be6ddce7a7ace732"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "request_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -1108,8 +1108,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "required_transitions": []
     }
    }
@@ -1356,15 +1356,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "3dad7560851e46ac9f4b39d8bb4d3ca3"
+     "hex": "8a119b9e16bc47328f7b7676d015b0dc"
     },
     {
      "event": "uuid",
-     "hex": "e9f4e5d1b19f4ee7923e72d7a0bf091c"
+     "hex": "bc67ba94637d4efaa09e467ada679f81"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-e9f4e5d1b19f4ee7923e72d7a0bf091c",
+     "request_id": "mcp-discovery-bc67ba94637d4efaa09e467ada679f81",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -2222,8 +2222,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-e9f4e5d1b19f4ee7923e72d7a0bf091c",
-     "inference_id": "inference-3dad7560851e46ac9f4b39d8bb4d3ca3",
+     "discovery_id": "mcp-discovery-bc67ba94637d4efaa09e467ada679f81",
+     "inference_id": "inference-8a119b9e16bc47328f7b7676d015b0dc",
      "required_transitions": []
     }
    }
@@ -2722,15 +2722,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "d126446d00bd4e5b8e80cf2800741f4f"
+     "hex": "fab36728a78b4b7e8787c0de2f960063"
     },
     {
      "event": "uuid",
-     "hex": "b9d0b7afa12a42739b885126e21c73d4"
+     "hex": "a712755f6cac44d599d5269512e74f7b"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-b9d0b7afa12a42739b885126e21c73d4",
+     "request_id": "mcp-discovery-a712755f6cac44d599d5269512e74f7b",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -3819,8 +3819,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-b9d0b7afa12a42739b885126e21c73d4",
-     "inference_id": "inference-d126446d00bd4e5b8e80cf2800741f4f",
+     "discovery_id": "mcp-discovery-a712755f6cac44d599d5269512e74f7b",
+     "inference_id": "inference-fab36728a78b4b7e8787c0de2f960063",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -4084,15 +4084,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "1ae8bc87608144b59dcecac69e1a014e"
+     "hex": "ac8efe121c5949f1ba2dde83458bfed0"
     },
     {
      "event": "uuid",
-     "hex": "d69b849648194baabf673244161747fa"
+     "hex": "5796a670482c490e8d9782bfcdc83011"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-d69b849648194baabf673244161747fa",
+     "request_id": "mcp-discovery-5796a670482c490e8d9782bfcdc83011",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -5181,8 +5181,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-d69b849648194baabf673244161747fa",
-     "inference_id": "inference-1ae8bc87608144b59dcecac69e1a014e",
+     "discovery_id": "mcp-discovery-5796a670482c490e8d9782bfcdc83011",
+     "inference_id": "inference-ac8efe121c5949f1ba2dde83458bfed0",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -5446,15 +5446,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "3c1ea2adef9246f298f66b6758ac398b"
+     "hex": "0b80a25553a14945a93258ef7777682c"
     },
     {
      "event": "uuid",
-     "hex": "b0dc993dbbea44a594ffd0c9e53fa1eb"
+     "hex": "45ac16b9c20d4c218f8a7abff2e91ac7"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-b0dc993dbbea44a594ffd0c9e53fa1eb",
+     "request_id": "mcp-discovery-45ac16b9c20d4c218f8a7abff2e91ac7",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -6366,8 +6366,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-b0dc993dbbea44a594ffd0c9e53fa1eb",
-     "inference_id": "inference-3c1ea2adef9246f298f66b6758ac398b",
+     "discovery_id": "mcp-discovery-45ac16b9c20d4c218f8a7abff2e91ac7",
+     "inference_id": "inference-0b80a25553a14945a93258ef7777682c",
      "required_transitions": []
     }
    }
@@ -6614,15 +6614,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "68b335177db44ee5b63ab61e4030e767"
+     "hex": "dd2ee150d2844277b89c1af40ce8fcc9"
     },
     {
      "event": "uuid",
-     "hex": "d2acf5168137428cbf063499fca475a0"
+     "hex": "3c3ae353fb14428e90b401a6c1cc0aff"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-d2acf5168137428cbf063499fca475a0",
+     "request_id": "mcp-discovery-3c3ae353fb14428e90b401a6c1cc0aff",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -7668,8 +7668,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-d2acf5168137428cbf063499fca475a0",
-     "inference_id": "inference-68b335177db44ee5b63ab61e4030e767",
+     "discovery_id": "mcp-discovery-3c3ae353fb14428e90b401a6c1cc0aff",
+     "inference_id": "inference-dd2ee150d2844277b89c1af40ce8fcc9",
      "required_transitions": []
     }
    }
@@ -8235,10 +8235,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -8509,8 +8509,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -10626,10 +10626,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -10756,7 +10756,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+       "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -10908,8 +10908,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -13282,10 +13282,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -13412,7 +13412,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+       "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -13564,8 +13564,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -14655,10 +14655,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -14785,7 +14785,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+       "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -16388,10 +16388,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -16518,7 +16518,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+       "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
        "owner": "gm",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -16670,8 +16670,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -17966,10 +17966,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -18102,7 +18102,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+       "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -18254,8 +18254,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -20349,10 +20349,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -20623,8 +20623,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -21314,10 +21314,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -21588,8 +21588,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -23360,10 +23360,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -23634,8 +23634,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -25749,10 +25749,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -26023,8 +26023,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -28268,10 +28268,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+     "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -28494,8 +28494,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
-      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+      "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
+      "mcp_discovery_id": "mcp-discovery-2c63888f28f04481be6ddce7a7ace732",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -30069,7 +30069,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -30092,7 +30092,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -30109,7 +30109,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -30118,7 +30118,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -30141,11 +30141,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -30293,7 +30293,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -30366,15 +30366,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "3fb943a03a78479c90bc0a2033bf89a3"
+     "hex": "b9c8b9ffe46e46279419c7723226db94"
     },
     {
      "event": "uuid",
-     "hex": "33e8e7a8e19943ad861673396d4aff6e"
+     "hex": "bbeeb6361d334c6d96f0da847a2a3b87"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "request_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -31252,8 +31252,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "required_transitions": []
     }
    }
@@ -31389,7 +31389,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -31412,7 +31412,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -31429,7 +31429,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -31438,7 +31438,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -31461,11 +31461,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -31613,7 +31613,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -31686,15 +31686,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "4efaddb25c124cc5b268aae4db915473"
+     "hex": "68e58909ccb24416925a56c9a30f4300"
     },
     {
      "event": "uuid",
-     "hex": "77688053341c462f8459572ac18f589c"
+     "hex": "ff53a46f5ead403a84c4b877678537a3"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-77688053341c462f8459572ac18f589c",
+     "request_id": "mcp-discovery-ff53a46f5ead403a84c4b877678537a3",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -32572,8 +32572,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-77688053341c462f8459572ac18f589c",
-     "inference_id": "inference-4efaddb25c124cc5b268aae4db915473",
+     "discovery_id": "mcp-discovery-ff53a46f5ead403a84c4b877678537a3",
+     "inference_id": "inference-68e58909ccb24416925a56c9a30f4300",
      "required_transitions": []
     }
    }
@@ -32709,7 +32709,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -32732,7 +32732,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -32749,7 +32749,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -32758,7 +32758,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -32781,11 +32781,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -32933,7 +32933,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -33147,7 +33147,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -33170,7 +33170,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -33187,7 +33187,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -33196,7 +33196,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -33219,11 +33219,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -33371,7 +33371,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -33444,15 +33444,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "6a6d43636bf144cfa40cf7dcc24bc29b"
+     "hex": "e179f773a6e043c09514b7dde2ad0478"
     },
     {
      "event": "uuid",
-     "hex": "3cac0d273e514b3796e651077349fd7c"
+     "hex": "0c28cec1b94742afa4b936976b4b76b0"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-3cac0d273e514b3796e651077349fd7c",
+     "request_id": "mcp-discovery-0c28cec1b94742afa4b936976b4b76b0",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -34628,8 +34628,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-3cac0d273e514b3796e651077349fd7c",
-     "inference_id": "inference-6a6d43636bf144cfa40cf7dcc24bc29b",
+     "discovery_id": "mcp-discovery-0c28cec1b94742afa4b936976b4b76b0",
+     "inference_id": "inference-e179f773a6e043c09514b7dde2ad0478",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -34782,7 +34782,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -34805,7 +34805,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -34822,7 +34822,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -34831,7 +34831,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -34854,11 +34854,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -35006,7 +35006,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -35079,15 +35079,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "8db32be618e046bea94655da8312ad2a"
+     "hex": "a398d022d4354df48322905089933837"
     },
     {
      "event": "uuid",
-     "hex": "88ef103abb7640388b54a37bac237101"
+     "hex": "4c8b1eb44f1e4ccf8372a2a784a67245"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-88ef103abb7640388b54a37bac237101",
+     "request_id": "mcp-discovery-4c8b1eb44f1e4ccf8372a2a784a67245",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -36261,8 +36261,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-88ef103abb7640388b54a37bac237101",
-     "inference_id": "inference-8db32be618e046bea94655da8312ad2a",
+     "discovery_id": "mcp-discovery-4c8b1eb44f1e4ccf8372a2a784a67245",
+     "inference_id": "inference-a398d022d4354df48322905089933837",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -36415,7 +36415,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -36438,7 +36438,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -36455,7 +36455,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -36464,7 +36464,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -36487,11 +36487,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -36639,7 +36639,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -36712,15 +36712,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "7cea73cd7cfd428e942d1ca7ceb72d92"
+     "hex": "ac9130f4547c47d38e3a655f20731ab2"
     },
     {
      "event": "uuid",
-     "hex": "98ccc5e59f19495d9033740de2fc8aec"
+     "hex": "ca3ab343ac334b68be9bf77c6519a9d5"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-98ccc5e59f19495d9033740de2fc8aec",
+     "request_id": "mcp-discovery-ca3ab343ac334b68be9bf77c6519a9d5",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -37652,8 +37652,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-98ccc5e59f19495d9033740de2fc8aec",
-     "inference_id": "inference-7cea73cd7cfd428e942d1ca7ceb72d92",
+     "discovery_id": "mcp-discovery-ca3ab343ac334b68be9bf77c6519a9d5",
+     "inference_id": "inference-ac9130f4547c47d38e3a655f20731ab2",
      "required_transitions": []
     }
    }
@@ -37789,7 +37789,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -37812,7 +37812,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -37829,7 +37829,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -37838,7 +37838,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -37861,11 +37861,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -38013,7 +38013,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -38086,15 +38086,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "532d36b4c2164dd785356f4c4b094a4e"
+     "hex": "03c472ca449548b4b8d889d2b47a5c1d"
     },
     {
      "event": "uuid",
-     "hex": "2a3127eed8c24dc895f7278582a6aef4"
+     "hex": "77dde229df884e4dac2386e5cc86ba64"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-2a3127eed8c24dc895f7278582a6aef4",
+     "request_id": "mcp-discovery-77dde229df884e4dac2386e5cc86ba64",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -39160,8 +39160,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-2a3127eed8c24dc895f7278582a6aef4",
-     "inference_id": "inference-532d36b4c2164dd785356f4c4b094a4e",
+     "discovery_id": "mcp-discovery-77dde229df884e4dac2386e5cc86ba64",
+     "inference_id": "inference-03c472ca449548b4b8d889d2b47a5c1d",
      "required_transitions": []
     }
    }
@@ -39297,7 +39297,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -39320,7 +39320,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -39337,7 +39337,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -39346,7 +39346,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -39369,11 +39369,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -39894,10 +39894,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -39930,7 +39930,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -40207,8 +40207,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -40664,7 +40664,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -40725,7 +40725,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -41835,7 +41835,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -41858,7 +41858,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -41875,7 +41875,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -41884,7 +41884,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -41907,11 +41907,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -42544,10 +42544,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -42580,7 +42580,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -42693,7 +42693,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+       "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -42865,8 +42865,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -43456,7 +43456,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -43517,7 +43517,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -44750,7 +44750,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -44773,7 +44773,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -44790,7 +44790,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -44799,7 +44799,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -44822,11 +44822,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -45459,10 +45459,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -45495,7 +45495,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -45608,7 +45608,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+       "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -45780,8 +45780,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -46008,7 +46008,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -46069,7 +46069,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -46494,7 +46494,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -46517,7 +46517,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -46534,7 +46534,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -46543,7 +46543,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -46566,11 +46566,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -47091,10 +47091,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -47127,7 +47127,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -47240,7 +47240,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+       "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -48301,7 +48301,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -48324,7 +48324,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -48341,7 +48341,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -48350,7 +48350,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -48373,11 +48373,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -49010,10 +49010,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -49046,7 +49046,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -49159,7 +49159,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+       "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
        "owner": "gm",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -49331,8 +49331,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -49607,7 +49607,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -49668,7 +49668,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -50138,7 +50138,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -50161,7 +50161,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -50178,7 +50178,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -50187,7 +50187,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -50210,11 +50210,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -50847,10 +50847,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -50883,7 +50883,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -51002,7 +51002,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+       "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -51174,8 +51174,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -51691,7 +51691,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -51752,7 +51752,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -52892,7 +52892,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -52915,7 +52915,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -52932,7 +52932,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -52941,7 +52941,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -52964,11 +52964,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -53489,10 +53489,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -53525,7 +53525,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -53802,8 +53802,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -53854,7 +53854,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -53915,7 +53915,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -54116,7 +54116,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -54139,7 +54139,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -54156,7 +54156,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -54165,7 +54165,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -54188,11 +54188,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -54713,10 +54713,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -54749,7 +54749,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -55026,8 +55026,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -55394,7 +55394,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -55455,7 +55455,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -56421,7 +56421,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -56444,7 +56444,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -56461,7 +56461,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -56470,7 +56470,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -56493,11 +56493,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -57018,10 +57018,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -57054,7 +57054,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -57331,8 +57331,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -57788,7 +57788,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -57849,7 +57849,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -58957,7 +58957,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -58980,7 +58980,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -58997,7 +58997,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -59006,7 +59006,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -59029,11 +59029,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -59666,10 +59666,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -59702,7 +59702,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -59979,8 +59979,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -60548,7 +60548,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -60609,7 +60609,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -61847,7 +61847,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -61870,7 +61870,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -61887,7 +61887,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
+       "message_id": "inference-f6fadfa7e5c14b629362da5cc13da58a-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -61896,7 +61896,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "inference_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -61919,11 +61919,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 6609,
+         "elapsed_ms": 0,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 32,
+         "quiet_ms": 0,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -62444,10 +62444,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+     "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -62480,7 +62480,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -62709,8 +62709,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
-      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+      "inference_id": "inference-b9c8b9ffe46e46279419c7723226db94",
+      "mcp_discovery_id": "mcp-discovery-bbeeb6361d334c6d96f0da847a2a3b87",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -63166,7 +63166,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -63227,7 +63227,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
+        "response_id": "inference-f6fadfa7e5c14b629362da5cc13da58a",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
