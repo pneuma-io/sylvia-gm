@@ -321,3 +321,189 @@ pub fn player_action_request_matches(stored: Option<&JsonMap>, request: &JsonMap
             .all(|(key, value)| sylvia_domain::pyops::py_eq(stored.get(key).unwrap_or(&Json::Null), value))
     })
 }
+
+// ── The owner's player-control checks and parameter bindings ───────────────────────────────
+
+use sylvia_domain::error::{DomainError, DomainResult};
+use sylvia_domain::pyops::py_type_name;
+
+/// `TypeError: unhashable type` when Python cannot put `value` in a set. The owner's action
+/// declarations, control scope and state are frozen, so the type is `FrozenJsonDict` or
+/// `FrozenJsonList` (differences row 48: a literal surface source is thawed, so Python names
+/// `dict` or `list` there).
+fn hashable(value: &Json) -> DomainResult<()> {
+    match value {
+        Json::Object(_) => Err(DomainError::type_error("unhashable type: 'FrozenJsonDict'")),
+        Json::Array(_) => Err(DomainError::type_error("unhashable type: 'FrozenJsonList'")),
+        _ => Ok(()),
+    }
+}
+
+/// `isinstance(value, Sequence)`: a list, or text (whose characters are never mappings).
+fn sequence_items(value: Option<&Json>) -> Option<&[Json]> {
+    match value {
+        Some(Json::Array(items)) => Some(items),
+        Some(Json::String(_)) => Some(&[]),
+        _ => None,
+    }
+}
+
+/// `{item.get("id") for item in participants if isinstance(item, Mapping)}`, as the text ids a
+/// text identity can match.
+fn participant_ids(participants: &[Json]) -> DomainResult<std::collections::HashSet<&str>> {
+    let mut ids = std::collections::HashSet::new();
+    for item in participants.iter().filter_map(Json::as_object) {
+        if let Some(id) = item.get("id") {
+            hashable(id)?;
+            if let Json::String(id) = id {
+                ids.insert(id.as_str());
+            }
+        }
+    }
+    Ok(ids)
+}
+
+/// `value["id"]` on one item of a scope's frozen `actors` (a `FrozenJsonList` is a tuple).
+fn subscript_id(value: &Json) -> DomainResult<&Json> {
+    match value {
+        Json::Object(map) => map.get("id").ok_or_else(|| DomainError::uncaught("KeyError", "'id'")),
+        Json::String(_) => Err(DomainError::type_error("string indices must be integers, not 'str'")),
+        Json::Array(_) => Err(DomainError::type_error("tuple indices must be integers or slices, not str")),
+        other => {
+            Err(DomainError::type_error(format!("'{}' object is not subscriptable", py_type_name(other))))
+        }
+    }
+}
+
+/// `validate_player_control(scope, parameters, actor_parameter)`: direct actor selection stays
+/// inside the Ruleset's current player decision scope (`project_player_control_scope`).
+pub fn validate_player_control(
+    scope: Option<&JsonMap>,
+    parameters: &JsonMap,
+    actor_parameter: Option<&str>,
+) -> DomainResult<()> {
+    let Some(scope) = scope else { return Ok(()) };
+    if scope.get("available") != Some(&Json::Bool(true)) {
+        return Err(DomainError::command_rejected("The Ruleset currently requires a GM decision"));
+    }
+    let Some(actor_parameter) = actor_parameter else { return Ok(()) };
+    let mut allowed = std::collections::HashSet::new();
+    let mut add = |actor: &Json| -> DomainResult<()> {
+        let id = subscript_id(actor)?;
+        hashable(id)?;
+        if let Json::String(id) = id {
+            allowed.insert(id.clone());
+        }
+        Ok(())
+    };
+    match scope.get("actors") {
+        None => return Err(DomainError::uncaught("KeyError", "'actors'")),
+        Some(Json::Array(items)) => items.iter().try_for_each(&mut add)?,
+        // Iterating text or a mapping gives text, which `["id"]` refuses.
+        Some(Json::String(text)) if !text.is_empty() => add(&Json::String(String::new()))?,
+        Some(Json::Object(map)) if !map.is_empty() => add(&Json::String(String::new()))?,
+        Some(Json::String(_) | Json::Object(_)) => {}
+        Some(other) => {
+            return Err(DomainError::type_error(format!("'{}' object is not iterable", py_type_name(other))))
+        }
+    }
+    match parameters.get(actor_parameter) {
+        Some(Json::String(actor_id)) if allowed.contains(actor_id) => Ok(()),
+        _ => Err(DomainError::command_rejected("This actor is not currently controlled by the player")),
+    }
+}
+
+/// `resolve_party_action_parameters(action, selection, data, allow_entity_ids=...)`: the chosen
+/// visible party member bound to the Ruleset's declared actor parameter.
+pub fn resolve_party_action_parameters(
+    action: &JsonMap,
+    selection: &Json,
+    data: &Json,
+    allow_entity_ids: bool,
+) -> DomainResult<JsonMap> {
+    let invalid = || DomainError::command_rejected("Party action selection is invalid");
+    let (Some(Json::Object(bindings)), Some(Json::Object(fixed))) =
+        (action.get("bindings"), action.get("params"))
+    else {
+        return Err(invalid());
+    };
+    bindings.values().try_for_each(hashable)?;
+    if bindings.len() != 1 || bindings.values().any(|value| value != "actor") {
+        return Err(invalid());
+    }
+    let Some(selection) =
+        selection.as_object().filter(|selection| selection.len() == 1 && selection.contains_key("actor"))
+    else {
+        return Err(invalid());
+    };
+    let Some(participants) = sequence_items(data.get("participants")) else { return Err(invalid()) };
+    let mut visible = participant_ids(participants)?;
+    if allow_entity_ids {
+        if let Some(Json::Object(entities)) = data.get("entities") {
+            visible.extend(entities.keys().map(String::as_str));
+        }
+    }
+    let actor_id = match &selection["actor"] {
+        Json::String(id) if visible.contains(id.as_str()) => id,
+        _ => return Err(DomainError::command_rejected("The selected party member is unavailable")),
+    };
+    let mut parameters = fixed.clone();
+    for key in bindings.keys() {
+        parameters.insert(key.clone(), Json::String(actor_id.clone()));
+    }
+    Ok(parameters)
+}
+
+/// `retain_player_action_origin(outcome, origin)`: the UI provenance saved in the same
+/// transaction as the real mechanics result.
+pub fn retain_player_action_origin(
+    mut outcome: sylvia_domain::authority::MechanicOutcome,
+    origin: Option<&JsonMap>,
+) -> sylvia_domain::authority::MechanicOutcome {
+    if let Some(origin) = origin {
+        let mut marker = JsonMap::new();
+        marker.insert("kind".into(), Json::from(sylvia_domain::player_actions::PLAYER_ACTION_ORIGIN));
+        marker.insert("origin".into(), Json::Object(origin.clone()));
+        outcome.consequences.push(marker);
+    }
+    outcome
+}
+
+/// `resolve_inventory_action_parameters(action, selection, data)`: an owned visible actor and
+/// bounded form data bound to a declared inventory operation.
+pub fn resolve_inventory_action_parameters(
+    action: &JsonMap,
+    selection: &Json,
+    data: &Json,
+) -> DomainResult<JsonMap> {
+    let invalid = || DomainError::command_rejected("Inventory action selection is invalid");
+    let (Some(Json::Object(bindings)), Some(Json::Object(fixed))) =
+        (action.get("bindings"), action.get("params"))
+    else {
+        return Err(invalid());
+    };
+    let Some(selection) = selection.as_object() else { return Err(invalid()) };
+    let Some(participants) = sequence_items(data.get("participants")) else { return Err(invalid()) };
+    bindings.values().try_for_each(hashable)?;
+    let declared =
+        bindings.values().all(|source| matches!(source.as_str(), Some("actor" | "declared_action")));
+    let sources: std::collections::HashSet<&str> = bindings.values().filter_map(Json::as_str).collect();
+    let selected: std::collections::HashSet<&str> = selection.keys().map(String::as_str).collect();
+    if !declared || selected != sources || !selection.contains_key("actor") {
+        return Err(invalid());
+    }
+    // `not isinstance(actor, str) or actor not in {...}`: the ids are read only for text.
+    let available = match &selection["actor"] {
+        Json::String(actor) => participant_ids(participants)?.contains(actor.as_str()),
+        _ => false,
+    };
+    if !available {
+        return Err(DomainError::command_rejected("The selected inventory owner is unavailable"));
+    }
+    let mut parameters = fixed.clone();
+    for (parameter, source) in bindings {
+        let source = source.as_str().expect("every binding source is checked as text");
+        parameters.insert(parameter.clone(), selection[source].clone());
+    }
+    Ok(parameters)
+}

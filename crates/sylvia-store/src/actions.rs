@@ -5,11 +5,11 @@
 //! `complete_turn`, `turn_is_completed`, `action_receipt`, `idempotency_hit`, `action_hit`),
 //! `sqlite_session.require_active_campaign` and `sqlite_state_ownership.owner_for_mutation`.
 //!
-//! Not yet ported here, refused rather than run differently: resolving a mechanics choice,
-//! participant mutations (they validate against package schemas, lane 1) and Campaign File
-//! command batches. Python's `commit_action` takes them as optional arguments; this port's
-//! [`CommitAction`] has no fields for them yet, and an outcome with participant mutations is
-//! refused with [`StoreError::NotPorted`].
+//! A commit may resolve a pending mechanics choice ([`CommitAction::choice_resolution`]) and
+//! replace live characters (the outcome's participant mutations, checked again by
+//! `_validate_participant_mutations` and recorded as `participant_updated` consequences). Not yet
+//! ported: Campaign File command batches, which Python's `commit_action` takes as an optional
+//! argument; [`CommitAction`] has no field for them yet.
 
 use crate::error::{value_error, StoreError, StoreResult};
 use crate::pytext::{py_int, py_str};
@@ -32,8 +32,9 @@ pub(crate) fn dump(value: &Json) -> String {
 /// `_decode_canonical_json`: the stored text must parse, refusing non-standard constants, and
 /// be exactly the canonical text of its value (which also refuses repeated members).
 pub(crate) fn load_json(text: &str) -> StoreResult<Json> {
-    let parsed = sylvia_base::pyjson::loads(text)
-        .map_err(|_| value_error("Stored JSON is not the exact canonical representation"))?;
+    // `_decode_canonical_json`: text `json.loads` refuses raises its `JSONDecodeError`; only
+    // text it reads that is not the exact canonical form is the canonical-representation error.
+    let parsed = sylvia_base::pyjson::loads(text).map_err(crate::error::json_error)?;
     if dump(&parsed) != text {
         return Err(value_error("Stored JSON is not the exact canonical representation"));
     }
@@ -396,11 +397,6 @@ impl AuthorityStore {
                 "unsafe_canonical_payload",
             ));
         }
-        if !command.outcome.participant_mutations.is_empty() {
-            return Err(StoreError::NotPorted(
-                "participant mutations in commit_action (lane 1 schema validation)",
-            ));
-        }
         let connection = self.connect()?;
         let result = self.commit_action_in(&connection, command);
         if !connection.is_autocommit() {
@@ -416,7 +412,10 @@ impl AuthorityStore {
     ) -> StoreResult<ActionReceipt> {
         let campaign_id = command.campaign_id.as_str();
         connection.execute_batch("BEGIN IMMEDIATE")?;
-        if !command.outcome.mutations.is_empty() || command.choice_resolution.is_some() {
+        if !command.outcome.mutations.is_empty()
+            || !command.outcome.participant_mutations.is_empty()
+            || command.choice_resolution.is_some()
+        {
             self.ensure_campaign_schema(connection)?;
         }
         let mut resolving = None;
@@ -481,13 +480,13 @@ impl AuthorityStore {
             return Err(rejected("TURN does not admit actions", "command_rejected"));
         }
 
+        let actor = MutationActor {
+            campaign_id: &command.campaign_id,
+            package_id: &command.package_id,
+            package_version: &command.package_version,
+            package_sha256: &command.package_sha256,
+        };
         for mutation in &command.outcome.mutations {
-            let actor = MutationActor {
-                campaign_id: &command.campaign_id,
-                package_id: &command.package_id,
-                package_version: &command.package_version,
-                package_sha256: &command.package_sha256,
-            };
             let (owner, is_new) = owner_for_mutation(connection, &actor, &mutation.namespace)?;
             if is_new {
                 connection.execute(
@@ -497,8 +496,7 @@ impl AuthorityStore {
                 )?;
             }
         }
-        // `_validate_participant_mutations` has nothing to check: participant mutations are
-        // refused above until they are ported.
+        crate::action_execution::validate_participant_mutations(connection, &actor, &command.outcome)?;
         let resulting_revision = command
             .expected_revision
             .checked_add(1)
@@ -617,8 +615,29 @@ impl AuthorityStore {
                 ]),
             )?;
         }
-        for (ordinal, consequence) in command.outcome.consequences.iter().enumerate() {
-            let consequence = Json::Object(consequence.clone());
+        let mut consequences: Vec<Json> =
+            command.outcome.consequences.iter().map(|item| Json::Object(item.clone())).collect();
+        for mutation in &command.outcome.participant_mutations {
+            let Some(previous) = one_row(
+                connection,
+                "SELECT data_json FROM participants WHERE campaign_id = ? AND participant_id = ?",
+                &[&campaign_id, &mutation.participant_id],
+            )?
+            else {
+                return Err(StoreError::Other("TypeError: 'NoneType' object is not subscriptable".into()));
+            };
+            consequences.push(object(vec![
+                ("kind", "participant_updated".into()),
+                ("participant_id", mutation.participant_id.clone().into()),
+                ("before", Json::Object(load_payload(&py_str(&previous[0]))?)),
+                ("after", Json::Object(mutation.data.clone())),
+            ]));
+            connection.execute(
+                "UPDATE participants SET data_json = ? WHERE campaign_id = ? AND participant_id = ?",
+                params![dump(&Json::Object(mutation.data.clone())), campaign_id, mutation.participant_id],
+            )?;
+        }
+        for (ordinal, consequence) in consequences.into_iter().enumerate() {
             connection.execute(
                 "INSERT INTO consequences VALUES (?, ?, ?, ?)",
                 params![

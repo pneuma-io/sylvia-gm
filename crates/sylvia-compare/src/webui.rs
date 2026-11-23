@@ -70,7 +70,11 @@ pub struct Part {
     /// back as an upload). The session runner fills `content_bytes` from it.
     #[serde(default)]
     pub content_from_step: Option<String>,
-    /// The bytes `content_from_step` names, filled in before the step is sent.
+    /// Content read from this checkout file (relative to the checkout root), byte for byte.
+    #[serde(default)]
+    pub content_from_file: Option<String>,
+    /// The bytes `content_from_step` or `content_from_file` names, filled in before the step is
+    /// sent.
     #[serde(skip)]
     pub content_bytes: Option<Vec<u8>>,
 }

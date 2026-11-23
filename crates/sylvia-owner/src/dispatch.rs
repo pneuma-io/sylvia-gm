@@ -168,6 +168,8 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
         }
+        "install_package" => commands::packages::handle_install_package(context, params).await,
+        "install_package_file" => commands::packages::handle_install_package_file(context, params).await,
         "export_package_candidate" | "export_package_candidate_file" => {
             commands::packages::handle_export_package_candidate(context, params).await
         }
