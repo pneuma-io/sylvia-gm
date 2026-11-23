@@ -1,0 +1,43 @@
+{
+ "traces": [
+  {
+   "exchange_id": "ex-1",
+   "request": {
+    "messages": [
+     {
+      "role": "user",
+      "content": "H\u00e9llo \u2014 \u2713"
+     }
+    ],
+    "n": 1.5
+   },
+   "empty": {},
+   "list": []
+  },
+  {
+   "nested": [
+    [
+     1,
+     2
+    ],
+    {
+     "z": null,
+     "a": true
+    }
+   ],
+   "text": "line\nbreak\t\"quoted\""
+  }
+ ],
+ "diagnostics": [
+  {
+   "code": "rejected",
+   "detail": "\u00fcn\u00efcode"
+  }
+ ],
+ "document": "{\n  \"enabled\": true,\n  \"trace_count\": 2,\n  \"traces\": [\n    {\n      \"exchange_id\": \"ex-1\",\n      \"request\": {\n        \"messages\": [\n          {\n            \"role\": \"user\",\n            \"content\": \"H\u00e9llo \u2014 \u2713\"\n          }\n        ],\n        \"n\": 1.5\n      },\n      \"empty\": {},\n      \"list\": []\n    },\n    {\n      \"nested\": [\n        [\n          1,\n          2\n        ],\n        {\n          \"z\": null,\n          \"a\": true\n        }\n      ],\n      \"text\": \"line\\nbreak\\t\\\"quoted\\\"\"\n    }\n  ],\n  \"safe_mechanics_diagnostics\": [\n    {\n      \"code\": \"rejected\",\n      \"detail\": \"\u00fcn\u00efcode\"\n    }\n  ]\n}\n",
+ "empty_document": "{\n  \"enabled\": false,\n  \"trace_count\": 0,\n  \"traces\": [],\n  \"safe_mechanics_diagnostics\": []\n}\n",
+ "record_bytes": [
+  149,
+  91
+ ]
+}

@@ -430,3 +430,320 @@ pub async fn handle_chatgpt_connection(ctx: &DispatchContext, params: &JsonMap) 
     }
     Ok(Json::Object(result))
 }
+
+/// `handle_open_provider_setup`: `open_provider_setup(params.get("preset_id"))`, which opens
+/// only a shipped service's setup page.
+pub async fn handle_open_provider_setup(_ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let preset_id = param(params, "preset_id")?;
+    let opened = tokio::task::spawn_blocking(move || {
+        sylvia_provider::config::provider_settings::open_provider_setup(&preset_id)
+    })
+    .await
+    .map_err(|error| CodedError::new("internal_error", error.to_string()))?;
+    reply(&opened.map_err(config_error)?)
+}
+
+/// `_MAX_ADMIN_AUDIT_VIEW_BYTES` (`owner_process.py`): the largest record the live view carries.
+const MAX_ADMIN_AUDIT_VIEW_BYTES: usize = 256 * 1024;
+
+/// `CommandRejected(message)`.
+fn command_rejected(message: &str) -> CodedError {
+    CodedError::rejected(message)
+}
+
+/// `OwnerProtocolError(message)`.
+fn protocol(message: &str) -> CodedError {
+    CodedError::rejected(message).with_error_type("OwnerProtocolError")
+}
+
+/// `handle_admin_full_audit_status`: `AuthorityOwner.admin_full_audit_status()`.
+pub async fn handle_admin_full_audit_status(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    Ok(Json::Object(ctx.store.narration().admin_full_audit_status()))
+}
+
+/// `handle_set_admin_full_audit`: `set_admin_full_audit(_optional_bool(params, "enabled"))`.
+pub async fn handle_set_admin_full_audit(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let enabled = super::campaigns::optional_bool(params, "enabled")?;
+    Ok(Json::Object(ctx.store.narration().set_admin_full_audit(enabled)))
+}
+
+/// `handle_admin_full_audit_record`: one exact trace, `{"index", "trace"}`, unless its compact
+/// ASCII encoding is over the live-view limit, which answers with its size instead.
+pub async fn handle_admin_full_audit_record(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let index = super::campaigns::required_nonnegative_int(params, "index")?;
+    // `admin_full_audit_record(index)`, under the narration lock.
+    let trace = ctx.store.narration().with(|inner| {
+        usize::try_from(index).ok().and_then(|index| inner.inspector_trace.get(index).cloned())
+    });
+    let Some(trace) = trace else {
+        return Err(command_rejected("Admin Full Audit record is unavailable"));
+    };
+    let mut record = JsonMap::new();
+    record.insert("index".into(), index.into());
+    record.insert("trace".into(), trace);
+    let record = Json::Object(record);
+    let encoded = record_view_bytes(&record);
+    if encoded > MAX_ADMIN_AUDIT_VIEW_BYTES {
+        let mut reply = JsonMap::new();
+        reply.insert("index".into(), index.into());
+        reply.insert("trace".into(), Json::Null);
+        reply.insert("unavailable_reason".into(), "record_too_large_for_live_view".into());
+        reply.insert("bytes".into(), encoded.into());
+        return Ok(Json::Object(reply));
+    }
+    Ok(record)
+}
+
+/// The `errno` Python gives an `OSError`: on Windows CPython's `winerror_to_errno` for the
+/// codes whose errno `audit_export_save_error` tests (any other code is `EINVAL`), elsewhere the
+/// raw error number.
+fn python_errno(error: &std::io::Error) -> Option<i32> {
+    let raw = error.raw_os_error()?;
+    if !cfg!(windows) {
+        return Some(raw);
+    }
+    Some(match raw {
+        2 | 3 | 15 | 18 | 53 | 67 | 161 | 206 => 2,
+        5 | 16 | 19..=36 | 65 | 82 | 83 | 108 | 132 | 158 | 167 | 10013 => 13,
+        112 => 28,
+        267 => 20,
+        _ => 22,
+    })
+}
+
+/// `audit_export_save_error(error)`: the save failure explained without paths or payloads.
+fn audit_export_save_error(error: &std::io::Error) -> String {
+    let errno = python_errno(error);
+    let winerror = if cfg!(windows) { error.raw_os_error() } else { None };
+    // ENOSPC; EACCES, EPERM, EROFS; ENOENT, ENOTDIR, ENODEV (Linux and Windows numbering).
+    let (enospc, permission, unavailable): (&[i32], &[i32], &[i32]) = (&[28], &[13, 1, 30], &[2, 20, 19]);
+    let has = |set: &[i32]| errno.is_some_and(|errno| set.contains(&errno));
+    let windows = |set: &[i32]| winerror.is_some_and(|code| set.contains(&code));
+    if has(enospc) || windows(&[39, 112]) {
+        return "Audit export could not be saved: not enough space. Free space or choose another drive."
+            .into();
+    }
+    if has(permission) || windows(&[5, 32, 33]) {
+        return "Audit export could not be saved: the destination is not writable. \
+                Choose a writable folder or close applications using the destination file."
+            .into();
+    }
+    if has(unavailable) || windows(&[3, 15, 21]) {
+        return "Audit export could not be saved: the destination is unavailable. \
+                Choose an available folder or drive."
+            .into();
+    }
+    "Audit export file could not be saved. Try another destination.".into()
+}
+
+/// One value as `json.dumps(value, ensure_ascii=False, allow_nan=False, indent=2)`, each line
+/// after the first indented four more spaces, as the export writes its list items.
+fn audit_export_item(value: &Json) -> Vec<u8> {
+    let options = sylvia_base::pyjson::Dump {
+        ensure_ascii: false,
+        item_separator: ",",
+        key_separator: ": ",
+        indent: Some(2),
+        ..sylvia_base::pyjson::Dump::DEFAULT
+    };
+    let encoded = sylvia_base::pyjson::dumps(value, options);
+    format!("    {}", encoded.replace('\n', "\n    ")).into_bytes()
+}
+
+/// `export_admin_full_audit`'s document: the enabled flag, the traces and the safe mechanics
+/// diagnostics, written exactly as Python's streaming writer writes them.
+fn audit_export_document(enabled: bool, traces: &[Json], diagnostics: &[Json]) -> Vec<u8> {
+    let mut out = Vec::new();
+    out.extend_from_slice(b"{\n  \"enabled\": ");
+    out.extend_from_slice(if enabled { b"true" } else { b"false" });
+    out.extend_from_slice(format!(",\n  \"trace_count\": {},\n  \"traces\": [", traces.len()).as_bytes());
+    for (index, trace) in traces.iter().enumerate() {
+        out.extend_from_slice(if index == 0 { b"\n" } else { b",\n" });
+        out.extend_from_slice(&audit_export_item(trace));
+    }
+    if !traces.is_empty() {
+        out.extend_from_slice(b"\n  ");
+    }
+    out.extend_from_slice(b"],\n  \"safe_mechanics_diagnostics\": [");
+    for (index, diagnostic) in diagnostics.iter().enumerate() {
+        out.extend_from_slice(if index == 0 { b"\n" } else { b",\n" });
+        out.extend_from_slice(&audit_export_item(diagnostic));
+    }
+    if !diagnostics.is_empty() {
+        out.extend_from_slice(b"\n  ");
+    }
+    out.extend_from_slice(b"]\n}\n");
+    out
+}
+
+/// `NamedTemporaryFile(prefix=f".{name}.", suffix=".tmp", dir=folder, delete=False)`: a new
+/// file that did not exist, opened for writing.
+fn audit_temporary_file(folder: &std::path::Path, name: &str) -> std::io::Result<(PathBuf, std::fs::File)> {
+    const LETTERS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789_";
+    for _ in 0..100 {
+        let mut random = [0u8; 8];
+        getrandom::getrandom(&mut random).expect("the operating system's random source is available");
+        let tail: String =
+            random.iter().map(|byte| LETTERS[*byte as usize % LETTERS.len()] as char).collect();
+        let path = folder.join(format!(".{name}.{tail}.tmp"));
+        match std::fs::OpenOptions::new().write(true).create_new(true).open(&path) {
+            Ok(file) => return Ok((path, file)),
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(error) => return Err(error),
+        }
+    }
+    Err(std::io::Error::new(std::io::ErrorKind::AlreadyExists, "No usable temporary file name found"))
+}
+
+/// `handle_export_admin_full_audit`: one immutable audit snapshot, written atomically to the
+/// selected file (a temporary file beside it, fsynced, then renamed over it).
+pub async fn handle_export_admin_full_audit(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let text = super::campaigns::required(params, "destination_path")?;
+    let selected = std::path::PathBuf::from(&text);
+    let Some(name) = selected.file_name().map(|name| name.to_string_lossy().into_owned()) else {
+        return Err(protocol("Audit export destination must be an absolute file path"));
+    };
+    if !selected.is_absolute() {
+        return Err(protocol("Audit export destination must be an absolute file path"));
+    }
+    let parent = selected.parent().unwrap_or(&selected);
+    let parent = super::campaigns::resolve_strict(parent)
+        .map_err(|error| command_rejected(&audit_export_save_error(&error)))?;
+    let destination = parent.join(&name);
+    // `not destination.exists() or destination.is_file()`.
+    let regular_file = match std::fs::metadata(&destination) {
+        Ok(metadata) => metadata.is_file(),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => true,
+        Err(error) => return Err(command_rejected(&audit_export_save_error(&error))),
+    };
+    if !regular_file {
+        return Err(protocol(
+            "Audit export destination is not a regular file. Choose a file in a writable folder.",
+        ));
+    }
+    // The snapshot, under one narration lock.
+    let (enabled, traces, diagnostics) = ctx.store.narration().with(|inner| {
+        (inner.admin_full_audit_enabled, inner.inspector_trace.clone(), inner.mechanics_diagnostics.clone())
+    });
+    let document = audit_export_document(enabled, &traces, &diagnostics);
+    let written = tokio::task::spawn_blocking(move || -> std::io::Result<u64> {
+        use std::io::Write;
+        // `destination.parent.mkdir(parents=False, exist_ok=True)`.
+        if let Err(error) = std::fs::create_dir(&parent) {
+            if !(error.kind() == std::io::ErrorKind::AlreadyExists && parent.is_dir()) {
+                return Err(error);
+            }
+        }
+        let (temporary, mut file) = audit_temporary_file(&parent, &name)?;
+        let outcome = (|| {
+            file.write_all(&document)?;
+            file.flush()?;
+            file.sync_all()?;
+            let size = file.metadata()?.len();
+            drop(file);
+            std::fs::rename(&temporary, &destination)?;
+            Ok(size)
+        })();
+        if outcome.is_err() {
+            // Best-effort cleanup must not replace the original save failure.
+            let _ = std::fs::remove_file(&temporary);
+        }
+        outcome
+    })
+    .await
+    .map_err(|error| CodedError::new("internal_error", error.to_string()))?;
+    let size = written.map_err(|error| command_rejected(&audit_export_save_error(&error)))?;
+    let mut reply = JsonMap::new();
+    reply.insert("status".into(), "exported".into());
+    reply.insert("trace_count".into(), traces.len().into());
+    reply.insert("bytes".into(), size.into());
+    Ok(Json::Object(reply))
+}
+
+/// The live view's size check: `len(json.dumps(_json_value(record), ensure_ascii=True,
+/// separators=(",", ":"), allow_nan=False).encode("utf-8"))`.
+fn record_view_bytes(record: &Json) -> usize {
+    let options = sylvia_base::pyjson::Dump {
+        item_separator: ",",
+        key_separator: ":",
+        ..sylvia_base::pyjson::Dump::DEFAULT
+    };
+    sylvia_base::pyjson::dump_bytes(record, options).len()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `tests/vectors/admin_full_audit_vectors.json`, from `generate_admin_full_audit_vectors.py`:
+    /// the export document Python writes for two traces (nested values, Unicode, escapes, empty
+    /// containers, a float) and one diagnostic, the document with nothing captured, and the live
+    /// view's byte count for each record. The `admin-commands` session covers the commands
+    /// themselves, with nothing captured.
+    #[test]
+    fn audit_export_and_record_size_match_python() {
+        let path = crate::util::source_root()
+            .join("crates/sylvia-owner/tests/vectors/admin_full_audit_vectors.json");
+        let text = std::fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("cannot read {}: {error}", path.display()));
+        let vectors: Json = serde_json::from_str(&text).unwrap();
+        let traces = vectors["traces"].as_array().unwrap();
+        let diagnostics = vectors["diagnostics"].as_array().unwrap();
+        assert_eq!(
+            String::from_utf8(audit_export_document(true, traces, diagnostics)).unwrap(),
+            vectors["document"].as_str().unwrap()
+        );
+        assert_eq!(
+            String::from_utf8(audit_export_document(false, &[], &[])).unwrap(),
+            vectors["empty_document"].as_str().unwrap()
+        );
+        for (index, trace) in traces.iter().enumerate() {
+            let record = serde_json::json!({"index": index, "trace": trace});
+            assert_eq!(
+                record_view_bytes(&record) as u64,
+                vectors["record_bytes"][index].as_u64().unwrap(),
+                "record {index}"
+            );
+        }
+    }
+
+    /// `audit_export_save_error`: each errno and Windows code Python names, and the fallback.
+    #[test]
+    fn audit_export_save_errors_follow_python() {
+        let message = |raw: i32| audit_export_save_error(&std::io::Error::from_raw_os_error(raw));
+        let space = "Audit export could not be saved: not enough space. Free space or choose another drive.";
+        let writable = "Audit export could not be saved: the destination is not writable. \
+                        Choose a writable folder or close applications using the destination file.";
+        let unavailable = "Audit export could not be saved: the destination is unavailable. \
+                           Choose an available folder or drive.";
+        let other = "Audit export file could not be saved. Try another destination.";
+        let cases: &[(i32, &str)] = if cfg!(windows) {
+            &[
+                (112, space),
+                (39, space),
+                (5, writable),
+                (32, writable),
+                (19, writable),
+                (2, unavailable),
+                (3, unavailable),
+                (267, unavailable),
+                (21, writable),
+                (87, other),
+            ]
+        } else {
+            &[
+                (28, space),
+                (13, writable),
+                (1, writable),
+                (30, writable),
+                (2, unavailable),
+                (20, unavailable),
+                (19, unavailable),
+                (22, other),
+            ]
+        };
+        for (raw, want) in cases {
+            assert_eq!(message(*raw), *want, "code {raw}");
+        }
+    }
+}
