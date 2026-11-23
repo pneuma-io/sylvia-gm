@@ -14,6 +14,8 @@ sylvia-domain.workspace = true
 sylvia-engine.workspace = true
 sylvia-store.workspace = true
 serde_json.workspace = true
+# Python lookaround in the No Ruleset mechanics patterns (docs/rust-port/sites/regex-sites.md).
+fancy-regex.workspace = true
 
 [dev-dependencies]
 # The vector tests' hooks (`vector-hooks`); never a normal dependency's feature.

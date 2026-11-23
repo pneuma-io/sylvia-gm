@@ -1,0 +1,2894 @@
+{
+ "safe_error": [
+  {
+   "error": {
+    "class": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Operation parameter 'target' is required; field 'mode' is unknown"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "mechanics_validation_failed",
+    "reason": "The operation did not satisfy its declared parameters or current rules state.",
+    "validation": {
+     "field_paths": [
+      "mode",
+      "target"
+     ]
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"mechanics_validation_failed\",\"reason\":\"The operation did not satisfy its declared parameters or current rules state.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[\"mode\",\"target\"]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Unknown parameter 'a.b-c' and parameter 'a.b-c' again, field '9x'"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "mechanics_validation_failed",
+    "reason": "The operation did not satisfy its declared parameters or current rules state.",
+    "validation": {
+     "field_paths": [
+      "a.b-c"
+     ]
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"mechanics_validation_failed\",\"reason\":\"The operation did not satisfy its declared parameters or current rules state.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[\"a.b-c\"]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "CommandRejected",
+    "code": "campaign_knowledge_limit_invalid",
+    "message": "Search limit is invalid"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "campaign_knowledge_limit_invalid",
+    "reason": "Search parameter 'limit' must be an integer from 1 to 8. Retry with limit=5.",
+    "validation": {
+     "field_paths": [
+      "limit"
+     ],
+     "minimum": 1,
+     "maximum": 8,
+     "expected_type": "integer"
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"campaign_knowledge_limit_invalid\",\"reason\":\"Search parameter 'limit' must be an integer from 1 to 8. Retry with limit=5.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"expected_type\":\"integer\",\"field_paths\":[\"limit\"],\"maximum\":8,\"minimum\":1}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "CommandRejected",
+    "code": "campaign_reference_too_large",
+    "message": "Read is too large"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "campaign_reference_too_large",
+    "reason": "This Campaign State read exceeds its byte bound; facts may still be present. Use search_campaign_knowledge with sources=['campaign_state'] and limit=5, then read_campaign_reference with source='campaign_state' and an exact returned path. Do not repeat the oversized whole-state read.",
+    "validation": {
+     "field_paths": [
+      "path"
+     ]
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"campaign_reference_too_large\",\"reason\":\"This Campaign State read exceeds its byte bound; facts may still be present. Use search_campaign_knowledge with sources=['campaign_state'] and limit=5, then read_campaign_reference with source='campaign_state' and an exact returned path. Do not repeat the oversized whole-state read.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[\"path\"]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "CommandRejected",
+    "code": "mcp_tool_unavailable",
+    "message": "MCP tool is no longer available"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "mcp_tool_unavailable",
+    "reason": "The selected operation is no longer available.",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"mcp_tool_unavailable\",\"reason\":\"The selected operation is no longer available.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "CommandRejected",
+    "code": "campaign_not_found",
+    "message": "Something else entirely"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "campaign_not_found",
+    "reason": "Mechanics authority rejected the operation.",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"campaign_not_found\",\"reason\":\"Mechanics authority rejected the operation.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Expected revision 4, found 5"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "stale_revision",
+    "reason": "Campaign state changed before the operation could be admitted.",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"stale_revision\",\"reason\":\"Campaign state changed before the operation could be admitted.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "WrongOwner",
+    "code": "wrong_owner",
+    "message": "Not this owner"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "wrong_owner",
+    "reason": "The operation did not originate from the current campaign authority.",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"wrong_owner\",\"reason\":\"The operation did not originate from the current campaign authority.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Reused key"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "idempotency_conflict",
+    "reason": "The operation identity conflicts with an earlier request.",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"idempotency_conflict\",\"reason\":\"The operation identity conflicts with an earlier request.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "OwnerConflict",
+    "code": "authority_rejected",
+    "message": "Another owner holds the database"
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "authority_rejected",
+    "reason": "Mechanics authority rejected the operation.",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"authority_rejected\",\"reason\":\"Mechanics authority rejected the operation.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "MechanicsRejected",
+    "code": "mechanics_validation_failed",
+    "message": "Arguments invalid",
+    "mechanics": {
+     "field_paths": [
+      "targets",
+      "spell",
+      "targets"
+     ],
+     "validation_issues": [
+      {
+       "path": "spell",
+       "kind": "invalid_enum_value",
+       "expected_type": "string",
+       "allowed_values": [
+        "fire_bolt",
+        "shield"
+       ]
+      },
+      {
+       "path": "targets",
+       "kind": "too_long",
+       "parent_path": "",
+       "minimum": 1,
+       "maximum": 3,
+       "actual_length": 5
+      }
+     ],
+     "state_changed": false,
+     "refusal_reasons": [
+      "Only one reason"
+     ]
+    }
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "mechanics_validation_failed",
+    "reason": "The operation did not satisfy its declared parameters or current rules state.",
+    "validation": {
+     "field_paths": [
+      "spell",
+      "targets"
+     ],
+     "issues": [
+      {
+       "path": "spell",
+       "kind": "invalid_enum_value",
+       "expected_type": "string",
+       "allowed_values": [
+        "fire_bolt",
+        "shield"
+       ]
+      },
+      {
+       "path": "targets",
+       "kind": "too_long",
+       "parent_path": "",
+       "minimum": 1,
+       "maximum": 3,
+       "actual_length": 5
+      }
+     ]
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"mechanics_validation_failed\",\"reason\":\"The operation did not satisfy its declared parameters or current rules state.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[\"spell\",\"targets\"],\"issues\":[{\"allowed_values\":[\"fire_bolt\",\"shield\"],\"expected_type\":\"string\",\"kind\":\"invalid_enum_value\",\"path\":\"spell\"},{\"actual_length\":5,\"kind\":\"too_long\",\"maximum\":3,\"minimum\":1,\"parent_path\":\"\",\"path\":\"targets\"}]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "MechanicsRejected",
+    "code": "command_rejected",
+    "message": "Already moved",
+    "mechanics": {
+     "field_paths": [],
+     "validation_issues": [],
+     "state_changed": true,
+     "refusal_reasons": [
+      "First reason",
+      "Second reason"
+     ]
+    }
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "mechanics_validation_failed",
+    "reason": "The operation did not satisfy its declared parameters or current rules state.",
+    "reasons": [
+     "First reason",
+     "Second reason"
+    ],
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": true
+   },
+   "text": "{\"code\":\"mechanics_validation_failed\",\"reason\":\"The operation did not satisfy its declared parameters or current rules state.\",\"reasons\":[\"First reason\",\"Second reason\"],\"state_changed\":true,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "MechanicsRejected",
+    "code": "spell_unavailable",
+    "message": "Spell is not castable",
+    "mechanics": {
+     "field_paths": [],
+     "validation_issues": [
+      {
+       "path": "spell",
+       "kind": "invalid_enum_value",
+       "expected_type": "string",
+       "allowed_values": [
+        "fire_bolt",
+        "shield"
+       ]
+      }
+     ],
+     "state_changed": false,
+     "refusal_reasons": []
+    }
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "spell_unavailable",
+    "reason": "This spell is not part of this Ruleset's castable spells: it is excluded or not yet available. validation.issues allowed_values lists the spells castable in this campaign now. Choose one of those, or tell the player this spell is unavailable; do not retry it.",
+    "validation": {
+     "field_paths": [],
+     "issues": [
+      {
+       "path": "spell",
+       "kind": "invalid_enum_value",
+       "expected_type": "string",
+       "allowed_values": [
+        "fire_bolt",
+        "shield"
+       ]
+      }
+     ]
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"spell_unavailable\",\"reason\":\"This spell is not part of this Ruleset's castable spells: it is excluded or not yet available. validation.issues allowed_values lists the spells castable in this campaign now. Choose one of those, or tell the player this spell is unavailable; do not retry it.\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[],\"issues\":[{\"allowed_values\":[\"fire_bolt\",\"shield\"],\"expected_type\":\"string\",\"kind\":\"invalid_enum_value\",\"path\":\"spell\"}]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "RulesetPreconditionRejected",
+    "code": "ruleset_precondition_failed",
+    "message": "Missing input 'target_distance'",
+    "mechanics": {
+     "field_paths": [
+      "target_distance",
+      "target_willing"
+     ],
+     "validation_issues": [],
+     "state_changed": false,
+     "refusal_reasons": [
+      "Missing input 'target_distance'",
+      "The target must be within 30 feet",
+      "Missing required parameter 'target_willing'"
+     ]
+    }
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "ruleset_precondition_failed",
+    "reason": "Missing input 'target_distance'",
+    "reasons": [
+     "Missing input 'target_distance'",
+     "The target must be within 30 feet",
+     "Missing required parameter 'target_willing'"
+    ],
+    "validation": {
+     "field_paths": [
+      "target_distance",
+      "target_willing"
+     ]
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"ruleset_precondition_failed\",\"reason\":\"Missing input 'target_distance'\",\"reasons\":[\"Missing input 'target_distance'\",\"The target must be within 30 feet\",\"Missing required parameter 'target_willing'\"],\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[\"target_distance\",\"target_willing\"]}}",
+   "is_error": true
+  },
+  {
+   "error": {
+    "class": "RulesetPreconditionRejected",
+    "code": "ruleset_precondition_failed",
+    "message": "The caster has no spell slots left",
+    "mechanics": {
+     "field_paths": [],
+     "validation_issues": [],
+     "state_changed": false,
+     "refusal_reasons": [
+      "The caster has no spell slots left"
+     ]
+    }
+   },
+   "structured": {
+    "status": "rejected",
+    "code": "ruleset_precondition_failed",
+    "reason": "The caster has no spell slots left",
+    "validation": {
+     "field_paths": []
+    },
+    "state_changed": false
+   },
+   "text": "{\"code\":\"ruleset_precondition_failed\",\"reason\":\"The caster has no spell slots left\",\"state_changed\":false,\"status\":\"rejected\",\"validation\":{\"field_paths\":[]}}",
+   "is_error": true
+  }
+ ],
+ "helpers": [
+  {
+   "name": "unavailable tool",
+   "helper": "reject_unavailable_tool",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_x": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "x",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "x description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      },
+      "tool_b_y": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "y",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "y description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_z",
+      "arguments": "{}"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_x": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "x",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "x description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      },
+      "tool_b_y": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "y",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "y description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_z",
+      "arguments": "{}"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "unavailable_catalog_tool",
+       "state_changed": false,
+       "requested_provider_tool_name": "tool_z",
+       "available_operations": [
+        {
+         "provider_tool_name": "tool_a_x",
+         "operation": "x"
+        },
+        {
+         "provider_tool_name": "tool_b_y",
+         "operation": "y"
+        }
+       ],
+       "instruction": "This provider tool is absent from the current request and cannot be called. Do not call it again in this correction. Choose one exact provider_tool_name from available_operations only when its operation fits the current Ruleset state. If an engine transition is marked required, call that transition first."
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "read selected arguments",
+   "helper": "read_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_begin_srd_spell_action": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.srd-lite.bg3",
+       "package_version": "0.3.29",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "begin_srd_spell_action",
+       "capability": "dnd.srd.5.2.1.spells",
+       "input_schema": {
+        "__srd_input_schema__": 16
+       },
+       "parameter_derivations": null,
+       "description": "",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      },
+      "tool_b_x": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "x",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "x description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"tool\": \"begin_srd_spell_action\", \"value\": \"aid\"}"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_begin_srd_spell_action": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.srd-lite.bg3",
+       "package_version": "0.3.29",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "begin_srd_spell_action",
+       "capability": "dnd.srd.5.2.1.spells",
+       "input_schema": {
+        "__srd_input_schema__": 16
+       },
+       "parameter_derivations": null,
+       "description": "",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      },
+      "tool_b_x": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "x",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "x description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"tool\": \"begin_srd_spell_action\", \"value\": \"aid\"}"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "ok",
+       "tool": "begin_srd_spell_action",
+       "spell": "aid",
+       "arguments_field": "spell_arguments",
+       "arguments": {
+        "type": "object",
+        "properties": {
+         "material_component_available": {
+          "description": "For a required Material component, confirm the selected supply can be accessed with a hand or used as its focus description allows.",
+          "type": "boolean"
+         }
+        },
+        "required": [],
+        "additionalProperties": false
+       },
+       "instruction": "Pass these inside spell_arguments (or at the top level); keep the tool's own listed inputs at the top level.",
+       "state_changed": false
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "read selected arguments, unknown value",
+   "helper": "read_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_begin_srd_spell_action": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.srd-lite.bg3",
+       "package_version": "0.3.29",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "begin_srd_spell_action",
+       "capability": "dnd.srd.5.2.1.spells",
+       "input_schema": {
+        "__srd_input_schema__": 16
+       },
+       "parameter_derivations": null,
+       "description": "",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"tool\": \"tool_a_begin_srd_spell_action\", \"value\": \"nope\"}"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_begin_srd_spell_action": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.srd-lite.bg3",
+       "package_version": "0.3.29",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "begin_srd_spell_action",
+       "capability": "dnd.srd.5.2.1.spells",
+       "input_schema": {
+        "__srd_input_schema__": 16
+       },
+       "parameter_derivations": null,
+       "description": "",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"tool\": \"tool_a_begin_srd_spell_action\", \"value\": \"nope\"}"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "argument_contract_value_unknown",
+       "instruction": "Choose a spell the tool lists.",
+       "state_changed": false
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "read selected arguments, bad JSON",
+   "helper": "read_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_begin_srd_spell_action": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.srd-lite.bg3",
+       "package_version": "0.3.29",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "begin_srd_spell_action",
+       "capability": "dnd.srd.5.2.1.spells",
+       "input_schema": {
+        "__srd_input_schema__": 16
+       },
+       "parameter_derivations": null,
+       "description": "",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"tool\": \"x\", "
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "round_finish_reason": "length"
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_a_begin_srd_spell_action": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.srd-lite.bg3",
+       "package_version": "0.3.29",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "begin_srd_spell_action",
+       "capability": "dnd.srd.5.2.1.spells",
+       "input_schema": {
+        "__srd_input_schema__": 16
+       },
+       "parameter_derivations": null,
+       "description": "",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"tool\": \"x\", "
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "provider_tool_arguments_invalid_json",
+       "state_changed": false,
+       "provider_response_finish_reason": "length",
+       "received_argument_characters": 14,
+       "json_error": {
+        "message": "Expecting property name enclosed in double quotes",
+        "line": 1,
+        "column": 15,
+        "position": 14
+       },
+       "instruction": "The streamed tool arguments were not a complete JSON object. Call the same tool again with the full valid JSON object from its first character; do not continue the partial text."
+      }
+     },
+     "round_finish_reason": "length"
+    }
+   }
+  },
+  {
+   "name": "read selected arguments, no contract tools",
+   "helper": "read_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_b_x": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "x",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "x description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "aliases": {
+      "tool_b_x": {
+       "__class__": "ModelMechanicsTool",
+       "package_id": "sylvia.test",
+       "package_version": "1.0.0",
+       "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+       "name": "x",
+       "capability": "test",
+       "input_schema": {
+        "type": "object",
+        "properties": {}
+       },
+       "parameter_derivations": null,
+       "description": "x description",
+       "category": "mechanic",
+       "model_behavior": "optional"
+      }
+     },
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "unavailable_catalog_tool",
+       "state_changed": false,
+       "requested_provider_tool_name": "tool_a_x",
+       "available_operations": [
+        {
+         "provider_tool_name": "tool_b_x",
+         "operation": "x"
+        }
+       ],
+       "instruction": "This provider tool is absent from the current request and cannot be called. Do not call it again in this correction. Choose one exact provider_tool_name from available_operations only when its operation fits the current Ruleset state. If an engine transition is marked required, call that transition first."
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "unwrap selected arguments, no contract",
+   "helper": "unwrap_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.test",
+      "package_version": "1.0.0",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "x",
+      "capability": "test",
+      "input_schema": {
+       "type": "object",
+       "properties": {}
+      },
+      "parameter_derivations": null,
+      "description": "x description",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "parameters": {
+      "a": 1
+     }
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": true,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.test",
+      "package_version": "1.0.0",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "x",
+      "capability": "test",
+      "input_schema": {
+       "type": "object",
+       "properties": {}
+      },
+      "parameter_derivations": null,
+      "description": "x description",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "parameters": {
+      "a": 1
+     }
+    }
+   }
+  },
+  {
+   "name": "unwrap selected arguments, flattened",
+   "helper": "unwrap_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.srd-lite.bg3",
+      "package_version": "0.3.29",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "cast_spell_outside_combat",
+      "capability": "dnd.srd.5.2.1.spells",
+      "input_schema": {
+       "__srd_input_schema__": 19
+      },
+      "parameter_derivations": null,
+      "description": "",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "parameters": {
+      "spell": "aid",
+      "caster_state": "p-1",
+      "spell_arguments": {
+       "material_component_available": true
+      }
+     }
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": true,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.srd-lite.bg3",
+      "package_version": "0.3.29",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "cast_spell_outside_combat",
+      "capability": "dnd.srd.5.2.1.spells",
+      "input_schema": {
+       "__srd_input_schema__": 19
+      },
+      "parameter_derivations": null,
+      "description": "",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "parameters": {
+      "spell": "aid",
+      "caster_state": "p-1",
+      "material_component_available": true
+     }
+    }
+   }
+  },
+  {
+   "name": "unwrap selected arguments, refused",
+   "helper": "unwrap_selected_arguments",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.srd-lite.bg3",
+      "package_version": "0.3.29",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "begin_srd_spell_action",
+      "capability": "dnd.srd.5.2.1.spells",
+      "input_schema": {
+       "__srd_input_schema__": 16
+      },
+      "parameter_derivations": null,
+      "description": "",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "parameters": {
+      "spell": "acid_arrow",
+      "caster": "p-1",
+      "spell_arguments": {
+       "material_component_available": "yes",
+       "caster": "p-2"
+      }
+     }
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": false,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.srd-lite.bg3",
+      "package_version": "0.3.29",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "begin_srd_spell_action",
+      "capability": "dnd.srd.5.2.1.spells",
+      "input_schema": {
+       "__srd_input_schema__": 16
+      },
+      "parameter_derivations": null,
+      "description": "",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "selected_arguments_invalid",
+       "state_changed": false,
+       "validation": {
+        "issues": [
+         {
+          "path": "spell_arguments.caster",
+          "kind": "duplicate_input"
+         }
+        ]
+       },
+       "selected_arguments": {
+        "type": "object",
+        "properties": {
+         "material_component_available": {
+          "description": "For a required Material component, confirm the selected supply can be accessed with a hand or used as its focus description allows.",
+          "type": "boolean"
+         },
+         "minor_elementals_damage_type": {
+          "enum": [
+           "acid",
+           "cold",
+           "fire",
+           "lightning"
+          ],
+          "type": "string"
+         },
+         "selected_damage_type": {
+          "enum": [
+           "acid",
+           "bludgeoning",
+           "cold",
+           "fire",
+           "force",
+           "lightning",
+           "necrotic",
+           "piercing",
+           "poison",
+           "psychic",
+           "radiant",
+           "slashing",
+           "thunder"
+          ],
+          "type": "string"
+         },
+         "sorcerous_burst_extra_dice": {
+          "type": "boolean"
+         },
+         "sorcerous_burst_extra_dice_limit": {
+          "maximum": 100,
+          "minimum": -1,
+          "type": "integer"
+         },
+         "target_can_see_caster": {
+          "type": "boolean"
+         },
+         "witness_state_ids": {
+          "items": {
+           "type": "string"
+          },
+          "type": "array"
+         }
+        },
+        "required": [],
+        "additionalProperties": false
+       },
+       "instruction": "Use only the inputs selected_arguments lists for this spell, inside spell_arguments, keep the tool's own inputs at the top level, and retry once."
+      }
+     },
+     "parameters": {
+      "spell": "acid_arrow",
+      "caster": "p-2",
+      "material_component_available": "yes"
+     }
+    }
+   }
+  },
+  {
+   "name": "invalid JSON, no finish reason",
+   "helper": "reject_invalid_tool_json",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"spell\": \"aid\",\n \"x\": ]"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "round_finish_reason": null
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"spell\": \"aid\",\n \"x\": ]"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "provider_tool_arguments_invalid_json",
+       "state_changed": false,
+       "provider_response_finish_reason": "stream_ended_without_finish_reason",
+       "received_argument_characters": 24,
+       "json_error": {
+        "message": "Expecting value",
+        "line": 2,
+        "column": 7,
+        "position": 23
+       },
+       "instruction": "The streamed tool arguments were not a complete JSON object. Call the same tool again with the full valid JSON object from its first character; do not continue the partial text."
+      }
+     },
+     "round_finish_reason": null
+    }
+   }
+  },
+  {
+   "name": "invalid JSON, length",
+   "helper": "reject_invalid_tool_json",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"a\": \"café"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "round_finish_reason": "length"
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{\"a\": \"café"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "provider_tool_arguments_invalid_json",
+       "state_changed": false,
+       "provider_response_finish_reason": "length",
+       "received_argument_characters": 11,
+       "json_error": {
+        "message": "Unterminated string starting at",
+        "line": 1,
+        "column": 7,
+        "position": 6
+       },
+       "instruction": "The streamed tool arguments were not a complete JSON object. Call the same tool again with the full valid JSON object from its first character; do not continue the partial text."
+      }
+     },
+     "round_finish_reason": "length"
+    }
+   }
+  },
+  {
+   "name": "missing fields, narrative state",
+   "helper": "record_missing_tool_fields",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.application",
+      "package_version": "1",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "update_campaign_file",
+      "capability": "narrative_state.update_campaign_file",
+      "input_schema": {
+       "type": "object",
+       "properties": {}
+      },
+      "parameter_derivations": null,
+      "description": "",
+      "category": "narrative_state",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "missing": [
+      "state_change",
+      "summary"
+     ]
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "record_mechanics_diagnostic",
+     "args": [
+      {
+       "kind": "mechanics_rejection",
+       "privacy": "safe_metadata_only",
+       "session_id": "session-1",
+       "turn_id": "turn-1",
+       "action_id": "call-1",
+       "tool_name": "update_campaign_file",
+       "rejection_code": "missing_required_arguments",
+       "validation_field_paths": [
+        "state_change",
+        "summary"
+       ],
+       "state_changed": false
+      }
+     ],
+     "kwargs": {},
+     "result": null
+    }
+   ],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.application",
+      "package_version": "1",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "update_campaign_file",
+      "capability": "narrative_state.update_campaign_file",
+      "input_schema": {
+       "type": "object",
+       "properties": {}
+      },
+      "parameter_derivations": null,
+      "description": "",
+      "category": "narrative_state",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "missing_required_arguments",
+       "missing": [
+        "state_change",
+        "summary"
+       ],
+       "instruction": "Retry this tool with every required argument."
+      }
+     },
+     "missing": [
+      "state_change",
+      "summary"
+     ]
+    }
+   }
+  },
+  {
+   "name": "missing fields, mechanic",
+   "helper": "record_missing_tool_fields",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.test",
+      "package_version": "1.0.0",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "x",
+      "capability": "test",
+      "input_schema": {
+       "type": "object",
+       "properties": {}
+      },
+      "parameter_derivations": null,
+      "description": "x description",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "missing": [
+      "target"
+     ]
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "catalog_tool": {
+      "__class__": "ModelMechanicsTool",
+      "package_id": "sylvia.test",
+      "package_version": "1.0.0",
+      "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "name": "x",
+      "capability": "test",
+      "input_schema": {
+       "type": "object",
+       "properties": {}
+      },
+      "parameter_derivations": null,
+      "description": "x description",
+      "category": "mechanic",
+      "model_behavior": "optional"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "missing_required_arguments",
+       "missing": [
+        "target"
+       ],
+       "instruction": "Retry this tool with every required argument."
+      }
+     },
+     "missing": [
+      "target"
+     ]
+    }
+   }
+  },
+  {
+   "name": "invalid revision",
+   "helper": "reject_invalid_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "campaign_file_revised_narration_invalid",
+       "field_paths": [
+        "revised_player_facing_response"
+       ],
+       "state_changed": false,
+       "instruction": "revised_player_facing_response must be one complete non-empty ordered response-block list with no serialized tool call. npc_utterance blocks require speaker_id and spoken_words; speaker_id must be anonymous, an exact current participant or Campaign Entity ID, or an entity_id admitted by this same update; an anonymous speaker may add a short single-line speaker_name; narration and ooc blocks use text. Put actions and attribution in separate narration blocks; start a new utterance when that NPC resumes speaking. OOC input requires an ooc acknowledgement block. Correct the complete Campaign File disposition and retry."
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "Campaign File rejection, held",
+   "helper": "record_campaign_file_rejection",
+   "arguments": {
+    "error": {
+     "class": "CommandRejected",
+     "code": "campaign_file_update_invalid",
+     "message": "bad update"
+    }
+   },
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Held prose.",
+     "buffered_raw_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Held prose.",
+     "buffered_raw_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "campaign_file_update_invalid",
+       "instruction": "Rebuild the rejected state arguments against the currently exposed tool schema. validation.issues identifies each path, problem kind, expected type, direct parent, and allowed values or size bound when the schema declares one. It never echoes submitted values. Correct every listed issue rather than patching one symptom. The state_change declaration and supplied non-empty state collections must agree. Sylvia already holds the exact player-facing response from this rejected call. If its layout needs correction, supply a complete replacement in revised_player_facing_response, preserving the decided outcome and separating narration from spoken words. Otherwise omit that field to keep the held response."
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "Campaign File rejection, mechanics",
+   "helper": "record_campaign_file_rejection",
+   "arguments": {
+    "error": {
+     "class": "MechanicsRejected",
+     "code": "campaign_file_disposition_inconsistent",
+     "message": "inconsistent",
+     "mechanics": {
+      "field_paths": [
+       "memories",
+       "state_change"
+      ],
+      "validation_issues": [
+       {
+        "path": "memories",
+        "kind": "too_short",
+        "minimum": 1,
+        "actual_length": 0
+       }
+      ],
+      "state_changed": false,
+      "refusal_reasons": []
+     }
+    }
+   },
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "campaign_file_disposition_inconsistent",
+       "field_paths": [
+        "memories",
+        "state_change"
+       ],
+       "validation": {
+        "field_paths": [
+         "memories",
+         "state_change"
+        ],
+        "issues": [
+         {
+          "path": "memories",
+          "kind": "too_short",
+          "minimum": 1,
+          "actual_length": 0
+         }
+        ]
+       },
+       "state_changed": false,
+       "instruction": "Rebuild the rejected state arguments against the currently exposed tool schema. validation.issues identifies each path, problem kind, expected type, direct parent, and allowed values or size bound when the schema declares one. It never echoes submitted values. Correct every listed issue rather than patching one symptom. The state_change declaration and supplied non-empty state collections must agree."
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "Campaign File rejection, other code",
+   "helper": "record_campaign_file_rejection",
+   "arguments": {
+    "error": {
+     "class": "CommandRejected",
+     "code": "campaign_preparation_pending",
+     "message": "pending"
+    }
+   },
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Held prose.",
+     "buffered_raw_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Held prose.",
+     "buffered_raw_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "campaign_preparation_pending"
+      }
+     }
+    }
+   }
+  },
+  {
+   "name": "duplicate collections",
+   "helper": "restore_unchanged_narration",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "campaign_file_mutation_attempted": false,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "mutation_attempted_before_call": true
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "campaign_file_mutation_attempted": true,
+     "local_tool_failures": {
+      "__set__": [
+       "call-1"
+      ]
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "rejected",
+       "code": "campaign_file_duplicate_collections",
+       "state_changed": false,
+       "instruction": "Campaign File authority found every supplied collection to be already current, so those collections must be omitted. Review the complete held response before retrying. If it introduces any new lasting clue, direction, discovery, relationship, commitment, or scene change, submit those actual changes. Otherwise remove unsupported new material from the response and send only the complete concise response with no state collections. Do not resubmit an unchanged scene merely because the prose mentions it."
+      }
+     },
+     "mutation_attempted_before_call": true
+    }
+   }
+  },
+  {
+   "name": "unchanged, settled",
+   "helper": "record_unchanged_campaign_file",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "settled_narration": "Settled.",
+     "update": {
+      "state_change": "unchanged"
+     }
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "buffered_narration_needs_disposition": false,
+     "campaign_file_narration_pending": false,
+     "force_campaign_file_update": false
+    },
+    "progress": {
+     "campaign_file_disposition_in_exchange": true
+    },
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Settled.",
+     "buffered_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "campaign_file_unchanged",
+       "result": {
+        "state_change": "unchanged"
+       },
+       "player_facing_response": "Settled.",
+       "instruction": "Campaign File review is settled without a database write. Sylvia will now deliver the settled player-facing response."
+      }
+     },
+     "settled_narration": "Settled.",
+     "update": {
+      "state_change": "unchanged"
+     }
+    }
+   }
+  },
+  {
+   "name": "unchanged, unsettled with blocks",
+   "helper": "record_unchanged_campaign_file",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_response_blocks": [
+      {
+       "kind": "narration",
+       "text": "A"
+      }
+     ],
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "settled_narration": null,
+     "update": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "campaign_file_narration_pending": true,
+     "force_campaign_file_update": false
+    },
+    "progress": {
+     "campaign_file_disposition_in_exchange": true
+    },
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_response_blocks": [
+      {
+       "kind": "narration",
+       "text": "A"
+      }
+     ],
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "campaign_file_unchanged",
+       "result": {},
+       "player_facing_response": null,
+       "response_blocks": [
+        {
+         "kind": "narration",
+         "text": "A"
+        }
+       ],
+       "instruction": "Campaign File review is settled without a database write. Now return only the complete in-world GM response for the reviewed outcome."
+      }
+     },
+     "settled_narration": null,
+     "update": {}
+    }
+   }
+  },
+  {
+   "name": "updated, settled",
+   "helper": "record_updated_campaign_file",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Old.",
+     "buffered_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "settled_narration": "Settled.",
+     "update": {
+      "state_change": "changed",
+      "memories": [
+       1
+      ]
+     }
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "buffered_narration_needs_disposition": false,
+     "campaign_file_narration_pending": false,
+     "force_campaign_file_update": false
+    },
+    "progress": {
+     "campaign_file_disposition_in_exchange": true,
+     "any_commit_in_exchange": true,
+     "campaign_file_commit_in_exchange": true
+    },
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": "Settled.",
+     "buffered_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "campaign_file_updated",
+       "result": {
+        "state_change": "changed",
+        "memories": [
+         1
+        ]
+       },
+       "player_facing_response": "Settled.",
+       "instruction": "Campaign File review is settled at this admitted revision. Sylvia will now deliver the settled player-facing response."
+      }
+     },
+     "settled_narration": "Settled.",
+     "update": {
+      "state_change": "changed",
+      "memories": [
+       1
+      ]
+     }
+    }
+   }
+  },
+  {
+   "name": "updated, unsettled",
+   "helper": "record_updated_campaign_file",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {},
+     "settled_narration": null,
+     "update": {}
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "campaign_file_narration_pending": true,
+     "force_campaign_file_update": false
+    },
+    "progress": {
+     "campaign_file_disposition_in_exchange": true,
+     "any_commit_in_exchange": true,
+     "campaign_file_commit_in_exchange": true
+    },
+    "decisions": {},
+    "locals": {
+     "assembly": {
+      "__class__": "_ToolCallAssembly",
+      "call_id": "call-1",
+      "name": "tool_a_x",
+      "arguments": "{}"
+     },
+     "buffered_narration": null,
+     "buffered_response_blocks": null,
+     "local_tool_failures": {
+      "__set__": []
+     },
+     "local_tool_results": {
+      "call-1": {
+       "status": "campaign_file_updated",
+       "result": {},
+       "player_facing_response": null,
+       "instruction": "Campaign File update is settled at this admitted revision. Now return only the complete in-world GM response for the admitted outcome."
+      }
+     },
+     "settled_narration": null,
+     "update": {}
+    }
+   }
+  },
+  {
+   "name": "settle, held prose",
+   "helper": "settle_campaign_file_narration",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": "Held.",
+     "buffered_raw_response_blocks": null,
+     "buffered_response_blocks": null,
+     "parameters": {
+      "state_change": "changed",
+      "memories": [],
+      "scene": {
+       "a": 1
+      }
+     },
+     "revised_narration": null,
+     "revised_narration_supplied": false,
+     "revised_raw_blocks": null
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "buffered_narration_needs_disposition": true
+    },
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": "Held.",
+     "buffered_raw_response_blocks": null,
+     "buffered_response_blocks": null,
+     "empty_collection_paths": [
+      "memories"
+     ],
+     "parameters": {
+      "state_change": "changed",
+      "memories": [],
+      "scene": {
+       "a": 1
+      }
+     },
+     "parameters_establish_changes": true,
+     "revised_narration": null,
+     "revised_narration_supplied": false,
+     "revised_raw_blocks": null,
+     "settled_narration": "Held."
+    }
+   }
+  },
+  {
+   "name": "settle, revised prose",
+   "helper": "settle_campaign_file_narration",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": "Held.",
+     "buffered_raw_response_blocks": [
+      {
+       "kind": "y"
+      }
+     ],
+     "buffered_response_blocks": [
+      {
+       "kind": "x"
+      }
+     ],
+     "parameters": {
+      "state_change": "unchanged",
+      "state_change_summary": "s"
+     },
+     "revised_narration": "Revised.",
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": null
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "buffered_narration_needs_disposition": true
+    },
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": "Revised.",
+     "buffered_raw_response_blocks": null,
+     "buffered_response_blocks": null,
+     "empty_collection_paths": [],
+     "parameters": {
+      "state_change": "unchanged",
+      "state_change_summary": "s"
+     },
+     "parameters_establish_changes": false,
+     "revised_narration": "Revised.",
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": null,
+     "settled_narration": "Revised."
+    }
+   }
+  },
+  {
+   "name": "settle, revised blocks",
+   "helper": "settle_campaign_file_narration",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "buffered_response_blocks": [
+      {
+       "kind": "x"
+      }
+     ],
+     "parameters": {
+      "entities": [
+       {
+        "entity_id": "e-1"
+       }
+      ],
+      "memories": []
+     },
+     "revised_narration": "",
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": [
+      {
+       "kind": "narration",
+       "text": "B"
+      }
+     ]
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {
+     "buffered_narration_needs_disposition": true
+    },
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": [
+      {
+       "kind": "narration",
+       "text": "B"
+      }
+     ],
+     "buffered_response_blocks": null,
+     "empty_collection_paths": [
+      "memories"
+     ],
+     "parameters": {
+      "entities": [
+       {
+        "entity_id": "e-1"
+       }
+      ],
+      "memories": []
+     },
+     "parameters_establish_changes": true,
+     "revised_narration": "",
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": [
+      {
+       "kind": "narration",
+       "text": "B"
+      }
+     ],
+     "settled_narration": null
+    }
+   }
+  },
+  {
+   "name": "settle, nothing",
+   "helper": "settle_campaign_file_narration",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "buffered_response_blocks": null,
+     "parameters": {},
+     "revised_narration": null,
+     "revised_narration_supplied": false,
+     "revised_raw_blocks": null
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "buffered_response_blocks": null,
+     "empty_collection_paths": [],
+     "parameters": {},
+     "parameters_establish_changes": false,
+     "revised_narration": null,
+     "revised_narration_supplied": false,
+     "revised_raw_blocks": null,
+     "settled_narration": null
+    }
+   }
+  },
+  {
+   "name": "correction, held",
+   "helper": "retry_rejected_tool_call",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": "Held prose.",
+     "buffered_raw_response_blocks": null,
+     "current_application_controls": [],
+     "max_rejected_tool_corrections": 5,
+     "rejected_tool_corrections_used": 1
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": "Held prose.",
+     "buffered_raw_response_blocks": null,
+     "current_application_controls": [
+      {
+       "role": "system",
+       "content": "SYLVIA_GM_TOOL_CORRECTION: One or more preceding calls were rejected. Read each structured tool result, preserve every successful result, and address only the rejected operation. That may require corrected arguments or a different currently exposed operation when the result says the original is unavailable or unsuitable. Do not narrate an uncommitted outcome. Correct every reported issue against the currently exposed schema instead of patching only one symptom. Sylvia already holds the exact player-facing response. Do not repeat it in the corrected tool arguments. This is correction 2 of 5."
+      }
+     ],
+     "max_rejected_tool_corrections": 5,
+     "rejected_tool_corrections_used": 2
+    }
+   }
+  },
+  {
+   "name": "correction, nothing held",
+   "helper": "retry_rejected_tool_call",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "current_application_controls": [
+      {
+       "role": "system",
+       "content": "earlier"
+      }
+     ],
+     "max_rejected_tool_corrections": 5,
+     "rejected_tool_corrections_used": 0
+    }
+   },
+   "calls": [],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_narration": null,
+     "buffered_raw_response_blocks": null,
+     "current_application_controls": [
+      {
+       "role": "system",
+       "content": "earlier"
+      },
+      {
+       "role": "system",
+       "content": "SYLVIA_GM_TOOL_CORRECTION: One or more preceding calls were rejected. Read each structured tool result, preserve every successful result, and address only the rejected operation. That may require corrected arguments or a different currently exposed operation when the result says the original is unavailable or unsuitable. Do not narrate an uncommitted outcome. Correct every reported issue against the currently exposed schema instead of patching only one symptom. This is correction 1 of 5."
+      }
+     ],
+     "max_rejected_tool_corrections": 5,
+     "rejected_tool_corrections_used": 1
+    }
+   }
+  },
+  {
+   "name": "revision, prose with deliberation",
+   "helper": "prepare_campaign_file_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "revised_player_facing_response": "The player wants to leave.\nThe door opens.",
+      "state_change": "unchanged"
+     }
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "campaign_preparation_boundary",
+     "args": [
+      "campaign-1"
+     ],
+     "kwargs": {},
+     "result": null
+    }
+   ],
+   "warnings": [
+    "provider_private_deliberation"
+   ],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "state_change": "unchanged"
+     },
+     "pending_boundary": null,
+     "revised_narration": "The door opens.",
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": null,
+     "selected_raw_blocks": null
+    }
+   }
+  },
+  {
+   "name": "revision, blocks",
+   "helper": "prepare_campaign_file_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "revised_player_facing_response": [
+       {
+        "kind": "narration",
+        "text": "The player wants a fight.\nRain falls."
+       },
+       {
+        "kind": "npc_utterance",
+        "speaker_id": "anonymous",
+        "spoken_words": "Halt!"
+       }
+      ]
+     }
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "campaign_preparation_boundary",
+     "args": [
+      "campaign-1"
+     ],
+     "kwargs": {},
+     "result": {
+      "__class__": "ModelDecisionBoundary",
+      "owner": "player",
+      "actor_id": "actor-1",
+      "actor_name": "Mara",
+      "actor_state": {
+       "hp": 9
+      },
+      "campaign_revision": 7,
+      "active_side_id": "side-a",
+      "focused_actor_id": "actor-1",
+      "eligible_actors": [
+       {
+        "__class__": "ModelDecisionActor",
+        "actor_id": "actor-1",
+        "actor_name": "Mara",
+        "actor_state": {
+         "hp": 9
+        }
+       }
+      ],
+      "preparation": null
+     }
+    }
+   ],
+   "warnings": [
+    "provider_private_deliberation"
+   ],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {},
+     "pending_boundary": {
+      "__class__": "ModelDecisionBoundary",
+      "owner": "player",
+      "actor_id": "actor-1",
+      "actor_name": "Mara",
+      "actor_state": {
+       "hp": 9
+      },
+      "campaign_revision": 7,
+      "active_side_id": "side-a",
+      "focused_actor_id": "actor-1",
+      "eligible_actors": [
+       {
+        "__class__": "ModelDecisionActor",
+        "actor_id": "actor-1",
+        "actor_name": "Mara",
+        "actor_state": {
+         "hp": 9
+        }
+       }
+      ],
+      "preparation": null
+     },
+     "revised_narration": "",
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": [
+      {
+       "kind": "narration",
+       "text": "Rain falls."
+      },
+      {
+       "kind": "npc_dialogue",
+       "speaker_id": "anonymous",
+       "text": "Halt!"
+      }
+     ],
+     "selected_raw_blocks": [
+      {
+       "kind": "narration",
+       "text": "Rain falls."
+      },
+      {
+       "kind": "npc_dialogue",
+       "speaker_id": "anonymous",
+       "text": "Halt!"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "revision, only deliberation",
+   "helper": "prepare_campaign_file_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "revised_player_facing_response": [
+       {
+        "kind": "narration",
+        "text": "The user wants more."
+       }
+      ]
+     }
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "campaign_preparation_boundary",
+     "args": [
+      "campaign-1"
+     ],
+     "kwargs": {},
+     "result": null
+    }
+   ],
+   "warnings": [
+    "provider_private_deliberation"
+   ],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {},
+     "pending_boundary": null,
+     "revised_narration": null,
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": null,
+     "selected_raw_blocks": null
+    }
+   }
+  },
+  {
+   "name": "revision, invalid blocks",
+   "helper": "prepare_campaign_file_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "revised_player_facing_response": [
+       {
+        "kind": "npc_dialogue",
+        "text": "x"
+       }
+      ]
+     }
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "campaign_preparation_boundary",
+     "args": [
+      "campaign-1"
+     ],
+     "kwargs": {},
+     "result": null
+    }
+   ],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {},
+     "pending_boundary": null,
+     "revised_narration": null,
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": null,
+     "selected_raw_blocks": null
+    }
+   }
+  },
+  {
+   "name": "revision, absent",
+   "helper": "prepare_campaign_file_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": [
+      {
+       "kind": "narration",
+       "text": "Held."
+      }
+     ],
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "state_change": "unchanged"
+     }
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "campaign_preparation_boundary",
+     "args": [
+      "campaign-1"
+     ],
+     "kwargs": {},
+     "result": null
+    }
+   ],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": [
+      {
+       "kind": "narration",
+       "text": "Held."
+      }
+     ],
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "state_change": "unchanged"
+     },
+     "pending_boundary": null,
+     "revised_narration": null,
+     "revised_narration_supplied": false,
+     "revised_raw_blocks": null,
+     "selected_raw_blocks": [
+      {
+       "kind": "narration",
+       "text": "Held."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "name": "revision, not text",
+   "helper": "prepare_campaign_file_revision",
+   "arguments": {},
+   "state": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {
+      "revised_player_facing_response": 5
+     }
+    }
+   },
+   "calls": [
+    {
+     "event": "call",
+     "name": "campaign_preparation_boundary",
+     "args": [
+      "campaign-1"
+     ],
+     "kwargs": {},
+     "result": null
+    }
+   ],
+   "warnings": [],
+   "returned": null,
+   "after": {
+    "obligations": {},
+    "progress": {},
+    "decisions": {},
+    "locals": {
+     "buffered_raw_response_blocks": null,
+     "campaign_id": "campaign-1",
+     "parameters": {},
+     "pending_boundary": null,
+     "revised_narration": 5,
+     "revised_narration_supplied": true,
+     "revised_raw_blocks": null,
+     "selected_raw_blocks": null
+    }
+   }
+  }
+ ]
+}

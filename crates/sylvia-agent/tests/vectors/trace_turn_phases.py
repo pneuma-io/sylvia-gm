@@ -11,7 +11,12 @@ For each call of a traced phase it logs:
 - every owner call the phase makes (the adapter's owner is wrapped in a proxy), with its
   arguments and full result, the catalog supplier's results, each `uuid4().hex` it draws and
   each `set_audit_context` payload;
-- `phase_end`: the turn locals after the phase, or the exception it raised.
+- `phase_end`: the turn locals after the phase, or the exception it raised, and what it
+  returned when that is not `None`.
+
+A traced function may also be one of the tool batch's helpers (T3a), whose arguments after the
+state vary: the provider input when there is one, any other positional argument and the
+keyword arguments (`turn_id`, a refusal's `error`) are passed through as given.
 
 Each call is then run again on copies of its state and input with the variants
 `VARIANTS[phase]` names: some turn locals set, and some owner reads answered with given values
@@ -120,6 +125,21 @@ def dump_state(state: ProviderTurnState) -> dict[str, object]:
     return groups
 
 
+def copied_value(value: object) -> object:
+    """`copy.deepcopy(value)`, or, for a value holding something it cannot copy (a frozen
+    snapshot's `mappingproxy`), new containers around the same immutable leaves."""
+    try:
+        return copy.deepcopy(value)
+    except TypeError:
+        if isinstance(value, dict):
+            return {key: copied_value(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [copied_value(item) for item in value]
+        if isinstance(value, set):
+            return set(value)
+        return value
+
+
 def copy_state(state: ProviderTurnState) -> ProviderTurnState:
     """A deep copy of the assigned locals (`copy.deepcopy` reads every slot, and an unassigned
     one raises `UnboundLocalError`)."""
@@ -138,7 +158,7 @@ def copy_state(state: ProviderTurnState) -> ProviderTurnState:
             value = getattr(state, field.name)
         except UnboundLocalError:
             continue
-        setattr(copied, field.name, copy.deepcopy(value))
+        setattr(copied, field.name, copied_value(value))
     try:
         if state.exchange_messages is state.messages:
             copied.exchange_messages = copied.messages
@@ -345,6 +365,37 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
             "required_tool_call_correction_message": {"role": "system", "content": "Fix B."}}},
         {"name": "cancelled", "cancelled": True},
     ],
+    "reject_ruleless_mechanics": [
+        {"name": "blocks with mechanics", "set": {
+            "selected_raw_blocks": ({"kind": "narration", "text": "Roll a d20 to see."},),
+            "revised_narration_supplied": True}},
+        {"name": "held prose with mechanics", "set": {
+            "selected_raw_blocks": None, "revised_narration_supplied": False,
+            "buffered_narration": "The wolf bites: you take 5 damage."}},
+        {"name": "out-of-character negation", "set": {
+            "selected_raw_blocks": ({"kind": "ooc", "text": "We never roll for initiative."},),
+            "revised_narration_supplied": True}},
+        {"name": "revised prose supplied", "set": {
+            "selected_raw_blocks": None, "revised_narration_supplied": True,
+            "buffered_narration": "Roll a d20."}},
+    ],
+    "validate_revision_speakers": [
+        {"name": "unknown speaker", "set": {"selected_raw_blocks": (
+            {"kind": "npc_dialogue", "speaker_id": "entity-nobody", "text": "Hello."},)}},
+        {"name": "speaker this update admits", "set": {
+            "selected_raw_blocks": ({"kind": "npc_dialogue", "speaker_id": "entity-new",
+                                     "text": "Hello."},),
+            "parameters": {"entities": [{"entity_id": "entity-new"}, {"entity_id": 3}, "x"]}}},
+        {"name": "OOC acknowledgement missing", "set": {
+            "ooc_ack_required": True,
+            "selected_raw_blocks": ({"kind": "narration", "text": "Rain."},)}},
+        {"name": "OOC acknowledgement given", "set": {
+            "ooc_ack_required": True,
+            "selected_raw_blocks": ({"kind": "ooc", "text": "Noted."},
+                                    {"kind": "npc_dialogue", "speaker_id": "anonymous",
+                                     "text": "Who goes?"})}},
+        {"name": "no blocks", "set": {"selected_raw_blocks": None, "ooc_ack_required": True}},
+    ],
     "prepare_provider_round": [
         {"name": "player boundary", "tools": True, "answer": {
             "campaign_preparation_boundary": boundary("player"),
@@ -375,8 +426,9 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
 }
 
 
-def run_variant(function, self, state, provider_input, turn_id, variant):  # type: ignore[no-untyped-def]
+def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[no-untyped-def]
     state = copy_state(state)
+    provider_input = args[0] if args else None
     for key, value in variant.get("set", {}).items():  # type: ignore[union-attr]
         setattr(state, key, value)
     for key, value in variant.get("obligations", {}).items():  # type: ignore[union-attr]
@@ -387,7 +439,7 @@ def run_variant(function, self, state, provider_input, turn_id, variant):  # typ
         setattr(state.decisions, key, value)
     if variant.get("tools"):
         state.current_catalog = (*state.current_catalog, *EXTRA_TOOLS)
-    supplier = provider_input.catalog_supplier
+    supplier = getattr(provider_input, "catalog_supplier", None)
     if variant.get("catalog_tools") and supplier is not None:
         provider_input = dataclasses.replace(
             provider_input, catalog_supplier=lambda request: (*supplier(request), *EXTRA_TOOLS))
@@ -407,7 +459,8 @@ def run_variant(function, self, state, provider_input, turn_id, variant):  # typ
         if variant.get("lock"):
             changes["package_lock"] = lock_with_entry(real.package_lock)
         OVERRIDES["snapshot"] = dataclasses.replace(real, **changes)
-    traced_call(function, self, state, provider_input, turn_id, variant["name"])
+    traced_call(function, self, state, (provider_input, *args[1:]) if args else args, kwargs,
+                variant["name"])
     OVERRIDES.clear()
 
 
@@ -419,24 +472,29 @@ def lock_with_entry(lock: object) -> object:
     return PackageLock((entry,))
 
 
-def traced_call(function, self, state, provider_input, turn_id, variant):  # type: ignore[no-untyped-def]
-    supplier = provider_input.catalog_supplier
+def traced_call(function, self, state, args, kwargs, variant):  # type: ignore[no-untyped-def]
+    provider_input = args[0] if args else None
+    turn_id = kwargs.get("turn_id")
+    supplier = getattr(provider_input, "catalog_supplier", None)
     if supplier is not None:
         def logged(request_id: str) -> object:
             result = supplier(request_id)
             log({"event": "catalog", "request_id": request_id, "result": plain(result)})
             return result
         provider_input = dataclasses.replace(provider_input, catalog_supplier=logged)
+        args = (provider_input, *args[1:])
     provider = self._provider  # noqa: SLF001
     self._provider = AuditedProvider(provider)  # noqa: SLF001
     log({"event": "phase_start", "phase": function.__name__, "variant": variant,
          "turn_id": turn_id, "adapter": getattr(self, "_trace_adapter", None),
          "model": plain(getattr(provider, "model_info", None)),
-         "input": dump_input(provider_input), "state": dump_state(state)})
+         "input": dump_input(provider_input) if provider_input is not None else None,
+         "state": dump_state(state)})
     ACTIVE["value"] = True
     try:
-        result = function(self, state, provider_input, turn_id=turn_id)
-        if result is not None and hasattr(result, "__next__"):
+        result = function(self, state, *args, **kwargs)
+        generated = result is not None and hasattr(result, "__next__")
+        if generated:
             events = []
             for event in result:
                 log({"event": "phase_event", "value": plain(event)})
@@ -454,18 +512,19 @@ def traced_call(function, self, state, provider_input, turn_id, variant):  # typ
     finally:
         ACTIVE["value"] = False
         self._provider = provider  # noqa: SLF001
-    log({"event": "phase_end", "state": dump_state(state)})
+    log({"event": "phase_end", "state": dump_state(state),
+         **({"returned": plain(result)} if result is not None and not generated else {})})
     return result
 
 
 def wrap(name: str) -> None:
     function = getattr(_provider_turn_phases, name)
 
-    def traced(self, state, provider_input, *, turn_id):  # type: ignore[no-untyped-def]
+    def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
         before = copy_state(state)
-        result = traced_call(function, self, state, provider_input, turn_id, None)
+        result = traced_call(function, self, state, args, kwargs, None)
         for variant in VARIANTS.get(name, []):
-            run_variant(function, self, before, provider_input, turn_id, variant)
+            run_variant(function, self, before, args, kwargs, variant)
         return result
 
     traced.__name__ = name

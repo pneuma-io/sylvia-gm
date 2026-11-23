@@ -52,7 +52,7 @@ pub mod http;
 mod httpx_text;
 pub mod httpx_url;
 pub mod lifecycle;
-mod log;
+pub mod log;
 pub mod model_facts;
 pub mod net;
 pub mod openai_compat;

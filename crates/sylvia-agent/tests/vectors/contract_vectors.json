@@ -1,0 +1,1097 @@
+{
+ "cases": [
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": "fast",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "count": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "label": {
+       "$ref": "#/$defs/label",
+       "description": "kept as written"
+      },
+      "speed": {
+       "type": "number",
+       "maximum": 30
+      }
+     },
+     "required": [
+      "speed",
+      "count"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": "quick",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "count": {
+       "type": "integer",
+       "minimum": 1
+      },
+      "label": {
+       "$ref": "#/$defs/label",
+       "description": "kept as written"
+      },
+      "speed": {
+       "type": "number",
+       "maximum": 30
+      }
+     },
+     "required": [
+      "speed",
+      "count"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": "slow",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "count": {
+       "type": "integer",
+       "minimum": 1
+      }
+     },
+     "required": [
+      "count"
+     ],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": "none",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {},
+     "required": [],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": "nope",
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": null,
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "small",
+   "value": 3,
+   "expected": {
+    "ok": null
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "begin_srd_spell_action",
+   "value": "acid_arrow",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "material_component_available": {
+       "description": "For a required Material component, confirm the selected supply can be accessed with a hand or used as its focus description allows.",
+       "type": "boolean"
+      },
+      "minor_elementals_damage_type": {
+       "enum": [
+        "acid",
+        "cold",
+        "fire",
+        "lightning"
+       ],
+       "type": "string"
+      },
+      "selected_damage_type": {
+       "enum": [
+        "acid",
+        "bludgeoning",
+        "cold",
+        "fire",
+        "force",
+        "lightning",
+        "necrotic",
+        "piercing",
+        "poison",
+        "psychic",
+        "radiant",
+        "slashing",
+        "thunder"
+       ],
+       "type": "string"
+      },
+      "sorcerous_burst_extra_dice": {
+       "type": "boolean"
+      },
+      "sorcerous_burst_extra_dice_limit": {
+       "maximum": 100,
+       "minimum": -1,
+       "type": "integer"
+      },
+      "target_can_see_caster": {
+       "type": "boolean"
+      },
+      "witness_state_ids": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      }
+     },
+     "required": [],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "begin_srd_spell_action",
+   "value": "alter_self",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "all_targets_willing": {
+       "type": "boolean"
+      },
+      "target_willing": {
+       "type": "boolean"
+      },
+      "transformation_accept_temporary_hp": {
+       "type": "boolean"
+      },
+      "transformation_appearance": {
+       "type": "string"
+      },
+      "transformation_equipment": {
+       "type": "string"
+      },
+      "transformation_form": {
+       "type": "string"
+      },
+      "transformation_forms": {
+       "items": {
+        "additionalProperties": false,
+        "properties": {
+         "form_id": {
+          "type": "string"
+         },
+         "target": {
+          "type": "string"
+         }
+        },
+        "required": [
+         "target",
+         "form_id"
+        ],
+        "type": "object"
+       },
+       "type": "array"
+      },
+      "transformation_option": {
+       "type": "string"
+      },
+      "transformation_same_basic_shape": {
+       "type": "boolean"
+      },
+      "transformation_same_size": {
+       "type": "boolean"
+      },
+      "transformation_seen_before": {
+       "type": "boolean"
+      }
+     },
+     "required": [],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "begin_srd_spell_action",
+   "value": "mage_armour",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "all_targets_willing": {
+       "type": "boolean"
+      },
+      "material_component_available": {
+       "description": "For a required Material component, confirm the selected supply can be accessed with a hand or used as its focus description allows.",
+       "type": "boolean"
+      },
+      "target_willing": {
+       "type": "boolean"
+      }
+     },
+     "required": [],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "cast_spell_outside_combat",
+   "value": "acid_splash",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "environment_origin": {
+       "items": {
+        "type": "number"
+       },
+       "maxItems": 3,
+       "minItems": 3,
+       "type": "array"
+      },
+      "thunderwave_unsecured_objects": {
+       "description": "Actual unsecured objects the GM identifies as entirely inside the Cube.",
+       "items": {
+        "type": "string"
+       },
+       "maxItems": 64,
+       "type": "array",
+       "uniqueItems": true
+      },
+      "witness_state_ids": {
+       "items": {
+        "type": "string"
+       },
+       "type": "array"
+      }
+     },
+     "required": [],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "selected_schema",
+   "schema": "cast_spell_outside_combat",
+   "value": "hunter_s_mark",
+   "expected": {
+    "ok": {
+     "type": "object",
+     "properties": {
+      "rider_ability": {
+       "enum": [
+        "strength",
+        "dexterity",
+        "constitution",
+        "intelligence",
+        "wisdom",
+        "charisma"
+       ],
+       "type": "string"
+      }
+     },
+     "required": [],
+     "additionalProperties": false
+    }
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "fast",
+    "actor": "a"
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "fast",
+      "actor": "a"
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "fast",
+    "mode_arguments": null,
+    "count": 2
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "fast",
+      "count": 2
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "fast",
+    "mode_arguments": "x"
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "fast"
+     },
+     [
+      {
+       "path": "mode_arguments",
+       "kind": "not_an_object"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "fast",
+    "mode_arguments": {
+     "speed": 10,
+     "count": 2
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "fast",
+      "speed": 10,
+      "count": 2
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "quick",
+    "mode_arguments": {
+     "speed": 40,
+     "count": 0
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "quick",
+      "speed": 40,
+      "count": 0
+     },
+     [
+      {
+       "path": "mode_arguments.count",
+       "kind": "invalid_value",
+       "detail": "0 is less than the minimum of 1"
+      },
+      {
+       "path": "mode_arguments.speed",
+       "kind": "invalid_value",
+       "detail": "40 is greater than the maximum of 30"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "fast",
+    "count": 1,
+    "mode_arguments": {
+     "count": 2,
+     "actor": "a",
+     "mode": "slow",
+     "zz": 1
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "slow",
+      "count": 2,
+      "actor": "a",
+      "zz": 1
+     },
+     [
+      {
+       "path": "mode_arguments.actor",
+       "kind": "belongs_at_top_level"
+      },
+      {
+       "path": "mode_arguments.count",
+       "kind": "duplicate_input"
+      },
+      {
+       "path": "mode_arguments.mode",
+       "kind": "duplicate_input"
+      },
+      {
+       "path": "mode_arguments.zz",
+       "kind": "unknown_input"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "slow",
+    "mode_arguments": {
+     "speed": "fast",
+     "count": "two"
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "slow",
+      "speed": "fast",
+      "count": "two"
+     },
+     [
+      {
+       "path": "mode_arguments.count",
+       "kind": "invalid_value",
+       "detail": "'two' is not of type 'integer'"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "none",
+    "mode_arguments": {
+     "speed": "fast"
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "none",
+      "speed": "fast"
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode": "nope",
+    "mode_arguments": {
+     "speed": "fast"
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "mode": "nope",
+      "speed": "fast"
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "small",
+   "arguments": {
+    "mode_arguments": {
+     "count": "x"
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "count": "x"
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "begin_srd_spell_action",
+   "arguments": {
+    "spell": "acid_arrow",
+    "caster": "p-1",
+    "spell_arguments": {
+     "material_component_available": true,
+     "witness_state_ids": [
+      "w-1"
+     ]
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "spell": "acid_arrow",
+      "caster": "p-1",
+      "material_component_available": true,
+      "witness_state_ids": [
+       "w-1"
+      ]
+     },
+     []
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "begin_srd_spell_action",
+   "arguments": {
+    "spell": "acid_arrow",
+    "caster": "p-1",
+    "spell_arguments": {
+     "material_component_available": "yes",
+     "witness_state_ids": "w-1",
+     "selected_damage_type": 7
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "spell": "acid_arrow",
+      "caster": "p-1",
+      "material_component_available": "yes",
+      "witness_state_ids": "w-1",
+      "selected_damage_type": 7
+     },
+     [
+      {
+       "path": "spell_arguments.material_component_available",
+       "kind": "invalid_value",
+       "detail": "'yes' is not of type 'boolean'"
+      },
+      {
+       "path": "spell_arguments.selected_damage_type",
+       "kind": "invalid_value",
+       "detail": "7 is not one of ['acid', 'bludgeoning', 'cold', 'fire', 'force', 'lightning', 'necrotic', 'piercing', 'poison', 'psychic', 'radiant', 'slashing', 'thunder']"
+      },
+      {
+       "path": "spell_arguments.selected_damage_type",
+       "kind": "invalid_value",
+       "detail": "7 is not of type 'string'"
+      },
+      {
+       "path": "spell_arguments.witness_state_ids",
+       "kind": "invalid_value",
+       "detail": "'w-1' is not of type 'array'"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "begin_srd_spell_action",
+   "arguments": {
+    "spell": "acid_arrow",
+    "spell_arguments": {
+     "transformation_form": "x",
+     "advantage": true
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "spell": "acid_arrow",
+      "transformation_form": "x",
+      "advantage": true
+     },
+     [
+      {
+       "path": "spell_arguments.advantage",
+       "kind": "belongs_at_top_level"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "begin_srd_spell_action",
+   "arguments": {
+    "spell": "mage_armour",
+    "spell_arguments": {
+     "material_component_available": 1
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "spell": "mage_armour",
+      "material_component_available": 1
+     },
+     [
+      {
+       "path": "spell_arguments.material_component_available",
+       "kind": "invalid_value",
+       "detail": "1 is not of type 'boolean'"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "begin_srd_spell_action",
+   "arguments": {
+    "spell": "alter_self",
+    "spell_arguments": {
+     "transformation_same_size": "no",
+     "target_willing": null
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "spell": "alter_self",
+      "transformation_same_size": "no",
+      "target_willing": null
+     },
+     [
+      {
+       "path": "spell_arguments.target_willing",
+       "kind": "invalid_value",
+       "detail": "None is not of type 'boolean'"
+      },
+      {
+       "path": "spell_arguments.transformation_same_size",
+       "kind": "invalid_value",
+       "detail": "'no' is not of type 'boolean'"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "unwrap_arguments",
+   "schema": "cast_spell_outside_combat",
+   "arguments": {
+    "spell": "acid_splash",
+    "caster_state": "p-1",
+    "spell_arguments": {
+     "environment_origin": 3,
+     "not_an_input": 1
+    }
+   },
+   "expected": {
+    "ok": [
+     {
+      "spell": "acid_splash",
+      "caster_state": "p-1",
+      "environment_origin": 3,
+      "not_an_input": 1
+     },
+     [
+      {
+       "path": "spell_arguments.not_an_input",
+       "kind": "unknown_input"
+      }
+     ]
+    ]
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": [],
+   "expected": {
+    "ok": {
+     "status": "rejected",
+     "code": "provider_tool_arguments_not_object"
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": "x",
+   "expected": {
+    "ok": {
+     "status": "rejected",
+     "code": "provider_tool_arguments_not_object"
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "nope",
+    "value": "aid"
+   },
+   "expected": {
+    "ok": {
+     "status": "rejected",
+     "code": "argument_contract_tool_unavailable",
+     "available_tools": [
+      "tool_a1_begin_srd_spell_action",
+      "tool_b2_cast_spell_outside_combat",
+      "tool_c3_small"
+     ]
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": 5,
+    "value": "aid"
+   },
+   "expected": {
+    "ok": {
+     "status": "rejected",
+     "code": "argument_contract_tool_unavailable",
+     "available_tools": [
+      "tool_a1_begin_srd_spell_action",
+      "tool_b2_cast_spell_outside_combat",
+      "tool_c3_small"
+     ]
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "mcp__sylvia__begin_srd_spell_action",
+    "value": "aid"
+   },
+   "expected": {
+    "ok": {
+     "status": "ok",
+     "tool": "mcp__sylvia__begin_srd_spell_action",
+     "spell": "aid",
+     "arguments_field": "spell_arguments",
+     "arguments": {
+      "type": "object",
+      "properties": {
+       "material_component_available": {
+        "description": "For a required Material component, confirm the selected supply can be accessed with a hand or used as its focus description allows.",
+        "type": "boolean"
+       }
+      },
+      "required": [],
+      "additionalProperties": false
+     },
+     "instruction": "Pass these inside spell_arguments (or at the top level); keep the tool's own listed inputs at the top level."
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "tool_b2_cast_spell_outside_combat",
+    "value": "mage_armour"
+   },
+   "expected": {
+    "ok": {
+     "status": "ok",
+     "tool": "tool_b2_cast_spell_outside_combat",
+     "spell": "mage_armor",
+     "arguments_field": "spell_arguments",
+     "arguments": {
+      "type": "object",
+      "properties": {
+       "all_targets_willing": {
+        "type": "boolean"
+       },
+       "material_component_available": {
+        "description": "For a required Material component, confirm the selected supply can be accessed with a hand or used as its focus description allows.",
+        "type": "boolean"
+       },
+       "target_willing": {
+        "type": "boolean"
+       }
+      },
+      "required": [],
+      "additionalProperties": false
+     },
+     "instruction": "Pass these inside spell_arguments (or at the top level); keep the tool's own listed inputs at the top level."
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "cast_spell_outside_combat",
+    "value": "nope"
+   },
+   "expected": {
+    "ok": {
+     "status": "rejected",
+     "code": "argument_contract_value_unknown",
+     "instruction": "Choose a spell the tool lists."
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "begin_srd_spell_action"
+   },
+   "expected": {
+    "ok": {
+     "status": "rejected",
+     "code": "argument_contract_value_unknown",
+     "instruction": "Choose a spell the tool lists."
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "small",
+    "value": "quick"
+   },
+   "expected": {
+    "ok": {
+     "status": "ok",
+     "tool": "small",
+     "mode": "fast",
+     "arguments_field": "mode_arguments",
+     "arguments": {
+      "type": "object",
+      "properties": {
+       "count": {
+        "type": "integer",
+        "minimum": 1
+       },
+       "label": {
+        "$ref": "#/$defs/label",
+        "description": "kept as written"
+       },
+       "speed": {
+        "type": "number",
+        "maximum": 30
+       }
+      },
+      "required": [
+       "speed",
+       "count"
+      ],
+      "additionalProperties": false
+     },
+     "instruction": "Pass these inside mode_arguments (or at the top level); keep the tool's own listed inputs at the top level."
+    }
+   }
+  },
+  {
+   "function": "read_tool_arguments",
+   "tools": [
+    [
+     "tool_a1_begin_srd_spell_action",
+     "begin_srd_spell_action"
+    ],
+    [
+     "tool_b2_cast_spell_outside_combat",
+     "cast_spell_outside_combat"
+    ],
+    [
+     "tool_c3_small",
+     "small"
+    ]
+   ],
+   "parameters": {
+    "tool": "mcp__x__small",
+    "value": "slow"
+   },
+   "expected": {
+    "ok": {
+     "status": "ok",
+     "tool": "mcp__x__small",
+     "mode": "slow",
+     "arguments_field": "mode_arguments",
+     "arguments": {
+      "type": "object",
+      "properties": {
+       "count": {
+        "type": "integer",
+        "minimum": 1
+       }
+      },
+      "required": [
+       "count"
+      ],
+      "additionalProperties": false
+     },
+     "instruction": "Pass these inside mode_arguments (or at the top level); keep the tool's own listed inputs at the top level."
+    }
+   }
+  }
+ ]
+}
