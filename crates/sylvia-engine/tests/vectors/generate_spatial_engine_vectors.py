@@ -12,12 +12,19 @@ source.
 
 Each case is a scene and a query, both admitted by Python first (inadmissible random draws are
 discarded). The record is `_engine._resolve_<kind>(_engine._compile(scene), query.as_payload())`
-or the exception it raises. Placement is S3c's and not here.
+or the exception it raises. `results` admits engine results (named by their case) and corrupted
+copies with `admit_spatial_result`; `sessions` run `SpatialEngine` queries, scene replacements and
+earlier snapshots.
+
+To keep the per-platform files small, a result over 128 bytes (a payload over 256) is kept as
+`result_sha256` (`payload_sha256`): the SHA-256 of Python's compact JSON in its own key order.
+Every tenth engine case, and every case a result-admission entry names, keeps its whole result.
 """
 
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 import math
@@ -479,6 +486,31 @@ def exhausted_paths(rng, scenes, cases):
         added += 1
 
 
+def compact(value: object) -> bytes:
+    """The text a large record is hashed by: Python's compact JSON in its own key order."""
+    return json.dumps(value, ensure_ascii=True, separators=(",", ":"), allow_nan=False).encode("ascii")
+
+
+def digest(value: object) -> str:
+    return hashlib.sha256(compact(value)).hexdigest()
+
+
+# Larger records are kept as the SHA-256 of their compact JSON, so the per-platform files stay
+# small: inputs stay whole, and the Rust test hashes its own output the same way.
+RESULT_INLINE = 128
+# Every tenth engine case keeps its whole result, so a difference can be read, not only seen.
+SAMPLE_EVERY = 10
+PAYLOAD_INLINE = 256
+CORRUPT_LIMIT = 2048
+
+
+def kept(record: dict, key: str, limit: int) -> dict:
+    if key in record and len(compact(record[key])) > limit:
+        record = dict(record)
+        record[f"{key}_sha256"] = digest(record.pop(key))
+    return record
+
+
 def admit_result(scene_value: dict, payload: object) -> dict:
     scene = admit_spatial_scene(scene_value)
     try:
@@ -558,7 +590,7 @@ def session_cases(rng: random.Random, scenes: list[dict]) -> list[dict]:
             snapshot_index = rng.randrange(len(snapshots)) if rng.random() < 0.3 else None
             try:
                 result = engine.query(query, snapshot=None if snapshot_index is None else snapshots[snapshot_index])
-                record = {"payload": result.as_payload()}
+                record = kept({"payload": result.as_payload()}, "payload", PAYLOAD_INLINE)
             except SpatialValidationError as error:
                 record = {"error": ["SpatialValidationError", str(error), error.code, error.path]}
             steps.append({"query": query, "snapshot": snapshot_index, **record})
@@ -599,18 +631,25 @@ def main() -> int:
     SNAPS = None
     result_rng = random.Random(4809)
     results = []
-    for case in cases:
+    whole = set()
+    for number, case in enumerate(cases):
         if "result" not in case:
             continue
-        if result_rng.random() < 0.25:
-            results.append({"scene": case["scene"], "input": case["result"], **admit_result(scenes[case["scene"]], case["result"])})
-        if result_rng.random() < 0.3:
+        if result_rng.random() < 0.1:
+            # An engine result admitted as it is: the input is that case's result, kept whole.
+            whole.add(number)
+            record = admit_result(scenes[case["scene"]], case["result"])
+            results.append({"scene": case["scene"], "case": number, **kept(record, "payload", PAYLOAD_INLINE)})
+        if result_rng.random() < 0.2 and len(compact(case["result"])) <= CORRUPT_LIMIT:
             broken = corrupt(result_rng, case["result"])
-            results.append({"scene": case["scene"], "input": broken, **admit_result(scenes[case["scene"]], broken)})
+            record = admit_result(scenes[case["scene"]], broken)
+            results.append({"scene": case["scene"], "input": broken, **kept(record, "payload", PAYLOAD_INLINE)})
+    cases = [case if number in whole or number % SAMPLE_EVERY == 0 else kept(case, "result", RESULT_INLINE)
+             for number, case in enumerate(cases)]
     sessions = session_cases(random.Random(4810), scenes)
     OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "platform": PLATFORM, "scenes": scenes, "cases": cases,
                                     "results": results, "sessions": sessions},
-                                   ensure_ascii=True, allow_nan=False) + "\n").encode("ascii"))
+                                   ensure_ascii=True, allow_nan=False, separators=(",", ":")) + "\n").encode("ascii"))
     kinds = {}
     for case in cases:
         kinds[case["query"]["kind"]] = kinds.get(case["query"]["kind"], 0) + 1
