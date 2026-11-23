@@ -897,6 +897,31 @@ pub async fn handle_campaign_index(ctx: &DispatchContext, _params: &JsonMap) -> 
     Ok(Json::Array(entries.iter().map(campaign_entry_value).collect()))
 }
 
+/// `handle_campaign_creation_catalog`: `_campaign_creation_catalog(storage_root, owner,
+/// include_participants=...)`, the content a new campaign can be made from. `include_participants`
+/// defaults to `True` (`_optional_bool(..., default=True)`); anything present must be a boolean.
+pub async fn handle_campaign_creation_catalog(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let include_participants = match params.get("include_participants") {
+        None => true,
+        Some(Json::Bool(value)) => *value,
+        Some(_) => return Err(protocol("include_participants must be a boolean")),
+    };
+    let (storage_root, bundled) = (ctx.storage_root.clone(), std::sync::Arc::clone(&ctx.bundled));
+    let catalog = ctx
+        .store
+        .call(move |store| {
+            crate::creation_catalog::campaign_creation_catalog(
+                &storage_root,
+                store,
+                &bundled,
+                include_participants,
+            )
+        })
+        .await
+        .map_err(store_error)?;
+    Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
