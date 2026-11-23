@@ -964,7 +964,7 @@ pub(crate) fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<S
 
 /// `_optional_bool(payload, key)`: absent is `False`; anything present must be a boolean
 /// (`null` included).
-fn optional_bool(params: &JsonMap, key: &str) -> CodedResult<bool> {
+pub(crate) fn optional_bool(params: &JsonMap, key: &str) -> CodedResult<bool> {
     match params.get(key) {
         None => Ok(false),
         Some(Json::Bool(value)) => Ok(*value),
@@ -996,7 +996,7 @@ fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
 
 /// `_required_nonnegative_int(payload, key)`: an integer, not a bool, at least zero. An integer
 /// beyond 64 bits, which Python would take, is refused as a declared limit.
-fn required_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<i64> {
+pub(crate) fn required_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<i64> {
     match params.get(key) {
         Some(Json::Number(number)) if number.as_i64().is_some_and(|value| value >= 0) => {
             Ok(number.as_i64().unwrap_or_default())
@@ -1123,6 +1123,47 @@ pub async fn handle_campaign_creation_catalog(ctx: &DispatchContext, params: &Js
         .await
         .map_err(store_error)?;
     Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
+}
+
+/// `handle_catalog`: the campaign's admitted tools (`AuthorityOwner.catalog(campaign_id)`), each
+/// as its package identity, name, capability and input schema.
+pub async fn handle_catalog(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let campaign_id = required(params, "campaign_id")?;
+    let tools = sylvia_app::authority::content_reads::catalog(&ctx.store, &campaign_id, false)
+        .await
+        .map_err(store_error)?;
+    Ok(Json::Array(
+        tools
+            .into_iter()
+            .map(|tool| {
+                let mut entry = JsonMap::new();
+                entry.insert("package_id".into(), tool.package_id.into());
+                entry.insert("package_version".into(), tool.package_version.into());
+                entry.insert("package_sha256".into(), tool.package_sha256.into());
+                entry.insert("name".into(), tool.name.into());
+                entry.insert("capability".into(), tool.capability.into());
+                entry.insert("input_schema".into(), Json::Object(tool.input_schema));
+                Json::Object(entry)
+            })
+            .collect(),
+    ))
+}
+
+/// `handle_backup_database`: one coherent online copy of the authority database at
+/// `backups/<backup_id>.sqlite3` under the storage root.
+pub async fn handle_backup_database(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let backup_id = required_artifact_id(params, "backup_id")?;
+    let backups = ctx.storage_root.join("backups");
+    let target = backups.join(format!("{backup_id}.sqlite3"));
+    // `target.parent.mkdir(parents=True, exist_ok=True)`: a failure is an `OSError`.
+    std::fs::create_dir_all(&backups).map_err(|error| {
+        sylvia_base::CodedError::new("internal_error", error.to_string()).with_error_type("OSError")
+    })?;
+    ctx.store.call(move |store| store.backup_database(&target)).await.map_err(store_error)?;
+    let mut reply = JsonMap::new();
+    reply.insert("backup_id".into(), backup_id.into());
+    reply.insert("status".into(), "created".into());
+    Ok(Json::Object(reply))
 }
 
 #[cfg(test)]

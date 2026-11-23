@@ -1,0 +1,561 @@
+{
+ "cases": [
+  {
+   "name": "lite primary",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ],
+   "result": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": []
+    }
+   ]
+  },
+  {
+   "name": "lite with a dependency",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": "pneuma.severed-lands"
+   },
+   "surfaces": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ],
+   "result": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": []
+    }
+   ]
+  },
+  {
+   "name": "another primary",
+   "lock": {
+    "primary": "pneuma.riichi-mahjong",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ],
+   "result": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lite only as a dependency",
+   "lock": {
+    "primary": "pneuma.riichi-mahjong",
+    "dependency": "sylvia.srd-lite.bg3"
+   },
+   "surfaces": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ],
+   "result": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "empty lock",
+   "lock": null,
+   "surfaces": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ],
+   "result": [
+    {
+     "id": "combat",
+     "kind": "panel",
+     "actions": [
+      {
+       "id": "attack",
+       "intent": "attack",
+       "label": "Attack"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "look",
+       "label": "Look"
+      },
+      {
+       "id": "odd",
+       "intent": 5
+      }
+     ],
+     "title": "Combat"
+    },
+    {
+     "actions": [],
+     "id": "empty"
+    },
+    {
+     "id": "only-end",
+     "actions": [
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      },
+      {
+       "id": "end",
+       "intent": "end_combat_encounter",
+       "label": "End encounter"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "no surfaces",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": null
+   },
+   "surfaces": [],
+   "result": []
+  },
+  {
+   "name": "surface without actions",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "bare"
+    }
+   ],
+   "error": {
+    "class": "KeyError",
+    "message": "'actions'"
+   }
+  },
+  {
+   "name": "action that is text",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "text",
+     "actions": [
+      "end_combat_encounter"
+     ]
+    }
+   ],
+   "error": {
+    "class": "AttributeError",
+    "message": "'str' object has no attribute 'get'"
+   }
+  },
+  {
+   "name": "actions as a mapping",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "map",
+     "actions": {
+      "intent": "attack"
+     }
+    }
+   ],
+   "error": {
+    "class": "AttributeError",
+    "message": "'str' object has no attribute 'get'"
+   }
+  },
+  {
+   "name": "actions as a number",
+   "lock": {
+    "primary": "sylvia.srd-lite.bg3",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "number",
+     "actions": 3
+    }
+   ],
+   "error": {
+    "class": "TypeError",
+    "message": "'int' object is not iterable"
+   }
+  },
+  {
+   "name": "unchecked shapes without lite",
+   "lock": {
+    "primary": "pneuma.riichi-mahjong",
+    "dependency": null
+   },
+   "surfaces": [
+    {
+     "id": "bare"
+    }
+   ],
+   "result": [
+    {
+     "id": "bare"
+    }
+   ]
+  }
+ ]
+}

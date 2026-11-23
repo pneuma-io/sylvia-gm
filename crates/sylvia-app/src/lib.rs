@@ -43,6 +43,7 @@ pub mod decision_scope;
 pub mod initial_character_state;
 pub mod interview_content;
 pub mod knowledge_search;
+pub mod launch_compatibility;
 pub mod library_sources;
 pub mod network_graph;
 pub mod package_library;
