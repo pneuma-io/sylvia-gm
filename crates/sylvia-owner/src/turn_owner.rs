@@ -1,31 +1,27 @@
 //! `TurnOwner` for the owner's reads: the GM turn's owner calls, as delegation.
 //!
-//! Each method is the owner's whole operation (lane 3's `sylvia_app::authority::turn_reads`,
-//! #414). A call lane 3 has not ported yet answers `rust_port_pending`, naming the
-//! `AuthorityOwner` method, so a turn that reaches it stops there as the other unported steps do.
+//! Each method is the owner's whole operation (lane 3's: `sylvia_app::authority::turn_reads`,
+//! #414 and #420, and the store's own operations). A call added later that lane 3 has not
+//! ported yet answers `rust_port_pending`, naming the `AuthorityOwner` method.
 
 use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_app::authority::turn_reads;
-use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_base::{CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
-use sylvia_provider::factory::PORT_PENDING;
 use sylvia_provider::BoxFuture;
-
-/// The refusal for an owner call not ported yet.
-fn pending(method: &str) -> CodedError {
-    CodedError::new(PORT_PENDING, format!("The Rust owner cannot run AuthorityOwner.{method} yet."))
-}
 
 impl TurnOwner for OwnerReads {
     fn model_decision_boundary<'a>(
         &'a self,
-        _campaign_id: &'a str,
+        campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<ModelDecisionBoundary>>> {
-        Box::pin(async { Err(pending("model_decision_boundary")) })
+        Box::pin(async move {
+            turn_reads::model_decision_boundary(self.store(), campaign_id).await.map_err(store_error)
+        })
     }
 
     fn campaign_preparation_boundary<'a>(
