@@ -9,9 +9,8 @@
 //! `guided_advance`, `guided_start`, `guided_finalize`) that commits them.
 //!
 //! Interview Contributions are resolved with lane 1's `interview_content`
-//! (`resolve_interview_content`, on the store as its `InterviewOwner`) and required starting
-//! state is checked with its `plan_state_admission`. Lane 1 answers `rust_port_pending` for the
-//! Plan and bundled-snapshot branches it has not ported, and that answer passes through.
+//! (`resolve_interview_content`, on the store as its `ReferenceOwner`) and required starting
+//! state is checked with its `plan_state_admission`.
 //!
 //! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently: finalizing a
 //! construction that is not a guided Interview, and binding participants or initial state (only
@@ -21,7 +20,7 @@
 //! assessed against the empty one (`EMPTY_MODEL_CAPABILITY_REGISTRY`).
 
 use crate::bundled_packages::BundledPackages;
-use crate::interview_content::{require_active_ruleset, resolve_interview_content, InterviewOwner};
+use crate::interview_content::{require_active_ruleset, resolve_interview_content};
 use crate::plan_state_admission::validate_plan_state;
 use std::collections::BTreeSet;
 use std::sync::Arc;
@@ -42,7 +41,6 @@ use sylvia_domain::interview_contribution::{
 use sylvia_domain::model_capability::{
     model_guidance_payload_sha256, ModelCapabilityRegistry, ModelGuidanceDecision,
 };
-use sylvia_domain::package_library::PackageCandidate;
 use sylvia_domain::package_library::{campaign_setting_entries, canonical_json_bytes, PackageLockRecord};
 use sylvia_domain::pyops::py_eq;
 use sylvia_domain::session::{
@@ -51,7 +49,6 @@ use sylvia_domain::session::{
     PlanAcceptanceStatus, PlanValidationOutcome, SessionMessageKind, SessionRecord, SessionRecordFields,
     SessionStatus,
 };
-use sylvia_domain::DomainError;
 use sylvia_store::campaigns::current_lock_record;
 use sylvia_store::guided_advance::AdvanceDraft;
 use sylvia_store::guided_finalize::GuidedStartCommit;
@@ -353,31 +350,6 @@ async fn next_guided_question(
     Ok((step, guided_question(step).to_owned()))
 }
 
-/// The store as lane 1's `InterviewOwner`: `AuthorityOwner.package_candidate` and
-/// `package_candidates`. A store failure keeps Python's class, code and message.
-struct StoreInterviewOwner<'a>(&'a sylvia_store::AuthorityStore);
-
-fn domain_error(error: StoreError) -> DomainError {
-    match error.rejection() {
-        Some(coded) if coded.error_type == Some("ValueError") => DomainError::value(coded.message),
-        Some(coded) if matches!(coded.error_type, None | Some("CommandRejected")) => {
-            DomainError::command_rejected_with(coded.message, coded.code, Vec::new())
-        }
-        Some(coded) => DomainError::uncaught(coded.error_type.unwrap_or("RuntimeError"), coded.message),
-        None => DomainError::uncaught("RuntimeError", error.to_string()),
-    }
-}
-
-impl InterviewOwner for StoreInterviewOwner<'_> {
-    fn package_candidate(&self, candidate_id: &str) -> sylvia_domain::DomainResult<PackageCandidate> {
-        self.0.package_candidate(candidate_id).map_err(domain_error)
-    }
-
-    fn package_candidates(&self) -> sylvia_domain::DomainResult<Vec<PackageCandidate>> {
-        self.0.package_candidates().map_err(domain_error)
-    }
-}
-
 /// `_GUIDED_CONTRIBUTION_STEPS[step][1]`: the owner kind a Contribution step reads.
 fn contribution_owner_kind(step: &str) -> &'static str {
     match step {
@@ -479,8 +451,7 @@ async fn guided_campaign_contribution(
     let content = store
         .call(move |store| {
             // Python's owner has no content storage root (`local_owner` never passes one).
-            resolve_interview_content(&StoreInterviewOwner(store), &bundled, None, &Json::Object(selections))
-                .map_err(StoreError::from)
+            resolve_interview_content(store, &bundled, None, &Json::Object(selections))
         })
         .await?;
     if owner_kind == "campaign_plan" {
