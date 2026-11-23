@@ -250,7 +250,8 @@ pub async fn prepare_provider_round(
             let mut selected = Vec::new();
             for tool in state.locals.current_catalog.get()? {
                 if matches!(tool.category.as_str(), "reference" | "narrative_state")
-                    || (key("package_id")? == tool.package_id.as_str() && key("intent")? == tool.name.as_str())
+                    || (key("package_id")? == tool.package_id.as_str()
+                        && key("intent")? == tool.name.as_str())
                 {
                     selected.push(tool.clone());
                 }

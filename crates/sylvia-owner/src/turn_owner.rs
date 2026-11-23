@@ -1,11 +1,13 @@
 //! `TurnOwner` for the owner's reads: the GM turn's owner calls, as delegation.
 //!
-//! Each method is the owner's whole operation (lane 3's). A call lane 3 has not ported yet
-//! answers `rust_port_pending`, naming the `AuthorityOwner` method, so a turn that reaches it
-//! stops there as the other unported steps do.
+//! Each method is the owner's whole operation (lane 3's `sylvia_app::authority::turn_reads`,
+//! #414). A call lane 3 has not ported yet answers `rust_port_pending`, naming the
+//! `AuthorityOwner` method, so a turn that reaches it stops there as the other unported steps do.
 
+use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
+use sylvia_app::authority::turn_reads;
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
@@ -27,16 +29,20 @@ impl TurnOwner for OwnerReads {
 
     fn campaign_preparation_boundary<'a>(
         &'a self,
-        _campaign_id: &'a str,
+        campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<ModelDecisionBoundary>>> {
-        Box::pin(async { Err(pending("campaign_preparation_boundary")) })
+        Box::pin(async move {
+            turn_reads::campaign_preparation_boundary(self.store(), campaign_id).await.map_err(store_error)
+        })
     }
 
     fn current_package_lock<'a>(
         &'a self,
-        _campaign_id: &'a str,
+        campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<PackageLockRecord>> {
-        Box::pin(async { Err(pending("current_package_lock")) })
+        Box::pin(async move {
+            turn_reads::current_package_lock(self.store(), campaign_id).await.map_err(store_error)
+        })
     }
 
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()> {

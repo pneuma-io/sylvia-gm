@@ -14,8 +14,8 @@ use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
     CampaignConstructionBasis, CampaignContinuityView, CampaignDisplaySnapshot, CampaignSnapshot,
     CampaignState, CanonicalEvent, CanonicalEventType, CanonicalReplay, EventVisibility, LifecycleState,
-    ModelDecisionActor, ModelDecisionBoundary, ModelDecisionOwner, ModelToolBehavior, PackageDependency, PackageLock,
-    PackageLockEntry, PackageRole, Participant, ParticipantFields, TurnStatus, WriterRole,
+    ModelDecisionActor, ModelDecisionBoundary, ModelDecisionOwner, ModelToolBehavior, PackageDependency,
+    PackageLock, PackageLockEntry, PackageRole, Participant, ParticipantFields, TurnStatus, WriterRole,
 };
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
 use sylvia_domain::session::{
