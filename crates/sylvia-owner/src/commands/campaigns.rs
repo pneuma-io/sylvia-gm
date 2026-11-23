@@ -748,7 +748,7 @@ async fn recover_campaign(
 
 /// `_required_artifact_id(payload, key)`: a nonempty string matching
 /// `[A-Za-z0-9][A-Za-z0-9._-]{0,127}` in full.
-fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<String> {
+pub(crate) fn required_artifact_id(params: &JsonMap, key: &str) -> CodedResult<String> {
     let value = required(params, key)?;
     let mut characters = value.chars();
     let first_ok = characters.next().is_some_and(|first| first.is_ascii_alphanumeric());
@@ -770,7 +770,7 @@ fn optional_bool(params: &JsonMap, key: &str) -> CodedResult<bool> {
 }
 
 /// `Path.resolve(strict=True)`, without Windows' `\\?\` prefix, which pathlib does not show.
-fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
+pub(crate) fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::path::PathBuf> {
     let resolved = std::fs::canonicalize(path)?;
     let text = resolved.to_string_lossy();
     Ok(if let Some(rest) = text.strip_prefix(r"\\?\UNC\") {
@@ -819,7 +819,7 @@ fn guided_draft_value(draft: &sylvia_domain::authority::GuidedCampaignDraft) -> 
 }
 
 /// `_required_text(params, key)` as a handler's error.
-fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
+pub(crate) fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
     crate::dispatch::required_text(params, key).map_err(|failure| match failure {
         crate::dispatch::Failure::Rejected(error) => error,
         _ => unreachable!("a missing parameter is a rejection"),

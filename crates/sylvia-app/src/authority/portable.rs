@@ -5,9 +5,10 @@
 use std::path::Path;
 use std::sync::Arc;
 use sylvia_domain::authority::{validate_authority_identity, CampaignExportResult};
+use sylvia_domain::package_library::PackageCandidate;
 use sylvia_store::recovery::CampaignRecoveryResult;
 use sylvia_store::recovery_staging::stage_campaign_archive_blocking;
-use sylvia_store::{StoreError, StoreHandle, StoreResult};
+use sylvia_store::{AuthorityStore, StoreError, StoreHandle, StoreResult};
 
 /// `AuthorityOwner.export_campaign(operation_id, campaign_id, target, include_thinking=...)`:
 /// both identities checked (a `ValueError`), then the store publishes one self-contained archive
@@ -58,55 +59,78 @@ pub async fn recover_campaign(
 pub async fn export_package_candidate(
     store: &StoreHandle,
     candidate_id: &str,
+    target: &mut (dyn std::io::Write + Send),
+) -> StoreResult<sylvia_base::JsonMap> {
+    let id = candidate_id.to_owned();
+    let (candidate, drafts) = store.call(move |store| export_drafts(store, &id)).await?;
+    write_export(candidate_id, &candidate, &drafts, target)
+}
+
+/// [`export_package_candidate`] for a caller already inside one store call (lane 1's selection
+/// owner, whose `retained_plan_snapshot` exports a candidate): the same reads and archive, on the
+/// store it is given.
+pub fn export_package_candidate_on(
+    store: &AuthorityStore,
+    candidate_id: &str,
     target: &mut dyn std::io::Write,
 ) -> StoreResult<sylvia_base::JsonMap> {
+    let (candidate, drafts) = export_drafts(store, candidate_id)?;
+    write_export(candidate_id, &candidate, &drafts, target)
+}
+
+/// The candidate and one normalized draft per locked package: its exact manifest without `files`
+/// and `content_sha256`, and every admitted file under its own byte count.
+fn export_drafts(
+    store: &AuthorityStore,
+    candidate_id: &str,
+) -> StoreResult<(PackageCandidate, Vec<crate::package_materialization::NormalizedPackageDraft>)> {
     use sylvia_base::Json;
     use sylvia_domain::package_library::{parse_canonical_json_bytes, JsonShapeLimits};
-    let id = candidate_id.to_owned();
-    let (candidate, drafts) = store
-        .call(move |store| {
-            let candidate = store.package_candidate(&id)?;
-            let mut drafts = Vec::new();
-            for entry in candidate.package_lock().entries() {
-                let manifest =
-                    store.exact_package_manifest(entry.package_id(), entry.version(), entry.sha256())?;
-                let parsed = parse_canonical_json_bytes(
-                    manifest.canonical_json.as_bytes(),
-                    "Package manifest",
-                    JsonShapeLimits::NONE,
-                )?;
-                let Json::Object(mut record) = parsed else {
-                    return Err(rejected("Installed package manifest is unavailable", "command_rejected"));
-                };
-                record.shift_remove("files");
-                record.shift_remove("content_sha256");
-                let mut payloads = Vec::new();
-                for file in &manifest.files {
-                    let value = store.package_file_bytes(
-                        entry.package_id(),
-                        entry.version(),
-                        entry.sha256(),
-                        file.path(),
-                        file.byte_count(),
-                    )?;
-                    let Some(value) = value else {
-                        return Err(rejected(
-                            "Installed package file is unavailable",
-                            "package_file_unavailable",
-                        ));
-                    };
-                    payloads.push((file.path().to_owned(), value));
-                }
-                drafts.push(crate::package_materialization::NormalizedPackageDraft::new(
-                    record,
-                    payloads,
-                    manifest.format_version,
-                ));
-            }
-            Ok((candidate, drafts))
-        })
-        .await?;
-    let materialized = crate::package_materialization::materialize_package_archive(&drafts)?;
+    let candidate = store.package_candidate(candidate_id)?;
+    let mut drafts = Vec::new();
+    for entry in candidate.package_lock().entries() {
+        let manifest = store.exact_package_manifest(entry.package_id(), entry.version(), entry.sha256())?;
+        let parsed = parse_canonical_json_bytes(
+            manifest.canonical_json.as_bytes(),
+            "Package manifest",
+            JsonShapeLimits::NONE,
+        )?;
+        let Json::Object(mut record) = parsed else {
+            return Err(rejected("Installed package manifest is unavailable", "command_rejected"));
+        };
+        record.shift_remove("files");
+        record.shift_remove("content_sha256");
+        let mut payloads = Vec::new();
+        for file in &manifest.files {
+            let value = store.package_file_bytes(
+                entry.package_id(),
+                entry.version(),
+                entry.sha256(),
+                file.path(),
+                file.byte_count(),
+            )?;
+            let Some(value) = value else {
+                return Err(rejected("Installed package file is unavailable", "package_file_unavailable"));
+            };
+            payloads.push((file.path().to_owned(), value));
+        }
+        drafts.push(crate::package_materialization::NormalizedPackageDraft::new(
+            record,
+            payloads,
+            manifest.format_version,
+        ));
+    }
+    Ok((candidate, drafts))
+}
+
+/// The closure rebuilt, checked against the candidate and written to `target` in 64 KiB chunks.
+fn write_export(
+    candidate_id: &str,
+    candidate: &PackageCandidate,
+    drafts: &[crate::package_materialization::NormalizedPackageDraft],
+    target: &mut dyn std::io::Write,
+) -> StoreResult<sylvia_base::JsonMap> {
+    let materialized = crate::package_materialization::materialize_package_archive(drafts)?;
     if materialized.package_lock != *candidate.package_lock()
         || materialized.closure_sha256 != candidate.closure_sha256()
     {
