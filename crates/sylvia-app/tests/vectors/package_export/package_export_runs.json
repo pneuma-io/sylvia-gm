@@ -1,0 +1,133 @@
+{
+ "python": "3.12.11",
+ "runs": [
+  {
+   "base": "cast",
+   "candidate_id": "candidate-install-1",
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-1",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "archive_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+     "byte_count": 25842
+    }
+   },
+   "written_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+   "written_bytes": 25842
+  },
+  {
+   "base": "cast",
+   "candidate_id": "candidate-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "candidate_unavailable",
+    "message": "Package candidate is unavailable"
+   },
+   "written_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "written_bytes": 0
+  },
+  {
+   "base": "session_pages",
+   "candidate_id": "candidate-install-pages",
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-pages",
+     "closure_sha256": "1610a50d70788603a837025a5736f5399c2151438a5e918a2a75da9f8b3f19a1",
+     "archive_sha256": "48365fa3e6027fb0e37a302419ea4aeddfe627b858fed5a4a3a099c6d00b6b76",
+     "byte_count": 798
+    }
+   },
+   "written_sha256": "48365fa3e6027fb0e37a302419ea4aeddfe627b858fed5a4a3a099c6d00b6b76",
+   "written_bytes": 798
+  },
+  {
+   "base": "session_pages",
+   "candidate_id": "candidate-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "candidate_unavailable",
+    "message": "Package candidate is unavailable"
+   },
+   "written_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "written_bytes": 0
+  },
+  {
+   "base": "campaigns",
+   "candidate_id": "candidate-install-campaign-index",
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-campaign-index",
+     "closure_sha256": "1610a50d70788603a837025a5736f5399c2151438a5e918a2a75da9f8b3f19a1",
+     "archive_sha256": "48365fa3e6027fb0e37a302419ea4aeddfe627b858fed5a4a3a099c6d00b6b76",
+     "byte_count": 798
+    }
+   },
+   "written_sha256": "48365fa3e6027fb0e37a302419ea4aeddfe627b858fed5a4a3a099c6d00b6b76",
+   "written_bytes": 798
+  },
+  {
+   "base": "campaigns",
+   "candidate_id": "candidate-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "candidate_unavailable",
+    "message": "Package candidate is unavailable"
+   },
+   "written_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "written_bytes": 0
+  },
+  {
+   "base": "install",
+   "candidate_id": "candidate-install-1",
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-1",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "archive_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+     "byte_count": 25842
+    }
+   },
+   "written_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+   "written_bytes": 25842
+  },
+  {
+   "base": "install",
+   "candidate_id": "candidate-install-2",
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-2",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "archive_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+     "byte_count": 25842
+    }
+   },
+   "written_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+   "written_bytes": 25842
+  },
+  {
+   "base": "install",
+   "candidate_id": "candidate-install-3",
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-3",
+     "closure_sha256": "3c1b153af197d3758fb389e538b10ac99f802c5eaafa272e965fc7aad0a57ffb",
+     "archive_sha256": "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec",
+     "byte_count": 1071
+    }
+   },
+   "written_sha256": "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec",
+   "written_bytes": 1071
+  },
+  {
+   "base": "install",
+   "candidate_id": "candidate-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "candidate_unavailable",
+    "message": "Package candidate is unavailable"
+   },
+   "written_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "written_bytes": 0
+  }
+ ]
+}
