@@ -942,4 +942,7 @@ pub(crate) fn tool_metadata_of(runtime: &RuntimeTables, name: &str) -> Outcome<J
     tool_metadata(runtime_tool(runtime, name)?)
 }
 
-pub use crate::package_mechanic::{materialize_package_mechanic, MechanicFailure, PackageMechanic};
+pub use crate::package_mechanic::{
+    materialize_package_mechanic, materialize_player_action_checker, materialize_player_action_previewer,
+    MechanicFailure, PackageMechanic, PlayerActionChecker, PlayerActionPreviewer, PortPending,
+};

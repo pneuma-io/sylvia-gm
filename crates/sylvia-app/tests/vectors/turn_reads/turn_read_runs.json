@@ -1,0 +1,1459 @@
+{
+ "python": "3.12.11",
+ "runs": [
+  {
+   "base": "cast",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-24229fcb0721cd8964c1e3f830c8d43abb3bc181",
+     "campaign_id": "campaign-table",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ]
+       },
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "dependencies": [
+         {
+          "__class__": "PackageDependency",
+          "package_id": "pneuma.riichi-mahjong",
+          "version": "0.1.1",
+          "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "kind": "ruleset_snapshot",
+          "namespace": "ruleset_snapshot"
+         }
+        ],
+        "capabilities": []
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "cast",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-3de406634709e1f91412b368fae5043a49ffd9f5",
+     "campaign_id": "campaign-workshop",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ]
+       },
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "dependencies": [
+         {
+          "__class__": "PackageDependency",
+          "package_id": "pneuma.riichi-mahjong",
+          "version": "0.1.1",
+          "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "kind": "ruleset_snapshot",
+          "namespace": "ruleset_snapshot"
+         }
+        ],
+        "capabilities": []
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "cast",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "package_unavailable",
+    "message": "Campaign package lock is unavailable"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "campaign_narrative_options",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-24229fcb0721cd8964c1e3f830c8d43abb3bc181",
+     "campaign_id": "campaign-table",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ]
+       },
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "dependencies": [
+         {
+          "__class__": "PackageDependency",
+          "package_id": "pneuma.riichi-mahjong",
+          "version": "0.1.1",
+          "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "kind": "ruleset_snapshot",
+          "namespace": "ruleset_snapshot"
+         }
+        ],
+        "capabilities": []
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-3de406634709e1f91412b368fae5043a49ffd9f5",
+     "campaign_id": "campaign-workshop",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.1",
+        "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ]
+       },
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.1",
+        "sha256": "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+        "role": "dependency",
+        "load_order": 1,
+        "dependencies": [
+         {
+          "__class__": "PackageDependency",
+          "package_id": "pneuma.riichi-mahjong",
+          "version": "0.1.1",
+          "sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+          "kind": "ruleset_snapshot",
+          "namespace": "ruleset_snapshot"
+         }
+        ],
+        "capabilities": []
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "package_unavailable",
+    "message": "Campaign package lock is unavailable"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "campaign_narrative_options",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-e7ef7d0f209c19051874bfe071e4c818372187cb",
+     "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+     "closure_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": []
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-a1",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-a82b0952de2aaccc5c265249bd4b9fdc263a3276",
+     "campaign_id": "campaign-a1",
+     "closure_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": []
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-a1",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-a2",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-7aefbb8a67313848151e948a5dac69331e80bf1c",
+     "campaign_id": "campaign-a2",
+     "closure_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": []
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-a2",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-b",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-f5415efa469a8024e7eaab85245ac830ba6de56b",
+     "campaign_id": "campaign-b",
+     "closure_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": []
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-b",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-clockwork",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-cedfb8d93593a19e3686f015a99d06fab58c46a3",
+     "campaign_id": "campaign-clockwork",
+     "closure_sha256": "1610a50d70788603a837025a5736f5399c2151438a5e918a2a75da9f8b3f19a1",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "synthetic.actions",
+        "version": "1.0.0",
+        "sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "synthetic.checks"
+        ]
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-clockwork",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-b27aa9a81bcfadaf8116966519cd6cd132aa5293",
+     "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+     "closure_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": []
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "package_unavailable",
+    "message": "Campaign package lock is unavailable"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_narrative_options",
+   "session_id": "builder-interview",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_narrative_options",
+   "session_id": "builder-ruleless",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_narrative_options",
+   "session_id": "dm-clockwork",
+   "outcome": {
+    "ok": {
+     "campaign_revision": 0,
+     "operations": [
+      "record_memory",
+      "record_entity",
+      "update_scene",
+      "update_inventory"
+     ],
+     "scene_act_ids": [],
+     "plan_item_ids": [],
+     "eligible_secret_ids": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_narrative_options",
+   "session_id": "session-dm-4a4b97133864fe33934ec185",
+   "outcome": {
+    "ok": {
+     "campaign_revision": 4,
+     "operations": [
+      "record_memory",
+      "record_entity",
+      "update_scene",
+      "update_inventory"
+     ],
+     "scene_act_ids": [],
+     "plan_item_ids": [],
+     "eligible_secret_ids": []
+    }
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "campaign_narrative_options",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-build",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-b47755c91b820a89437ef726d88c6747c1a2c87a",
+     "campaign_id": "campaign-build",
+     "closure_sha256": "1610a50d70788603a837025a5736f5399c2151438a5e918a2a75da9f8b3f19a1",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "synthetic.actions",
+        "version": "1.0.0",
+        "sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "synthetic.checks"
+        ]
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-build",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-story",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-e55968e3b7c797ba058c415ead34301de2916b88",
+     "campaign_id": "campaign-story",
+     "closure_sha256": "1610a50d70788603a837025a5736f5399c2151438a5e918a2a75da9f8b3f19a1",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "synthetic.actions",
+        "version": "1.0.0",
+        "sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "synthetic.checks"
+        ]
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-story",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "package_unavailable",
+    "message": "Campaign package lock is unavailable"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_narrative_options",
+   "session_id": "builder-1",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_narrative_options",
+   "session_id": "builder-2",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_narrative_options",
+   "session_id": "dm-1",
+   "outcome": {
+    "ok": {
+     "campaign_revision": 8,
+     "operations": [
+      "record_memory",
+      "record_entity",
+      "update_scene",
+      "update_plan_progress",
+      "update_inventory"
+     ],
+     "scene_act_ids": [
+      "act-1",
+      "act-2"
+     ],
+     "plan_item_ids": [
+      "act-1",
+      "act-2",
+      "ending:end-quiet",
+      "ending:end-loud"
+     ],
+     "eligible_secret_ids": []
+    }
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "campaign_narrative_options",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-narrative",
+   "outcome": {
+    "ok": {
+     "__class__": "PackageLockRecord",
+     "lock_id": "lock-c565d3f0e991fb6161a3374eaef957c4c6ee23c3",
+     "campaign_id": "campaign-narrative",
+     "closure_sha256": "1610a50d70788603a837025a5736f5399c2151438a5e918a2a75da9f8b3f19a1",
+     "package_lock": {
+      "__class__": "PackageLock",
+      "entries": [
+       {
+        "__class__": "PackageLockEntry",
+        "package_id": "synthetic.actions",
+        "version": "1.0.0",
+        "sha256": "54ed18b006d393def3fe3dc546be956b477dfa653efcb6967541bc417d68d0d6",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "synthetic.checks"
+        ]
+       }
+      ]
+     },
+     "availability": "available",
+     "predecessor_lock_id": null,
+     "created_revision": 0
+    }
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-narrative",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "current_package_lock",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "package_unavailable",
+    "message": "Campaign package lock is unavailable"
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "campaign_narrative_options",
+   "session_id": "builder-n",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "campaign_narrative_options",
+   "session_id": "dm-n",
+   "outcome": {
+    "ok": {
+     "campaign_revision": 4,
+     "operations": [
+      "record_memory",
+      "record_entity",
+      "update_scene",
+      "update_plan_progress",
+      "reveal_secret",
+      "update_inventory"
+     ],
+     "scene_act_ids": [
+      "act-1",
+      "act-2"
+     ],
+     "plan_item_ids": [
+      "obj-1",
+      "act-1",
+      "act-2",
+      "ending:end-home",
+      "ending:end-road"
+     ],
+     "eligible_secret_ids": [
+      "secret-gm",
+      "secret-kept",
+      "legacy-secret-3"
+     ]
+    }
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "campaign_narrative_options",
+   "session_id": "session-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  }
+ ],
+ "private_records": [
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "First, "
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 1,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "then."
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 1,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "then."
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 1,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "other."
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Private provider record identity already has different data"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 2,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{\"output\": [{\"type\": \"reasoning\", \"id\": \"rs_1\"}]}"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 3,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "[1, 2]"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid native continuation record"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 3,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{not json"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid native continuation record"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 3,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "summary",
+    "payload": "Thinking."
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid private provider record"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": -1,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "Thinking."
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid private provider record"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 3,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "Thinking."
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid private provider record"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "missing-session",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "Thinking."
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Private provider record requires one known session"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "chat-1",
+    "attempt_id": "attempt-chat",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "Builder thought."
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-2",
+    "response_id": "response-2",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "Second."
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-3",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{\"again\": true}"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-4",
+    "response_id": "actor-context-abababababababababababababababababababababababababababababababab-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{\"actor_context\": {\"format\": 1, \"context_id\": \"abababababababababababababababababababababababababababababababab\", \"actor_id\": \"aki\", \"messages\": [{\"role\": \"user\", \"content\": \"Your turn.\"}]}}"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-4",
+    "response_id": "actor-context-abababababababababababababababababababababababababababababababab-2",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 1,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{\"actor_context\": {\"format\": 1, \"context_id\": \"abababababababababababababababababababababababababababababababab\", \"actor_id\": \"aki\", \"messages\": [{\"role\": \"assistant\", \"content\": \"Pass.\"}]}}"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "finish",
+   "session_id": "dm-1",
+   "attempt_id": "attempt-1",
+   "completed": true,
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "finish",
+   "session_id": "dm-1",
+   "attempt_id": "attempt-2",
+   "completed": false,
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "finish",
+   "session_id": "dm-1",
+   "attempt_id": "attempt-none",
+   "completed": true,
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 9,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "late"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Private provider attempt is already terminal"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-1",
+    "response_id": "response-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "thinking",
+    "payload": "First, "
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "inspection_index",
+   "session_id": "dm-1",
+   "outcome": {
+    "ok": [
+     {
+      "attempt_id": "attempt-1",
+      "response_id": "response-1",
+      "turn_id": "turn-1",
+      "basis_message_id": "message-1",
+      "source_order": 0,
+      "status": "completed",
+      "chunk_count": 2
+     },
+     {
+      "attempt_id": "attempt-2",
+      "response_id": "response-2",
+      "turn_id": "turn-1",
+      "basis_message_id": "message-1",
+      "source_order": 0,
+      "status": "interrupted",
+      "chunk_count": 1
+     }
+    ]
+   }
+  },
+  {
+   "op": "inspection_index",
+   "session_id": "chat-1",
+   "outcome": {
+    "ok": [
+     {
+      "attempt_id": "attempt-chat",
+      "response_id": "response-1",
+      "turn_id": "turn-1",
+      "basis_message_id": "message-1",
+      "source_order": 0,
+      "status": "partial",
+      "chunk_count": 1
+     }
+    ]
+   }
+  },
+  {
+   "op": "inspection_index",
+   "session_id": "missing-session",
+   "outcome": {
+    "ok": []
+   }
+  },
+  {
+   "op": "read_thinking",
+   "session_id": "dm-1",
+   "attempt_id": "attempt-1",
+   "response_id": "response-1",
+   "outcome": {
+    "ok": "First, then."
+   }
+  },
+  {
+   "op": "read_thinking",
+   "session_id": "dm-1",
+   "attempt_id": "attempt-2",
+   "response_id": "response-2",
+   "outcome": {
+    "ok": "Second."
+   }
+  },
+  {
+   "op": "read_thinking",
+   "session_id": "dm-1",
+   "attempt_id": "attempt-1",
+   "response_id": "response-9",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "provider_continuation",
+   "session_id": "dm-1",
+   "response_id": "response-1",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Native continuation identity is ambiguous"
+   }
+  },
+  {
+   "op": "provider_continuation",
+   "session_id": "dm-1",
+   "response_id": "response-2",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "provider_continuation",
+   "session_id": "dm-1",
+   "response_id": "response-1",
+   "provider_id": "openai",
+   "model_id": "other",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-5",
+    "response_id": "response-5",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{\"only\": 1}"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "provider_continuation",
+   "session_id": "dm-1",
+   "response_id": "response-5",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "ok": {
+     "only": 1
+    }
+   }
+  },
+  {
+   "op": "actor_context",
+   "session_id": "dm-1",
+   "context_id": "abababababababababababababababababababababababababababababababab",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "ok": {
+     "format": 1,
+     "context_id": "abababababababababababababababababababababababababababababababab",
+     "actor_id": "aki",
+     "messages": [
+      {
+       "role": "user",
+       "content": "Your turn."
+      },
+      {
+       "role": "assistant",
+       "content": "Pass."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "op": "actor_context",
+   "session_id": "dm-1",
+   "context_id": "abababababababababababababababababababababababababababababababab",
+   "provider_id": "openai",
+   "model_id": "other",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "actor_context",
+   "session_id": "dm-1",
+   "context_id": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "actor_context",
+   "session_id": "dm-1",
+   "context_id": "not-hex",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid actor context identity"
+   }
+  },
+  {
+   "op": "actor_context",
+   "session_id": "dm-1",
+   "context_id": "ABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABAB",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid actor context identity"
+   }
+  },
+  {
+   "op": "append",
+   "record": {
+    "session_id": "dm-1",
+    "attempt_id": "attempt-6",
+    "response_id": "actor-context-efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef-1",
+    "turn_id": "turn-1",
+    "basis_message_id": "message-1",
+    "source_order": 0,
+    "provider_id": "openai",
+    "model_id": "gpt-test",
+    "kind": "continuation",
+    "payload": "{\"actor_context\": {\"format\": 1, \"context_id\": \"efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef00\", \"actor_id\": \"aki\", \"messages\": []}}"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "op": "actor_context",
+   "session_id": "dm-1",
+   "context_id": "efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+   "provider_id": "openai",
+   "model_id": "gpt-test",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Actor context ownership is invalid"
+   }
+  }
+ ]
+}

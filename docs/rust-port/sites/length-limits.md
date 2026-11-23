@@ -72,9 +72,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `builder/_package_record_edits.py:34` | `_read_record` | len() against a limit | `if len(raw) > _RECORD_BYTE_LIMIT:` |  `sylvia-app` package_record_edit_vectors |
 | `builder/_package_snapshots.py:101` | `_source_selection` | len() against a limit | `if len(raw) > 65536:` | |
 | `builder/_plan_snapshot_materializer.py:168` | `_removed_paths` | len() against a limit | `or len(value) > _REMOVAL_COUNT_LIMIT` | |
-| `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` | |
-| `campaign/rift.py:406` | `materialize_rift_selection` | len() against a limit | `if len(companion_ids) > RIFT_RULESET_COMPANION_MAXIMUM or len(set(companion_ids)) != len(` | |
-| `campaign/rift.py:410` | `materialize_rift_selection` | len() against a limit | `if not isinstance(customization_notes, str) or len(customization_notes) > 4_000:` | |
+| `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` |  `sylvia-app` rift_vectors |
+| `campaign/rift.py:406` | `materialize_rift_selection` | len() against a limit | `if len(companion_ids) > RIFT_RULESET_COMPANION_MAXIMUM or len(set(companion_ids)) != len(` |  `sylvia-app` rift_vectors |
+| `campaign/rift.py:410` | `materialize_rift_selection` | len() against a limit | `if not isinstance(customization_notes, str) or len(customization_notes) > 4_000:` |  `sylvia-app` rift_vectors |
 | `domain/authority.py:652` | `mechanic_outcome_is_safe` | len() against a limit | `or not 2 <= len(choice.options) <= 16` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:653` | `mechanic_outcome_is_safe` | len() against a limit | `or len(choice.prompt.encode("utf-8")) > 4096` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:667` | `mechanic_outcome_is_safe` | len() against a limit | `or len(option.label.encode("utf-8")) > 1024` | `sylvia-domain` identity_vectors |
@@ -312,7 +312,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:2163` | `set_session_model_once_settings` | len() against a limit | `or len(session_id) > 512` | |
 | `provider/_claude_install.py:175` | `verify_manifest` | len() against a limit | `primary = {(fields[11] if len(fields) > 11 else fields[2]).upper() for fields in valid}` | `sylvia-provider` install_vectors |
 | `provider/_claude_runtime.py:379` | `ClaudeConnection._read` | len() against a limit | `if len(line.encode("utf-8")) > MAX_FRAME_BYTES or not line.endswith("\n"):` | `sylvia-provider` runtime_process |
-| `provider/_lifecycle.py:38` | `LifecycleTiming.record` | len() against a limit | `if len(self._spans) < 24:` | |
+| `provider/_lifecycle.py:38` | `LifecycleTiming.record` | len() against a limit | `if len(self._spans) < 24:` || `sylvia-provider` chatgpt_rules_vectors |
 | `provider/_openai_compat.py:644` | `_responses_service_tier` | len() against a limit | `if isinstance(value, str) and 0 < len(value) <= 32 and value.isascii():` | |
 | `provider/_openai_compat.py:855` | `OpenAICompatProvider._response_continuation_options` | len() against a limit | `and len(context_id) <= 256):` || yes |
 | `provider/_reasoning.py:41` | `reasoning_values` | len() against a limit | `or len(values) > 16` | |

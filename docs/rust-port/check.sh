@@ -25,6 +25,11 @@ echo "== tests"
 cargo test --workspace
 echo "== build"
 cargo build -p sylvia-owner -p sylvia-compare
+# Vector hooks (sylvia-engine's `vector-hooks`) are test tooling: the shipped owner must not
+# contain them, so its dependency graph without dev-dependencies must not enable the feature.
+if cargo tree -p sylvia-owner -e features,no-dev -i sylvia-engine | grep -q 'vector-hooks'; then
+  echo "sylvia-owner enables sylvia-engine's vector-hooks feature"; exit 1
+fi
 
 compare="target/debug/sylvia-compare$exe"
 owner="target/debug/sylvia-gm-owner$exe"

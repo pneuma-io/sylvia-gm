@@ -1,0 +1,6165 @@
+{
+ "python": "3.12.11",
+ "now": "2026-11-23T09:30:00.123456+00:00",
+ "isoformat": [
+  {
+   "text": "2026-11-23T09:30:00Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:30:00.1Z",
+   "parsed": "2026-11-23T09:30:00.100000+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:30:00.1234567Z",
+   "parsed": "2026-11-23T09:30:00.123456+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:30:00,5+01:00",
+   "parsed": "2026-11-23T09:30:00.500000+01:00",
+   "offset_micros": 3600000000
+  },
+  {
+   "text": "2026-11-23 09:30",
+   "parsed": "2026-11-23T09:30:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23T09",
+   "parsed": "2026-11-23T09:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23",
+   "parsed": "2026-11-23T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "20261123T093000Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-W48-1T09:00Z",
+   "parsed": "2026-11-23T09:00:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026W481T09:00Z",
+   "parsed": "2026-11-23T09:00:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026W48",
+   "parsed": "2026-11-23T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-W48",
+   "parsed": "2026-11-23T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-W48-7",
+   "parsed": "2026-11-29T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026W487",
+   "parsed": "2026-11-29T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-W53-1",
+   "parsed": "2026-12-28T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-W00-1",
+   "parsed": null
+  },
+  {
+   "text": "2026-W48-8",
+   "parsed": null
+  },
+  {
+   "text": "2020-W53-1",
+   "parsed": "2020-12-28T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2015-W53-7",
+   "parsed": "2016-01-03T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23T09:30:00+0130",
+   "parsed": "2026-11-23T09:30:00+01:30",
+   "offset_micros": 5400000000
+  },
+  {
+   "text": "2026-11-23T09:30:00+01:30:15.5",
+   "parsed": "2026-11-23T09:30:00+01:30:15.500000",
+   "offset_micros": 5415500000
+  },
+  {
+   "text": "2026-11-23T09:30:00-00:00",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:30:00-01:30:15.5",
+   "parsed": "2026-11-23T09:30:00-01:30:15.500000",
+   "offset_micros": -5415500000
+  },
+  {
+   "text": "2026-11-23x09:30Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T24:00:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00.12Z",
+   "parsed": "2026-11-23T09:30:00.120000+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T0930Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:3Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00 ",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00.123+01",
+   "parsed": "2026-11-23T09:30:00.123000+01:00",
+   "offset_micros": 3600000000
+  },
+  {
+   "text": "+2026-11-23T09:30Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00.000000000001Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-1-23T09:30Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:60Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00.",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00.Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23TZ",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30Z ",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30ZZ",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30+",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30+24:00",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30+23:59:59.999999",
+   "parsed": "2026-11-23T09:30:00+23:59:59.999999",
+   "offset_micros": 86399999999
+  },
+  {
+   "text": "2026-11-23T09:30-23:59",
+   "parsed": "2026-11-23T09:30:00-23:59",
+   "offset_micros": -86340000000
+  },
+  {
+   "text": "2026-02-29T00:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2024-02-29T00:00Z",
+   "parsed": "2024-02-29T00:00:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "0000-01-01T00:00Z",
+   "parsed": null
+  },
+  {
+   "text": "0001-01-01T00:00Z",
+   "parsed": "0001-01-01T00:00:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "9999-12-31T23:59:59.999999Z",
+   "parsed": "9999-12-31T23:59:59.999999+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-13-01T00:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-31T00:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00+01:3",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00+1",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00+01:30:",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T093000.5Z",
+   "parsed": "2026-11-23T09:30:00.500000+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:3000Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T0930:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09.5Z",
+   "parsed": "2026-11-23T09:00:00.500000+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:30.5Z",
+   "parsed": "2026-11-23T09:30:00.500000+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09,5",
+   "parsed": "2026-11-23T09:00:00.500000",
+   "offset_micros": null
+  },
+  {
+   "text": "20261123",
+   "parsed": "2026-11-23T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026112",
+   "parsed": null
+  },
+  {
+   "text": "202611",
+   "parsed": null
+  },
+  {
+   "text": "2026",
+   "parsed": null
+  },
+  {
+   "text": "",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00\u00e9",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23\u00e909:30",
+   "parsed": "2026-11-23T09:30:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23T09:30Z\u0000x",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T09:30:00.123456789+05:45",
+   "parsed": "2026-11-23T09:30:00.123456+05:45",
+   "offset_micros": 20700000000
+  },
+  {
+   "text": "2026-W48-1",
+   "parsed": "2026-11-23T00:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-W4",
+   "parsed": null
+  },
+  {
+   "text": "2026-W48-",
+   "parsed": null
+  },
+  {
+   "text": "2026-W48-1-",
+   "parsed": null
+  },
+  {
+   "text": "2026-W48T09",
+   "parsed": "2026-11-23T09:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026W48T09",
+   "parsed": "2026-11-23T09:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026W481T09",
+   "parsed": "2026-11-23T09:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026W4812",
+   "parsed": null
+  },
+  {
+   "text": "2026W48123",
+   "parsed": "2026-11-23T23:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23T09:30:00-05:00",
+   "parsed": "2026-11-23T09:30:00-05:00",
+   "offset_micros": -18000000000
+  },
+  {
+   "text": "2026-11-23T09:30:00+14:00",
+   "parsed": "2026-11-23T09:30:00+14:00",
+   "offset_micros": 50400000000
+  },
+  {
+   "text": "2026-11-23T09-05",
+   "parsed": "2026-11-23T09:00:00-05:00",
+   "offset_micros": -18000000000
+  },
+  {
+   "text": "2026-11-23T09+05",
+   "parsed": "2026-11-23T09:00:00+05:00",
+   "offset_micros": 18000000000
+  },
+  {
+   "text": "2026-11-23T09:30:00.1234",
+   "parsed": "2026-11-23T09:30:00.123400",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23T09:30:00,123456",
+   "parsed": "2026-11-23T09:30:00.123456",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23T9:30Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30:00.1+",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23\ud83d\ude0009:30Z",
+   "parsed": "2026-11-23T09:30:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "20261123\u00e90930",
+   "parsed": "2026-11-23T09:30:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-W48-1\u00e909",
+   "parsed": "2026-11-23T09:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026W481\u00e909:00",
+   "parsed": "2026-11-23T09:00:00",
+   "offset_micros": null
+  },
+  {
+   "text": "2026-11-23\u00e9",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T09:30\u00e9",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23\u00e9\u00e909:30",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T00:00Z",
+   "parsed": "2026-11-23T00:00:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T00:59Z",
+   "parsed": "2026-11-23T00:59:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T00:60Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T23:00Z",
+   "parsed": "2026-11-23T23:00:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T23:59Z",
+   "parsed": "2026-11-23T23:59:00+00:00",
+   "offset_micros": 0
+  },
+  {
+   "text": "2026-11-23T23:60Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T24:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T24:59Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T24:60Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T99:00Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T99:59Z",
+   "parsed": null
+  },
+  {
+   "text": "2026-11-23T99:60Z",
+   "parsed": null
+  }
+ ],
+ "facts": [
+  {
+   "name": "no-catalog",
+   "content": null,
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "fresh",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+    }
+   }
+  },
+  {
+   "name": "utf16",
+   "content": "fffe7b00220063006c00690065006e0074005f00760065007200730069006f006e0022003a002000220030002e00390039002e00300022002c002000220066006500740063006800650064005f006100740022003a002000220032003000320036002d00310031002d00320033005400300039003a00330030003a00300030002e003100320033003400350036002b00300030003a003000300022002c00200022006d006f00640065006c00730022003a0020005b007b00220073006c007500670022003a00200022006700700074002d0036002d0073006f006c0022002c002000220063006f006e0074006500780074005f00770069006e0064006f00770022003a0020003400300030003000300030002c00200022006500660066006500630074006900760065005f0063006f006e0074006500780074005f00770069006e0064006f0077005f00700065007200630065006e00740022003a002000390035007d005d007d00",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+    }
+   }
+  },
+  {
+   "name": "a-minute-ahead",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:34:00+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:34:00+00:00"
+    }
+   }
+  },
+  {
+   "name": "five-minutes-ahead",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:35:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:35:00.123456+00:00"
+    }
+   }
+  },
+  {
+   "name": "over-five-minutes-ahead",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:35:00.123457+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "a-day-old",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-22T09:30:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-22T09:30:00.123456+00:00"
+    }
+   }
+  },
+  {
+   "name": "over-a-day-old",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-22T09:30:00.123455+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "offset",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T11:30:00+02:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T11:30:00+02:00"
+    }
+   }
+  },
+  {
+   "name": "naive",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:30:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "week-date",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-W48-1T09:30Z\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 380000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:30:00+00:00"
+    }
+   }
+  },
+  {
+   "name": "bad-date",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"yesterday\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "date-not-text",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": 5, \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "no-date",
+   "content": "{\"client_version\": \"1\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "no-version",
+   "content": "{\"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "version-not-text",
+   "content": "{\"client_version\": 1, \"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "not-a-dict",
+   "content": "[1]",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "models-not-list",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": {\"a\": 1}}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "rows",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": [5, {\"slug\": \"other\", \"context_window\": 1, \"effective_context_window_percent\": 1}, {\"slug\": \"gpt-6-luna\", \"context_window\": 1000, \"effective_context_window_percent\": 33}, {\"slug\": \"codex-mini\", \"context_window\": 1, \"effective_context_window_percent\": 50}, {\"slug\": \"gpt-6-sol\", \"context_window\": true, \"effective_context_window_percent\": 95}, {\"slug\": \"gpt-6-sol\", \"context_window\": 10000001, \"effective_context_window_percent\": 95}, {\"slug\": \"gpt-6-sol\", \"context_window\": 400000.0, \"effective_context_window_percent\": 95}, {\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 101}, {\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 50}, {\"slug\": 7, \"context_window\": 400000, \"effective_context_window_percent\": 50}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+     "runtime_context_window": 330,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+     "runtime_context_window": 200000,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+    }
+   }
+  },
+  {
+   "name": "unhashable-slug",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-luna\", \"context_window\": 1000, \"effective_context_window_percent\": 50}, {\"slug\": [\"x\"], \"context_window\": 1, \"effective_context_window_percent\": 1}, {\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+     "runtime_context_window": 500,
+     "runtime_context_source": "model_catalog",
+     "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "not-json",
+   "content": "{nope",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "too-large",
+   "content": "@too-large",
+   "ids": [
+    "gpt-6-sol",
+    "gpt-6-luna",
+    "codex-mini"
+   ],
+   "facts": {
+    "gpt-6-luna": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+    },
+    "gpt-6-sol": {
+     "output_reference_tokens": 128000,
+     "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+    }
+   }
+  },
+  {
+   "name": "empty-ids",
+   "content": "{\"client_version\": \"0.99.0\", \"fetched_at\": \"2026-11-23T09:30:00.123456+00:00\", \"models\": [{\"slug\": \"gpt-6-sol\", \"context_window\": 400000, \"effective_context_window_percent\": 95}]}",
+   "ids": [],
+   "facts": {}
+  }
+ ],
+ "accounts": [
+  {
+   "name": "status-signed-out",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "status-signed-in",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com"
+     }
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "status-odd-account",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "apiKey"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": "x"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": 5
+      }
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "status",
+    "status",
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    },
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-completes",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": [
+      {
+       "method": "account/login/completed",
+       "params": {
+        "loginId": "L1",
+        "success": true
+       }
+      }
+     ]
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    },
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com"
+     }
+    }
+   ],
+   "changes": 2,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-pending-then-fails",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": [
+      {
+       "method": "account/login/completed",
+       "params": {
+        "loginId": "L1",
+        "success": false
+       }
+      }
+     ]
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "status",
+    "status",
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": true,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": true,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": true,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 5,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "completion-for-another-login",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": [
+      {
+       "method": "account/login/completed",
+       "params": {
+        "loginId": "L9",
+        "success": true
+       }
+      },
+      {
+       "method": "account/login/completed",
+       "params": {
+        "loginId": "L1",
+        "success": false
+       }
+      }
+     ]
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": true,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "changes": 2,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "odd-notifications",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": [
+      {
+       "method": "account/login/completed",
+       "params": "x"
+      },
+      {
+       "method": "other",
+       "params": {
+        "loginId": "L1"
+       }
+      },
+      {
+       "method": "account/login/completed"
+      }
+     ]
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "status"
+   ],
+   "results": [
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": true,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-twice",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    },
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L2",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "begin_login"
+   ],
+   "results": [
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    },
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    }
+   ],
+   "changes": 2,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    },
+    {
+     "id": 4,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-http-link",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "http://auth.openai.com/x"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "cancel_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    },
+    {
+     "value": {
+      "login_pending": false
+     }
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-other-host",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://evil.example/x"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    }
+   ],
+   "ops": [
+    "begin_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-user-info",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://a@auth.openai.com/x"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    }
+   ],
+   "ops": [
+    "begin_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-port",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.chatgpt.com:8443/x"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    },
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://AUTH.CHATGPT.COM:443/x"
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "begin_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    },
+    {
+     "value": {
+      "auth_url": "https://AUTH.CHATGPT.COM:443/x",
+      "login_pending": true
+     }
+    }
+   ],
+   "changes": 2,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    },
+    {
+     "id": 4,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-bad-port",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com:99999/x"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    }
+   ],
+   "ops": [
+    "begin_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-no-id",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    }
+   ]
+  },
+  {
+   "name": "login-wrong-type",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "apiKey",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    }
+   ],
+   "ops": [
+    "begin_login"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported sign-in link."
+     ]
+    }
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    }
+   ]
+  },
+  {
+   "name": "cancel-without-login",
+   "steps": [],
+   "ops": [
+    "cancel_login"
+   ],
+   "results": [
+    {
+     "value": {
+      "login_pending": false
+     }
+    }
+   ],
+   "changes": 0,
+   "log": []
+  },
+  {
+   "name": "logout",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    },
+    {
+     "method": "account/logout",
+     "result": {}
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "begin_login",
+    "logout"
+   ],
+   "results": [
+    {
+     "value": {
+      "auth_url": "https://auth.openai.com/oauth/authorize?x=1",
+      "login_pending": true
+     }
+    },
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "changes": 2,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    },
+    {
+     "id": 4,
+     "method": "account/logout",
+     "params": {}
+    },
+    {
+     "id": 5,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "models",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": "c1"
+     }
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "odd",
+        "inputModalities": "text",
+        "displayName": null
+       },
+       "not-a-dict",
+       {
+        "displayName": "no id"
+       },
+       {
+        "model": 5
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "ops": [
+    "models"
+   ],
+   "catalog": {
+    "client_version": "0.99.0",
+    "fetched_at": "2026-11-23T09:30:00.123456+00:00",
+    "models": [
+     {
+      "slug": "gpt-6-sol",
+      "context_window": 400000,
+      "effective_context_window_percent": 95
+     },
+     {
+      "slug": "image-only",
+      "context_window": 1000,
+      "effective_context_window_percent": 90
+     }
+    ]
+   },
+   "results": [
+    {
+     "value": [
+      {
+       "id": "gpt-6-sol",
+       "name": "GPT-6 Sol",
+       "verified": false,
+       "unavailable_reason": null,
+       "supported_reasoning_efforts": [
+        "low",
+        "high"
+       ],
+       "default_reasoning_effort": "high",
+       "service_tiers": [
+        {
+         "id": "fast",
+         "name": "Fast",
+         "description": "Quicker."
+        },
+        {
+         "id": "flex",
+         "name": "Flex",
+         "description": ""
+        }
+       ],
+       "output_reference_tokens": 128000,
+       "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+       "runtime_context_window": 380000,
+       "runtime_context_source": "model_catalog",
+       "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+      },
+      {
+       "id": "gpt-6-luna",
+       "name": "gpt-6-luna",
+       "verified": false,
+       "unavailable_reason": null,
+       "supported_reasoning_efforts": [],
+       "default_reasoning_effort": null,
+       "service_tiers": [],
+       "output_reference_tokens": 128000,
+       "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+      },
+      {
+       "id": "image-only",
+       "name": "image-only",
+       "verified": false,
+       "unavailable_reason": "This model does not advertise text input.",
+       "supported_reasoning_efforts": [],
+       "default_reasoning_effort": null,
+       "service_tiers": [],
+       "runtime_context_window": 900,
+       "runtime_context_source": "model_catalog",
+       "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+      },
+      {
+       "id": "odd",
+       "name": null,
+       "verified": false,
+       "unavailable_reason": "This model does not advertise text input.",
+       "supported_reasoning_efforts": [],
+       "default_reasoning_effort": null,
+       "service_tiers": []
+      }
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": "c1",
+      "limit": 100
+     }
+    }
+   ]
+  },
+  {
+   "name": "models-signed-out",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "ops": [
+    "models"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "Sign in to ChatGPT before finding subscription models."
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "models-bad-list",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": {}
+     }
+    }
+   ],
+   "ops": [
+    "models"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported model list."
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ]
+  },
+  {
+   "name": "models-cursor-repeats",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [],
+      "nextCursor": "c1"
+     }
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [],
+      "nextCursor": "c1"
+     }
+    }
+   ],
+   "ops": [
+    "models"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime did not finish listing models."
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": "c1",
+      "limit": 100
+     }
+    }
+   ]
+  },
+  {
+   "name": "models-cursor-not-text",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [],
+      "nextCursor": 5
+     }
+    }
+   ],
+   "ops": [
+    "models"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime did not finish listing models."
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ]
+  },
+  {
+   "name": "runtime-rejects",
+   "steps": [
+    {
+     "method": "account/read",
+     "error": {
+      "code": 1,
+      "message": "no"
+     }
+    }
+   ],
+   "ops": [
+    "status"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime rejected this operation. Check sign-in and runtime compatibility."
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  },
+  {
+   "name": "unsupported-reply",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": [
+      1
+     ]
+    }
+   ],
+   "ops": [
+    "status"
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The Codex runtime returned an unsupported reply."
+     ]
+    }
+   ],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ]
+  }
+ ],
+ "settings": [
+  {
+   "name": "unknown-action",
+   "steps": [],
+   "calls": [
+    [
+     "delete",
+     null
+    ],
+    [
+     5,
+     null
+    ]
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "This ChatGPT connection action is unavailable."
+     ]
+    },
+    {
+     "error": [
+      "CodexConnectionError",
+      "This ChatGPT connection action is unavailable."
+     ]
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [],
+   "config": null
+  },
+  {
+   "name": "status",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    }
+   ],
+   "calls": [
+    [
+     "status",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com"
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "login",
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    }
+   ],
+   "calls": [
+    [
+     "login",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "login_pending": true,
+      "signed_in": false
+     }
+    }
+   ],
+   "opened": [
+    "https://auth.openai.com/oauth/authorize?x=1"
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "login-browser-fails",
+   "browser": false,
+   "steps": [
+    {
+     "method": "account/login/start",
+     "result": {
+      "type": "chatgpt",
+      "loginId": "L1",
+      "authUrl": "https://auth.openai.com/oauth/authorize?x=1"
+     },
+     "notify": []
+    },
+    {
+     "method": "account/login/cancel",
+     "result": {}
+    }
+   ],
+   "calls": [
+    [
+     "login",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "The sign-in browser could not open. Check your default browser."
+     ]
+    }
+   ],
+   "opened": [
+    "https://auth.openai.com/oauth/authorize?x=1"
+   ],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/login/start",
+     "params": {
+      "type": "chatgpt"
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/login/cancel",
+     "params": {
+      "loginId": "L1"
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "cancel",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "calls": [
+    [
+     "cancel",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "logout",
+   "steps": [
+    {
+     "method": "account/logout",
+     "result": {}
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": null
+     },
+     "notify": []
+    }
+   ],
+   "calls": [
+    [
+     "logout",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": false,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": null,
+      "email": null
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 1,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/logout",
+     "params": {}
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "models",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "models",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": false,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ]
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "add-model",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "catalog": {
+    "client_version": "0.99.0",
+    "fetched_at": "2026-11-23T09:30:00.123456+00:00",
+    "models": [
+     {
+      "slug": "gpt-6-sol",
+      "context_window": 400000,
+      "effective_context_window_percent": 95
+     }
+    ]
+   },
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": false,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+        "runtime_context_window": 380000,
+        "runtime_context_source": "model_catalog",
+        "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: null\n      declared_context_source: unknown\n      runtime_context_window: 380000\n      runtime_context_source: model_catalog\n      configured_context_window: null\n      effective_context_window: 380000\n      effective_context_source: model_catalog\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      configured_context_observed_at: null\n      context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 380000\n      context_window_source: model_catalog\n      max_output_tokens: 128000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: null\n      output_allowance_source: provider_metadata\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  },
+  {
+   "name": "add-model-capacities",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": 200000,
+      "max_output_tokens": 64000
+     }
+    ],
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": 511,
+      "max_output_tokens": null
+     }
+    ],
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": 10000001
+     }
+    ],
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": 300000.0,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": false,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    },
+    {
+     "error": [
+      "CodexConnectionError",
+      "Enter positive token capacities, with room for input as well as the reply."
+     ]
+    },
+    {
+     "error": [
+      "CodexConnectionError",
+      "Enter positive token capacities, with room for input as well as the reply."
+     ]
+    },
+    {
+     "error": [
+      "CodexConnectionError",
+      "Enter positive token capacities, with room for input as well as the reply."
+     ]
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 5,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 6,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 7,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 8,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 9,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 10,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 11,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 12,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 13,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: null\n      declared_context_source: unknown\n      runtime_context_window: null\n      runtime_context_source: unknown\n      configured_context_window: 200000\n      effective_context_window: 200000\n      effective_context_source: user_configured\n      declared_context_observed_at: null\n      runtime_context_observed_at: null\n      configured_context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      context_observed_at: null\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 200000\n      context_window_source: user_configured\n      max_output_tokens: 64000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: 64000\n      output_allowance_source: user_configured\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  },
+  {
+   "name": "add-model-refused",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol"
+     }
+    ],
+    [
+     "add_model",
+     {
+      "id": "nope",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ],
+    [
+     "add_model",
+     {
+      "id": "image-only",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "results": [
+    {
+     "error": [
+      "CodexConnectionError",
+      "Choose a model and supply its capacity settings."
+     ]
+    },
+    {
+     "error": [
+      "CodexConnectionError",
+      "This model is not advertised for this ChatGPT connection."
+     ]
+    },
+    {
+     "error": [
+      "CodexConnectionError",
+      "This model does not advertise text input."
+     ]
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 5,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 6,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 7,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 8,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 9,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 10,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": null
+  },
+  {
+   "name": "add-then-refresh",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ],
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": 100000,
+      "max_output_tokens": null
+     }
+    ],
+    [
+     "models",
+     null
+    ]
+   ],
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": false,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    },
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": false,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    },
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": true,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       }
+      ]
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 5,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 6,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 7,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    },
+    {
+     "id": 8,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 9,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 10,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: null\n      declared_context_source: unknown\n      runtime_context_window: null\n      runtime_context_source: unknown\n      configured_context_window: 100000\n      effective_context_window: 100000\n      effective_context_source: user_configured\n      declared_context_observed_at: null\n      runtime_context_observed_at: null\n      configured_context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      context_observed_at: null\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 100000\n      context_window_source: user_configured\n      max_output_tokens: 128000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: null\n      output_allowance_source: provider_metadata\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers: []\n"
+  },
+  {
+   "name": "prior-reported-window",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "catalog": {
+    "client_version": "0.99.0",
+    "fetched_at": "2026-11-23T09:30:00.123456+00:00",
+    "models": [
+     {
+      "slug": "gpt-6-sol",
+      "context_window": 400000,
+      "effective_context_window_percent": 95
+     }
+    ]
+   },
+   "seed": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 250000\n      runtime_context_source: runtime_reported\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      declared_max_output_tokens: 100000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      service_tiers: []\n",
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": true,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+        "runtime_context_window": 380000,
+        "runtime_context_source": "model_catalog",
+        "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 250000\n      runtime_context_source: runtime_reported\n      configured_context_window: null\n      effective_context_window: 250000\n      effective_context_source: runtime_reported\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      configured_context_observed_at: null\n      context_observed_at: '2026-11-20T08:00:00+00:00'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 250000\n      context_window_source: runtime_reported\n      max_output_tokens: 128000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: null\n      output_allowance_source: provider_metadata\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  },
+  {
+   "name": "prior-catalog-window",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "seed": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 250000\n      runtime_context_source: model_catalog\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      declared_max_output_tokens: 100000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      service_tiers: []\n",
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": true,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 250000\n      runtime_context_source: model_catalog\n      configured_context_window: null\n      effective_context_window: 250000\n      effective_context_source: model_catalog\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      configured_context_observed_at: null\n      context_observed_at: '2026-11-20T08:00:00+00:00'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 250000\n      context_window_source: model_catalog\n      max_output_tokens: 128000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: null\n      output_allowance_source: provider_metadata\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  },
+  {
+   "name": "prior-smaller-catalog-window",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "catalog": {
+    "client_version": "0.99.0",
+    "fetched_at": "2026-11-23T09:30:00.123456+00:00",
+    "models": [
+     {
+      "slug": "gpt-6-sol",
+      "context_window": 400000,
+      "effective_context_window_percent": 95
+     }
+    ]
+   },
+   "seed": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 250000\n      runtime_context_source: model_catalog\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      declared_max_output_tokens: 100000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      service_tiers: []\n",
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": true,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+        "runtime_context_window": 380000,
+        "runtime_context_source": "model_catalog",
+        "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 380000\n      runtime_context_source: model_catalog\n      configured_context_window: null\n      effective_context_window: 380000\n      effective_context_source: model_catalog\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      configured_context_observed_at: null\n      context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 380000\n      context_window_source: model_catalog\n      max_output_tokens: 128000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: null\n      output_allowance_source: provider_metadata\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  },
+  {
+   "name": "prior-larger-window",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "add_model",
+     {
+      "id": "gpt-6-sol",
+      "context_window": null,
+      "max_output_tokens": null
+     }
+    ]
+   ],
+   "catalog": {
+    "client_version": "0.99.0",
+    "fetched_at": "2026-11-23T09:30:00.123456+00:00",
+    "models": [
+     {
+      "slug": "gpt-6-sol",
+      "context_window": 400000,
+      "effective_context_window_percent": 95
+     }
+    ]
+   },
+   "seed": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 500000\n      runtime_context_source: runtime_reported\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      declared_max_output_tokens: 100000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      service_tiers: []\n",
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": true,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol",
+        "runtime_context_window": 380000,
+        "runtime_context_source": "model_catalog",
+        "runtime_context_observed_at": "2026-11-23T09:30:00.123456+00:00"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ],
+      "saved_model": "chatgpt-subscription/gpt-6-sol"
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: 380000\n      runtime_context_source: model_catalog\n      configured_context_window: null\n      effective_context_window: 380000\n      effective_context_source: model_catalog\n      declared_context_observed_at: null\n      runtime_context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      configured_context_observed_at: null\n      context_observed_at: '2026-11-23T09:30:00.123456+00:00'\n      configured_runtime_mismatch: false\n      configured_declared_mismatch: false\n      context_window: 380000\n      context_window_source: model_catalog\n      max_output_tokens: 128000\n      declared_max_output_tokens: 128000\n      configured_output_tokens: null\n      output_allowance_source: provider_metadata\n      documented_source: null\n      documented_at: null\n      builder_output_tokens: 32000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  },
+  {
+   "name": "refresh-legacy",
+   "steps": [
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "account/read",
+     "result": {
+      "account": {
+       "type": "chatgpt",
+       "planType": "plus",
+       "email": "player@example.com",
+       "token": "secret"
+      }
+     },
+     "notify": []
+    },
+    {
+     "method": "model/list",
+     "result": {
+      "data": [
+       {
+        "model": "gpt-6-sol",
+        "displayName": "GPT-6 Sol",
+        "supportedReasoningEfforts": [
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": "high"
+         },
+         {
+          "reasoningEffort": "low"
+         },
+         {
+          "reasoningEffort": ""
+         },
+         {
+          "x": 1
+         },
+         "medium"
+        ],
+        "defaultReasoningEffort": "high",
+        "serviceTiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex"
+         },
+         {
+          "id": "",
+          "name": "x"
+         },
+         {
+          "id": "y"
+         },
+         5
+        ],
+        "inputModalities": [
+         "text",
+         "image"
+        ]
+       },
+       {
+        "model": "gpt-6-luna",
+        "defaultReasoningEffort": "max",
+        "supportedReasoningEfforts": "low"
+       },
+       {
+        "model": "image-only",
+        "inputModalities": [
+         "image"
+        ]
+       }
+      ],
+      "nextCursor": null
+     }
+    }
+   ],
+   "calls": [
+    [
+     "models",
+     null
+    ]
+   ],
+   "seed": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: null\n      runtime_context_source: unknown\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      declared_max_output_tokens: 100000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n",
+   "results": [
+    {
+     "value": {
+      "signed_in": true,
+      "login_pending": false,
+      "login_failed": false,
+      "plan_type": "plus",
+      "email": "player@example.com",
+      "saved_models_refreshed": true,
+      "models": [
+       {
+        "id": "gpt-6-sol",
+        "name": "GPT-6 Sol",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [
+         "low",
+         "high"
+        ],
+        "default_reasoning_effort": "high",
+        "service_tiers": [
+         {
+          "id": "fast",
+          "name": "Fast",
+          "description": "Quicker."
+         },
+         {
+          "id": "flex",
+          "name": "Flex",
+          "description": ""
+         }
+        ],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-sol"
+       },
+       {
+        "id": "gpt-6-luna",
+        "name": "gpt-6-luna",
+        "verified": false,
+        "unavailable_reason": null,
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": [],
+        "output_reference_tokens": 128000,
+        "output_reference_source": "https://developers.openai.com/api/docs/models/gpt-6-luna"
+       },
+       {
+        "id": "image-only",
+        "name": "image-only",
+        "verified": false,
+        "unavailable_reason": "This model does not advertise text input.",
+        "supported_reasoning_efforts": [],
+        "default_reasoning_effort": null,
+        "service_tiers": []
+       }
+      ]
+     }
+    }
+   ],
+   "opened": [],
+   "changes": 0,
+   "log": [
+    {
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "capabilities": {
+       "experimentalApi": true
+      },
+      "clientInfo": {
+       "name": "sylvia_gm",
+       "title": "Sylvia GM",
+       "version": "0.3.0"
+      }
+     }
+    },
+    {
+     "method": "initialized"
+    },
+    {
+     "id": 2,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 3,
+     "method": "account/read",
+     "params": {
+      "refreshToken": false
+     }
+    },
+    {
+     "id": 4,
+     "method": "model/list",
+     "params": {
+      "cursor": null,
+      "limit": 100
+     }
+    }
+   ],
+   "config": "providers:\n  chatgpt_subscription:\n    enabled: true\n    preset_id: chatgpt_subscription\n    mode: subscription\n    name: ChatGPT subscription\n    base_url: https://chatgpt.com\n    api_key: ''\n    headers: {}\n    models:\n    - id: gpt-6-sol\n      name: GPT-6 Sol (ChatGPT)\n      declared_context_window: 1050000\n      declared_context_source: model_catalog\n      runtime_context_window: null\n      runtime_context_source: unknown\n      runtime_context_observed_at: '2026-11-20T08:00:00+00:00'\n      declared_max_output_tokens: 100000\n      transport: codex_app_server\n      supports_streaming: true\n      supports_tools: true\n      supported_reasoning_efforts:\n      - low\n      - high\n      default_reasoning_effort: high\n      service_tiers:\n      - id: fast\n        name: Fast\n        description: Quicker.\n      - id: flex\n        name: Flex\n        description: ''\n"
+  }
+ ]
+}
