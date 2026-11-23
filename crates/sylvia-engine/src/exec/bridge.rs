@@ -102,6 +102,35 @@ pub trait StateBridge {
     fn combat_mut(&mut self) -> &mut Dict;
     /// `combat_state`, read only.
     fn combat(&self) -> &Dict;
+
+    /// `hasattr(bridge, "spatial_snapshot")`: whether this bridge owns spatial scenes.
+    fn supports_spatial(&self) -> bool {
+        false
+    }
+    /// `spatial_snapshot(scene_path)`.
+    fn spatial_snapshot(&mut self, _scene_path: &str) -> Result<Value, ExecError> {
+        Err(ExecError::Python { class: "AttributeError", message: "spatial_snapshot".into() })
+    }
+    /// `spatial_query(scene_path, operation=..., query=..., snapshot=...)`.
+    fn spatial_query(
+        &mut self,
+        _scene_path: &str,
+        _operation: &str,
+        _query: &Value,
+        _snapshot: &Value,
+    ) -> Result<Value, ExecError> {
+        Err(ExecError::Python { class: "AttributeError", message: "spatial_query".into() })
+    }
+    /// `spatial_mutation(scene_path, request)`.
+    fn spatial_mutation(&mut self, _scene_path: &str, _request: &Value) -> Result<Value, ExecError> {
+        Err(ExecError::Python { class: "AttributeError", message: "spatial_mutation".into() })
+    }
+    /// `register_spatial_private_variable(name)`.
+    fn register_spatial_private_variable(&mut self, _name: &str) {}
+    /// `register_state_parameter(name, source)`.
+    fn register_state_parameter(&mut self, _name: &str, _source: &str) {}
+    /// `register_spatial_aggregate(name, source)`.
+    fn register_spatial_aggregate(&mut self, _name: &str, _source: &Value) {}
 }
 
 /// `_mutable_json(value)`: mappings to `dict` with `str` keys, sequences to `list`, the rest
@@ -206,11 +235,11 @@ pub fn nested_set(value: &mut Dict, path: &str, replacement: Value) -> Result<()
     Ok(())
 }
 
-/// `AuthorityMemoryStateBridge(namespace, authority_state, participants)` without its spatial
-/// part.
-#[derive(Debug, Clone)]
+/// `AuthorityMemoryStateBridge(namespace, authority_state, participants)`.
+#[derive(Debug)]
 pub struct MemoryStateBridge {
     pub namespace: String,
+    spatial: super::spatial_bridge::SpatialBridge,
     state: Dict,
     entities: Dict,
     combat: Dict,
@@ -249,6 +278,7 @@ impl MemoryStateBridge {
         };
         Ok(Self {
             namespace: namespace.to_owned(),
+            spatial: super::spatial_bridge::SpatialBridge::default(),
             before_state: state.clone(),
             before_entities: entities.clone(),
             before_combat: combat.clone(),
@@ -278,6 +308,22 @@ impl MemoryStateBridge {
             Some(Value::Dict(map)) => Ok(Arc::make_mut(map)),
             _ => Err(ExecError::key_error(entity_id)),
         }
+    }
+
+    /// The spatial part: open engines, snapshots, evidence and private variables.
+    pub fn spatial(&self) -> &super::spatial_bridge::SpatialBridge {
+        &self.spatial
+    }
+
+    /// The spatial part, for a bridge that reads scenes through another view.
+    pub fn spatial_mut(&mut self) -> &mut super::spatial_bridge::SpatialBridge {
+        &mut self.spatial
+    }
+
+    /// `_spatial_engine(scene_path)`'s read: the scene's field in package state, as a mapping.
+    pub fn scene_at(&self, scene_path: &str) -> Result<Json, ExecError> {
+        let field = super::spatial_bridge::scene_field(scene_path)?;
+        super::spatial_bridge::scene_value(&self.read_field("state", field)?)
     }
 
     /// `mutations()`: each changed root as one `StateMutation`, in state, entities, combat order.
@@ -443,5 +489,63 @@ impl StateBridge for MemoryStateBridge {
 
     fn combat(&self) -> &Dict {
         &self.combat
+    }
+
+    fn supports_spatial(&self) -> bool {
+        true
+    }
+
+    fn spatial_snapshot(&mut self, scene_path: &str) -> Result<Value, ExecError> {
+        let scene = self.scene_at(scene_path)?;
+        Ok(Value::from_json(&self.spatial.snapshot(scene_path, &scene)?))
+    }
+
+    fn spatial_query(
+        &mut self,
+        scene_path: &str,
+        operation: &str,
+        query: &Value,
+        snapshot: &Value,
+    ) -> Result<Value, ExecError> {
+        let Value::Dict(_) = query else {
+            return Err(ExecError::package_runtime("Spatial query input must be an object"));
+        };
+        let query = super::spatial_bridge::input_json(query)?;
+        let scene = self.scene_at(scene_path)?;
+        let Json::Object(query) = query else { unreachable!("a dict") };
+        // Python checks the snapshot reference after opening the scene's engine.
+        let snapshot = match snapshot {
+            Value::None => Json::Null,
+            Value::Dict(_) => super::spatial_bridge::input_json(snapshot)?,
+            _ => {
+                self.spatial.engine(scene_path, &scene)?;
+                return Err(ExecError::package_runtime("Spatial snapshot reference is invalid"));
+            }
+        };
+        Ok(Value::from_json(&self.spatial.query(scene_path, &scene, operation, &query, &snapshot)?))
+    }
+
+    fn spatial_mutation(&mut self, scene_path: &str, request: &Value) -> Result<Value, ExecError> {
+        let Value::Dict(_) = request else {
+            return Err(ExecError::package_runtime("Spatial mutation input must be an object"));
+        };
+        let request = super::spatial_bridge::input_json(request)?;
+        let scene = self.scene_at(scene_path)?;
+        let (advanced, result) = self.spatial.mutation(scene_path, &scene, &request)?;
+        let field = scene_path.strip_prefix("state.").unwrap_or(scene_path);
+        self.write_field("state", field, Value::from_json(&Json::Object(advanced)))?;
+        Ok(Value::from_json(&result))
+    }
+
+    fn register_spatial_private_variable(&mut self, name: &str) {
+        self.spatial.register_private(name);
+    }
+
+    fn register_state_parameter(&mut self, name: &str, source: &str) {
+        self.spatial.register_state_parameter(name, source);
+    }
+
+    fn register_spatial_aggregate(&mut self, name: &str, source: &Value) {
+        self.spatial.register_aggregate(name, source);
     }
 }

@@ -526,7 +526,8 @@ pub(crate) fn handle_for_each(
     loop {
         list = ctx.current_list(&list);
         let Some(item) = list.get(index).cloned() else { break };
-        ctx.vars.insert(name.clone(), item);
+        ctx.vars.insert(name.clone(), item.clone());
+        super::effects::protect_spatial_aggregate(&name, &get(map, "collection", text("")), &item, ctx);
         for effect in &effects {
             execute_effect(effect, ctx, host)?;
         }
@@ -670,7 +671,10 @@ pub(crate) fn handle_list_push(
     let mut grown = (*list).clone();
     grown.push(value);
     let list = if live { ctx.replace_list(&list, grown) } else { Arc::new(grown) };
-    ctx.vars.insert(store_as, Value::List(list));
+    ctx.vars.insert(store_as.clone(), Value::List(list.clone()));
+    let source =
+        Value::list(vec![Value::str(list_ref.as_str()), map.get("value").cloned().unwrap_or(Value::None)]);
+    super::effects::protect_spatial_aggregate(&store_as, &source, &Value::List(list), ctx);
     Ok(())
 }
 
@@ -690,8 +694,9 @@ pub(crate) fn handle_list_pop(
         return Ok(());
     };
     let list = if live { ctx.replace_list(&list, shrunk) } else { Arc::new(shrunk) };
-    ctx.vars.insert(list_ref, Value::List(list));
-    ctx.vars.insert(store_as, value);
+    ctx.vars.insert(list_ref.clone(), Value::List(list));
+    ctx.vars.insert(store_as.clone(), value.clone());
+    super::effects::protect_spatial_aggregate(&store_as, &Value::str(list_ref.as_str()), &value, ctx);
     Ok(())
 }
 
