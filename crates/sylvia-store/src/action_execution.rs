@@ -1,11 +1,6 @@
 //! The store reads and writes an action's execution makes before its commit, from
 //! `sqlite_authority.py`: `action_basis`, `declared_package_tool`, `mechanic_mutations_are_owned`,
-//! `bind_transport_alias`, and the pending-choice lookups `pending_mechanics_hit` and
-//! `pending_mechanics_action` as far as a plain commit needs them.
-//!
-//! A pending mechanics choice is only compared by its action and payload identity here. Reading
-//! the whole pending request (`_pending_from_row`) comes with choice resolution, so an execution
-//! that would answer with an awaiting-choice receipt is refused as [`StoreError::NotPorted`].
+//! and `bind_transport_alias`. The pending mechanics choices are [`crate::mechanics_choices`].
 
 use crate::actions::{load_payload, owner_for_mutation, rejected, MutationActor};
 use crate::campaigns::{named_rows, Named};
@@ -19,9 +14,6 @@ use sylvia_domain::authority::{
 };
 use sylvia_domain::package_library::ToolDeclaration;
 
-/// Choice resolution is not ported yet.
-const CHOICE_PENDING: &str = "an awaiting mechanics choice (choice resolution, T3 step 2)";
-
 /// `ActionBasis`: what an action is admitted against.
 #[derive(Debug, Clone, PartialEq)]
 pub struct ActionBasis {
@@ -32,25 +24,8 @@ pub struct ActionBasis {
     pub participants: Vec<Participant>,
 }
 
-/// What a campaign's pending mechanics choice says about one command.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum PendingChoice {
-    /// No choice is pending for the campaign.
-    None,
-    /// The pending choice is this command's own action with the same payload.
-    SameAction,
-    /// Another action is awaiting its choice.
-    Other,
-}
-
 fn idempotency_conflict(message: &str) -> StoreError {
     StoreError::Coded(authority_coded("IdempotencyConflict", message))
-}
-
-fn table_exists(connection: &rusqlite::Connection, name: &str) -> StoreResult<bool> {
-    Ok(!named_rows(connection, "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", &[&name])?
-        .1
-        .is_empty())
 }
 
 fn receipt(campaign_id: &str, action_id: &str, row: &Named<'_>) -> StoreResult<ActionReceipt> {
@@ -155,64 +130,6 @@ impl AuthorityStore {
             }
         }
         Ok(true)
-    }
-
-    /// The pending mechanics choice's alias for one transport key (`pending_mechanics_hit`):
-    /// refused as not ported when it exists, since its answer is an awaiting-choice receipt; an
-    /// alias whose payload differs is the conflict Python raises first.
-    pub fn pending_mechanics_alias(
-        &self,
-        campaign_id: &str,
-        idempotency_key: &str,
-        payload_hash: &str,
-    ) -> StoreResult<()> {
-        let connection = self.connect_read_only()?;
-        if !table_exists(&connection, "pending_mechanics_action_aliases")? {
-            return Ok(());
-        }
-        let found = named_rows(
-            &connection,
-            "SELECT alias.payload_hash FROM pending_mechanics_action_aliases AS alias \
-             JOIN pending_mechanics_actions AS pending \
-             ON pending.campaign_id = alias.campaign_id AND pending.action_id = alias.action_id \
-             WHERE alias.campaign_id = ? AND alias.idempotency_key = ?",
-            &[&campaign_id, &idempotency_key],
-        )?
-        .1;
-        match found.first() {
-            None => Ok(()),
-            Some(row) if py_str(&row[0]) != payload_hash => {
-                Err(idempotency_conflict("Idempotency key payload does not match"))
-            }
-            Some(_) => Err(StoreError::NotPorted(CHOICE_PENDING)),
-        }
-    }
-
-    /// The campaign's pending mechanics choice (`pending_mechanics_action`), compared with one
-    /// command's action and payload.
-    pub fn pending_choice_for(
-        &self,
-        campaign_id: &str,
-        action_id: &str,
-        payload_hash: &str,
-    ) -> StoreResult<PendingChoice> {
-        let connection = self.connect_read_only()?;
-        if !table_exists(&connection, "pending_mechanics_actions")? {
-            return Ok(PendingChoice::None);
-        }
-        let found = named_rows(
-            &connection,
-            "SELECT action_id, payload_hash FROM pending_mechanics_actions WHERE campaign_id = ?",
-            &[&campaign_id],
-        )?
-        .1;
-        Ok(match found.first() {
-            None => PendingChoice::None,
-            Some(row) if py_str(&row[0]) == action_id && py_str(&row[1]) == payload_hash => {
-                PendingChoice::SameAction
-            }
-            Some(_) => PendingChoice::Other,
-        })
     }
 
     /// `bind_transport_alias(...)`: a new transport key reserved for a durable action's replay.

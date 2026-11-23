@@ -31,6 +31,7 @@ pub mod handle;
 pub mod lanes;
 pub mod launch;
 pub mod lifecycle;
+pub mod mechanics_choices;
 pub mod narration;
 pub mod owner_lock;
 mod owner_sessions;

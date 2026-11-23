@@ -1,0 +1,944 @@
+{
+ "python": "3.12.11",
+ "owner_id": "choice-runs",
+ "runs": [
+  {
+   "name": "an action awaiting its choice",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "idempotency_key": "key-1",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 0,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 2
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-1",
+     "basis_revision": 0,
+     "turn_id": "turn-campaign-one",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-response",
+      "prompt": "Signal 4: choose a response.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "echo",
+        "label": "Echo the signal"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "ground",
+        "label": "Ground the signal"
+       }
+      ]
+     },
+     "choice_sequence": 0
+    }
+   }
+  },
+  {
+   "name": "its replay with its key",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "idempotency_key": "key-1",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 0,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 2
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-1",
+     "basis_revision": 0,
+     "turn_id": "turn-campaign-one",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-response",
+      "prompt": "Signal 4: choose a response.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "echo",
+        "label": "Echo the signal"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "ground",
+        "label": "Ground the signal"
+       }
+      ]
+     },
+     "choice_sequence": 0
+    }
+   }
+  },
+  {
+   "name": "its replay with a new key",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "idempotency_key": "key-1b",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 0,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 2
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-1",
+     "basis_revision": 0,
+     "turn_id": "turn-campaign-one",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-response",
+      "prompt": "Signal 4: choose a response.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "echo",
+        "label": "Echo the signal"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "ground",
+        "label": "Ground the signal"
+       }
+      ]
+     },
+     "choice_sequence": 0
+    }
+   }
+  },
+  {
+   "name": "another action while one is pending",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-2",
+    "idempotency_key": "key-2",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 0,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 2
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "mechanics_choice_pending",
+    "message": "Campaign is awaiting a mechanics choice"
+   }
+  },
+  {
+   "name": "an invalid resolution identity",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": " bad",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Mechanics choice authority identity is invalid"
+   }
+  },
+  {
+   "name": "another owner",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "someone",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "WrongOwner",
+    "code": "wrong_owner",
+    "message": "Command owner does not hold this application authority"
+   }
+  },
+  {
+   "name": "a stale revision",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 5,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution does not match its reservation"
+   }
+  },
+  {
+   "name": "a sequence that does not match",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 1
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution does not match its reservation"
+   }
+  },
+  {
+   "name": "a choice that does not match",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-other",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution does not match its reservation"
+   }
+  },
+  {
+   "name": "an option that is not offered",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "loud",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution does not match its reservation"
+   }
+  },
+  {
+   "name": "an action that is not pending",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-9",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "mechanics_choice_unavailable",
+    "message": "Mechanics choice reservation is unavailable"
+   }
+  },
+  {
+   "name": "a second transport key",
+   "kind": "sql",
+   "command": {
+    "statement": "INSERT INTO pending_mechanics_action_aliases SELECT campaign_id, ?, action_id, payload_hash FROM pending_mechanics_action_aliases WHERE campaign_id = ? AND action_id = ?",
+    "parameters": [
+     "key-0",
+     "campaign-one",
+     "action-1"
+    ]
+   },
+   "outcome": null
+  },
+  {
+   "name": "the answer committing",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-1",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "advance",
+      "context": {
+       "_signal": {
+        "sides": 6,
+        "count": 1,
+        "results": [
+         4
+        ],
+        "total": 4,
+        "modifier": 0
+       },
+       "_response": "echo"
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "its replay",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 1,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-1",
+     "status": "committed",
+     "result": {
+      "context": {
+       "_response": "echo",
+       "_signal": {
+        "count": 1,
+        "modifier": 0,
+        "results": [
+         4
+        ],
+        "sides": 6,
+        "total": 4
+       }
+      },
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "advance"
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "a conflicting replay",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-1",
+    "owner_id": "choice-runs",
+    "expected_revision": 1,
+    "choice_id": "signal-response",
+    "option_id": "ground",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution identity payload does not match"
+   }
+  },
+  {
+   "name": "nothing pending",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "resolution_id": "res-2",
+    "owner_id": "choice-runs",
+    "expected_revision": 1,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "mechanics_choice_unavailable",
+    "message": "Mechanics choice reservation is unavailable"
+   }
+  },
+  {
+   "name": "the transport key after the commit",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "idempotency_key": "key-1b",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 1,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 2
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Action identity payload does not match"
+   }
+  },
+  {
+   "name": "the first transport key after the commit",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-1",
+    "idempotency_key": "key-0",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 0,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 2
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-1",
+     "status": "committed",
+     "result": {
+      "context": {
+       "_response": "echo",
+       "_signal": {
+        "count": 1,
+        "modifier": 0,
+        "results": [
+         4
+        ],
+        "sides": 6,
+        "total": 4
+       }
+      },
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "advance"
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "a second action",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-3",
+    "idempotency_key": "key-3",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 1,
+    "turn_id": "turn-campaign-one",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 4
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-3",
+     "basis_revision": 1,
+     "turn_id": "turn-campaign-one",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-response",
+      "prompt": "Signal 4: choose a response.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "echo",
+        "label": "Echo the signal"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "ground",
+        "label": "Ground the signal"
+       }
+      ]
+     },
+     "choice_sequence": 0
+    }
+   }
+  },
+  {
+   "name": "answered the other way",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-one",
+    "action_id": "action-3",
+    "resolution_id": "res-3",
+    "owner_id": "choice-runs",
+    "expected_revision": 1,
+    "choice_id": "signal-response",
+    "option_id": "ground",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-one",
+     "action_id": "action-3",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "advance",
+      "context": {
+       "_signal": {
+        "sides": 6,
+        "count": 1,
+        "results": [
+         4
+        ],
+        "total": 4,
+        "modifier": 0
+       },
+       "_response": "ground"
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 2
+    }
+   }
+  },
+  {
+   "name": "a two-choice action",
+   "kind": "act",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "idempotency_key": "key-1",
+    "owner_id": "choice-runs",
+    "writer": "dm",
+    "expected_revision": 0,
+    "turn_id": "turn-campaign-two",
+    "package_id": "synthetic.clockwork",
+    "tool_name": "advance",
+    "parameters": {
+     "steps": 3
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-two",
+     "action_id": "action-1",
+     "basis_revision": 0,
+     "turn_id": "turn-campaign-two",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-response",
+      "prompt": "Signal 6: choose a response.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "echo",
+        "label": "Echo the signal"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "ground",
+        "label": "Ground the signal"
+       }
+      ]
+     },
+     "choice_sequence": 0
+    }
+   }
+  },
+  {
+   "name": "its first answer",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "resolution_id": "res-a",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-two",
+     "action_id": "action-1",
+     "basis_revision": 0,
+     "turn_id": "turn-campaign-two",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-strength",
+      "prompt": "Choose the signal's strength.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "faint",
+        "label": "Faint"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "strong",
+        "label": "Strong"
+       }
+      ]
+     },
+     "choice_sequence": 1
+    }
+   }
+  },
+  {
+   "name": "the first answer replayed",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "resolution_id": "res-a",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "AwaitingChoiceReceipt",
+     "campaign_id": "campaign-two",
+     "action_id": "action-1",
+     "basis_revision": 0,
+     "turn_id": "turn-campaign-two",
+     "choice": {
+      "__class__": "MechanicsChoiceRequest",
+      "choice_id": "signal-strength",
+      "prompt": "Choose the signal's strength.",
+      "options": [
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "faint",
+        "label": "Faint"
+       },
+       {
+        "__class__": "MechanicsChoiceOption",
+        "option_id": "strong",
+        "label": "Strong"
+       }
+      ]
+     },
+     "choice_sequence": 1
+    }
+   }
+  },
+  {
+   "name": "the first answer at the wrong sequence",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "resolution_id": "res-b",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution does not match its reservation"
+   }
+  },
+  {
+   "name": "its second answer",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "resolution_id": "res-b",
+    "owner_id": "choice-runs",
+    "expected_revision": 0,
+    "choice_id": "signal-strength",
+    "option_id": "strong",
+    "session_id": null,
+    "choice_sequence": 1
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-two",
+     "action_id": "action-1",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "advance",
+      "context": {
+       "_signal": {
+        "sides": 6,
+        "count": 1,
+        "results": [
+         6
+        ],
+        "total": 6,
+        "modifier": 0
+       },
+       "_response": "echo",
+       "_strength": "strong"
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": [],
+      "mechanics_choice_answers": [
+       {
+        "resolution_id": "res-a",
+        "request": {
+         "choice_id": "signal-response",
+         "prompt": "Signal 6: choose a response.",
+         "options": [
+          {
+           "option_id": "echo",
+           "label": "Echo the signal"
+          },
+          {
+           "option_id": "ground",
+           "label": "Ground the signal"
+          }
+         ]
+        },
+        "option_id": "echo",
+        "session_id": null
+       }
+      ]
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "the second answer replayed",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "resolution_id": "res-b",
+    "owner_id": "choice-runs",
+    "expected_revision": 1,
+    "choice_id": "signal-strength",
+    "option_id": "strong",
+    "session_id": null,
+    "choice_sequence": 1
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-two",
+     "action_id": "action-1",
+     "status": "committed",
+     "result": {
+      "context": {
+       "_response": "echo",
+       "_signal": {
+        "count": 1,
+        "modifier": 0,
+        "results": [
+         6
+        ],
+        "sides": 6,
+        "total": 6
+       },
+       "_strength": "strong"
+      },
+      "logs": [],
+      "mechanics_choice_answers": [
+       {
+        "option_id": "echo",
+        "request": {
+         "choice_id": "signal-response",
+         "options": [
+          {
+           "label": "Echo the signal",
+           "option_id": "echo"
+          },
+          {
+           "label": "Ground the signal",
+           "option_id": "ground"
+          }
+         ],
+         "prompt": "Signal 6: choose a response."
+        },
+        "resolution_id": "res-a",
+        "session_id": null
+       }
+      ],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "advance"
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "the first answer after the commit",
+   "kind": "resolve",
+   "command": {
+    "campaign_id": "campaign-two",
+    "action_id": "action-1",
+    "resolution_id": "res-a",
+    "owner_id": "choice-runs",
+    "expected_revision": 1,
+    "choice_id": "signal-response",
+    "option_id": "echo",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign-two",
+     "action_id": "action-1",
+     "status": "committed",
+     "result": {
+      "context": {
+       "_response": "echo",
+       "_signal": {
+        "count": 1,
+        "modifier": 0,
+        "results": [
+         6
+        ],
+        "sides": 6,
+        "total": 6
+       },
+       "_strength": "strong"
+      },
+      "logs": [],
+      "mechanics_choice_answers": [
+       {
+        "option_id": "echo",
+        "request": {
+         "choice_id": "signal-response",
+         "options": [
+          {
+           "label": "Echo the signal",
+           "option_id": "echo"
+          },
+          {
+           "label": "Ground the signal",
+           "option_id": "ground"
+          }
+         ],
+         "prompt": "Signal 6: choose a response."
+        },
+        "resolution_id": "res-a",
+        "session_id": null
+       }
+      ],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "advance"
+     },
+     "resulting_revision": 1
+    }
+   }
+  }
+ ]
+}

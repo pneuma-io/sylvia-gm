@@ -17,10 +17,11 @@ use sylvia_base::{CodedError, Json, JsonMap};
 use sylvia_domain::authority::{
     canonical_payload_is_safe, mechanic_outcome_is_safe, validate_authority_identity, ActionCommand,
     ActionReceipt, ActionStatus, AwaitingChoiceReceipt, CampaignRecord, LifecycleState, MechanicContext,
-    MechanicOutcome, PackageLock, PackageLockEntry, Participant, PlayerProjection, PlayerProjectionKind,
-    TurnStatus,
+    MechanicOutcome, MechanicsChoiceAnswer, MechanicsChoiceResolution, PackageLock, PackageLockEntry,
+    Participant, PlayerProjection, PlayerProjectionKind, ResolveMechanicsChoiceCommand, TurnStatus,
 };
 use sylvia_domain::DomainError;
+use sylvia_store::mechanics_choices::awaiting_receipt;
 use sylvia_store::{AuthorityStore, StoreError, StoreHandle};
 
 /// The owner's answer to `rust_port_pending`.
@@ -265,32 +266,34 @@ pub async fn execute_action(
     let replay = {
         let (command, hash) = (owned.clone(), hash.clone());
         store
-            .call(move |store| -> sylvia_store::StoreResult<Option<Result<ActionReceipt, &'static str>>> {
+            .call(move |store| -> sylvia_store::StoreResult<Option<Result<ActionExecution, &'static str>>> {
                 if let Some(existing) =
                     store.idempotency_hit(&command.campaign_id, &command.idempotency_key)?
                 {
                     if existing.payload_hash != hash {
                         return Ok(Some(Err("Idempotency key payload does not match")));
                     }
-                    return Ok(Some(Ok(existing.receipt)));
+                    return Ok(Some(Ok(ActionExecution::Receipt(existing.receipt))));
                 }
-                store.pending_mechanics_alias(&command.campaign_id, &command.idempotency_key, &hash)?;
-                match store.pending_choice_for(&command.campaign_id, &command.action_id, &hash)? {
-                    sylvia_store::action_execution::PendingChoice::None => {}
-                    sylvia_store::action_execution::PendingChoice::SameAction => {
-                        return Err(StoreError::NotPorted(
-                            "an awaiting mechanics choice (choice resolution, T3 step 2)",
-                        ));
+                if let Some((alias_hash, pending)) =
+                    store.pending_mechanics_hit(&command.campaign_id, &command.idempotency_key)?
+                {
+                    if alias_hash != hash {
+                        return Ok(Some(Err("Idempotency key payload does not match")));
                     }
-                    sylvia_store::action_execution::PendingChoice::Other => {
-                        return Err(StoreError::from(DomainError::Rejected {
-                            error_type: "CommandRejected",
-                            code: "mechanics_choice_pending".into(),
-                            message: "Campaign is awaiting a mechanics choice".into(),
-                            diagnostics: Vec::new(),
-                            mechanics: None,
-                        }));
+                    return Ok(Some(Ok(ActionExecution::AwaitingChoice(awaiting_receipt(&pending)))));
+                }
+                if let Some(pending) = store.pending_mechanics_action(&command.campaign_id)? {
+                    if pending.action_id == command.action_id && pending.payload_hash == hash {
+                        return Ok(Some(Ok(ActionExecution::AwaitingChoice(awaiting_receipt(&pending)))));
                     }
+                    return Err(StoreError::from(DomainError::Rejected {
+                        error_type: "CommandRejected",
+                        code: "mechanics_choice_pending".into(),
+                        message: "Campaign is awaiting a mechanics choice".into(),
+                        diagnostics: Vec::new(),
+                        mechanics: None,
+                    }));
                 }
                 if let Some(existing) = store.action_hit(&command.campaign_id, &command.action_id)? {
                     if existing.payload_hash != hash {
@@ -303,14 +306,14 @@ pub async fn execute_action(
                             &command.idempotency_key,
                             &hash,
                         )
-                        .map(|receipt| Some(Ok(receipt)));
+                        .map(|receipt| Some(Ok(ActionExecution::Receipt(receipt))));
                 }
                 Ok(None)
             })
             .await?
     };
     match replay {
-        Some(Ok(receipt)) => return Ok(ActionExecution::Receipt(receipt)),
+        Some(Ok(execution)) => return Ok(execution),
         Some(Err(message)) => {
             return Err(rejected("IdempotencyConflict", "idempotency_conflict", message).into())
         }
@@ -352,12 +355,19 @@ pub async fn execute_action(
             .await?
     };
     let commit = match decided {
-        Ok(commit) => commit,
+        Ok(Decided::Awaiting(receipt)) => return Ok(ActionExecution::AwaitingChoice(receipt)),
+        Ok(Decided::Commit(commit)) => commit,
         Err(ExecuteFailure::Domain(error)) => return Err(error.into()),
         Err(ExecuteFailure::Store(error)) => return Err(error.into()),
     };
     let receipt = store.call(move |store| store.commit_action(&commit)).await?;
     Ok(ActionExecution::Receipt(receipt))
+}
+
+/// What running the mechanic decided: a choice to await, or the commit to make.
+enum Decided {
+    Awaiting(AwaitingChoiceReceipt),
+    Commit(Box<sylvia_store::actions::CommitAction>),
 }
 
 /// A failure inside the store call that runs the mechanic.
@@ -378,17 +388,14 @@ impl From<DomainError> for ExecuteFailure {
     }
 }
 
-/// `_admitted_tool`, the parameter checks, the mechanic and its outcome checks, on the store
-/// thread, with the tool's pending projection held for the run.
-fn execute_on(
+/// `_admitted_tool(command, package_lock, state=..., turn_status=..., writer=...)`: the package's
+/// built tool, if its capability is the package's and its declaration admits this campaign now.
+fn admitted_tool(
     store: &AuthorityStore,
-    narration: &sylvia_store::narration::NarrationState,
     command: &ActionCommand,
-    hash: &str,
     package: &PackageLockEntry,
     basis: &sylvia_store::action_execution::ActionBasis,
-    parameters: JsonMap,
-) -> Result<Box<sylvia_store::actions::CommitAction>, ExecuteFailure> {
+) -> Result<super::content_reads::CatalogTool, ExecuteFailure> {
     let unavailable = || command_rejected("Package tool is inactive or unavailable", "tool_unavailable");
     let declaration = store.declared_package_tool(
         package.package_id(),
@@ -413,6 +420,21 @@ fn execute_on(
     {
         return Err(unavailable().into());
     }
+    Ok(tool)
+}
+
+/// `_admitted_tool`, the parameter checks, the mechanic and its outcome checks, on the store
+/// thread, with the tool's pending projection held for the run.
+fn execute_on(
+    store: &AuthorityStore,
+    narration: &sylvia_store::narration::NarrationState,
+    command: &ActionCommand,
+    hash: &str,
+    package: &PackageLockEntry,
+    basis: &sylvia_store::action_execution::ActionBasis,
+    parameters: JsonMap,
+) -> Result<Decided, ExecuteFailure> {
+    let tool = admitted_tool(store, command, package, basis)?;
     sylvia_domain::schema_admission::validate_parameters(&parameters, &tool.input_schema)?;
     let participant_ids: Vec<&str> =
         basis.participants.iter().map(|participant| participant.fields().participant_id.as_str()).collect();
@@ -455,12 +477,28 @@ fn execute_on(
     let outcome = run_mechanic(store, narration, command, package, &tool, &context);
     narration.with(|inner| inner.pending_tools.retain(|(known, _)| *known != key));
     let (outcome, status) = outcome?;
-    if outcome.choice.is_some() {
-        return Err(ExecuteFailure::Store(StoreError::NotPorted(
-            "a mechanic asking for a choice (choice resolution, T3 step 2)",
-        )));
+    if let Some(choice) = &outcome.choice {
+        let pending =
+            store.reserve_mechanics_choice(&sylvia_store::mechanics_choices::ChoiceReservation {
+                campaign_id: &command.campaign_id,
+                action_id: &command.action_id,
+                idempotency_key: &command.idempotency_key,
+                payload_hash: hash,
+                expected_revision: command.expected_revision,
+                writer: command.writer,
+                turn_id: &command.turn_id,
+                package_id: &command.package_id,
+                package_version: package.version(),
+                package_sha256: package.sha256(),
+                tool_name: &command.tool_name,
+                parameters: &parameters,
+                initiating_session_id: command.initiating_session_id.as_deref(),
+                choice,
+                player_action_origin: None,
+            })?;
+        return Ok(Decided::Awaiting(awaiting_receipt(&pending)));
     }
-    Ok(Box::new(sylvia_store::actions::CommitAction {
+    Ok(Decided::Commit(Box::new(sylvia_store::actions::CommitAction {
         campaign_id: command.campaign_id.clone(),
         action_id: command.action_id.clone(),
         idempotency_key: command.idempotency_key.clone(),
@@ -475,7 +513,8 @@ fn execute_on(
         parameters,
         outcome,
         status,
-    }))
+        choice_resolution: None,
+    })))
 }
 
 /// The mechanic run inside Python's `try`: a `RulesetPreconditionRejected` is raised; any other
@@ -528,4 +567,293 @@ fn run_mechanic(
         // `except Exception`: a store failure here is a defect too, with its text.
         Err(error) => defect(error.to_string(), None),
     }
+}
+
+/// `AuthorityOwner.resolve_mechanics_choice(command)`: one answer to the campaign's pending
+/// mechanics choice. The action resumes with the answer; it either asks its next choice (saved
+/// with the answer) or commits with every answer it took. A choice a player action is waiting on
+/// runs under Python's direct-action work, which comes with the player-action family, so it
+/// answers `rust_port_pending`.
+pub async fn resolve_mechanics_choice(
+    store: &StoreHandle,
+    owner_id: &str,
+    command: &ResolveMechanicsChoiceCommand,
+) -> Result<ActionExecution, ActionError> {
+    let campaign_id = command.campaign_id.clone();
+    let pending = store.call(move |store| store.pending_mechanics_action(&campaign_id)).await?;
+    if pending.as_ref().is_some_and(|pending| pending.player_action_origin.is_some()) {
+        return Err(ActionError::Store(StoreError::NotPorted(
+            "a player action's mechanics choice (direct-action work, T3 step 4)",
+        )));
+    }
+    let _work = super::guided::campaign_work(store, &command.campaign_id).await?;
+    let invalid =
+        || command_rejected("Mechanics choice authority identity is invalid", "invalid_authority_identity");
+    if !(0..64).contains(&command.choice_sequence) {
+        return Err(invalid().into());
+    }
+    let identities = [
+        (&command.campaign_id, "Campaign identity"),
+        (&command.action_id, "Action identity"),
+        (&command.resolution_id, "Mechanics choice resolution identity"),
+        (&command.owner_id, "Application owner identity"),
+        (&command.choice_id, "Mechanics choice identity"),
+        (&command.option_id, "Mechanics choice option identity"),
+    ];
+    for (value, label) in identities {
+        validate_authority_identity(value, label, false).map_err(|_| invalid())?;
+    }
+    if let Some(session) = &command.session_id {
+        validate_authority_identity(session, "Agent session identity", false).map_err(|_| invalid())?;
+    }
+    let _lane = store.lanes().owner.acquire(&command.campaign_id).await;
+    if command.owner_id != owner_id {
+        return Err(rejected(
+            "WrongOwner",
+            "wrong_owner",
+            "Command owner does not hold this application authority",
+        )
+        .into());
+    }
+    let owned = command.clone();
+    let replay = store
+        .call(move |store| {
+            store.mechanics_choice_resolution_receipt(&sylvia_store::mechanics_choices::ResolutionIdentity {
+                campaign_id: &owned.campaign_id,
+                resolution_id: &owned.resolution_id,
+                action_id: &owned.action_id,
+                choice_id: &owned.choice_id,
+                option_id: &owned.option_id,
+                session_id: owned.session_id.as_deref(),
+                choice_sequence: owned.choice_sequence,
+            })
+        })
+        .await?;
+    match replay {
+        Some(sylvia_store::mechanics_choices::ResolutionReplay::Receipt(receipt)) => {
+            return Ok(ActionExecution::Receipt(receipt))
+        }
+        Some(sylvia_store::mechanics_choices::ResolutionReplay::AwaitingChoice(receipt)) => {
+            return Ok(ActionExecution::AwaitingChoice(receipt))
+        }
+        None => {}
+    }
+    let campaign_id = command.campaign_id.clone();
+    let pending = store.call(move |store| store.pending_mechanics_action(&campaign_id)).await?;
+    let Some(pending) = pending.filter(|pending| pending.action_id == command.action_id) else {
+        return Err(command_rejected(
+            "Mechanics choice reservation is unavailable",
+            "mechanics_choice_unavailable",
+        )
+        .into());
+    };
+    if pending.basis_revision != command.expected_revision
+        || pending.prior_answers.len() as i64 != command.choice_sequence
+        || pending.choice.choice_id != command.choice_id
+        || !pending.choice.options.iter().any(|option| option.option_id == command.option_id)
+        || pending.initiating_session_id != command.session_id
+    {
+        return Err(rejected(
+            "IdempotencyConflict",
+            "idempotency_conflict",
+            "Mechanics choice resolution does not match its reservation",
+        )
+        .into());
+    }
+    let basis = {
+        let (campaign_id, turn_id) = (pending.campaign_id.clone(), pending.turn_id.clone());
+        store.call(move |store| store.action_basis(&campaign_id, &turn_id)).await?
+    };
+    let package = locked_package(&pending.package_id, &basis.package_lock)?;
+    if package.version() != pending.package_version
+        || package.sha256() != pending.package_sha256
+        || basis.campaign.revision != pending.basis_revision
+        || basis.campaign.writer != pending.writer
+    {
+        return Err(rejected("StaleRevision", "stale_revision", "Mechanics choice basis has drifted").into());
+    }
+    let synthetic = ActionCommand {
+        campaign_id: pending.campaign_id.clone(),
+        action_id: pending.action_id.clone(),
+        idempotency_key: "pending-choice-resolution".into(),
+        owner_id: command.owner_id.clone(),
+        writer: pending.writer,
+        expected_revision: pending.basis_revision,
+        turn_id: pending.turn_id.clone(),
+        package_id: pending.package_id.clone(),
+        tool_name: pending.tool_name.clone(),
+        parameters: pending.parameters.clone(),
+        initiating_session_id: pending.initiating_session_id.clone(),
+    };
+    admit(&synthetic, &basis.campaign, basis.turn_status)?;
+    let resolution = MechanicsChoiceResolution {
+        choice_id: command.choice_id.clone(),
+        option_id: command.option_id.clone(),
+        expected_request: pending.choice.clone(),
+        prior_answers: pending.prior_answers.clone(),
+    };
+    let decided = {
+        let (pending, command, basis, package, resolution) =
+            (pending.clone(), command.clone(), basis, package.clone(), resolution.clone());
+        let synthetic = synthetic.clone();
+        store
+            .call(move |store| {
+                Ok(resolve_on(store, &pending, &command, &synthetic, &basis, &package, resolution))
+            })
+            .await?
+    };
+    match decided {
+        Ok(Decided::Awaiting(receipt)) => Ok(ActionExecution::AwaitingChoice(receipt)),
+        Ok(Decided::Commit(commit)) => {
+            Ok(ActionExecution::Receipt(store.call(move |store| store.commit_action(&commit)).await?))
+        }
+        Err(ExecuteFailure::Domain(error)) => Err(error.into()),
+        Err(ExecuteFailure::Store(error)) => Err(error.into()),
+    }
+}
+
+/// The resumed mechanic on the store thread: any failure leaves the reservation in place, as
+/// Python's `except Exception` around the run does.
+#[allow(clippy::too_many_arguments)]
+fn resolve_on(
+    store: &AuthorityStore,
+    pending: &sylvia_domain::authority::PendingMechanicsAction,
+    command: &ResolveMechanicsChoiceCommand,
+    synthetic: &ActionCommand,
+    basis: &sylvia_store::action_execution::ActionBasis,
+    package: &PackageLockEntry,
+    resolution: MechanicsChoiceResolution,
+) -> Result<Decided, ExecuteFailure> {
+    let tool = admitted_tool(store, synthetic, package, basis)?;
+    sylvia_domain::schema_admission::validate_parameters(&pending.parameters, &tool.input_schema)?;
+    let participant_ids: Vec<&str> =
+        basis.participants.iter().map(|participant| participant.fields().participant_id.as_str()).collect();
+    sylvia_domain::schema_admission::validate_references(
+        &pending.parameters,
+        &tool.input_schema,
+        &participant_ids,
+    )?;
+    let context = MechanicContext {
+        campaign_id: pending.campaign_id.clone(),
+        turn_id: pending.turn_id.clone(),
+        action_id: pending.action_id.clone(),
+        state: basis.state.clone(),
+        parameters: pending.parameters.clone(),
+        participants: basis
+            .participants
+            .iter()
+            .map(|participant| {
+                (participant.fields().participant_id.clone(), participant_context(participant))
+            })
+            .collect(),
+        choice_resolution: Some(resolution.clone()),
+    };
+    let failed = || {
+        ExecuteFailure::Domain(command_rejected(
+            "Mechanics choice resolution failed without consuming its reservation",
+            "mechanics_choice_resolution_failed",
+        ))
+    };
+    let outcome = match tool.execute.execute(&context) {
+        Ok(outcome) => outcome,
+        Err(crate::package_mechanic::MechanicFailure::PortPending(what)) => {
+            return Err(ExecuteFailure::Store(StoreError::Coded(CodedError::new(PORT_PENDING, what))))
+        }
+        Err(_) => return Err(failed()),
+    };
+    if owned_outcome(&outcome).is_err() || !mechanic_outcome_is_safe(&outcome) {
+        return Err(failed());
+    }
+    match store.mechanic_mutations_are_owned(
+        &pending.campaign_id,
+        &pending.package_id,
+        &pending.package_version,
+        &pending.package_sha256,
+        &outcome,
+    ) {
+        Ok(true) => {}
+        Err(StoreError::NotPorted(what)) => return Err(ExecuteFailure::Store(StoreError::NotPorted(what))),
+        Ok(false) | Err(_) => return Err(failed()),
+    }
+    if let Some(next) = &outcome.choice {
+        let answer = MechanicsChoiceAnswer {
+            resolution_id: command.resolution_id.clone(),
+            request: pending.choice.clone(),
+            option_id: command.option_id.clone(),
+            session_id: command.session_id.clone(),
+        };
+        return Ok(Decided::Awaiting(store.advance_mechanics_choice(pending, &answer, next)?));
+    }
+    let mut outcome = outcome;
+    if let Some(origin) = preparation_origin(store, pending, command)? {
+        let mut marker = JsonMap::new();
+        marker.insert("kind".into(), sylvia_domain::player_actions::PLAYER_ACTION_ORIGIN.into());
+        marker.insert("origin".into(), Json::Object(origin));
+        outcome.consequences.push(marker);
+    }
+    Ok(Decided::Commit(Box::new(sylvia_store::actions::CommitAction {
+        campaign_id: pending.campaign_id.clone(),
+        action_id: pending.action_id.clone(),
+        idempotency_key: "pending-choice-resolution".into(),
+        payload_hash: pending.payload_hash.clone(),
+        expected_revision: pending.basis_revision,
+        writer: pending.writer,
+        turn_id: pending.turn_id.clone(),
+        package_id: pending.package_id.clone(),
+        package_version: pending.package_version.clone(),
+        package_sha256: pending.package_sha256.clone(),
+        tool_name: pending.tool_name.clone(),
+        parameters: pending.parameters.clone(),
+        outcome,
+        status: ActionStatus::Committed,
+        choice_resolution: Some(sylvia_store::actions::ChoiceCommit {
+            resolution_id: command.resolution_id.clone(),
+            resolution,
+            session_id: command.session_id.clone(),
+        }),
+    })))
+}
+
+/// A preparation choice answered in a session is the player's event: its origin is the click
+/// (`player_control_origin` of the mechanics choice), read only when the answer commits.
+fn preparation_origin(
+    store: &AuthorityStore,
+    pending: &sylvia_domain::authority::PendingMechanicsAction,
+    command: &ResolveMechanicsChoiceCommand,
+) -> Result<Option<JsonMap>, ExecuteFailure> {
+    if pending.player_action_origin.is_some() || command.session_id.is_none() {
+        return Ok(None);
+    }
+    let Some(boundary) = super::turn_reads::preparation_boundary_on(store, &command.campaign_id)? else {
+        return Ok(None);
+    };
+    let Some(preparation) = &boundary.preparation else { return Ok(None) };
+    let matches = sylvia_domain::pyops::py_eq(
+        &Json::from(pending.package_id.as_str()),
+        preparation.get("package_id").unwrap_or(&Json::Null),
+    ) && sylvia_domain::pyops::py_eq(
+        &Json::from(pending.tool_name.as_str()),
+        preparation.get("intent").unwrap_or(&Json::Null),
+    );
+    if !matches {
+        return Ok(None);
+    }
+    let mut source = JsonMap::new();
+    source.insert("kind".into(), "mechanics_choice".into());
+    source.insert("action_id".into(), pending.action_id.as_str().into());
+    source.insert("choice_id".into(), command.choice_id.as_str().into());
+    source.insert("choice_sequence".into(), command.choice_sequence.into());
+    source.insert("option_id".into(), command.option_id.as_str().into());
+    source.insert("resolution_id".into(), command.resolution_id.as_str().into());
+    let mut origin = sylvia_domain::player_actions::player_control_origin(
+        &Json::Object(source),
+        pending.basis_revision,
+        None,
+        command.session_id.as_deref(),
+    )?;
+    let mut policy = JsonMap::new();
+    policy.insert("confirmation".into(), "required".into());
+    policy.insert("response".into(), "automatic".into());
+    origin.insert("policy".into(), Json::Object(policy));
+    Ok(Some(origin))
 }
