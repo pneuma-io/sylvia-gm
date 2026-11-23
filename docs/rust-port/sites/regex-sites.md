@@ -212,7 +212,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `session/_divergence.py:123` | `DivergenceDetector.analyze` | re.search; pattern built at run time, check by hand | `if re.search(pattern, response_lower):` | |
 | `session/_narrative_scanner.py:88` | `NarrativeScanner._compile_rules._c` | re.compile; pattern built at run time, check by hand | `return re.compile(pattern, flags)` | |
 | `session/_narrative_scanner.py:210` | `NarrativeScanner.scan` | re.compile; pattern built at run time, check by hand | `re.compile(tag, re.IGNORECASE \| re.DOTALL))` | |
-| `tools/_builder_handlers.py:274` | `tool_search_files` | re.compile; pattern built at run time, check by hand | `regex = re.compile(pattern)` | |
+| `tools/_builder_handlers.py:274` | `tool_search_files` | re.compile; pattern built at run time, check by hand | `regex = re.compile(pattern)` | `sylvia-agent` builder_tool_vectors; differences row (untranslatable patterns) |
 
 ## Lane 5: Owner, clients and release
 

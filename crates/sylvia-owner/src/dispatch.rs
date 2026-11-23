@@ -147,6 +147,8 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "catalog" => commands::campaigns::handle_catalog(context, params).await,
+        "backup_database" => commands::campaigns::handle_backup_database(context, params).await,
         "campaign_creation_catalog" => {
             commands::campaigns::handle_campaign_creation_catalog(context, params).await
         }
@@ -191,6 +193,17 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::providers::handle_validate_provider_model(context, params).await
         }
         "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
+        "open_provider_setup" => commands::providers::handle_open_provider_setup(context, params).await,
+        "admin_full_audit_status" => {
+            commands::providers::handle_admin_full_audit_status(context, params).await
+        }
+        "admin_full_audit_record" => {
+            commands::providers::handle_admin_full_audit_record(context, params).await
+        }
+        "export_admin_full_audit" => {
+            commands::providers::handle_export_admin_full_audit(context, params).await
+        }
+        "set_admin_full_audit" => commands::providers::handle_set_admin_full_audit(context, params).await,
         "claude_connection" => commands::providers::handle_claude_connection(context, params).await,
         "chatgpt_connection" => commands::providers::handle_chatgpt_connection(context, params).await,
         "remove_provider_settings" => {

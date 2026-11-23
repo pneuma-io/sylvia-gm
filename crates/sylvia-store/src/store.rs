@@ -39,6 +39,8 @@ pub struct AuthorityStore {
     created_new_database: bool,
     closed: bool,
     pub(crate) faults: Faults,
+    /// `_tools` and `_runtime_payloads`, shared with the store handle.
+    tool_cache: std::sync::Arc<crate::tool_cache::ToolCache>,
 }
 
 /// Python's private deterministic fault seams (`_before_commit` and its kin): tests set one to
@@ -94,6 +96,7 @@ impl AuthorityStore {
             created_new_database: false,
             closed: false,
             faults: Faults::default(),
+            tool_cache: std::sync::Arc::default(),
         };
         // Startup admission stays under the ownership lock through migrations.
         if let Some(before_migration) = before_migration {
@@ -107,6 +110,16 @@ impl AuthorityStore {
     #[doc(hidden)]
     pub fn set_faults(&mut self, faults: Faults) {
         self.faults = faults;
+    }
+
+    /// The owner's package tool caches ([`crate::tool_cache`]).
+    pub fn tool_cache(&self) -> &crate::tool_cache::ToolCache {
+        &self.tool_cache
+    }
+
+    /// Share the handle's tool caches with the store thread.
+    pub(crate) fn share_tool_cache(&mut self, cache: std::sync::Arc<crate::tool_cache::ToolCache>) {
+        self.tool_cache = cache;
     }
 
     /// The resolved database path.

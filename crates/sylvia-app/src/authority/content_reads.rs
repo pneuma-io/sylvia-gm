@@ -200,10 +200,52 @@ fn uncaught(class: &'static str, message: String) -> StoreError {
 /// has no runtime or its runtime refuses the tool (`except PackageRuntimeError: return None`).
 /// `package_tool_permanently_refused` is read after that `try`, so its refusal escapes as
 /// Python's `PackageRuntimeError`, a `ValueError`.
+///
+/// Each tool is materialized once per owner and kept (`_tools`, keyed by the exact package
+/// identity and tool name), and the runtime bytes it reads are kept for its siblings
+/// (`_runtime_payloads`, the last 16 packages), all under `_tools_lock` ([`AuthorityStore::tool_cache`]).
 pub(super) fn package_tool(
     store: &AuthorityStore,
     entry: &sylvia_domain::authority::PackageLockEntry,
     declaration: &sylvia_domain::package_library::ToolDeclaration,
+) -> StoreResult<Option<CatalogTool>> {
+    let package = (entry.package_id().to_owned(), entry.version().to_owned(), entry.sha256().to_owned());
+    let identity = (package.0.clone(), package.1.clone(), package.2.clone(), declaration.name.clone());
+    store.tool_cache().with(|cache| {
+        if let Some(existing) = cache.tools.get(&identity).and_then(|tool| tool.downcast_ref::<CatalogTool>())
+        {
+            return Ok(Some(existing.clone()));
+        }
+        let runtime = match cache.runtime_payload(&package) {
+            Some(runtime) => runtime,
+            None => {
+                let Some(runtime) = store.package_file_bytes(
+                    entry.package_id(),
+                    entry.version(),
+                    entry.sha256(),
+                    crate::package_runtime::PACKAGE_RUNTIME_PATH,
+                    crate::package_runtime::PACKAGE_RUNTIME_BYTE_LIMIT as i64,
+                )?
+                else {
+                    return Ok(None);
+                };
+                // Package identities are immutable: sibling tools reuse the verified bytes.
+                let runtime = std::sync::Arc::new(runtime);
+                cache.keep_runtime_payload(package, std::sync::Arc::clone(&runtime));
+                runtime
+            }
+        };
+        let Some(tool) = materialize_tool(entry, declaration, &runtime)? else { return Ok(None) };
+        cache.tools.insert(identity, std::sync::Arc::new(tool.clone()));
+        Ok(Some(tool))
+    })
+}
+
+/// The materialization `_package_tool` makes from a package's runtime bytes.
+fn materialize_tool(
+    entry: &sylvia_domain::authority::PackageLockEntry,
+    declaration: &sylvia_domain::package_library::ToolDeclaration,
+    runtime: &[u8],
 ) -> StoreResult<Option<CatalogTool>> {
     use crate::package_mechanic::{
         materialize_package_mechanic, materialize_player_action_checker, materialize_player_action_previewer,
@@ -212,26 +254,16 @@ pub(super) fn package_tool(
         package_tool_decision_title, package_tool_description, package_tool_model_behavior,
         package_tool_permanently_refused, package_tool_player_controls, PackageRuntimeFailure,
     };
-    let Some(runtime) = store.package_file_bytes(
-        entry.package_id(),
-        entry.version(),
-        entry.sha256(),
-        crate::package_runtime::PACKAGE_RUNTIME_PATH,
-        crate::package_runtime::PACKAGE_RUNTIME_BYTE_LIMIT as i64,
-    )?
-    else {
-        return Ok(None);
-    };
     let package_id = entry.package_id();
     let built = (|| -> Result<_, PackageRuntimeFailure> {
         let mechanic =
-            materialize_package_mechanic(package_id, entry.version(), entry.sha256(), declaration, &runtime)?;
-        let description = package_tool_description(package_id, declaration, &runtime)?;
-        let (model_behavior, predicates) = package_tool_model_behavior(package_id, declaration, &runtime)?;
-        let decision_title = package_tool_decision_title(package_id, declaration, &runtime)?;
-        let player_controls = package_tool_player_controls(package_id, declaration, &runtime)?;
-        let checker = materialize_player_action_checker(package_id, declaration, &runtime)?;
-        let previewer = materialize_player_action_previewer(package_id, declaration, &runtime)?;
+            materialize_package_mechanic(package_id, entry.version(), entry.sha256(), declaration, runtime)?;
+        let description = package_tool_description(package_id, declaration, runtime)?;
+        let (model_behavior, predicates) = package_tool_model_behavior(package_id, declaration, runtime)?;
+        let decision_title = package_tool_decision_title(package_id, declaration, runtime)?;
+        let player_controls = package_tool_player_controls(package_id, declaration, runtime)?;
+        let checker = materialize_player_action_checker(package_id, declaration, runtime)?;
+        let previewer = materialize_player_action_previewer(package_id, declaration, runtime)?;
         Ok((
             mechanic,
             description,
@@ -262,7 +294,7 @@ pub(super) fn package_tool(
     let mut without_required = input_schema.clone();
     without_required.insert("required".into(), Json::Array(Vec::new()));
     sylvia_domain::schema_admission::validate_parameters(&JsonMap::new(), &without_required)?;
-    let permanently_refused = match package_tool_permanently_refused(package_id, declaration, &runtime) {
+    let permanently_refused = match package_tool_permanently_refused(package_id, declaration, runtime) {
         Ok(refused) => refused,
         Err(PackageRuntimeFailure::Rejected(error)) => {
             return Err(sylvia_base::CodedError::new("command_rejected", error.message)
@@ -638,4 +670,85 @@ pub async fn model_context_owner(store: &StoreHandle, campaign_id: &str) -> Stor
             Ok(Some(owned_payload(&Json::Object(owner))?))
         })
         .await
+}
+
+#[cfg(test)]
+mod tool_cache_tests {
+    use super::package_tool;
+    use std::io::Read;
+    use sylvia_domain::authority::PackageLockEntry;
+    use sylvia_store::AuthorityStore;
+
+    fn folder(name: &str) -> std::path::PathBuf {
+        std::env::temp_dir().join(format!("sylvia-app-tool-cache-{name}-{}", std::process::id()))
+    }
+
+    /// The Riichi game in play, opened from the committed snapshot vector.
+    fn riichi(name: &str) -> AuthorityStore {
+        let folder = folder(name);
+        let _ = std::fs::remove_dir_all(&folder);
+        std::fs::create_dir_all(&folder).unwrap();
+        let vector = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/vectors/snapshots/riichi_started.sqlite3.gz");
+        let mut bytes = Vec::new();
+        flate2::read::GzDecoder::new(std::fs::File::open(vector).unwrap()).read_to_end(&mut bytes).unwrap();
+        let database = folder.join("authority.sqlite3");
+        std::fs::write(&database, bytes).unwrap();
+        AuthorityStore::open_for_application_owner(&database, None).unwrap()
+    }
+
+    #[test]
+    fn a_tool_is_materialized_once_per_exact_package_identity() {
+        let store = riichi("hit");
+        let basis = store.package_catalog_basis("campaign-table").unwrap();
+        let (entry, declaration) = basis.declarations[0].clone();
+        let first =
+            package_tool(&store, &entry, &declaration).unwrap().expect("the Riichi tool materializes");
+        let again = package_tool(&store, &entry, &declaration).unwrap().unwrap();
+        // A fresh materialization is a different mechanic (mechanics compare by identity).
+        assert_eq!(first.execute, again.execute, "the second read must be the kept tool");
+        store.tool_cache().with(|cache| {
+            assert_eq!(cache.tools.len(), 1);
+            assert_eq!(cache.runtime_payloads.len(), 1);
+        });
+        // A sibling tool reuses the kept runtime bytes.
+        let (sibling_entry, sibling) = basis
+            .declarations
+            .iter()
+            .find(|(other, tool)| other.sha256() == entry.sha256() && tool.name != declaration.name)
+            .cloned()
+            .expect("Riichi declares more than one tool");
+        let sibling_tool = package_tool(&store, &sibling_entry, &sibling).unwrap().unwrap();
+        assert_ne!(sibling_tool.execute, first.execute);
+        store.tool_cache().with(|cache| {
+            assert_eq!(cache.tools.len(), 2);
+            assert_eq!(cache.runtime_payloads.len(), 1);
+        });
+        drop(store);
+        let _ = std::fs::remove_dir_all(folder("hit"));
+    }
+
+    #[test]
+    fn another_sha256_under_the_same_package_id_and_version_misses() {
+        let store = riichi("miss");
+        let basis = store.package_catalog_basis("campaign-table").unwrap();
+        let (entry, declaration) = basis.declarations[0].clone();
+        assert!(package_tool(&store, &entry, &declaration).unwrap().is_some());
+        let other_sha256 = if entry.sha256().starts_with('0') { "1" } else { "0" }.repeat(64);
+        let other = PackageLockEntry::new(
+            entry.package_id(),
+            entry.version(),
+            other_sha256,
+            entry.role(),
+            entry.load_order(),
+            entry.dependencies().to_vec(),
+            entry.capabilities().to_vec(),
+        )
+        .unwrap();
+        // No package has that digest, so a miss reads no runtime and finds no tool.
+        assert!(package_tool(&store, &other, &declaration).unwrap().is_none());
+        store.tool_cache().with(|cache| assert_eq!(cache.tools.len(), 1));
+        drop(store);
+        let _ = std::fs::remove_dir_all(folder("miss"));
+    }
 }

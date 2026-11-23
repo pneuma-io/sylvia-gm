@@ -1,0 +1,318 @@
+{
+  "name": "admin-commands",
+  "description": "Owner commands with no turn behind them, on a No Ruleset campaign made through the interview (stand-in model): the catalog before and after the campaign exists; database backups and their refused identities; the provider setup page's refusals (no preset, an unknown one, a number, the custom preset, which has no setup page; a shipped preset would open a browser, so none is opened); and Full Audit: status, the record refusals, the enabled flag's refusals, switching it on and off, and exports (refused destinations, a fresh file, the same file again, and one while it is off); then shut down.",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "catalog",
+      "params": {}
+    },
+    {
+      "method": "catalog",
+      "params": {
+        "campaign_id": "campaign-missing"
+      }
+    },
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "create_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-draft",
+        "display_name": "Storm Courier",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "campaign_id": "/result/campaign_id",
+        "builder_session_id": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-ruleset",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 0,
+        "current_step": "ruleset",
+        "visible_answer": "No Ruleset",
+        "answer": {
+          "candidate_id": null
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-name",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 1,
+        "current_step": "name",
+        "visible_answer": "Storm Courier",
+        "answer": {
+          "display_name": "Storm Courier"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-boundaries",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 2,
+        "current_step": "boundaries_preferences",
+        "visible_answer": "None; Mystery",
+        "answer": {
+          "boundaries": "None",
+          "preferences": "Mystery"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-requests",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 3,
+        "current_step": "specific_requests",
+        "visible_answer": "No additional requests",
+        "answer": {
+          "no_additional_requests": true,
+          "requests": ""
+        }
+      }
+    },
+    {
+      "method": "start_guided_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "storm-start",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "display_name": "Storm Courier",
+        "candidate_id": null,
+        "setting_id": null,
+        "plan_id": null,
+        "player_character_id": null,
+        "companion_ids": [],
+        "premise": "A courier shelters from a storm."
+      }
+    },
+    {
+      "method": "finalize_campaign_construction",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "dm_provider_id": "${provider_id}",
+        "dm_model_id": "${model_id}"
+      },
+      "save": {
+        "session_id": "/result/handoff/dm_session_id",
+        "turn_id": "/result/dm_turn_id"
+      }
+    },
+    {
+      "method": "catalog",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "backup_database",
+      "params": {}
+    },
+    {
+      "method": "backup_database",
+      "params": {
+        "backup_id": "../escape"
+      }
+    },
+    {
+      "method": "backup_database",
+      "params": {
+        "backup_id": 5
+      }
+    },
+    {
+      "method": "backup_database",
+      "params": {
+        "backup_id": "backup-one"
+      }
+    },
+    {
+      "method": "open_provider_setup",
+      "params": {}
+    },
+    {
+      "method": "open_provider_setup",
+      "params": {
+        "preset_id": "nope"
+      }
+    },
+    {
+      "method": "open_provider_setup",
+      "params": {
+        "preset_id": 5
+      }
+    },
+    {
+      "method": "open_provider_setup",
+      "params": {
+        "preset_id": "custom"
+      }
+    },
+    {
+      "method": "admin_full_audit_status"
+    },
+    {
+      "method": "admin_full_audit_record",
+      "params": {
+        "index": 0
+      }
+    },
+    {
+      "method": "admin_full_audit_record",
+      "params": {
+        "index": -1
+      }
+    },
+    {
+      "method": "admin_full_audit_record",
+      "params": {
+        "index": true
+      }
+    },
+    {
+      "method": "admin_full_audit_record",
+      "params": {
+        "index": 1.0
+      }
+    },
+    {
+      "method": "admin_full_audit_record",
+      "params": {}
+    },
+    {
+      "method": "set_admin_full_audit",
+      "params": {
+        "enabled": null
+      }
+    },
+    {
+      "method": "set_admin_full_audit",
+      "params": {
+        "enabled": "yes"
+      }
+    },
+    {
+      "method": "set_admin_full_audit",
+      "params": {
+        "enabled": true
+      }
+    },
+    {
+      "method": "admin_full_audit_status"
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {}
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {
+        "destination_path": "relative-audit.json"
+      }
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {
+        "destination_path": "${data_root}"
+      }
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {
+        "destination_path": "${data_root}/missing-folder/audit.json"
+      }
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {
+        "destination_path": "${data_root}/audit-export.json"
+      }
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {
+        "destination_path": "${data_root}/audit-export.json"
+      }
+    },
+    {
+      "method": "set_admin_full_audit",
+      "params": {}
+    },
+    {
+      "method": "admin_full_audit_status"
+    },
+    {
+      "method": "export_admin_full_audit",
+      "params": {
+        "destination_path": "${data_root}/audit-disabled.json"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}
