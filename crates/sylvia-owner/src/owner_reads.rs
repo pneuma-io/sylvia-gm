@@ -33,6 +33,11 @@ impl OwnerReads {
         Self { store }
     }
 
+    /// The store handle the reads go to (for the GM turn's `TurnOwner` delegation).
+    pub(crate) fn store(&self) -> &StoreHandle {
+        &self.store
+    }
+
     /// `campaign_index()`.
     pub async fn campaign_index(&self) -> CodedResult<Vec<CampaignIndexEntry>> {
         self.store.call(|store| store.campaign_index_entries()).await.map_err(coded)

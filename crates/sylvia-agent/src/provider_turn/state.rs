@@ -204,7 +204,9 @@ turn_locals! {
         empty_collection_paths: Vec<String>,
         empty_completion_corrections_used: i64,
         entity_display_names: IndexMap<String, String>,
-        exchange_messages: Vec<Tagged>,
+        /// `exchange_messages`: Python assigns `state.messages` itself (the same list), so it is
+        /// only a marker here and [`TurnLocals::exchange_messages_mut`] reaches `messages`.
+        exchange_messages: (),
         facts: Option<JsonMap>,
         finish_reason: String,
         inference_id: String,
@@ -269,6 +271,15 @@ turn_locals! {
         tools: Vec<JsonMap>,
         unsupported_speakers: bool,
         update: JsonMap,
+    }
+}
+
+impl TurnLocals {
+    /// `state.exchange_messages`: the round's messages, the same list as `state.messages` once
+    /// the round assigned it (`state.exchange_messages = state.messages`).
+    pub fn exchange_messages_mut(&mut self) -> Local<&mut Vec<Tagged>> {
+        self.exchange_messages.get()?;
+        self.messages.get_mut()
     }
 }
 

@@ -541,9 +541,10 @@ impl WorkingContextProvider {
         self.model().map(|model| model.transport.as_str())
     }
 
-    /// The model's effective context window (`model_info.context_window`).
+    /// The model's effective context window (`model_info.context_window`), as it is now: an
+    /// account runtime may have observed a new window since construction.
     fn context_window(&self) -> Option<i64> {
-        self.model().and_then(|model| model.context_window)
+        self.model().and_then(ModelInfo::context_window)
     }
 
     fn runtime_managed(&self) -> bool {

@@ -3,7 +3,7 @@
 //! `_campaign_context_messages`, `_opening_footing_payload`, `_participant_prompt_payloads`, and
 //! the module helpers they use).
 
-use super::reads::OpeningReads;
+use super::reads::{OpeningReads, TurnOwner};
 use super::tagged::{Tagged, ACTIVE_RECORDS_KEY};
 use crate::campaign_memory::{self, RankReferences};
 use serde_json::{json, Value as Json};
@@ -36,7 +36,18 @@ pub struct ProviderSessionAdapter {
     pub(crate) campaign_plan: Option<JsonMap>,
     pub(crate) campaign_knowledge: Option<JsonMap>,
     pub(crate) context_mode: String,
+    /// The owner a GM turn calls ([`ProviderSessionAdapter::with_turn_owner`]); the opening
+    /// preflight's adapter has only the request assembly's reads.
+    pub(crate) turn: Option<Arc<dyn TurnOwner>>,
+    /// Lane 3's campaign-memory ranker, for the turn's campaign context.
+    pub(crate) rank: Option<Arc<RankFn>>,
+    /// `uuid.uuid4().hex`, for the turn's inference and discovery identities.
+    pub(crate) ids: Arc<dyn Fn() -> String + Send + Sync>,
 }
+
+/// The ranker a turn's adapter keeps ([`RankReferences`], owned).
+pub type RankFn =
+    dyn Fn(&str, &[campaign_memory::KnowledgeReference]) -> CodedResult<Vec<JsonMap>> + Send + Sync;
 
 fn value_error(message: &str) -> CodedError {
     CodedError::rejected(message).with_error_type("ValueError")
@@ -101,7 +112,76 @@ impl ProviderSessionAdapter {
             campaign_plan,
             campaign_knowledge,
             context_mode,
+            turn: None,
+            rank: None,
+            ids: Arc::new(crate::working_context::uuid4_hex),
         })
+    }
+
+    /// The adapter for GM turns: the owner's turn calls, and the ranker its campaign memory
+    /// uses. The owner also answers the request assembly's reads.
+    #[must_use]
+    pub fn with_turn_owner(mut self, owner: Arc<dyn TurnOwner>, rank: Arc<RankFn>) -> Self {
+        self.reads = Arc::clone(&owner) as Arc<dyn OpeningReads>;
+        self.turn = Some(owner);
+        self.rank = Some(rank);
+        self
+    }
+
+    /// Replace the `uuid4().hex` source (fixed identities for tests).
+    #[must_use]
+    pub fn with_ids(mut self, ids: Arc<dyn Fn() -> String + Send + Sync>) -> Self {
+        self.ids = ids;
+        self
+    }
+
+    /// The owner a GM turn calls.
+    pub(crate) fn turn_owner(&self) -> CodedResult<&dyn TurnOwner> {
+        self.turn.as_deref().ok_or_else(|| {
+            CodedError::new("internal_error", "This provider session adapter has no turn owner")
+                .with_error_type("RuntimeError")
+        })
+    }
+
+    /// The turn's campaign-memory ranker.
+    pub(crate) fn ranker(&self) -> CodedResult<&RankFn> {
+        self.rank.as_deref().ok_or_else(|| {
+            CodedError::new("internal_error", "This provider session adapter has no ranker")
+                .with_error_type("RuntimeError")
+        })
+    }
+
+    /// `uuid.uuid4().hex`.
+    pub(crate) fn uuid_hex(&self) -> String {
+        (self.ids)()
+    }
+
+    /// The wrapped provider.
+    pub fn provider(&self) -> &Arc<dyn Provider> {
+        &self.provider
+    }
+
+    /// `_gm_request_context_id(provider_input)`.
+    pub(crate) async fn gm_request_context_id(&self, input: &SessionProviderInput) -> CodedResult<String> {
+        let session = &input.session;
+        let campaign_id = session.campaign_id();
+        let mut owner = match self.gm_context_owner(input).await? {
+            Some(owner) => owner,
+            None => {
+                let mut owner = JsonMap::new();
+                owner.insert("kind".into(), "gm".into());
+                owner.insert("campaign_id".into(), campaign_id.map_or(Json::Null, Json::from));
+                owner.insert("session_id".into(), session.session_id().into());
+                owner
+            }
+        };
+        if let Some(campaign_id) = campaign_id {
+            let lock = self.turn_owner()?.current_package_lock(campaign_id).await?;
+            owner.insert("package_lock_id".into(), lock.lock_id.into());
+        }
+        owner.insert("provider_id".into(), session.fields().provider_id.as_str().into());
+        owner.insert("model_id".into(), session.fields().model_id.as_str().into());
+        Ok(crate::inference_identity::inference_context_id(&owner, self.provider.model_info()))
     }
 
     /// The request assembly this adapter's route uses (`self._context_mode`).
