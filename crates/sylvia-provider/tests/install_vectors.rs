@@ -102,7 +102,14 @@ fn run_case(case: &Value) {
         std::process::id(),
         name.replace('/', "-")
     ));
-    let _ = std::fs::remove_dir_all(&home);
+    if let Err(error) = std::fs::remove_dir_all(&home) {
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::NotFound,
+            "cannot clear the old work folder {}: {error}",
+            home.display()
+        );
+    }
     std::fs::create_dir_all(&home).unwrap();
     for existing in case["existing"].as_array().into_iter().flatten() {
         let target = home.join("install").join(existing[0].as_str().unwrap());
