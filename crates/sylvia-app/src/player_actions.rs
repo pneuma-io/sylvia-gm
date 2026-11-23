@@ -329,7 +329,7 @@ use sylvia_domain::pyops::py_type_name;
 
 /// `TypeError: unhashable type` when Python cannot put `value` in a set. The owner's action
 /// declarations, control scope and state are frozen, so the type is `FrozenJsonDict` or
-/// `FrozenJsonList` (differences row NEXT: a literal surface source is thawed, so Python names
+/// `FrozenJsonList` (differences row 48: a literal surface source is thawed, so Python names
 /// `dict` or `list` there).
 fn hashable(value: &Json) -> DomainResult<()> {
     match value {
