@@ -651,13 +651,20 @@ def targeted() -> list[dict]:
     case("overlap survives a move", synthetic("move", [query_effect("circle_overlap", "_o1"),
                                                        {"spatial_mutation": move, "store_as": "_m"},
                                                        query_effect("circle_overlap", "_o2")]), "move", target)
+    case("overlap int and float origin", synthetic("look", [
+        query_effect("circle_overlap", "_o1"), query_effect("circle_overlap", "_o2", origin=[5.5, 5.5, 0.0])]), "look", target)
+    case("overlap negative zero origin", synthetic("look", [
+        query_effect("circle_overlap", "_o1"), query_effect("circle_overlap", "_o2", origin=[5.5, 5.5, -0.0])]), "look", target)
+    case("scene changed by a write", synthetic("look", [
+        query_effect("ray"), {"set": {"field": "state.scene.map.revision", "value": 4}}, query_effect("ray", "_r")]),
+         "look", target)
     case("overlap moved fixed body", synthetic("move", [
         query_effect("circle_overlap", "_o1"),
         {"spatial_mutation": {**move, "target": {"kind": "entity", "id": "elf"}, "patch": {"position": [11, 10, 0]}},
          "store_as": "_m"},
         query_effect("circle_overlap", "_o2")]), "move", target)
     case("private copies", synthetic("look", [
-        query_effect("path"),
+        query_effect("path", start=[5, 5]),
         {"set": {"field": "_copy", "value": "_q"}}, {"set": {"field": "_cells", "value": "_q.cells"}},
         {"set": {"field": "_count", "value": "len(_q.cells)"}}, {"set": {"field": "_found", "value": "_q.found"}},
         {"set": {"field": "_twice", "value": "_cells"}},
@@ -669,12 +676,19 @@ def targeted() -> list[dict]:
         {"set": {"field": "_plain_map", "value": "state.plain"}},
         {"publish": {"fields": {"count": "_count", "cells": "_cells"}}}]), "look", target)
     case("private copies unpublished", synthetic("look", [
-        query_effect("path"), {"set": {"field": "_copy", "value": "_q"}}, {"set": {"field": "_count", "value": "len(_q.cells)"}},
-        {"set": {"field": "_entities", "value": "state.scene.entities"}}, {"set": {"field": "_plain_map", "value": "state.plain"}}]),
+        query_effect("path", start=[5, 5]), {"set": {"field": "_copy", "value": "_q"}},
+        {"set": {"field": "_count", "value": "len(_q.cells)"}}, {"set": {"field": "_twice", "value": "_copy"}},
+        {"set": {"field": "_cells", "value": "_q.cells"}}, {"for_each": {"collection": "_cells", "as": "_cell", "do": []}},
+        {"list_push": {"list": "_bag", "value": "_q"}}, {"list_push": {"list": "_box", "value": "_q"}},
+        {"list_pop": {"list": "_box"}, "store_as": "_popped"},
+        {"set": {"field": "_entities", "value": "state.scene.entities"}}, {"set": {"field": "_spaced", "value": "merge(state.scene , state.plain)"}},
+        {"set": {"field": "_near", "value": "xstate.scene"}}, {"set": {"field": "_plain_map", "value": "state.plain"}}]),
          "look", target)
     state_bound = [TARGET, {"name": "scene_map", "type": "object", "from_state": "state.scene.map"},
                    {"name": "plain_map", "type": "object", "from_state": "state.plain"}]
-    case("private state parameters", synthetic("look", [query_effect("ray")], parameters=state_bound), "look", target)
+    case("private state parameters", synthetic("look", [query_effect("ray"), {"set": {"field": "_copy_map", "value": "scene_map"}},
+                                                        {"set": {"field": "_copy_plain", "value": "plain_map"}}],
+                                                 parameters=state_bound), "look", target)
     case("state parameters without a scene", synthetic("look", [{"set": {"field": "_x", "value": 1}}], parameters=state_bound),
          "look", target)
     many = {"for_each": {"collection": "_xs", "as": "_i", "do": [
@@ -682,6 +696,8 @@ def targeted() -> list[dict]:
                            "query": {**{k: v for k, v in QUERIES["ray"].items() if k != "kind"}, "destination": ["{_i}", 10, 1.5]}},
          "store_as": "_q"}]}}
     case("evidence limit", synthetic("look", [{"set": {"field": "_xs", "value": [2 + i / 10 for i in range(130)]}}, many]),
+         "look", target)
+    case("evidence one over the limit", synthetic("look", [{"set": {"field": "_xs", "value": [2 + i / 10 for i in range(129)]}}, many]),
          "look", target)
     case("evidence just under the limit", synthetic("look", [{"set": {"field": "_xs", "value": [2 + i / 10 for i in range(128)]}}, many]),
          "look", target)

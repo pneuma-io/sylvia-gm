@@ -355,6 +355,8 @@ def targeted() -> list[dict]:
     case("preflight missing", {"preview": card, "preflight": ["absent"]}, extra=extra)
     case("preflight path", {"preview": card, "preflight": ["helper"],
                             "preflight_path": {"scene": "state.scene", "route": "_route", "cost": "_cost"}}, extra=extra)
+    case("preflight path missing scene", {"preview": card, "preflight": ["helper"],
+                                          "preflight_path": {"scene": "state.absent", "route": "_route", "cost": "_cost"}}, extra=extra)
     case("preflight big float", {"preview": {"version": 1, "title": "Big", "summary": [
         {"label": "B", "value": {"path": "context._big"}, "optional": True},
         {"label": "N", "value": {"path": "context._nan", "labels": {"nan": "x"}}, "optional": True},

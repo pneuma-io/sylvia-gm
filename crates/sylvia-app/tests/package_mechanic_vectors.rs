@@ -228,8 +228,7 @@ fn port_pending_passes_through_procedures_and_nested_calls() {
         assert_eq!(case["pending"], "aoe", "{name}: Python reaches the effect");
         let actual = record(case, &runtimes);
         assert_eq!(
-            actual["pending"],
-            "not yet ported: the 'aoe' effect (lane 2's spatial effect handlers)",
+            actual["pending"], "not yet ported: the 'aoe' effect (lane 2's spatial effect handlers)",
             "{name}: {actual}"
         );
     }
