@@ -56,5 +56,11 @@ harness = false
 name = "chatgpt_vectors"
 harness = false
 
+# ChatGPTProvider. It is also the scripted app-server its cases run against, which must answer
+# before a test harness reads its arguments.
+[[test]]
+name = "chatgpt_provider_vectors"
+harness = false
+
 [lints]
 workspace = true

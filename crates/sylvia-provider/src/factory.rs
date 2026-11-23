@@ -3,10 +3,11 @@
 //! Chat Completions and Responses build an [`OpenAICompatProvider`], Anthropic Messages an
 //! [`AnthropicProvider`] and Gemini a [`GeminiProvider`] (lane 5), each over its own HTTP client,
 //! as each Python provider builds its own client (its own connection pool and cookie jar). Claude
-//! Code builds a [`ClaudeProvider`] over Sylvia's copy in the runtime home. The ChatGPT runtime
-//! passes Python's checks and then answers `rust_port_pending` until its adapter is ported.
+//! Code builds a [`ClaudeProvider`] over Sylvia's copy in the runtime home, and the ChatGPT
+//! subscription a [`ChatGPTProvider`] over Sylvia's Codex runtime home.
 
 use crate::anthropic::{AnthropicEnvironment, AnthropicProvider};
+use crate::chatgpt_provider::ChatGPTProvider;
 use crate::claude_provider::ClaudeProvider;
 use crate::gemini::GeminiProvider;
 use crate::http::HttpTransport;
@@ -19,8 +20,8 @@ use crate::types::{transport, ModelInfo, ProviderConfig, RetryConfig, TimeoutCon
 use std::sync::Arc;
 use sylvia_base::CodedError;
 
-/// The code a transport whose adapter is not ported yet answers with (the owner's
-/// `rust_port_pending`).
+/// The owner's `rust_port_pending` code, for behaviour the port has not reached yet. Every
+/// transport now builds its provider.
 pub const PORT_PENDING: &str = "rust_port_pending";
 
 fn value_error(message: impl Into<String>) -> CodedError {
@@ -84,10 +85,6 @@ impl DefaultProviderFactory {
     }
 }
 
-fn pending(transport: &str) -> CodedError {
-    CodedError::new(PORT_PENDING, format!("The Rust owner cannot build {transport} providers yet."))
-}
-
 impl ProviderFactory for DefaultProviderFactory {
     fn create(&self, config: ProviderConfig) -> Result<Arc<dyn Provider>, CodedError> {
         Ok(match self.build(config)? {
@@ -95,6 +92,7 @@ impl ProviderFactory for DefaultProviderFactory {
             BuiltProvider::Anthropic(provider) => Arc::new(provider),
             BuiltProvider::Gemini(provider) => Arc::new(provider),
             BuiltProvider::Claude(provider) => Arc::new(*provider),
+            BuiltProvider::ChatGPT(provider) => Arc::new(*provider),
         })
     }
 }
@@ -109,6 +107,8 @@ pub enum BuiltProvider {
     Gemini(GeminiProvider),
     /// Sylvia's copy of Claude Code.
     Claude(Box<ClaudeProvider>),
+    /// The ChatGPT subscription through Codex.
+    ChatGPT(Box<ChatGPTProvider>),
 }
 
 /// The client timeouts for a Gemini provider. Python's `httpx.AsyncClient` applies each call's
@@ -147,7 +147,12 @@ impl DefaultProviderFactory {
             if config.provider_key != "chatgpt_subscription" || config.runtime_home.is_empty() {
                 return Err(value_error("ChatGPT requires an owner-managed subscription profile"));
             }
-            return Err(pending(wire));
+            return Ok(BuiltProvider::ChatGPT(Box::new(ChatGPTProvider::new(
+                std::path::Path::new(&config.runtime_home),
+                model_info,
+                None,
+                &crate::config::env::Environment::current(),
+            ))));
         }
         // Explicit configuration, else the provider's default, else the generic default.
         let retry_config =
