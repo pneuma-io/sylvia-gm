@@ -185,8 +185,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_session.py:1290` | `_speaker_names_overlap.contains` | re.search; pattern built at run time, check by hand | `return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None` || `sylvia-agent` tool_batch_vectors |
 | `agent/_provider_session.py:2369` | `ProviderSessionAdapter._relevant_character_files_message` | re.search; pattern built at run time, check by hand | `if re.search( rf"(?<!\w){re.escape(alias)}(?!\w)", current_player_text, flags=re.IGNORECASE, )` | |
 | `agent/_ruleset_test_runner.py:50` | `_failure_message` | re.fullmatch; plain | `if isinstance(code, str) and re.fullmatch(r"[a-z][a-z0-9_]{0,79}", code):` | |
-| `agent/_runner.py:2015` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"^'''(?:json)?\s*", "", clean)` | |
-| `agent/_runner.py:2016` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"\s*'''$", "", clean)` | |
+| `agent/_runner.py:2015` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"^'''(?:json)?\s*", "", clean)` | retired (B2b: DM_SESSION or the non-streaming turn) |
+| `agent/_runner.py:2016` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"\s*'''$", "", clean)` | retired (B2b: DM_SESSION or the non-streaming turn) |
 | `agent/_stateless_mcp.py:1341` | `_safe_error` | re.findall; pattern built at run time, check by hand | `for match in re.findall(pattern, str(error))` | `sylvia-agent` tool_batch_vectors |
 | `agent/_tool_loader.py:79` | `<module>` | re.compile; plain | `_ALIAS = re.compile(r"^tool_[0-9a-f]{12}_(.+)$")` | |
 | `agent/_working_context.py:579` | `WorkingContextProvider.read_history` | re.compile; pattern built at run time, check by hand | `match = re.compile(re.escape(query), re.IGNORECASE).search(text, offset)` | `sylvia-agent` working_context_vectors (Python's `_sre` case tables: `sylvia_base::pyre::ignorecase_search`) |

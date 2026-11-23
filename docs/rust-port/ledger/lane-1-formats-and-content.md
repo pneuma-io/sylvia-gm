@@ -11,7 +11,7 @@ file; a row moves to another lane only through the manager.
 | --- | ---: | --- | --- | --- |
 | `src/sylvia_gm/agent/_builder_question_answers.py` | 127 | `sylvia-agent::builder::question_answers` | ported | `builder_question_details`, `builder_question_answer_content` (vectors `builder_foundation_vectors`) |
 | `src/sylvia_gm/agent/_builder_reference_copy_tool.py` | 98 | `sylvia-agent::builder` | pending | |
-| `src/sylvia_gm/agent/_builder_session.py` | 2,709 | `sylvia-agent::builder` | in progress | B1: `_provider_history`, `_coalesce_builder_responses` and `_builder_native_request` (`builder::history`); `_creation_subflow_purpose`, `_effective_tracked_skill` and `_builder_prompt` (`builder::prompt`, its texts read from the Python source by `generate_builder_texts.py`); `_tool_call_details`, `_durable_tool_result` and `_builder_tool_evidence` (`builder::evidence`) (vectors `builder_foundation_vectors`). The turns follow in B3, the tools in B4 to B7 |
+| `src/sylvia_gm/agent/_builder_session.py` | 2,709 | `sylvia-agent::builder` | in progress | B1: `_provider_history`, `_coalesce_builder_responses` and `_builder_native_request` (`builder::history`); `_creation_subflow_purpose`, `_effective_tracked_skill` and `_builder_prompt` (`builder::prompt`, its texts read from the Python source by `generate_builder_texts.py`); `_tool_call_details`, `_durable_tool_result` and `_builder_tool_evidence` (`builder::evidence`) (vectors `builder_foundation_vectors`). The turns follow in B3, the tools in B4 to B7. `run_builder_turn` is not ported: only Python tests call it (see "Retired files" below) |
 | `src/sylvia_gm/agent/_builder_source_tool.py` | 75 | `sylvia-agent::builder` | pending | |
 | `src/sylvia_gm/agent/_builder_title.py` | 64 | `sylvia-agent::builder::title` | ported | `opening_title`, `FirstReplyTitle`, `TITLE_INSTRUCTION` (exported) (vectors `builder_foundation_vectors`) |
 | `src/sylvia_gm/agent/_character_draft_tool.py` | 99 | `sylvia-agent::builder` | pending | |
@@ -30,7 +30,7 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/agent/_ruleset_test_provider.py` | 153 | `sylvia-agent::builder` | pending | |
 | `src/sylvia_gm/agent/_ruleset_test_runner.py` | 348 | `sylvia-agent::builder` | pending | |
 | `src/sylvia_gm/agent/_ruleset_test_tool.py` | 70 | `sylvia-agent::builder` | pending | |
-| `src/sylvia_gm/agent/_runner.py` | 2,549 | `sylvia-agent::builder::runner` | pending | Port without the `store` (`StateAPI`) and `reveal_guard` parameters and every `DM_SESSION` branch: no live caller in the 0.4.1 snapshot. The constructor refuses `DM_SESSION` before any of that code runs, and its two callers (`agent/_builder_session.py`) pass `BUILDER_FREEFORM`. If the Rust mode type can still hold `DM_SESSION`, construction refuses it with Python's `ValueError` text; if it cannot, this row will say the mode is not representable. B2a: `_wrap_builder_handler` and the Builder tool registration are `builder::tools::handlers::builder_workspace_tools`. |
+| `src/sylvia_gm/agent/_runner.py` | 2,549 | `sylvia-agent::builder::runner` | ported | B2b: `AgentRunner` in the Builder modes (construction, `turn_stream`, `_BuilderLoopGuard`, `AgentLoopError`, `StreamEvent`, the output-limit continuation, native continuation, the `ask_question` stop, between-iteration steering, the `WIDGET_ANSWER|` conversion, `_build_tools`, `_execute_tool`, the activity callbacks and `_builder_stream_options`), proven by `builder_runner_vectors` (paired runs with one scripted provider, a cancelled turn included). Built with `history_path=None` as the Builder builds it: no history file is read or written. B2a: `_wrap_builder_handler` and the Builder tool registration are `builder::tools::handlers::builder_workspace_tools`. Not ported, no live caller in the 0.4.1 snapshot: the `store` (`StateAPI`) and `reveal_guard` parameters and every `DM_SESSION` branch (construction refuses `DmSession` with Python's `ValueError` text), and the non-streaming `turn`/`_turn_impl`, `AgentTurnResult`, `_turn_with_overflow_recovery`, `_compress_and_retry`, `_detect_truncation` and `ContextExhaustedError`; see "Retired files" below. `SessionUsageTracker` (never read by the Builder) is not ported. |
 | `src/sylvia_gm/agent/_skills.py` | 59 | `sylvia-agent::builder::skills` | ported | `builder_skills`, `builder_skill_references`, `load_builder_skill`. The skills and their references are exported into `builder/builder_texts.json` by `builder/generate_builder_texts.py` (vectors `builder_foundation_vectors`) |
 | `src/sylvia_gm/application/__init__.py` | 1 | `sylvia-app::__init__` | pending | |
 | `src/sylvia_gm/application/_srd_lite_character_legacy.py` | 315 | `sylvia-app::srd_lite_character_compatibility` | ported | Data only: the compressed Lite 0.2 contract is exported as `sylvia-app/src/srd_lite_legacy_character_contract.json` by `generate_srd_lite_legacy_contract.py`; read by `srd_lite_character_compatibility` |
@@ -176,3 +176,14 @@ The Builder's two `AgentRunner` constructions in `agent/_builder_session.py` pas
 touch a file, and nothing else in `src/` or `scripts/` calls them (`session/_history.py` only
 re-exports them). `tools/_dm_campaign_handlers.py` serves only the runner's `DM_SESSION` branches,
 which the Rust runner does not port (see the `agent/_runner.py` row); lane 4 agreed this one.
+
+Agreed with the manager on 24 Nov 2026 (B2b): the owner reaches the Builder only through
+`stream_builder_turn`, which uses `AgentRunner.turn_stream` (`interfaces/commands/sessions.py`).
+`run_builder_turn`, and the non-streaming `AgentRunner.turn` / `_turn_impl` it uses, are called only
+from Python tests; nothing in `src/` or `scripts/` calls them, nor does SylviaBench or Trigger
+Discipline's own code. `_turn_with_overflow_recovery`, `_compress_and_retry`, `_detect_truncation` and
+`ContextExhaustedError` serve only `_turn_impl`'s `DM_SESSION` branch. `AgentTurnResult` has one more
+user, `session/_divergence.py`'s `DivergenceHandler.handle_divergence` (re-exported by
+`session/__init__.py`), which is reached only from the runner's `DM_SESSION` branches (`_divergence`
+is set only in DM mode), so it is retired with them; lane 4 retired `session/_divergence.py` in this
+PR with their agreement.
