@@ -140,10 +140,15 @@ def install_patches() -> None:
 
     mechanic.install_patches()
 
-    def queries(*_args, **_kwargs):
-        raise mechanic.PortPending("queries")
+    # A preview's preflight path and map preview are projected after their engines open.
+    def path(*_args, **_kwargs):
+        raise mechanic.PortPending("preflight_path")
 
-    pr._resolve_spatial_input = queries
+    def map_preview(*_args, **_kwargs):
+        raise mechanic.PortPending("map_preview")
+
+    pr.project_preflight_path = path
+    pr.project_spatial_preview = map_preview
 
 
 def run(case: dict) -> dict:
@@ -160,23 +165,11 @@ def run(case: dict) -> dict:
                               runtime_bytes=data)
     except Exception as error:  # noqa: BLE001 - every exception class is behaviour here
         return {"materialize": [type(error).__name__, str(error)]}
-    # A preview's first spatial engine is its preflight path or its map preview.
-    runtime = pr._parse_runtime(package_id=case["package_id"], runtime_bytes=data)
-    policy = parse_player_controls(runtime.tools[case["declaration"]["name"]].metadata.get("player_controls"))
-    engine_use = "map_preview" if policy.map_preview is not None else "preflight_path"
-    original = pr.AuthorityMemoryStateBridge._spatial_engine
-
-    def engine(*_args, **_kwargs):
-        raise mechanic.PortPending(engine_use)
-
-    pr.AuthorityMemoryStateBridge._spatial_engine = engine
     try:
         result = control(owned_payload(case["parameters"]), owned_payload(case["state"]),
                          owned_payload(case["participants"]))
     except mechanic.PortPending as pending:
         return {"pending": pending.args[0]}
-    finally:
-        pr.AuthorityMemoryStateBridge._spatial_engine = original
     if case["kind"] == "check":
         return {"reason": result}
     return {"preview": None if result is None else mechanic._thaw(result)}
@@ -316,11 +309,25 @@ def targeted() -> list[dict]:
         {"label": "N", "value": {"path": "context._n"}}]}, "calculations": [
         {"set": {"field": "_n", "value": "len(combat.scene.entities)"}}]})
     query = {"store_as": "_route", "spatial_query": {"scene": "state.scene", "operation": "path",
-                                                    "query": {"max_steps": 10, "start": [1, 1, 0], "goal": [3, 3, 0]}}}
+                                                    "query": {"map_id": "keep", "start": [0, 0], "goal": [10, 10],
+                                                              "allow_diagonal": True, "corner_policy": "forbid_cutting",
+                                                              "include_entities": True, "max_steps": 1000}}}
+    route_card = {"version": 1, "title": "Route", "summary": [{"label": "Cost", "value": {"path": "context._cost"}, "optional": True},
+                                                              {"label": "N", "value": {"path": "context._steps"}}]}
+    route_calc = [{"set": {"field": "_steps", "value": "len(_route.cells)"}}]
     case("queries", {"preview": card, "queries": [query]})
     case("query clash", {"preview": card, "queries": [{**query, "store_as": "_y"}]},
          parameters=(target, {"name": "_y", "type": "integer", "default": 2}))
     case("map preview", {"queries": [query], "map_preview": {"path": "_route"}})
+    case("query route", {"preview": route_card, "queries": [query], "calculations": route_calc})
+    case("query route too long", {"preview": route_card, "calculations": route_calc,
+                                  "queries": [{**query, "spatial_query": {**query["spatial_query"], "query": {
+                                      **query["spatial_query"]["query"], "max_steps": 5000}}}]})
+    case("query route invalid", {"preview": route_card, "calculations": route_calc,
+                                 "queries": [{**query, "spatial_query": {**query["spatial_query"], "query": {
+                                     **query["spatial_query"]["query"], "goal": [99, 99]}}}]})
+    case("query bad scene", {"preview": route_card, "calculations": route_calc,
+                             "queries": [{**query, "spatial_query": {**query["spatial_query"], "scene": "state.absent"}}]})
     # Preflights.
     helper = {"description": "Helper.", "parameters": [target, {"name": "steps", "type": "integer", "default": 1}],
               "effects": [{"set": {"field": "_cost", "value": "steps * 5"}}, {"set": {"field": "_label", "value": "'ok'"}},

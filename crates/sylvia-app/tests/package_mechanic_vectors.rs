@@ -156,7 +156,7 @@ fn compare(name: &str, actual: &Json, wanted: &Json, failures: &mut Vec<String>)
     for key in
         ["name", "package_id", "package_version", "package_sha256", "declaration", "runtime", "context"]
     {
-        wanted.as_object_mut().unwrap().remove(key);
+        wanted.as_object_mut().unwrap().shift_remove(key);
     }
     if let (Some(effect), Some(message)) =
         (wanted.get("pending").and_then(Json::as_str), actual.get("pending").and_then(Json::as_str))
@@ -210,8 +210,8 @@ fn package_mechanics_run_as_python() {
 }
 
 /// `PortPending` passes through a procedure and a nested `call` as `Suspended` does: the targeted
-/// spatial cases reach their effect only inside one, and Python's catch-alls there would otherwise
-/// turn the refusal into a failed action.
+/// `pending` cases reach an effect not yet ported (`aoe`) only inside one, and Python's catch-alls
+/// there would otherwise turn the refusal into a failed action.
 #[test]
 fn port_pending_passes_through_procedures_and_nested_calls() {
     let vectors: Json =
@@ -223,13 +223,13 @@ fn port_pending_passes_through_procedures_and_nested_calls() {
         riichi: hex(catalog["riichi"]["runtime_hex"].as_str().unwrap()),
         root: Path::new(env!("CARGO_MANIFEST_DIR")).join("../.."),
     };
-    for name in ["spatial nested", "spatial procedure", "spatial for_each", "spatial conditional"] {
+    for name in ["pending nested", "pending procedure", "pending for_each", "pending conditional"] {
         let case = vectors["cases"].as_array().unwrap().iter().find(|c| c["name"] == name).expect(name);
-        assert_eq!(case["pending"], "spatial_query", "{name}: Python reaches the effect");
+        assert_eq!(case["pending"], "aoe", "{name}: Python reaches the effect");
         let actual = record(case, &runtimes);
         assert_eq!(
             actual["pending"],
-            "not yet ported: the 'spatial_query' effect (lane 2's spatial effect handlers)",
+            "not yet ported: the 'aoe' effect (lane 2's spatial effect handlers)",
             "{name}: {actual}"
         );
     }

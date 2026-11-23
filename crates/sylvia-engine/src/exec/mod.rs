@@ -10,6 +10,7 @@ pub mod error;
 pub mod handlers;
 pub mod procedures;
 pub mod shape;
+pub mod spatial_bridge;
 pub mod template;
 pub mod time;
 pub mod tool;

@@ -161,7 +161,9 @@ pub(crate) fn execute_effect(
         "register_initiative_trigger" => time::handle_register_initiative_trigger(&body, ctx),
         "clock_create" => time::handle_clock_create(&body, ctx),
         "clock_tick" => time::handle_clock_tick(&body, ctx),
-        // `spatial_query`, `spatial_mutation`, `shot_effect` and `aoe`: lane 2's C3.
+        "spatial_query" => handle_spatial_query(&body, effect_map, ctx),
+        "spatial_mutation" => handle_spatial_mutation(&body, effect_map, ctx),
+        // `shot_effect` and `aoe`: lane 2's C3b.
         other => Err(ExecError::port_pending(format_args!(
             "the '{other}' effect (lane 2's spatial effect handlers)"
         ))),
@@ -352,6 +354,8 @@ fn handle_set(body: &Value, ctx: &mut ExecutionContext<'_>) -> Result<(), ExecEr
         Some(expr) => resolve_value(expr, ctx)?,
     };
     if field.starts_with('_') {
+        let source = map.get("value").cloned().unwrap_or(Value::None);
+        protect_spatial_aggregate(&field, &source, &value, ctx);
         ctx.vars.insert(field, value);
         return Ok(());
     }
@@ -546,6 +550,130 @@ fn handle_set_participant(body: &Value, ctx: &mut ExecutionContext<'_>) -> Resul
         value,
     )?;
     refresh_participant_snapshots(ctx)
+}
+
+/// `_protect_spatial_aggregate(name, source, value, ctx)`: a copied query object or list stays
+/// private, through the bridge's aggregate sources; a scalar result value does not.
+pub(crate) fn protect_spatial_aggregate(
+    name: &str,
+    source: &Value,
+    value: &Value,
+    ctx: &mut ExecutionContext<'_>,
+) {
+    if matches!(value, Value::Dict(_) | Value::List(_) | Value::Tuple(_)) {
+        if let Some(bridge) = ctx.state_bridge.as_deref_mut() {
+            bridge.register_spatial_aggregate(name, source);
+        }
+    }
+}
+
+/// `_resolve_spatial_input(value, ctx)`: nested declarative query inputs, text resolved as a
+/// parameter is, without accepting executable values.
+pub fn resolve_spatial_input(value: &Value, ctx: &ExecutionContext<'_>) -> Value {
+    match value {
+        Value::Dict(map) => Value::dict(
+            map.iter().map(|(key, item)| (key.clone(), resolve_spatial_input(item, ctx))).collect(),
+        ),
+        Value::List(items) | Value::Tuple(items) => {
+            Value::list(items.iter().map(|item| resolve_spatial_input(item, ctx)).collect())
+        }
+        Value::Str(_) => {
+            let mut single = Dict::new();
+            single.insert("value".into(), value.clone());
+            super::template::resolve_params(&single, ctx).shift_remove("value").unwrap_or(Value::None)
+        }
+        other => super::context::deep_copy(other),
+    }
+}
+
+/// `store_as`, which must name a private context variable (`startswith("_")`).
+fn private_store_as(effect: &Dict, handler: &str) -> Result<String, ExecError> {
+    match effect.get("store_as") {
+        Some(Value::Str(name)) if name.starts_with('_') => Ok(name.to_string()),
+        _ => Err(ExecError::effect(handler, "store_as must be private")),
+    }
+}
+
+/// An exception in a spatial handler becomes its effect's error; its own refusals pass.
+fn in_spatial_handler(error: ExecError, handler: &str) -> ExecError {
+    match error {
+        ExecError::Effect { .. } => error,
+        error if error.passes_through() => error,
+        other => ExecError::effect(handler, other.message()),
+    }
+}
+
+/// `_handle_spatial_query`: one neutral physical query through the package-local bridge.
+fn handle_spatial_query(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
+    let Value::Dict(map) = body else {
+        return Err(ExecError::effect("spatial_query", "body must be an object"));
+    };
+    let store_as = private_store_as(effect, "spatial_query")?;
+    let (Some(Value::Str(scene)), Some(Value::Str(operation))) = (map.get("scene"), map.get("operation"))
+    else {
+        return Err(ExecError::effect("spatial_query", "scene and operation are required"));
+    };
+    if !ctx.state_bridge.as_deref().is_some_and(|bridge| bridge.supports_spatial()) {
+        return Err(ExecError::effect("spatial_query", "authoritative spatial bridge is unavailable"));
+    }
+    let result = if &**operation == "snapshot" {
+        ctx.state_bridge.as_deref_mut().expect("checked above").spatial_snapshot(scene)
+    } else {
+        let query = resolve_spatial_input(map.get("query").unwrap_or(&Value::None), ctx);
+        let snapshot = match map.get("snapshot") {
+            None => Value::None,
+            Some(reference) => match resolve_spatial_input(reference, ctx) {
+                Value::None => {
+                    return Err(ExecError::effect("spatial_query", "spatial snapshot context is unavailable"))
+                }
+                resolved => resolved,
+            },
+        };
+        ctx.state_bridge
+            .as_deref_mut()
+            .expect("checked above")
+            .spatial_query(scene, operation, &query, &snapshot)
+    }
+    .map_err(|error| in_spatial_handler(error, "spatial_query"))?;
+    ctx.vars.insert(store_as.clone(), result);
+    ctx.state_bridge.as_deref_mut().expect("checked above").register_spatial_private_variable(&store_as);
+    Ok(())
+}
+
+/// `_handle_spatial_mutation`: one neutral exact-object patch through the package-local bridge.
+fn handle_spatial_mutation(
+    body: &Value,
+    effect: &Dict,
+    ctx: &mut ExecutionContext<'_>,
+) -> Result<(), ExecError> {
+    let Value::Dict(map) = body else {
+        return Err(ExecError::effect("spatial_mutation", "body must be an object"));
+    };
+    let store_as = private_store_as(effect, "spatial_mutation")?;
+    let Some(Value::Str(scene)) = map.get("scene") else {
+        return Err(ExecError::effect("spatial_mutation", "scene is required"));
+    };
+    if !ctx.state_bridge.as_deref().is_some_and(|bridge| bridge.supports_spatial()) {
+        return Err(ExecError::effect("spatial_mutation", "authoritative spatial bridge is unavailable"));
+    }
+    let request: Dict =
+        map.iter().filter(|(key, _)| *key != "scene").map(|(k, v)| (k.clone(), v.clone())).collect();
+    let request = resolve_spatial_input(&Value::dict(request), ctx);
+    let result = ctx
+        .state_bridge
+        .as_deref_mut()
+        .expect("checked above")
+        .spatial_mutation(scene, &request)
+        .map_err(|error| in_spatial_handler(error, "spatial_mutation"))?;
+    // The bridge wrote the advanced scene to package state itself; as in Python, the context's
+    // entity snapshots are not refreshed.
+    ctx.vars.insert(store_as.clone(), result);
+    ctx.state_bridge.as_deref_mut().expect("checked above").register_spatial_private_variable(&store_as);
+    Ok(())
 }
 
 /// `_handle_nested_call`: run another tool under the same budget, then optionally export its
