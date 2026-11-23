@@ -48,7 +48,7 @@
      "code": "command_rejected",
      "message": "This Claude connection action is unavailable.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -65,7 +65,7 @@
      "code": "command_rejected",
      "message": "This Claude connection action is unavailable.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -83,7 +83,7 @@
      "code": "command_rejected",
      "message": "Claude connection options are invalid.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -103,7 +103,7 @@
      "code": "command_rejected",
      "message": "Claude connection options are invalid.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -123,7 +123,7 @@
      "code": "command_rejected",
      "message": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -147,7 +147,7 @@
      "code": "command_rejected",
      "message": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -164,7 +164,7 @@
      "code": "command_rejected",
      "message": "Sylvia uses its own copy of Claude Code. Install it to continue; any Claude Code you already have is left alone.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
@@ -208,16 +208,65 @@
      "code": "command_rejected",
      "message": "This Claude connection action is unavailable.",
      "diagnostics": [],
-     "diagnostic_id": "b37d86afc6e84d7e86942130ead64fa8"
+     "diagnostic_id": "c320734e174d4e4ba4c0fa0d5ee8a6b1"
     }
    }
   },
   {
    "id": "s10",
+   "method": "chatgpt_connection",
+   "params": {
+    "action": "nope"
+   },
+   "reply": {
+    "id": "s10",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "This ChatGPT connection action is unavailable.",
+     "diagnostics": [],
+     "diagnostic_id": "e8ca65db74a348928673f6d7305bfb51"
+    }
+   }
+  },
+  {
+   "id": "s11",
+   "method": "chatgpt_connection",
+   "params": {
+    "action": 5
+   },
+   "reply": {
+    "id": "s11",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "This ChatGPT connection action is unavailable.",
+     "diagnostics": [],
+     "diagnostic_id": "e8ca65db74a348928673f6d7305bfb51"
+    }
+   }
+  },
+  {
+   "id": "s12",
+   "method": "chatgpt_connection",
+   "params": {},
+   "reply": {
+    "id": "s12",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "This ChatGPT connection action is unavailable.",
+     "diagnostics": [],
+     "diagnostic_id": "e8ca65db74a348928673f6d7305bfb51"
+    }
+   }
+  },
+  {
+   "id": "s13",
    "method": "shutdown",
    "params": {},
    "reply": {
-    "id": "s10",
+    "id": "s13",
     "ok": true,
     "result": {
      "status": "closed"
@@ -158818,10 +158867,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "958d46dcd98d4e419edb85b95163f017",
-     "session": "205d894656cd472783ead6ffa8052a89",
-     "first_seen": 1795417612.080426,
-     "last_seen": 1795417612.080426,
+     "id": "23036887ee5a47bd87ce1a901fe09410",
+     "session": "467a41dce09343d88ff30abe2a8974c0",
+     "first_seen": 1795424663.90848,
+     "last_seen": 1795424663.90848,
      "count": 1
     },
     {
@@ -158838,11 +158887,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 15.2,
-     "id": "60647fd86404430ebbdcaa3306baf5e4",
-     "session": "205d894656cd472783ead6ffa8052a89",
-     "first_seen": 1795417626.5558205,
-     "last_seen": 1795417626.5570796,
+     "duration_ms": 9.3,
+     "id": "3db9b97b9a434cb78b7dae58c740ea59",
+     "session": "467a41dce09343d88ff30abe2a8974c0",
+     "first_seen": 1795424684.0538273,
+     "last_seen": 1795424684.0546708,
      "count": 2
     },
     {
@@ -158860,11 +158909,32 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.1,
-     "id": "b37d86afc6e84d7e86942130ead64fa8",
-     "session": "205d894656cd472783ead6ffa8052a89",
-     "first_seen": 1795417626.5562892,
-     "last_seen": 1795417626.5571434,
+     "id": "c320734e174d4e4ba4c0fa0d5ee8a6b1",
+     "session": "467a41dce09343d88ff30abe2a8974c0",
+     "first_seen": 1795424684.054093,
+     "last_seen": 1795424684.0547116,
      "count": 8
+    },
+    {
+     "format": 1,
+     "event": "command_completed",
+     "app_version": "0.4.1",
+     "build_version": "0.4.1",
+     "runtime": "source",
+     "platform": {
+      "os": "linux"
+     },
+     "operation": "chatgpt_connection",
+     "outcome": "error",
+     "severity": "error",
+     "error_code": "command_rejected",
+     "error_type": "OwnerProtocolError",
+     "duration_ms": 0.0,
+     "id": "e8ca65db74a348928673f6d7305bfb51",
+     "session": "467a41dce09343d88ff30abe2a8974c0",
+     "first_seen": 1795424684.05475,
+     "last_seen": 1795424684.0548167,
+     "count": 3
     },
     {
      "format": 1,
@@ -158881,10 +158951,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "ad7595deb05247cbba69a74addd55f19",
-     "session": "205d894656cd472783ead6ffa8052a89",
-     "first_seen": 1795417626.5573018,
-     "last_seen": 1795417626.5573018,
+     "id": "a348742534a4446c8a3a9654a59b00cc",
+     "session": "467a41dce09343d88ff30abe2a8974c0",
+     "first_seen": 1795424684.054911,
+     "last_seen": 1795424684.054911,
      "count": 1
     }
    ]

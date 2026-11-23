@@ -1,6 +1,6 @@
 {
   "name": "account-connections",
-  "description": "The Claude Code connection on an empty data folder, offline: its status before Sylvia's copy is installed, the refused actions and options, sign-in, model registration and sign-out refused until the copy exists, and cancel; then shut down.",
+  "description": "The Claude Code connection on an empty data folder, offline: its status before Sylvia's copy is installed, the refused actions and options, sign-in, model registration and sign-out refused until the copy exists, and cancel; then the ChatGPT connection's refused actions (unknown, a number, none), which are refused before any Codex runtime is looked for, so no machine's Codex is started; then shut down.",
   "steps": [
     {"method": "claude_connection", "params": {"action": "status"}},
     {"method": "claude_connection", "params": {"action": "nope"}},
@@ -12,6 +12,9 @@
     {"method": "claude_connection", "params": {"action": "logout"}},
     {"method": "claude_connection", "params": {"action": "cancel"}},
     {"method": "claude_connection", "params": {}},
+    {"method": "chatgpt_connection", "params": {"action": "nope"}},
+    {"method": "chatgpt_connection", "params": {"action": 5}},
+    {"method": "chatgpt_connection", "params": {}},
     {"method": "shutdown"}
   ],
   "rules": {

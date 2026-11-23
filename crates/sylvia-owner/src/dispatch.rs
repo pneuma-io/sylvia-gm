@@ -190,6 +190,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
         "claude_connection" => commands::providers::handle_claude_connection(context, params).await,
+        "chatgpt_connection" => commands::providers::handle_chatgpt_connection(context, params).await,
         "remove_provider_settings" => {
             commands::providers::handle_remove_provider_settings(context, params).await
         }
