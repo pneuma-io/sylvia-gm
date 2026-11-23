@@ -58,6 +58,57 @@ fn sequence(value: Option<&Json>) -> Option<&Vec<Json>> {
     }
 }
 
+/// Where a resolved surface value holds the campaign's own state.
+///
+/// Python's campaign state is frozen (`owned_payload`), and `resolve_surface_source` returns a
+/// `state` source's value as it is, while `literal`, `participants`, `keyed_values` and `object`
+/// build plain containers. A JSON value cannot record that, and one check reads it:
+/// `_project_occupied_space`'s `isinstance(widths, (list, tuple))`, which a frozen list fails.
+/// These are the key paths of every object or list a `state` source contributed, outermost
+/// only; an empty path is the whole value.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct StatePaths(Vec<Vec<String>>);
+
+impl StatePaths {
+    /// No state: every container is plain, as a literal's or a test's value is.
+    pub fn none() -> Self {
+        Self(Vec::new())
+    }
+
+    /// The whole value is one `state` source's.
+    pub fn whole() -> Self {
+        Self(vec![Vec::new()])
+    }
+
+    /// These key paths came from `state` sources.
+    pub fn from_paths(paths: Vec<Vec<String>>) -> Self {
+        Self(paths)
+    }
+
+    /// The key paths, outermost only, in the order they were resolved.
+    pub fn paths(&self) -> &[Vec<String>] {
+        &self.0
+    }
+
+    /// Whether the value at `path` lies inside a `state` source's value (Python holds it frozen).
+    pub fn covers(&self, path: &[&str]) -> bool {
+        self.0.iter().any(|prefix| prefix.len() <= path.len() && prefix.iter().zip(path).all(|(a, b)| a == b))
+    }
+
+    /// Drop the paths at or under `key`, for a keyed value replaced by a later entry.
+    fn forget(&mut self, key: &str) {
+        self.0.retain(|path| path.first().map(String::as_str) != Some(key));
+    }
+
+    /// Add `other`'s paths under `key`.
+    fn extend_under(&mut self, key: &str, other: StatePaths) {
+        for mut path in other.0 {
+            path.insert(0, key.to_owned());
+            self.0.push(path);
+        }
+    }
+}
+
 /// `resolve_surface_source(source, state=..., participants=...)`: resolve one admitted
 /// player-surface query without reading private authorities. Python's `None` is `Json::Null`,
 /// both as `source` and as the answer.
@@ -66,35 +117,35 @@ pub fn resolve_surface_source<P: SurfaceParticipant>(
     state: &JsonMap,
     participants: &[P],
 ) -> DomainResult<Json> {
-    let Json::Object(source) = source else { return Ok(Json::Null) };
+    Ok(resolve_surface_source_with_state_paths(source, state, participants)?.0)
+}
+
+/// `resolve_surface_source(...)`, with where the answer holds the campaign's frozen state.
+///
+/// The owner's callers (`_project_player_surfaces`, `_resolve_panel_control` and
+/// `_player_action_preview`) pass these paths to `project_coordinate_map` with the value, so a
+/// coordinate map's occupied space reads its widths as Python does.
+pub fn resolve_surface_source_with_state_paths<P: SurfaceParticipant>(
+    source: &Json,
+    state: &JsonMap,
+    participants: &[P],
+) -> DomainResult<(Json, StatePaths)> {
+    let Json::Object(source) = source else { return Ok((Json::Null, StatePaths::none())) };
     let kind = source.get("kind").and_then(Json::as_str);
     Ok(match kind {
-        Some("literal") => Json::Object(owned_payload(source.get("value").unwrap_or(&Json::Null))?),
+        Some("literal") => {
+            (Json::Object(owned_payload(source.get("value").unwrap_or(&Json::Null))?), StatePaths::none())
+        }
         Some("state") => {
             let (Some(Json::String(namespace)), Some(Json::String(key))) =
                 (source.get("namespace"), source.get("key"))
             else {
-                return Ok(Json::Null);
+                return Ok((Json::Null, StatePaths::none()));
             };
-            if let Some(value) = state.get(&format!("{namespace}.{key}")) {
-                return Ok(value.clone());
-            }
-            let (root, remainder) = match key.split_once('.') {
-                Some((root, remainder)) => (root, Some(remainder)),
-                None => (key.as_str(), None),
-            };
-            let mut current = state.get(&format!("{namespace}.{root}")).cloned().unwrap_or(Json::Null);
-            let Some(remainder) = remainder else { return Ok(current) };
-            for field in remainder.split('.') {
-                current = match current {
-                    Json::Object(map) => match map.get(field).cloned() {
-                        Some(value) => value,
-                        None => return Ok(Json::Null),
-                    },
-                    _ => return Ok(Json::Null),
-                };
-            }
-            current
+            let value = state_value(state, namespace, key);
+            let paths =
+                if value.is_object() || value.is_array() { StatePaths::whole() } else { StatePaths::none() };
+            (value, paths)
         }
         Some("participants") => {
             let kinds: Vec<&str> =
@@ -111,34 +162,72 @@ pub fn resolve_surface_source<P: SurfaceParticipant>(
                     }
                 }
             }
-            Json::Array(result)
+            (Json::Array(result), StatePaths::none())
         }
         Some("keyed_values") => {
             let mut keyed = JsonMap::new();
+            let mut paths = StatePaths::none();
             for entry in sequence(source.get("entries")).into_iter().flatten() {
                 let Json::Object(entry) = entry else { continue };
-                let key =
-                    resolve_surface_source(entry.get("key").unwrap_or(&Json::Null), state, participants)?;
-                let value =
-                    resolve_surface_source(entry.get("value").unwrap_or(&Json::Null), state, participants)?;
+                let (key, _) = resolve_surface_source_with_state_paths(
+                    entry.get("key").unwrap_or(&Json::Null),
+                    state,
+                    participants,
+                )?;
+                let (value, value_paths) = resolve_surface_source_with_state_paths(
+                    entry.get("value").unwrap_or(&Json::Null),
+                    state,
+                    participants,
+                )?;
                 if let Json::String(key) = key {
                     if !sylvia_base::pystr::strip(&key).is_empty() && !value.is_null() {
+                        paths.forget(&key);
+                        paths.extend_under(&key, value_paths);
                         keyed.insert(key, value);
                     }
                 }
             }
-            Json::Object(keyed)
+            (Json::Object(keyed), paths)
         }
         Some("object") => {
-            let Some(Json::Object(fields)) = source.get("fields") else { return Ok(Json::Null) };
+            let Some(Json::Object(fields)) = source.get("fields") else {
+                return Ok((Json::Null, StatePaths::none()));
+            };
             let mut resolved = JsonMap::new();
+            let mut paths = StatePaths::none();
             for (name, child) in fields {
-                resolved.insert(name.clone(), resolve_surface_source(child, state, participants)?);
+                let (value, child_paths) =
+                    resolve_surface_source_with_state_paths(child, state, participants)?;
+                paths.extend_under(name, child_paths);
+                resolved.insert(name.clone(), value);
             }
-            Json::Object(resolved)
+            (Json::Object(resolved), paths)
         }
-        _ => Json::Null,
+        _ => (Json::Null, StatePaths::none()),
     })
+}
+
+/// A `state` source's value: the exact key, else the dotted path below its first segment.
+fn state_value(state: &JsonMap, namespace: &str, key: &str) -> Json {
+    if let Some(value) = state.get(&format!("{namespace}.{key}")) {
+        return value.clone();
+    }
+    let (root, remainder) = match key.split_once('.') {
+        Some((root, remainder)) => (root, Some(remainder)),
+        None => (key, None),
+    };
+    let mut current = state.get(&format!("{namespace}.{root}")).cloned().unwrap_or(Json::Null);
+    let Some(remainder) = remainder else { return current };
+    for field in remainder.split('.') {
+        current = match current {
+            Json::Object(map) => match map.get(field).cloned() {
+                Some(value) => value,
+                None => return Json::Null,
+            },
+            _ => return Json::Null,
+        };
+    }
+    current
 }
 
 // ── Projections and tactical action parameters ────────────────────────────────────────────
@@ -422,9 +511,13 @@ pub fn coordinate_actor_reference(actions: &Json) -> Result<Option<String>, Tact
 
 /// `project_coordinate_map(value, actor_reference=...)`: the public active combat bodies, each
 /// with its Ruleset-selected mechanical actor reference and declared occupied space.
+/// `state_paths` says where `value` holds the campaign's frozen state, as
+/// `resolve_surface_source_with_state_paths` reports it; pass `StatePaths::none()` for a plain
+/// value.
 pub fn project_coordinate_map(
     value: &Json,
     actor_reference: Option<&str>,
+    state_paths: &StatePaths,
 ) -> Result<JsonMap, TacticalGridError> {
     if let Json::Object(map) = value {
         if map.get("enabled").is_some_and(|enabled| enabled != &Json::Bool(true)) {
@@ -468,10 +561,11 @@ pub fn project_coordinate_map(
         }
     }
     if let Some(declaration) = value.get("occupied_space") {
+        let frozen_widths = state_paths.covers(&["occupied_space", "declaration", "widths"]);
         let Json::Array(entities) = &mut projected["entities"] else { unreachable!("projected entities") };
         for item in entities {
             let item = item.as_object_mut().expect("a projected entity");
-            let space = project_occupied_space(declaration, item.get("actor_ref"));
+            let space = project_occupied_space(declaration, item.get("actor_ref"), frozen_widths);
             item.insert("occupied_space".into(), Json::Object(space));
         }
     }
@@ -479,10 +573,10 @@ pub fn project_coordinate_map(
 }
 
 /// `_project_occupied_space(value, actor_ref)`: a package-declared category/diameter table,
-/// without inferring a body or category. `widths` is read as SRD Lite's literal declaration is
-/// (differences row NEXT: Python's `isinstance(widths, (list, tuple))` refuses a frozen list, so
-/// widths read from state are `unavailable` there).
-fn project_occupied_space(value: &Json, actor_ref: Option<&Json>) -> JsonMap {
+/// without inferring a body or category. `isinstance(widths, (list, tuple))` refuses a frozen
+/// list, so widths read from the campaign's state (`frozen_widths`) are always `unavailable`;
+/// SRD Lite's literal declaration is thawed, so its widths are read.
+fn project_occupied_space(value: &Json, actor_ref: Option<&Json>, frozen_widths: bool) -> JsonMap {
     let mut unavailable = JsonMap::new();
     unavailable.insert("status".into(), Json::from("unavailable"));
     unavailable
@@ -506,7 +600,8 @@ fn project_occupied_space(value: &Json, actor_ref: Option<&Json>) -> JsonMap {
     ) else {
         return unavailable;
     };
-    let widths_valid = (1..=32).contains(&widths.len())
+    let widths_valid = !frozen_widths
+        && (1..=32).contains(&widths.len())
         && widths.iter().all(|width| width.as_f64().is_some_and(|width| 0.0 < width && width <= 1_000_000.0));
     if !widths_valid || field.is_empty() || !(1..=128).contains(&convention.chars().count()) {
         return unavailable;

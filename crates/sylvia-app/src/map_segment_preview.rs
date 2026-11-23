@@ -2,7 +2,7 @@
 //! mechanics are inferred; the owner lets every exception through, so they all keep their class.
 
 use crate::spatial_preview::project_spatial_preview;
-use crate::tactical_grid::{project_coordinate_map, project_tactical_grid, TacticalGridError};
+use crate::tactical_grid::{project_coordinate_map, project_tactical_grid, StatePaths, TacticalGridError};
 use sylvia_base::{Json, JsonMap};
 use sylvia_engine::spatial::{SpatialEngine, SpatialError};
 
@@ -34,8 +34,10 @@ pub fn segment_preview(
     if action.get("spatial_preview").and_then(Json::as_str) != Some("segment") {
         return Ok(None);
     }
+    // Without an actor reference every body's occupied space is unavailable, whatever the widths'
+    // source, and the presentation never shows it, so the coordinate map needs no state paths.
     let projected = if item(surface, "renderer")? == "coordinate_map" {
-        project_coordinate_map(data, None)?
+        project_coordinate_map(data, None, &StatePaths::none())?
     } else {
         project_tactical_grid(data)?
     };

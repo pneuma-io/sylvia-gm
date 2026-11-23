@@ -25,8 +25,9 @@ Three sources of inputs:
   is skipped: a Rust string cannot hold one (differences row 3).
 
 Every input is frozen (`owned_json_value`) before the call, as the owner's surface data, actions
-and projections are, except an occupied-space declaration, which is thawed as its shipped
-`literal` source is. Large values are kept once, by SHA-256, in `documents` (`{"$doc": digest}`).
+and projections are. A coordinate map's value is frozen only at its case's `state_paths`, as
+`resolve_surface_source` hands one over (by default SRD Lite's: everything from state except the
+occupied-space declaration, a literal). Large values are kept once, by SHA-256, in `documents` (`{"$doc": digest}`).
 """
 
 from __future__ import annotations
@@ -192,13 +193,15 @@ def run(case: dict) -> dict:
     arguments = {key: loaded(value) for key, value in case["arguments"].items()}
     frozen = {}
     for key, value in arguments.items():
-        if key in ("viewer_ids", "action_ids"):
+        if key == "state_paths":
+            frozen[key] = value
+        elif key in ("viewer_ids", "action_ids"):
             frozen[key] = frozenset(value)
         else:
             frozen[key] = owned_json_value(value)
-    for key in ("value", "data"):
-        if function in ("coordinate", "segment") and key in frozen:
-            frozen[key] = literal_declaration(frozen[key])
+    if function == "coordinate":
+        frozen["value"] = with_state(arguments["value"], arguments.pop("state_paths"))
+        frozen.pop("state_paths")
     positional = [frozen[key] for key in PARAMETERS[function] if key in frozen and key in POSITIONAL[function]]
     keywords = {key: frozen[key] for key in PARAMETERS[function] if key in frozen and key not in POSITIONAL[function]}
     try:
@@ -208,19 +211,30 @@ def run(case: dict) -> dict:
     return {"ok": thaw_json_value(result) if result is not None else None}
 
 
-def literal_declaration(data: object) -> object:
-    """Thaw an occupied-space declaration, as its shipped `literal` surface source is.
+def with_state(value: object, paths: list[list[str]], path: tuple = ()) -> object:
+    """The surface value as `resolve_surface_source` hands it over: the subtrees at `paths` frozen,
+    as a `state` source's are, and every other container plain, as a literal's or an object's are."""
+    from sylvia_gm.domain.authority import owned_json_value
 
-    `_project_occupied_space` checks `isinstance(widths, (list, tuple))`, which a frozen list
-    fails, so Python declares the space only for a literal's thawed widths (SRD Lite's case);
-    from state it is unavailable (differences row NEXT).
-    """
-    from sylvia_gm.domain.authority import thaw_json_value
+    if list(path) in paths:
+        return owned_json_value(value)
+    if isinstance(value, Mapping):
+        return {key: with_state(item, paths, (*path, key)) for key, item in value.items()}
+    return value
 
-    space = data.get("occupied_space") if isinstance(data, Mapping) else None
-    if not isinstance(space, Mapping) or "declaration" not in space:
-        return data
-    return {**data, "occupied_space": {**space, "declaration": thaw_json_value(space["declaration"])}}
+
+def default_state_paths(data: object) -> list[list[str]]:
+    """SRD Lite's combat map: every field from state except the occupied-space declaration, a
+    literal."""
+    if not isinstance(data, Mapping):
+        return [[]]
+    paths = [[key] for key in data if key != "occupied_space"]
+    space = data.get("occupied_space")
+    if isinstance(space, Mapping):
+        paths += [["occupied_space", key] for key in space if key != "declaration"]
+    elif "occupied_space" in data:
+        paths.append(["occupied_space"])
+    return paths
 
 
 POSITIONAL = {
@@ -298,6 +312,8 @@ def targeted() -> list[dict]:
     cases: list[dict] = []
 
     def case(label, function, **arguments):
+        if function == "coordinate" and "state_paths" not in arguments:
+            arguments["state_paths"] = default_state_paths(arguments["value"])
         cases.append({"label": label, "function": function,
                       "arguments": {key: stored(value) for key, value in arguments.items()}})
 
@@ -434,6 +450,17 @@ def targeted() -> list[dict]:
         for reference in ("actor_id", None):
             case(f"coordinate occupied {label} {reference}", "coordinate",
                  value=arena_data(occupied_space=space), actor_reference=reference)
+    for label, paths in {
+        "space from state": [["scene"], ["occupied_space"]],
+        "declaration from state": [["scene"], ["occupied_space", "declaration"]],
+        "widths from state": [["scene"], ["occupied_space", "declaration", "widths"]],
+        "whole value from state": [[]],
+        "actors from state": [["scene"], ["occupied_space", "actors"]],
+        "nothing from state": [],
+        "convention from state": [["occupied_space", "declaration", "convention"]],
+    }.items():
+        case(f"coordinate occupied {label}", "coordinate", value=arena_data(occupied_space=OCCUPIED),
+             actor_reference="actor_id", state_paths=paths)
 
     # coordinate_actor_reference
     actor_action = {"id": "a1", "label": "Move", "intent": "move", "params": {}, "bindings": {"who": "actor"}}
@@ -787,8 +814,10 @@ def random_cases(count: int) -> list[dict]:
             value = {**data, "occupied_space": mutate(rng, OCCUPIED)}
             if rng.random() < 0.4:
                 value["scene"] = mutate(rng, data["scene"])
+            paths = rng.choice([default_state_paths(value), [[]], [["occupied_space", "declaration"]], []])
             cases.append({"label": label, "function": "coordinate",
-                          "arguments": {"value": stored(value), "actor_reference": rng.choice(["actor_id", None, "size"])}})
+                          "arguments": {"value": stored(value), "actor_reference": rng.choice(["actor_id", None, "size"]),
+                                        "state_paths": paths}})
         elif kind == "tactical":
             chosen = rng.sample(sources, rng.randint(1, 3))
             if "path" in chosen and rng.random() < 0.85:
@@ -831,6 +860,8 @@ def main() -> int:
     if "--record" in sys.argv:
         recorded = record()
         for item in recorded:
+            if item["function"] == "coordinate":
+                item["arguments"]["state_paths"] = default_state_paths(item["arguments"]["value"])
             item["arguments"] = {key: stored(value) for key, value in item["arguments"].items()}
     else:
         previous = json.loads(OUTPUT.read_text(encoding="utf-8")) if OUTPUT.exists() else {}
@@ -838,6 +869,9 @@ def main() -> int:
         recorded = [{**{key: value for key, value in item.items() if key not in ("expected", "arguments")},
                      "arguments": {key: stored(loaded(value)) for key, value in item["arguments"].items()}}
                     for item in previous.get("cases", []) if item["label"].startswith("recorded ")]
+        for item in recorded:
+            if item["function"] == "coordinate" and "state_paths" not in item["arguments"]:
+                item["arguments"]["state_paths"] = default_state_paths(loaded(item["arguments"]["value"]))
     cases = targeted() + random_cases(1200) + recorded
     for item in cases:
         item["expected"] = run(item)

@@ -10,7 +10,7 @@ use sylvia_app::map_segment_preview::segment_preview;
 use sylvia_app::piece_table::{project_piece_table, resolve_piece_action_parameters};
 use sylvia_app::tactical_grid::{
     coordinate_actor_reference, project_coordinate_map, project_tactical_grid,
-    resolve_tactical_action_parameters,
+    resolve_tactical_action_parameters, StatePaths,
 };
 
 const VECTORS: &str = include_str!("vectors/tactical_surface_vectors.json");
@@ -33,6 +33,13 @@ fn ok<T: Into<Json>>(value: T) -> Json {
     json!({"ok": value.into()})
 }
 
+/// A case's `state_paths`: where its value holds the campaign's frozen state.
+fn state_paths(value: &Json) -> StatePaths {
+    let path =
+        |path: &Json| path.as_array().unwrap().iter().map(|key| key.as_str().unwrap().to_owned()).collect();
+    StatePaths::from_paths(value.as_array().unwrap().iter().map(path).collect())
+}
+
 fn ids(value: &Json) -> BTreeSet<String> {
     value.as_array().unwrap().iter().map(|item| item.as_str().unwrap().to_owned()).collect()
 }
@@ -53,7 +60,11 @@ fn run(case: &Json, documents: &Json) -> Json {
             Ok(value) => ok(value),
             Err(e) => error(e.python_class(), e.to_string()),
         },
-        "coordinate" => match project_coordinate_map(arg("value"), arg("actor_reference").as_str()) {
+        "coordinate" => match project_coordinate_map(
+            arg("value"),
+            arg("actor_reference").as_str(),
+            &state_paths(arg("state_paths")),
+        ) {
             Ok(value) => ok(value),
             Err(e) => error(e.python_class(), e.to_string()),
         },
