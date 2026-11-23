@@ -65,7 +65,9 @@ fn session_reasoning_matches_python() {
             ..SessionRecordFields::default()
         };
         let mut check = |label: String, got: Json, want: &Json| {
-            if got.to_string() != want.to_string() {
+            // As text: `serde_json`'s equality ignores key order, which Python's payloads fix.
+            let (got, want) = (got.to_string(), want.to_string());
+            if got != want {
                 failures.push(format!("#{index} {spec} {label}\n  Rust   {got}\n  Python {want}"));
             }
         };
