@@ -59,6 +59,7 @@ fn command(op: &Json) -> CommitAction {
             participant_mutations: Vec::new(),
         },
         status: ActionStatus::parse(&text(op, "status")).unwrap(),
+        choice_resolution: None,
     }
 }
 

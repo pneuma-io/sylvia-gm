@@ -78,6 +78,31 @@ pub struct CommitAction {
     pub parameters: JsonMap,
     pub outcome: MechanicOutcome,
     pub status: ActionStatus,
+    /// `choice_resolution_id`, `choice_resolution` and `choice_resolution_session_id`: the
+    /// answer that completes a pending mechanics choice, when this commit resolves one.
+    pub choice_resolution: Option<ChoiceCommit>,
+}
+
+/// The answer a commit resolves a pending mechanics choice with.
+#[derive(Debug, Clone, PartialEq)]
+pub struct ChoiceCommit {
+    pub resolution_id: String,
+    pub resolution: sylvia_domain::authority::MechanicsChoiceResolution,
+    pub session_id: Option<String>,
+}
+
+/// What `commit_action`'s resolution branch decided before the ordinary commit.
+enum Resolution {
+    /// The resolution identity was already committed: its receipt.
+    Replay(ActionReceipt),
+    /// The command to commit (its first transport alias and saved answers), the further aliases,
+    /// and the resolution and descriptor digests to record.
+    Commit {
+        command: Box<CommitAction>,
+        aliases: Vec<String>,
+        resolution_sha256: String,
+        descriptor_sha256: String,
+    },
 }
 
 /// `IdempotencyHit`.
@@ -181,6 +206,122 @@ fn package_uses_content_declarations(
     Ok(matches!(manifest.get("content_declarations"), Some(Json::String(_))))
 }
 
+/// `commit_action`'s resolution branch: a resolution identity already committed is its receipt;
+/// otherwise the pending choice must be exactly this command's reservation, and the command
+/// commits under its first transport alias with the saved answers in its result.
+fn resolution_on(
+    connection: &Connection,
+    command: &CommitAction,
+    choice: &ChoiceCommit,
+) -> StoreResult<Resolution> {
+    use crate::mechanics_choices::{
+        pending_from_row, request_descriptor_sha256, resolution_sha256, ResolutionIdentity,
+    };
+    let campaign_id = command.campaign_id.as_str();
+    let resolution = &choice.resolution;
+    let identity = ResolutionIdentity {
+        campaign_id,
+        resolution_id: &choice.resolution_id,
+        action_id: &command.action_id,
+        choice_id: &resolution.choice_id,
+        option_id: &resolution.option_id,
+        session_id: choice.session_id.as_deref(),
+        choice_sequence: resolution.prior_answers.len() as i64,
+    };
+    let digest = resolution_sha256(&identity);
+    let descriptor_sha256 = request_descriptor_sha256(&resolution.expected_request);
+    let conflict = |message: &str| coded("IdempotencyConflict", "idempotency_conflict", message);
+    if let Some(prior) = one_row(
+        connection,
+        "SELECT action_id, choice_id, option_id, resolution_sha256, descriptor_sha256, session_id, resulting_revision \
+         FROM mechanics_choice_resolutions WHERE campaign_id = ? AND resolution_id = ?",
+        &[&campaign_id, &choice.resolution_id],
+    )? {
+        let session = match &prior[5] {
+            Value::Null => None,
+            value => Some(py_str(value)),
+        };
+        if py_str(&prior[0]) != command.action_id
+            || py_str(&prior[1]) != resolution.choice_id
+            || py_str(&prior[2]) != resolution.option_id
+            || py_str(&prior[3]) != digest
+            || py_str(&prior[4]) != descriptor_sha256
+            || session != choice.session_id
+        {
+            return Err(conflict("Mechanics choice resolution identity payload does not match"));
+        }
+        let Some(action) = one_row(
+            connection,
+            "SELECT action_id, status, result_json, resulting_revision FROM actions WHERE campaign_id = ? AND action_id = ?",
+            &[&campaign_id, &command.action_id],
+        )?
+        else {
+            return Err(crate::error::schema_identity("Stored mechanics choice resolution is orphaned"));
+        };
+        return Ok(Resolution::Replay(receipt_from(campaign_id, &action)?));
+    }
+    let (columns, rows) = crate::campaigns::named_rows(
+        connection,
+        "SELECT * FROM pending_mechanics_actions WHERE campaign_id = ? AND action_id = ?",
+        &[&campaign_id, &command.action_id],
+    )?;
+    let Some(values) = rows.into_iter().next() else {
+        return Err(rejected("Mechanics choice reservation is unavailable", "mechanics_choice_unavailable"));
+    };
+    let stored = pending_from_row(&crate::campaigns::Named { columns: &columns, values })?;
+    let matches = stored.basis_revision == command.expected_revision
+        && stored.writer == command.writer
+        && stored.turn_id == command.turn_id
+        && stored.package_id == command.package_id
+        && stored.package_version == command.package_version
+        && stored.package_sha256 == command.package_sha256
+        && stored.tool_name == command.tool_name
+        && sylvia_domain::pyops::py_eq(
+            &Json::Object(stored.parameters.clone()),
+            &Json::Object(command.parameters.clone()),
+        )
+        && stored.payload_hash == command.payload_hash
+        && stored.choice == resolution.expected_request
+        && stored.prior_answers == resolution.prior_answers
+        && stored.choice.choice_id == resolution.choice_id
+        && stored.choice.options.iter().any(|option| option.option_id == resolution.option_id)
+        && stored.initiating_session_id == choice.session_id;
+    if !matches {
+        return Err(conflict("Mechanics choice resolution does not match its reservation"));
+    }
+    let aliases: Vec<String> = crate::campaigns::named_rows(
+        connection,
+        "SELECT idempotency_key FROM pending_mechanics_action_aliases WHERE campaign_id = ? AND action_id = ? \
+         ORDER BY idempotency_key",
+        &[&campaign_id, &command.action_id],
+    )?
+    .1
+    .iter()
+    .map(|row| py_str(&row[0]))
+    .collect();
+    let Some((first, rest)) = aliases.split_first() else {
+        return Err(crate::error::schema_identity(
+            "Stored mechanics choice reservation has no transport identity",
+        ));
+    };
+    let mut prepared = command.clone();
+    prepared.idempotency_key = first.clone();
+    if !stored.prior_answers.is_empty() {
+        let answers: Vec<Json> = stored
+            .prior_answers
+            .iter()
+            .map(|answer| Json::Object(sylvia_domain::mechanics_choices::answer_payload(answer)))
+            .collect();
+        prepared.outcome.result.insert("mechanics_choice_answers".into(), Json::Array(answers));
+    }
+    Ok(Resolution::Commit {
+        command: Box::new(prepared),
+        aliases: rest.to_vec(),
+        resolution_sha256: digest,
+        descriptor_sha256,
+    })
+}
+
 /// The package a mechanic acts as, for `owner_for_mutation`.
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct MutationActor<'a> {
@@ -275,9 +416,22 @@ impl AuthorityStore {
     ) -> StoreResult<ActionReceipt> {
         let campaign_id = command.campaign_id.as_str();
         connection.execute_batch("BEGIN IMMEDIATE")?;
-        if !command.outcome.mutations.is_empty() {
+        if !command.outcome.mutations.is_empty() || command.choice_resolution.is_some() {
             self.ensure_campaign_schema(connection)?;
         }
+        let mut resolving = None;
+        if let Some(choice) = &command.choice_resolution {
+            match resolution_on(connection, command, choice)? {
+                Resolution::Replay(receipt) => {
+                    connection.execute_batch("ROLLBACK")?;
+                    return Ok(receipt);
+                }
+                Resolution::Commit { command, aliases, resolution_sha256, descriptor_sha256 } => {
+                    resolving = Some((command, aliases, resolution_sha256, descriptor_sha256));
+                }
+            }
+        }
+        let command = resolving.as_ref().map_or(command, |(command, ..)| command.as_ref());
         if let Some(existing) = one_row(
             connection,
             "SELECT payload_hash, action_id, status, result_json, resulting_revision \
@@ -512,6 +666,42 @@ impl AuthorityStore {
                 resulting_revision
             ],
         )?;
+        if let (Some((_, aliases, resolution_sha256, descriptor_sha256)), Some(choice)) =
+            (&resolving, &command.choice_resolution)
+        {
+            for alias in aliases {
+                connection.execute(
+                    "INSERT INTO idempotency_records VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    params![
+                        campaign_id,
+                        alias,
+                        command.payload_hash,
+                        command.action_id,
+                        command.status.as_str(),
+                        dump(&result),
+                        resulting_revision
+                    ],
+                )?;
+            }
+            connection.execute(
+                "INSERT INTO mechanics_choice_resolutions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                params![
+                    campaign_id,
+                    choice.resolution_id,
+                    command.action_id,
+                    choice.resolution.choice_id,
+                    choice.resolution.option_id,
+                    resolution_sha256,
+                    descriptor_sha256,
+                    choice.session_id,
+                    resulting_revision
+                ],
+            )?;
+            connection.execute(
+                "DELETE FROM pending_mechanics_actions WHERE campaign_id = ? AND action_id = ?",
+                params![campaign_id, command.action_id],
+            )?;
+        }
         connection.execute(
             "INSERT INTO campaign_revisions (campaign_id, revision, action_id, activation_id) VALUES (?, ?, ?, NULL)",
             params![campaign_id, resulting_revision, command.action_id],

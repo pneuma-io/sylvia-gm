@@ -65,20 +65,23 @@ pub async fn campaign_preparation_boundary(
     campaign_id: &str,
 ) -> StoreResult<Option<ModelDecisionBoundary>> {
     let campaign_id = campaign_id.to_owned();
-    store
-        .call(move |store| {
-            let snapshot = store.snapshot(&campaign_id)?;
-            let Some(declared) = super::content_reads::decision_scope_declaration(store, &snapshot.state)?
-            else {
-                return Ok(None);
-            };
-            if !declared.contains_key("preparation") {
-                return Ok(None);
-            }
-            crate::decision_scope::project_campaign_preparation_scope(&snapshot.state, &declared)
-                .map_err(super::snapshots::projection_rejected)
-        })
-        .await
+    store.call(move |store| preparation_boundary_on(store, &campaign_id)).await
+}
+
+/// [`campaign_preparation_boundary`] on the store, for a caller already inside one store call.
+pub(super) fn preparation_boundary_on(
+    store: &AuthorityStore,
+    campaign_id: &str,
+) -> StoreResult<Option<ModelDecisionBoundary>> {
+    let snapshot = store.snapshot(campaign_id)?;
+    let Some(declared) = super::content_reads::decision_scope_declaration(store, &snapshot.state)? else {
+        return Ok(None);
+    };
+    if !declared.contains_key("preparation") {
+        return Ok(None);
+    }
+    crate::decision_scope::project_campaign_preparation_scope(&snapshot.state, &declared)
+        .map_err(super::snapshots::projection_rejected)
 }
 
 /// `AuthorityOwner.model_decision_boundary(campaign_id)`: the Ruleset-declared Player or GM
