@@ -88,6 +88,18 @@
 }
 ]
 },
+"srd-only": {
+"candidate_id": "srd-only",
+"closure": "6666666666666666666666666666666666666666666666666666666666666666",
+"entries": [
+{
+"id": "sylvia.srd-lite.bg3",
+"version": "0.3.29",
+"role": "primary",
+"dependencies": []
+}
+]
+},
 "rift": {
 "candidate_id": "rift",
 "closure": "760b19ac34ccb768bd49002a5e6fd31b90ea2aee153fb8a1fd1fc5bdbc2312c1",
@@ -114,6 +126,7 @@
 ]
 }
 },
+"sibling": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4",
 "cases": [
 {
 "owner": [
@@ -122,14 +135,17 @@
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {},
 "outcome": [
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -139,8 +155,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {}
 },
@@ -148,7 +166,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -158,8 +177,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": null
@@ -169,7 +190,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -179,8 +201,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "setting": {
 "setting_id": "x"
@@ -189,7 +213,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected world content requires its Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -199,8 +224,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "plan": {
 "plan_id": "p"
@@ -209,7 +236,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected world content requires its Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -219,8 +247,33 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "saved",
+"selections": {
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected world content requires its Ruleset",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": ""
@@ -229,7 +282,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Ruleset identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -239,8 +293,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": 5
@@ -249,7 +305,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Ruleset identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -259,8 +316,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -270,7 +329,8 @@ null
 "ok",
 "rules",
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -280,8 +340,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "missing"
@@ -291,7 +353,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -301,8 +364,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "broken"
@@ -311,7 +376,8 @@ null
 "outcome": [
 "CommandRejected",
 "Package store is unavailable",
-"store_unavailable"
+"store_unavailable",
+[]
 ]
 },
 {
@@ -321,8 +387,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "archived"
@@ -331,7 +399,8 @@ null
 "outcome": [
 "CommandRejected",
 "Full is archived; migrate this executable binding to SRD Lite before launch.",
-"archived_ruleset"
+"archived_ruleset",
+[]
 ]
 },
 {
@@ -341,8 +410,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "wotc.srd.5.2.1"
@@ -351,7 +422,8 @@ null
 "outcome": [
 "CommandRejected",
 "Full is archived; migrate this executable binding to SRD Lite before launch.",
-"archived_ruleset"
+"archived_ruleset",
+[]
 ]
 },
 {
@@ -361,8 +433,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -372,8 +446,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_plan"
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
 ]
 },
 {
@@ -383,8 +459,36 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -396,7 +500,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Campaign Plan library is unavailable",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -406,8 +511,36 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": 7
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -420,7 +553,8 @@ null
 "ok",
 "rules",
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -430,8 +564,37 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": null
+}
+},
+"outcome": [
+"ok",
+"rules",
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -441,8 +604,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -452,8 +617,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "world"
@@ -466,7 +633,8 @@ null
 "ok",
 "world",
 "pneuma.world",
-null
+null,
+[]
 ]
 },
 {
@@ -476,8 +644,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -491,7 +661,8 @@ null
 "ok",
 "world",
 "pneuma.world",
-null
+null,
+[]
 ]
 },
 {
@@ -501,8 +672,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -515,7 +688,8 @@ null
 "outcome": [
 "CommandRejected",
 "Package candidate is unavailable",
-"candidate_unavailable"
+"candidate_unavailable",
+[]
 ]
 },
 {
@@ -525,8 +699,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -537,8 +713,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -548,8 +726,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -562,7 +742,8 @@ null
 "ok",
 "world",
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -572,8 +753,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -585,7 +768,8 @@ null
 "outcome": [
 "CommandRejected",
 "The selected Setting belongs to another Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -595,8 +779,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -608,7 +794,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Setting identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -618,8 +805,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "legacy"
@@ -632,7 +821,8 @@ null
 "ok",
 "legacy",
 "pneuma.old-world",
-null
+null,
+[]
 ]
 },
 {
@@ -642,8 +832,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "world"
@@ -653,8 +845,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -664,8 +858,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "sylvia.srd-lite.bg3"
@@ -678,7 +874,8 @@ null
 "ok",
 "rift",
 "pneuma.severed-lands",
-null
+null,
+[]
 ]
 },
 {
@@ -688,8 +885,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "sylvia.srd-lite.bg3"
@@ -699,8 +898,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -710,8 +911,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "pneuma.rules"
@@ -721,8 +924,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -732,8 +937,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "pneuma.rules"
@@ -743,7 +950,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -753,15 +961,18 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": "rules"
 },
 "outcome": [
 "AttributeError",
 "'str' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -771,15 +982,18 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": null
 },
 "outcome": [
 "AttributeError",
 "'NoneType' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -789,8 +1003,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -800,7 +1016,8 @@ null
 "outcome": [
 "AttributeError",
 "'NoneType' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -810,8 +1027,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -821,7 +1040,8 @@ null
 "outcome": [
 "AttributeError",
 "'str' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -831,8 +1051,10 @@ null
 "legacy",
 "other",
 "archived",
+"srd-only",
 "rift"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -842,7 +1064,895 @@ null
 "outcome": [
 "AttributeError",
 "'list' object has no attribute 'get'",
-null
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": []
+},
+"outcome": [
+"AttributeError",
+"'list' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"rift",
+"pneuma.severed-lands",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands",
+"candidate_id": "rift"
+}
+},
+"outcome": [
+"ok",
+"rift",
+"pneuma.severed-lands",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+null,
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived",
+"srd-only",
+"rift"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -853,12 +1963,14 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {},
 "outcome": [
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -869,6 +1981,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {}
 },
@@ -876,7 +1989,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -887,6 +2001,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": null
@@ -896,7 +2011,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -907,6 +2023,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "setting": {
 "setting_id": "x"
@@ -915,7 +2032,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected world content requires its Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -926,6 +2044,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "plan": {
 "plan_id": "p"
@@ -934,7 +2053,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected world content requires its Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -945,6 +2065,28 @@ null
 "other",
 "archived"
 ],
+"storage": "saved",
+"selections": {
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected world content requires its Ruleset",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": ""
@@ -953,7 +2095,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Ruleset identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -964,6 +2107,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": 5
@@ -972,7 +2116,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Ruleset identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -983,6 +2128,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -992,7 +2138,8 @@ null
 "ok",
 "rules",
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -1003,6 +2150,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "missing"
@@ -1012,7 +2160,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -1023,6 +2172,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "broken"
@@ -1031,7 +2181,8 @@ null
 "outcome": [
 "CommandRejected",
 "Package store is unavailable",
-"store_unavailable"
+"store_unavailable",
+[]
 ]
 },
 {
@@ -1042,6 +2193,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "archived"
@@ -1050,7 +2202,8 @@ null
 "outcome": [
 "CommandRejected",
 "Full is archived; migrate this executable binding to SRD Lite before launch.",
-"archived_ruleset"
+"archived_ruleset",
+[]
 ]
 },
 {
@@ -1061,6 +2214,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "wotc.srd.5.2.1"
@@ -1069,7 +2223,8 @@ null
 "outcome": [
 "CommandRejected",
 "Full is archived; migrate this executable binding to SRD Lite before launch.",
-"archived_ruleset"
+"archived_ruleset",
+[]
 ]
 },
 {
@@ -1080,6 +2235,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1089,8 +2245,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_plan"
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
 ]
 },
 {
@@ -1101,6 +2259,31 @@ null
 "other",
 "archived"
 ],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1112,7 +2295,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Campaign Plan library is unavailable",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -1123,6 +2307,31 @@ null
 "other",
 "archived"
 ],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": 7
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1135,7 +2344,8 @@ null
 "ok",
 "rules",
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -1146,6 +2356,32 @@ null
 "other",
 "archived"
 ],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": null
+}
+},
+"outcome": [
+"ok",
+"rules",
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1155,8 +2391,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -1167,6 +2405,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "world"
@@ -1179,7 +2418,8 @@ null
 "ok",
 "world",
 "pneuma.world",
-null
+null,
+[]
 ]
 },
 {
@@ -1190,6 +2430,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1203,7 +2444,8 @@ null
 "ok",
 "world",
 "pneuma.world",
-null
+null,
+[]
 ]
 },
 {
@@ -1214,6 +2456,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1226,7 +2469,8 @@ null
 "outcome": [
 "CommandRejected",
 "Package candidate is unavailable",
-"candidate_unavailable"
+"candidate_unavailable",
+[]
 ]
 },
 {
@@ -1237,6 +2481,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1247,8 +2492,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -1259,6 +2506,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1271,7 +2519,8 @@ null
 "ok",
 "world",
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -1282,6 +2531,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1293,7 +2543,8 @@ null
 "outcome": [
 "CommandRejected",
 "The selected Setting belongs to another Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -1304,6 +2555,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1315,7 +2567,8 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Setting identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
@@ -1326,6 +2579,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "legacy"
@@ -1338,7 +2592,8 @@ null
 "ok",
 "legacy",
 "pneuma.old-world",
-null
+null,
+[]
 ]
 },
 {
@@ -1349,6 +2604,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "world"
@@ -1358,8 +2614,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -1370,6 +2628,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "sylvia.srd-lite.bg3"
@@ -1379,8 +2638,16 @@ null
 }
 },
 "outcome": [
-"pending",
-"install_package_archive"
+"ok",
+"cand-interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"d059ad3d8a09fdb0d4b11f57895a76727b509e8e96eeee27a4d6e14bb4593db7"
+]
+]
 ]
 },
 {
@@ -1391,6 +2658,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "sylvia.srd-lite.bg3"
@@ -1400,8 +2668,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -1412,6 +2682,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "pneuma.rules"
@@ -1421,8 +2692,10 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
@@ -1433,6 +2706,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "pneuma.rules"
@@ -1442,7 +2716,8 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
@@ -1453,13 +2728,15 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": "rules"
 },
 "outcome": [
 "AttributeError",
 "'str' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -1470,13 +2747,15 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": null
 },
 "outcome": [
 "AttributeError",
 "'NoneType' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -1487,6 +2766,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1496,7 +2776,8 @@ null
 "outcome": [
 "AttributeError",
 "'NoneType' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -1507,6 +2788,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1516,7 +2798,8 @@ null
 "outcome": [
 "AttributeError",
 "'str' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
@@ -1527,6 +2810,7 @@ null
 "other",
 "archived"
 ],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1536,21 +2820,856 @@ null
 "outcome": [
 "AttributeError",
 "'list' object has no attribute 'get'",
-null
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": []
+},
+"outcome": [
+"AttributeError",
+"'list' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"d059ad3d8a09fdb0d4b11f57895a76727b509e8e96eeee27a4d6e14bb4593db7"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands",
+"candidate_id": "rift"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+null,
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"rules",
+"world",
+"legacy",
+"other",
+"archived"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {},
 "outcome": [
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {}
 },
@@ -1558,11 +3677,13 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": null
@@ -1572,11 +3693,13 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "setting": {
 "setting_id": "x"
@@ -1585,11 +3708,13 @@ null
 "outcome": [
 "CommandRejected",
 "Selected world content requires its Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "plan": {
 "plan_id": "p"
@@ -1598,11 +3723,28 @@ null
 "outcome": [
 "CommandRejected",
 "Selected world content requires its Ruleset",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "saved",
+"selections": {
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected world content requires its Ruleset",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": ""
@@ -1611,11 +3753,13 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Ruleset identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": 5
@@ -1624,11 +3768,13 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Ruleset identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1638,11 +3784,13 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "missing"
@@ -1652,11 +3800,13 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "broken"
@@ -1665,11 +3815,13 @@ null
 "outcome": [
 "CommandRejected",
 "Package store is unavailable",
-"store_unavailable"
+"store_unavailable",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "archived"
@@ -1679,11 +3831,13 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "wotc.srd.5.2.1"
@@ -1692,11 +3846,13 @@ null
 "outcome": [
 "CommandRejected",
 "Full is archived; migrate this executable binding to SRD Lite before launch.",
-"archived_ruleset"
+"archived_ruleset",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1706,12 +3862,33 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_plan"
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1723,11 +3900,31 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Campaign Plan library is unavailable",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": 7
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1740,11 +3937,32 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": null
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1754,12 +3972,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "world"
@@ -1769,12 +3990,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1787,11 +4011,13 @@ null
 "outcome": [
 "CommandRejected",
 "Package candidate is unavailable",
-"candidate_unavailable"
+"candidate_unavailable",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1804,11 +4030,13 @@ null
 "outcome": [
 "CommandRejected",
 "Package candidate is unavailable",
-"candidate_unavailable"
+"candidate_unavailable",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1819,12 +4047,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1836,11 +4067,13 @@ null
 "outcome": [
 "CommandRejected",
 "Package candidate is unavailable",
-"candidate_unavailable"
+"candidate_unavailable",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1852,11 +4085,13 @@ null
 "outcome": [
 "CommandRejected",
 "Package candidate is unavailable",
-"candidate_unavailable"
+"candidate_unavailable",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1868,11 +4103,13 @@ null
 "outcome": [
 "CommandRejected",
 "Selected Setting identity is invalid",
-"command_rejected"
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "legacy"
@@ -1882,12 +4119,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "world"
@@ -1897,12 +4137,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "sylvia.srd-lite.bg3"
@@ -1912,12 +4155,21 @@ null
 }
 },
 "outcome": [
-"pending",
-"install_package_archive"
+"ok",
+"cand-interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"d059ad3d8a09fdb0d4b11f57895a76727b509e8e96eeee27a4d6e14bb4593db7"
+]
+]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "sylvia.srd-lite.bg3"
@@ -1927,12 +4179,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "pneuma.rules"
@@ -1942,12 +4197,15 @@ null
 }
 },
 "outcome": [
-"pending",
-"bundled_campaign_plans.bundled_setting_snapshot"
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "pneuma.rules"
@@ -1957,33 +4215,39 @@ null
 "ok",
 null,
 null,
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": "rules"
 },
 "outcome": [
 "AttributeError",
 "'str' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": null
 },
 "outcome": [
 "AttributeError",
 "'NoneType' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -1993,11 +4257,13 @@ null
 "outcome": [
 "AttributeError",
 "'NoneType' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -2007,11 +4273,13 @@ null
 "outcome": [
 "AttributeError",
 "'str' object has no attribute 'get'",
-null
+null,
+[]
 ]
 },
 {
 "owner": [],
+"storage": "none",
 "selections": {
 "ruleset": {
 "candidate_id": "rules"
@@ -2021,7 +4289,2120 @@ null
 "outcome": [
 "AttributeError",
 "'list' object has no attribute 'get'",
-null
+null,
+[]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": []
+},
+"outcome": [
+"AttributeError",
+"'list' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"d059ad3d8a09fdb0d4b11f57895a76727b509e8e96eeee27a4d6e14bb4593db7"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands",
+"candidate_id": "rift"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+null,
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": null
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"setting": {
+"setting_id": "x"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected world content requires its Ruleset",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected world content requires its Ruleset",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected world content requires its Ruleset",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": ""
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Ruleset identity is invalid",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": 5
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Ruleset identity is invalid",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "missing"
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "broken"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package store is unavailable",
+"store_unavailable",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "archived"
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "wotc.srd.5.2.1"
+}
+},
+"outcome": [
+"CommandRejected",
+"Full is archived; migrate this executable binding to SRD Lite before launch.",
+"archived_ruleset",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": "p"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": 7
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": 7
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": null
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": {
+"plan_id": null
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"setting_id": "pneuma.world"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "world"
+},
+"setting": {
+"setting_id": "pneuma.world"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"setting_id": "pneuma.world",
+"candidate_id": "world"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"setting_id": "pneuma.world",
+"candidate_id": "gone"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"setting_id": "pneuma.world",
+"candidate_id": 3
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"candidate_id": "world"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"candidate_id": "other"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": {
+"setting_id": 5
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting identity is invalid",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "legacy"
+},
+"setting": {
+"setting_id": "pneuma.old-world"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "world"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"d059ad3d8a09fdb0d4b11f57895a76727b509e8e96eeee27a4d6e14bb4593db7"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.rules"
+},
+"setting": {
+"setting_id": "pneuma.world"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.rules"
+}
+},
+"outcome": [
+"ok",
+null,
+null,
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": "rules"
+},
+"outcome": [
+"AttributeError",
+"'str' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": null
+},
+"outcome": [
+"AttributeError",
+"'NoneType' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": null
+},
+"outcome": [
+"AttributeError",
+"'NoneType' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"setting": "x"
+},
+"outcome": [
+"AttributeError",
+"'str' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": []
+},
+"outcome": [
+"AttributeError",
+"'list' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "rules"
+},
+"plan": []
+},
+"outcome": [
+"AttributeError",
+"'list' object has no attribute 'get'",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "a-debt-in-iron"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-b7f729add04518d3f2a7489e",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-b7f729add04518d3f2a7489e",
+"b7f729add04518d3f2a7489ec3a37252665a3fa168e9e54a2cec86952d235cae"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "the-rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "rift-awakening"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.elsewhere"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"plan": {
+"plan_id": "last-cart-through"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+{
+"format_id": "sylvia-gm-interview-contribution",
+"format_version": 1,
+"owner_kind": "campaign_plan",
+"id": "riichi-quick-test-format",
+"title": "Match format",
+"questions": [
+{
+"adaptive": false,
+"condition": null,
+"id": "match_format",
+"options": [
+{
+"id": "east_only",
+"label": "East-only"
+},
+{
+"id": "east_south",
+"label": "East-South"
+}
+],
+"prompt": "Which match would you like to play?",
+"required": true,
+"type": "choice"
+}
+]
+},
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "riichi-quick-test"
+}
+},
+"outcome": [
+"CommandRejected",
+"The selected Plan belongs to different content",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "campaign-plan-reusable-5e61a7909e512dc83c5a5e5c-d1dc47af2c9568d4"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-caa74fa83b0a39f84ea4b65a",
+"caa74fa83b0a39f84ea4b65a11cfaf54ddd2f0e44f1b85b4a476e161150434e9"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Campaign Plan library is unavailable",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "saved",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+},
+"plan": {
+"plan_id": "no-such-plan"
+}
+},
+"outcome": [
+"ValueError",
+"Reusable Campaign Plan identity is invalid",
+null,
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-d059ad3d8a09fdb0d4b11f57",
+"d059ad3d8a09fdb0d4b11f57895a76727b509e8e96eeee27a4d6e14bb4593db7"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "sylvia.srd-lite.bg3"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands",
+"candidate_id": "rift"
+}
+},
+"outcome": [
+"CommandRejected",
+"Package candidate is unavailable",
+"candidate_unavailable",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-41f19cd31ea95244e5242a14",
+"pneuma.riichi-club",
+null,
+[
+[
+"interview-snapshot-41f19cd31ea95244e5242a14",
+"41f19cd31ea95244e5242a140e5044eb87cf3dcec2d523d63229327ec04d3a07"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "pneuma.riichi-mahjong"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.severed-lands"
+}
+},
+"outcome": [
+"ok",
+"cand-interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"pneuma.severed-lands",
+null,
+[
+[
+"interview-snapshot-ed7a22cd4a06ae8e70340c1d",
+"ed7a22cd4a06ae8e70340c1d90040e597c5644c7e62261ae88ca1e6d88387476"
+]
+]
+]
+},
+{
+"owner": [
+"srd-only"
+],
+"storage": "none",
+"selections": {
+"ruleset": {
+"candidate_id": "srd-only"
+},
+"setting": {
+"setting_id": "pneuma.riichi-club"
+}
+},
+"outcome": [
+"CommandRejected",
+"Selected Setting snapshot is unavailable; refresh its choices",
+"command_rejected",
+[]
 ]
 }
 ]
