@@ -77,10 +77,10 @@ Ported: 63 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `open_provider_setup` | `providers.handle_open_provider_setup` | yes | yes | `admin-commands` |
 | `chatgpt_connection` | `providers.handle_chatgpt_connection` | no | yes | `account-connections` |
 | `claude_connection` | `providers.handle_claude_connection` | no | yes | `account-connections` |
-| `admin_full_audit_status` | `providers.handle_admin_full_audit_status` | yes | yes | `admin-commands` |
-| `admin_full_audit_record` | `providers.handle_admin_full_audit_record` | yes | yes | `admin-commands` |
-| `export_admin_full_audit` | `providers.handle_export_admin_full_audit` | no | yes | `admin-commands` |
-| `set_admin_full_audit` | `providers.handle_set_admin_full_audit` | yes | yes | `admin-commands` |
+| `admin_full_audit_status` | `providers.handle_admin_full_audit_status` | yes | yes | `admin-commands`, `admin-srd` |
+| `admin_full_audit_record` | `providers.handle_admin_full_audit_record` | yes | yes | `admin-commands`, `admin-srd` |
+| `export_admin_full_audit` | `providers.handle_export_admin_full_audit` | no | yes | `admin-commands`, `admin-srd` |
+| `set_admin_full_audit` | `providers.handle_set_admin_full_audit` | yes | yes | `admin-commands`, `admin-srd` |
 | `detect_local_providers` | `providers.handle_detect_local_providers` | yes | yes | none yet; lane 4's `discovery_vectors` (Python MockTransport exchanges) |
 | `discover_provider_models` | `providers.handle_discover_provider_models` | yes | yes | none yet; lane 4's `discovery_vectors` (Python MockTransport exchanges) |
 | `validate_provider_model` | `providers.handle_validate_provider_model` | yes | yes | none yet; lane 4's `validation_vectors` (Python's streamed probe bodies) |
@@ -127,7 +127,7 @@ Ported: 63 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `model_guidance` | `providers.handle_model_guidance` | yes | no | |
 | `finalize_campaign_construction` | `campaigns.handle_finalize_campaign_construction` | yes | yes | `fail-retry`, `reopen`, `stop-redirect` and `ruleless-turn` (step 8 matches; each session stops later, at `start_dm_session`); the application operation by the guided `finalize_runs` |
 | `start_dm_session` | `sessions.handle_start_dm_session` | yes | no | |
-| `catalog` | `campaigns.handle_catalog` | yes | yes | `admin-commands` |
+| `catalog` | `campaigns.handle_catalog` | yes | yes | `admin-commands`, `admin-srd` |
 | `execute_action` | `actions.handle_execute_action` | no | no | |
 | `resolve_mechanics_choice` | `actions.handle_resolve_mechanics_choice` | yes | no | |
 | `open_turn` | `actions.handle_open_turn` | no | no | |
@@ -140,7 +140,7 @@ Ported: 63 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `trash_campaign` | `campaigns.handle_trash_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
 | `restore_trashed_campaign` | `campaigns.handle_restore_trashed_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
 | `purge_campaign` | `campaigns.handle_purge_campaign` | yes | yes | paired run through owner dispatch (lane 3's Python run of `handle_purge_campaign`, `commands/campaigns.rs`); launch reconciliation by `tests/purge_reconcile.rs` |
-| `backup_database` | `campaigns.handle_backup_database` | no | yes | `admin-commands` |
+| `backup_database` | `campaigns.handle_backup_database` | no | yes | `admin-commands`, `admin-srd` |
 | `export_campaign_plan_file` | `campaigns.handle_export_campaign_plan_file` | no | no | |
 | `export_package_candidate` | `packages.handle_export_package_candidate` | no | yes | paired run through owner dispatch (lane 3's Python run of `handle_export_package_candidate`, `commands/packages.rs`); the operation by `sylvia-app/tests/package_export.rs` |
 | `export_package_candidate_file` | `packages.handle_export_package_candidate` | no | yes | paired run through owner dispatch (lane 3's Python run of `handle_export_package_candidate`, `commands/packages.rs`); the operation by `sylvia-app/tests/package_export.rs` |
