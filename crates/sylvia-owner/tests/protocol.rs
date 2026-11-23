@@ -104,7 +104,7 @@ fn launch_validation_and_shutdown() {
     assert!(reply.starts_with(prefix), "{reply}");
     let identity = &reply[prefix.len()..reply.len() - 3];
     assert!(identity.len() == 32 && identity.bytes().all(|byte| byte.is_ascii_hexdigit()), "{reply}");
-    owner.send(r#"{"id":"e","method":"catalog"}"#);
+    owner.send(r#"{"id":"e","method":"package_candidates"}"#);
     assert!(owner.read().contains(r#""code":"rust_port_pending""#));
     // A ported command answers from the store: a fresh database has no campaigns.
     owner.send(r#"{"id":"g","method":"campaign_index"}"#);
