@@ -134,7 +134,7 @@ fn admit(
 }
 
 /// `_participant_context_payload(participant)`.
-fn participant_context(participant: &Participant) -> Json {
+pub(super) fn participant_context(participant: &Participant) -> Json {
     let fields = participant.fields();
     let text = |value: &Option<String>| value.as_deref().map_or(Json::Null, Json::from);
     let mut payload = JsonMap::new();

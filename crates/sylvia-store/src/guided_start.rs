@@ -7,6 +7,11 @@
 //! `_insert_campaign_operation`, `sqlite_packages.insert_campaign_lock` (`_lock_id`) and
 //! `AuthorityOwner.append_agent_message`.
 //!
+//! The binding also writes the saved-library Start's participants and initial state:
+//! `legacy_participants_are_admitted`, `participant_adaptation_is_admitted` (with
+//! `_participant_adaptation_is_admitted` and `sqlite_campaign.artifact_from_adaptation_row`) and
+//! `sqlite_state_ownership.initial_owner` (with `_prefix_matches`).
+//!
 //! Before committing a binding it runs `sqlite_campaign.verify_f5_campaign_authority` (`f5`), as
 //! Python does. What is still not ported is refused in `sylvia_app::authority::guided`.
 
@@ -24,9 +29,11 @@ use rusqlite::{params, Connection};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
-    CampaignConfirmation, CampaignConstructionBasis, CampaignConstructionBegun, PackageLock, WriterRole,
+    CampaignConfirmation, CampaignConstructionBasis, CampaignConstructionBegun, PackageLock, Participant,
+    ParticipantValidationStatus, StateValue, WriterRole,
 };
 use sylvia_domain::package_library::{closure_sha256, PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::pyops::py_eq;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
 
 /// `_UNBOUND_CAMPAIGN_LOCK_HASH`.
@@ -216,7 +223,166 @@ pub struct BindBasis<'a> {
     pub package_lock: &'a PackageLock,
     pub turn_id: &'a str,
     pub builder_session_id: &'a str,
+    pub participants: &'a [Participant],
+    pub initial_state: &'a [StateValue],
     pub required_interview_steps: &'a [&'a str],
+}
+
+/// `sqlite_state_ownership._prefix_matches(package_ids, namespace)`.
+fn prefix_matches<'a>(package_ids: &[&'a str], namespace: &str) -> Vec<&'a str> {
+    package_ids
+        .iter()
+        .copied()
+        .filter(|package_id| namespace == *package_id || namespace.starts_with(&format!("{package_id}.")))
+        .collect()
+}
+
+/// `sqlite_state_ownership.initial_owner(package_lock, namespace)`: one initial-state owner,
+/// derived without allowing caller-selected ownership.
+pub(crate) fn initial_owner(package_lock: &PackageLock, namespace: &str) -> StoreResult<Option<String>> {
+    let package_ids: Vec<&str> = package_lock.entries().iter().map(|entry| entry.package_id()).collect();
+    let ambiguous =
+        || rejected("Campaign state namespace ownership is ambiguous", "state_namespace_ownership_invalid");
+    let matches = prefix_matches(&package_ids, namespace);
+    match matches.len() {
+        1 => return Ok(Some(matches[0].to_owned())),
+        0 => {}
+        _ => return Err(ambiguous()),
+    }
+    match package_ids.len() {
+        1 => Ok(Some(package_ids[0].to_owned())),
+        0 => Ok(None),
+        _ => Err(ambiguous()),
+    }
+}
+
+/// `_participant_adaptation_is_admitted(connection, participant)`: durable exact provenance is
+/// required only when an identity crosses schemas.
+pub(crate) fn participant_adaptation_admitted_on(
+    connection: &Connection,
+    participant: &Participant,
+) -> StoreResult<bool> {
+    let fields = participant.fields();
+    let target = (
+        fields.kind.clone(),
+        fields.package_id.clone(),
+        fields.package_version.clone(),
+        fields.package_sha256.clone(),
+        fields.schema_id.clone(),
+        fields.schema_sha256.clone(),
+    );
+    let (columns, rows) = named_rows(
+        connection,
+        "SELECT kind, package_id, package_version, package_sha256, schema_id, schema_sha256 \
+         FROM participants WHERE participant_id = ?",
+        &[&fields.participant_id],
+    )?;
+    let mut crosses_schema = false;
+    for values in rows {
+        let row = Named { columns: &columns, values };
+        let identity = (
+            row.text("kind")?,
+            row.text("package_id")?,
+            row.text("package_version")?,
+            row.optional_text("package_sha256")?,
+            row.optional_text("schema_id")?,
+            row.optional_text("schema_sha256")?,
+        );
+        crosses_schema |= identity != target;
+    }
+    let Some(adaptation_id) = &fields.adaptation_id else {
+        return Ok(!crosses_schema);
+    };
+    let (columns, mut rows) = named_rows(
+        connection,
+        "SELECT * FROM participant_adaptations WHERE operation_id = ?",
+        &[adaptation_id],
+    )?;
+    if rows.is_empty() {
+        return Ok(false);
+    }
+    // `sqlite_campaign.artifact_from_adaptation_row(row)`.
+    let row = Named { columns: &columns, values: rows.swap_remove(0) };
+    let adapted_data = Json::Object(load_payload(&row.text("data_json")?)?);
+    let data = Json::Object(fields.data.clone());
+    // Python builds the whole comparison tuple before `all`, so the data history is read
+    // whenever the data differ.
+    let data_matches = if py_eq(&data, &adapted_data) {
+        true
+    } else {
+        let (_, sources) = named_rows(
+            connection,
+            "SELECT campaign_id FROM participants WHERE participant_id = ? AND adaptation_id = ? AND data_json = ?",
+            &[&fields.participant_id, adaptation_id, &dump(&data)],
+        )?;
+        let mut found = false;
+        for source in sources {
+            let history = crate::participant_history::participant_data_history(
+                connection,
+                &py_str(&source[0]),
+                &fields.participant_id,
+                fields.data.clone(),
+            )?;
+            if history.iter().any(|value| py_eq(value, &adapted_data)) {
+                found = true;
+                break;
+            }
+        }
+        found
+    };
+    let text = |column: &str| row.text(column);
+    Ok(fields.participant_id == text("participant_id")?
+        && fields.kind == text("destination_kind")?
+        && fields.package_id == text("destination_package_id")?
+        && fields.package_version == text("destination_package_version")?
+        && fields.package_sha256.as_deref() == Some(text("destination_package_sha256")?.as_str())
+        && fields.schema_id.as_deref() == Some(text("destination_schema_id")?.as_str())
+        && fields.schema_sha256.as_deref() == Some(text("destination_schema_sha256")?.as_str())
+        && data_matches)
+}
+
+impl AuthorityStore {
+    /// `participant_adaptation_is_admitted(participant)`.
+    pub fn participant_adaptation_is_admitted(&self, participant: &Participant) -> StoreResult<bool> {
+        if !self.campaign_schema_is_active()? {
+            return Ok(participant.adaptation_id().is_none());
+        }
+        let connection = self.connect()?;
+        participant_adaptation_admitted_on(&connection, participant)
+    }
+
+    /// `legacy_participants_are_admitted(package_lock, participants)`: format-1 participant
+    /// behaviour preserved without weakening formats 2 and 3.
+    pub fn legacy_participants_are_admitted(
+        &self,
+        package_lock: &PackageLock,
+        participants: &[Participant],
+    ) -> StoreResult<bool> {
+        let connection = self.connect_read_only()?;
+        for participant in participants {
+            if participant.validation_status() == ParticipantValidationStatus::Validated {
+                continue;
+            }
+            // `{(entry.package_id, entry.version): entry ...}`: a later entry replaces an earlier one.
+            let Some(entry) = package_lock.entries().iter().rev().find(|entry| {
+                entry.package_id() == participant.package_id()
+                    && entry.version() == participant.package_version()
+            }) else {
+                return Ok(false);
+            };
+            let (_, rows) = named_rows(
+                &connection,
+                "SELECT canonical_json FROM package_manifests WHERE package_id = ? AND version = ? \
+                 AND content_sha256 = ? AND status = 'published'",
+                &[&entry.package_id(), &entry.version(), &entry.sha256()],
+            )?;
+            let Some(row) = rows.into_iter().next() else { return Ok(false) };
+            if load_payload(&py_str(&row[0]))?.contains_key("participant_artifacts") {
+                return Ok(false);
+            }
+        }
+        Ok(true)
+    }
 }
 
 /// The store's begin arguments.
@@ -388,6 +554,57 @@ impl AuthorityStore {
                         entry.role().as_str(),
                         entry.load_order()
                     ],
+                )?;
+            }
+            if bind.participants.iter().any(|item| item.validation_status() != ParticipantValidationStatus::Validated) {
+                return Err(rejected(
+                    "Confirmed campaign participants require exact package and schema proof",
+                    "participant_exact_proof_required",
+                ));
+            }
+            for participant in bind.participants {
+                if !participant_adaptation_admitted_on(connection, participant)? {
+                    return Err(rejected(
+                        "Cross-schema participant reuse requires a durable adaptation operation",
+                        "participant_adaptation_required",
+                    ));
+                }
+            }
+            for participant in bind.participants {
+                let fields = participant.fields();
+                connection.execute(
+                    "INSERT INTO participants VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    params![
+                        bind.campaign_id,
+                        fields.participant_id,
+                        fields.kind,
+                        fields.package_id,
+                        fields.package_version,
+                        dump(&Json::Object(fields.data.clone())),
+                        fields.package_sha256,
+                        fields.schema_id,
+                        fields.schema_sha256,
+                        fields.validation_status,
+                        fields.adaptation_id
+                    ],
+                )?;
+            }
+            let mut initial_owners = std::collections::BTreeMap::new();
+            for state_value in bind.initial_state {
+                let owner = initial_owner(bind.package_lock, state_value.namespace())?;
+                initial_owners.insert(state_value.namespace().to_owned(), owner);
+            }
+            for (namespace, owner_package_id) in &initial_owners {
+                connection.execute(
+                    "INSERT INTO campaign_state_namespace_owners (campaign_id, namespace, owner_package_id) \
+                     VALUES (?, ?, ?)",
+                    params![bind.campaign_id, namespace, owner_package_id],
+                )?;
+            }
+            for state_value in bind.initial_state {
+                connection.execute(
+                    "INSERT INTO campaign_state VALUES (?, ?, ?, ?)",
+                    params![bind.campaign_id, state_value.namespace(), state_value.key(), dump(state_value.value())],
                 )?;
             }
             connection.execute(
