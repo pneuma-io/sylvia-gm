@@ -11,8 +11,8 @@ in play (`riichi_started`), the campaign-reads profile (`campaigns`), the sessio
 (`session_pages`), and one this generator makes (`narrative`, written as
 `turn_reads/narrative.sqlite3.gz`): a DM campaign whose accepted Campaign Plan has acts, an
 objective repeating an act's identity, entries without a text identity, secrets (one revealed to
-the player, one to the GM only, one never) and a finite ending. For every campaign, and one that does not exist: `current_package_lock` and
-`campaign_preparation_boundary`. For every session, and one that does not exist:
+the player, one to the GM only, one never) and a finite ending. For every campaign, and one that does not exist: `current_package_lock`,
+`campaign_preparation_boundary` and `model_decision_boundary`. For every session, and one that does not exist:
 `campaign_narrative_options`.
 
 Then a scripted run on the session-page profile, each write in its own transaction on one of
@@ -275,7 +275,7 @@ def main() -> None:
             connection.close()
             with AuthorityOwner.open(database, "turn-read-runs") as owner:
                 for campaign_id in [*campaigns, "campaign-missing"]:
-                    for read in ("current_package_lock", "campaign_preparation_boundary"):
+                    for read in ("current_package_lock", "campaign_preparation_boundary", "model_decision_boundary"):
                         runs.append({"base": base, "read": read, "campaign_id": campaign_id,
                                      "outcome": outcome(lambda: getattr(owner, read)(campaign_id))})
                 for session_id in [*sessions, "session-missing"]:

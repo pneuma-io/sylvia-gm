@@ -270,7 +270,7 @@ async fn turn_reads_match_python() {
     .unwrap();
     let runs = record["runs"].as_array().unwrap();
     let steps = record["private_records"].as_array().unwrap();
-    assert_eq!((runs.len(), steps.len()), (50, 39));
+    assert_eq!((runs.len(), steps.len()), (68, 39));
     let mut failures = Vec::new();
     for name in ["cast", "riichi_started", "campaigns", "session_pages", "narrative"] {
         let (handle, thread) = open(name);
@@ -281,6 +281,11 @@ async fn turn_reads_match_python() {
                     turn_reads::current_package_lock(&handle, run["campaign_id"].as_str().unwrap())
                         .await
                         .map(|record| lock_record(&record)),
+                ),
+                "model_decision_boundary" => outcome(
+                    turn_reads::model_decision_boundary(&handle, run["campaign_id"].as_str().unwrap())
+                        .await
+                        .map(|boundary| boundary.as_ref().map_or(Json::Null, boundary_json)),
                 ),
                 "campaign_preparation_boundary" => outcome(
                     turn_reads::campaign_preparation_boundary(&handle, run["campaign_id"].as_str().unwrap())

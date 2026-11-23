@@ -64,6 +64,14 @@
   },
   {
    "base": "cast",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "cast",
    "read": "current_package_lock",
    "campaign_id": "campaign-workshop",
    "outcome": {
@@ -125,6 +133,14 @@
   },
   {
    "base": "cast",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "cast",
    "read": "current_package_lock",
    "campaign_id": "campaign-missing",
    "outcome": {
@@ -136,6 +152,16 @@
   {
    "base": "cast",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "cast",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-missing",
    "outcome": {
     "error": "CommandRejected",
@@ -216,6 +242,670 @@
   },
   {
    "base": "riichi_started",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-table",
+   "outcome": {
+    "ok": {
+     "__class__": "ModelDecisionBoundary",
+     "owner": "player",
+     "actor_id": "aki.seat",
+     "actor_name": "Akira",
+     "actor_state": {
+      "control": "player",
+      "game": {
+       "choices": [
+        {
+         "id": "choice:1:54",
+         "label": "Discard 2m",
+         "op": "discard",
+         "tiles": [
+          4
+         ]
+        },
+        {
+         "id": "choice:1:30",
+         "label": "Discard 3m",
+         "op": "discard",
+         "tiles": [
+          8
+         ]
+        },
+        {
+         "id": "choice:1:148",
+         "label": "Discard 3m",
+         "op": "discard",
+         "tiles": [
+          9
+         ]
+        },
+        {
+         "id": "choice:1:201",
+         "label": "Discard 5m",
+         "op": "discard",
+         "tiles": [
+          17
+         ]
+        },
+        {
+         "id": "choice:1:240",
+         "label": "Discard 6m",
+         "op": "discard",
+         "tiles": [
+          20
+         ]
+        },
+        {
+         "id": "choice:1:123",
+         "label": "Discard 9m",
+         "op": "discard",
+         "tiles": [
+          32
+         ]
+        },
+        {
+         "id": "choice:1:0",
+         "label": "Discard 1p",
+         "op": "discard",
+         "tiles": [
+          37
+         ]
+        },
+        {
+         "id": "choice:1:121",
+         "label": "Discard 6p",
+         "op": "discard",
+         "tiles": [
+          56
+         ]
+        },
+        {
+         "id": "choice:1:112",
+         "label": "Discard 2s",
+         "op": "discard",
+         "tiles": [
+          76
+         ]
+        },
+        {
+         "id": "choice:1:6",
+         "label": "Discard 3s",
+         "op": "discard",
+         "tiles": [
+          80
+         ]
+        },
+        {
+         "id": "choice:1:63",
+         "label": "Discard 6s",
+         "op": "discard",
+         "tiles": [
+          95
+         ]
+        },
+        {
+         "id": "choice:1:253",
+         "label": "Discard South",
+         "op": "discard",
+         "tiles": [
+          112
+         ]
+        },
+        {
+         "id": "choice:1:95",
+         "label": "Discard West",
+         "op": "discard",
+         "tiles": [
+          117
+         ]
+        },
+        {
+         "id": "choice:1:227",
+         "label": "Discard Red",
+         "op": "discard",
+         "tiles": [
+          132
+         ]
+        }
+       ],
+       "decision_actions": [
+        {
+         "arguments": {
+          "choice": "choice:1:54"
+         },
+         "id": "choice:1:54",
+         "label": "Discard 2m",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:30"
+         },
+         "id": "choice:1:30",
+         "label": "Discard 3m",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:148"
+         },
+         "id": "choice:1:148",
+         "label": "Discard 3m",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:201"
+         },
+         "id": "choice:1:201",
+         "label": "Discard 5m",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:240"
+         },
+         "id": "choice:1:240",
+         "label": "Discard 6m",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:123"
+         },
+         "id": "choice:1:123",
+         "label": "Discard 9m",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:0"
+         },
+         "id": "choice:1:0",
+         "label": "Discard 1p",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:121"
+         },
+         "id": "choice:1:121",
+         "label": "Discard 6p",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:112"
+         },
+         "id": "choice:1:112",
+         "label": "Discard 2s",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:6"
+         },
+         "id": "choice:1:6",
+         "label": "Discard 3s",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:63"
+         },
+         "id": "choice:1:63",
+         "label": "Discard 6s",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:253"
+         },
+         "id": "choice:1:253",
+         "label": "Discard South",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:95"
+         },
+         "id": "choice:1:95",
+         "label": "Discard West",
+         "operation": "take_action"
+        },
+        {
+         "arguments": {
+          "choice": "choice:1:227"
+         },
+         "id": "choice:1:227",
+         "label": "Discard Red",
+         "operation": "take_action"
+        }
+       ],
+       "discards": [],
+       "double_riichi": false,
+       "draw_count": 1,
+       "forbidden_discards": [],
+       "hand": [
+        80,
+        132,
+        117,
+        17,
+        32,
+        37,
+        20,
+        56,
+        9,
+        4,
+        112,
+        76,
+        95,
+        8
+       ],
+       "ippatsu": false,
+       "last_draw": 8,
+       "melds": [],
+       "pao_dragon": null,
+       "pao_wind": null,
+       "public_table": {
+        "dealer": 0,
+        "dora_indicators": [
+         3
+        ],
+        "honba": 0,
+        "last_discard": null,
+        "live_count": 69,
+        "message": "Match started.",
+        "phase": "discard",
+        "round_wind": 0,
+        "seats": [
+         {
+          "concealed_count": 14,
+          "discards": [],
+          "melds": [],
+          "name": "Akira",
+          "riichi": false,
+          "score": 25000,
+          "seat": 0
+         },
+         {
+          "concealed_count": 13,
+          "discards": [],
+          "melds": [],
+          "name": "Right opponent",
+          "riichi": false,
+          "score": 25000,
+          "seat": 1
+         },
+         {
+          "concealed_count": 13,
+          "discards": [],
+          "melds": [],
+          "name": "Across opponent",
+          "riichi": false,
+          "score": 25000,
+          "seat": 2
+         },
+         {
+          "concealed_count": 13,
+          "discards": [],
+          "melds": [],
+          "name": "Left opponent",
+          "riichi": false,
+          "score": 25000,
+          "seat": 3
+         }
+        ],
+        "sticks": 0
+       },
+       "revealed": false,
+       "riichi": false,
+       "riichi_furiten": false,
+       "riichi_waits": [],
+       "rinshan": false,
+       "temporary_furiten": false
+      },
+      "name": "Akira",
+      "participant_id": "aki",
+      "persona": "Play a thoughtful, friendly club match. Respect legal choices and base tactics on your own hand and public play.",
+      "score": 25000,
+      "seat": 0
+     },
+     "campaign_revision": 2,
+     "active_side_id": null,
+     "focused_actor_id": "aki.seat",
+     "eligible_actors": [
+      {
+       "__class__": "ModelDecisionActor",
+       "actor_id": "aki.seat",
+       "actor_name": "Akira",
+       "actor_state": {
+        "control": "player",
+        "game": {
+         "choices": [
+          {
+           "id": "choice:1:54",
+           "label": "Discard 2m",
+           "op": "discard",
+           "tiles": [
+            4
+           ]
+          },
+          {
+           "id": "choice:1:30",
+           "label": "Discard 3m",
+           "op": "discard",
+           "tiles": [
+            8
+           ]
+          },
+          {
+           "id": "choice:1:148",
+           "label": "Discard 3m",
+           "op": "discard",
+           "tiles": [
+            9
+           ]
+          },
+          {
+           "id": "choice:1:201",
+           "label": "Discard 5m",
+           "op": "discard",
+           "tiles": [
+            17
+           ]
+          },
+          {
+           "id": "choice:1:240",
+           "label": "Discard 6m",
+           "op": "discard",
+           "tiles": [
+            20
+           ]
+          },
+          {
+           "id": "choice:1:123",
+           "label": "Discard 9m",
+           "op": "discard",
+           "tiles": [
+            32
+           ]
+          },
+          {
+           "id": "choice:1:0",
+           "label": "Discard 1p",
+           "op": "discard",
+           "tiles": [
+            37
+           ]
+          },
+          {
+           "id": "choice:1:121",
+           "label": "Discard 6p",
+           "op": "discard",
+           "tiles": [
+            56
+           ]
+          },
+          {
+           "id": "choice:1:112",
+           "label": "Discard 2s",
+           "op": "discard",
+           "tiles": [
+            76
+           ]
+          },
+          {
+           "id": "choice:1:6",
+           "label": "Discard 3s",
+           "op": "discard",
+           "tiles": [
+            80
+           ]
+          },
+          {
+           "id": "choice:1:63",
+           "label": "Discard 6s",
+           "op": "discard",
+           "tiles": [
+            95
+           ]
+          },
+          {
+           "id": "choice:1:253",
+           "label": "Discard South",
+           "op": "discard",
+           "tiles": [
+            112
+           ]
+          },
+          {
+           "id": "choice:1:95",
+           "label": "Discard West",
+           "op": "discard",
+           "tiles": [
+            117
+           ]
+          },
+          {
+           "id": "choice:1:227",
+           "label": "Discard Red",
+           "op": "discard",
+           "tiles": [
+            132
+           ]
+          }
+         ],
+         "decision_actions": [
+          {
+           "arguments": {
+            "choice": "choice:1:54"
+           },
+           "id": "choice:1:54",
+           "label": "Discard 2m",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:30"
+           },
+           "id": "choice:1:30",
+           "label": "Discard 3m",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:148"
+           },
+           "id": "choice:1:148",
+           "label": "Discard 3m",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:201"
+           },
+           "id": "choice:1:201",
+           "label": "Discard 5m",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:240"
+           },
+           "id": "choice:1:240",
+           "label": "Discard 6m",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:123"
+           },
+           "id": "choice:1:123",
+           "label": "Discard 9m",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:0"
+           },
+           "id": "choice:1:0",
+           "label": "Discard 1p",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:121"
+           },
+           "id": "choice:1:121",
+           "label": "Discard 6p",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:112"
+           },
+           "id": "choice:1:112",
+           "label": "Discard 2s",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:6"
+           },
+           "id": "choice:1:6",
+           "label": "Discard 3s",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:63"
+           },
+           "id": "choice:1:63",
+           "label": "Discard 6s",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:253"
+           },
+           "id": "choice:1:253",
+           "label": "Discard South",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:95"
+           },
+           "id": "choice:1:95",
+           "label": "Discard West",
+           "operation": "take_action"
+          },
+          {
+           "arguments": {
+            "choice": "choice:1:227"
+           },
+           "id": "choice:1:227",
+           "label": "Discard Red",
+           "operation": "take_action"
+          }
+         ],
+         "discards": [],
+         "double_riichi": false,
+         "draw_count": 1,
+         "forbidden_discards": [],
+         "hand": [
+          80,
+          132,
+          117,
+          17,
+          32,
+          37,
+          20,
+          56,
+          9,
+          4,
+          112,
+          76,
+          95,
+          8
+         ],
+         "ippatsu": false,
+         "last_draw": 8,
+         "melds": [],
+         "pao_dragon": null,
+         "pao_wind": null,
+         "public_table": {
+          "dealer": 0,
+          "dora_indicators": [
+           3
+          ],
+          "honba": 0,
+          "last_discard": null,
+          "live_count": 69,
+          "message": "Match started.",
+          "phase": "discard",
+          "round_wind": 0,
+          "seats": [
+           {
+            "concealed_count": 14,
+            "discards": [],
+            "melds": [],
+            "name": "Akira",
+            "riichi": false,
+            "score": 25000,
+            "seat": 0
+           },
+           {
+            "concealed_count": 13,
+            "discards": [],
+            "melds": [],
+            "name": "Right opponent",
+            "riichi": false,
+            "score": 25000,
+            "seat": 1
+           },
+           {
+            "concealed_count": 13,
+            "discards": [],
+            "melds": [],
+            "name": "Across opponent",
+            "riichi": false,
+            "score": 25000,
+            "seat": 2
+           },
+           {
+            "concealed_count": 13,
+            "discards": [],
+            "melds": [],
+            "name": "Left opponent",
+            "riichi": false,
+            "score": 25000,
+            "seat": 3
+           }
+          ],
+          "sticks": 0
+         },
+         "revealed": false,
+         "riichi": false,
+         "riichi_furiten": false,
+         "riichi_waits": [],
+         "rinshan": false,
+         "temporary_furiten": false
+        },
+        "name": "Akira",
+        "participant_id": "aki",
+        "persona": "Play a thoughtful, friendly club match. Respect legal choices and base tactics on your own hand and public play.",
+        "score": 25000,
+        "seat": 0
+       }
+      }
+     ],
+     "preparation": null
+    }
+   }
+  },
+  {
+   "base": "riichi_started",
    "read": "current_package_lock",
    "campaign_id": "campaign-workshop",
    "outcome": {
@@ -277,6 +967,14 @@
   },
   {
    "base": "riichi_started",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-workshop",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "riichi_started",
    "read": "current_package_lock",
    "campaign_id": "campaign-missing",
    "outcome": {
@@ -288,6 +986,16 @@
   {
    "base": "riichi_started",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "riichi_started",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-missing",
    "outcome": {
     "error": "CommandRejected",
@@ -335,6 +1043,14 @@
   },
   {
    "base": "campaigns",
+   "read": "model_decision_boundary",
+   "campaign_id": "1509bb0a-9bf1-4331-8a11-8783593942a4",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
    "read": "current_package_lock",
    "campaign_id": "campaign-a1",
    "outcome": {
@@ -356,6 +1072,14 @@
   {
    "base": "campaigns",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-a1",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-a1",
    "outcome": {
     "ok": null
@@ -391,6 +1115,14 @@
   },
   {
    "base": "campaigns",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-a2",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
    "read": "current_package_lock",
    "campaign_id": "campaign-b",
    "outcome": {
@@ -412,6 +1144,14 @@
   {
    "base": "campaigns",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-b",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-b",
    "outcome": {
     "ok": null
@@ -460,6 +1200,14 @@
   },
   {
    "base": "campaigns",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-clockwork",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
    "read": "current_package_lock",
    "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
    "outcome": {
@@ -488,6 +1236,14 @@
   },
   {
    "base": "campaigns",
+   "read": "model_decision_boundary",
+   "campaign_id": "f5ec52ed-0108-4475-92e1-bc7656670b14",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "campaigns",
    "read": "current_package_lock",
    "campaign_id": "campaign-missing",
    "outcome": {
@@ -499,6 +1255,16 @@
   {
    "base": "campaigns",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "campaigns",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-missing",
    "outcome": {
     "error": "CommandRejected",
@@ -617,6 +1383,14 @@
   },
   {
    "base": "session_pages",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-build",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
    "read": "current_package_lock",
    "campaign_id": "campaign-story",
    "outcome": {
@@ -658,6 +1432,14 @@
   },
   {
    "base": "session_pages",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-story",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "session_pages",
    "read": "current_package_lock",
    "campaign_id": "campaign-missing",
    "outcome": {
@@ -669,6 +1451,16 @@
   {
    "base": "session_pages",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "session_pages",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-missing",
    "outcome": {
     "error": "CommandRejected",
@@ -777,6 +1569,14 @@
   },
   {
    "base": "narrative",
+   "read": "model_decision_boundary",
+   "campaign_id": "campaign-narrative",
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "base": "narrative",
    "read": "current_package_lock",
    "campaign_id": "campaign-missing",
    "outcome": {
@@ -788,6 +1588,16 @@
   {
    "base": "narrative",
    "read": "campaign_preparation_boundary",
+   "campaign_id": "campaign-missing",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "base": "narrative",
+   "read": "model_decision_boundary",
    "campaign_id": "campaign-missing",
    "outcome": {
     "error": "CommandRejected",
