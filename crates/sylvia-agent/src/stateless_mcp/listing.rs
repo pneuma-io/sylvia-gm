@@ -21,7 +21,9 @@
 
 use super::ModelMechanicsTool;
 use crate::provider_session::reads::TurnOwner;
-use crate::tool_exposure::{exposure_spell_ids, scoped_spell_choices, ExposureContext, EXPOSURE_KEY, SPELL_SCOPE_KEY};
+use crate::tool_exposure::{
+    exposure_spell_ids, scoped_spell_choices, ExposureContext, EXPOSURE_KEY, SPELL_SCOPE_KEY,
+};
 use serde_json::{json, Value as Json};
 use std::collections::BTreeSet;
 use std::sync::OnceLock;
@@ -264,7 +266,8 @@ pub fn campaign_file_update_schema(options: &JsonMap) -> CodedResult<JsonMap> {
             .collect(),
     };
     let mut properties = exported_map(&["campaign_file", "assessment_properties"]);
-    let collections = exported(&["campaign_file", "collections"]).as_array().expect("the exported collections");
+    let collections =
+        exported(&["campaign_file", "collections"]).as_array().expect("the exported collections");
     for pair in collections {
         let (operation, collection) = (pair[0].as_str().unwrap(), pair[1].as_str().unwrap());
         if !available.contains(operation) {
@@ -283,8 +286,15 @@ pub fn campaign_file_update_schema(options: &JsonMap) -> CodedResult<JsonMap> {
 }
 
 /// One of the application's own tools, with `_meta`'s fixed package identity.
-fn application_tool(name: &str, description: &str, input_schema: JsonMap, capability: &str, category: &str) -> ModelMechanicsTool {
-    let mut tool = ModelMechanicsTool::new(REFERENCE_PACKAGE_ID, "1", "0".repeat(64), name, capability, input_schema);
+fn application_tool(
+    name: &str,
+    description: &str,
+    input_schema: JsonMap,
+    capability: &str,
+    category: &str,
+) -> ModelMechanicsTool {
+    let mut tool =
+        ModelMechanicsTool::new(REFERENCE_PACKAGE_ID, "1", "0".repeat(64), name, capability, input_schema);
     tool.parameter_derivations = Some(JsonMap::new());
     tool.description = description.to_owned();
     tool.category = category.to_owned();
@@ -333,8 +343,12 @@ async fn server_list_tools(
     session_id: Option<&str>,
 ) -> CodedResult<Vec<ModelMechanicsTool>> {
     let (snapshot, _boundary) = owner.model_context_snapshot(campaign_id).await?;
-    let participant_ids: Vec<String> =
-        snapshot.state.participants.iter().map(|participant| participant.participant_id().to_owned()).collect();
+    let participant_ids: Vec<String> = snapshot
+        .state
+        .participants
+        .iter()
+        .map(|participant| participant.participant_id().to_owned())
+        .collect();
     let castable = castable_spell_ids(&snapshot);
     let catalog = owner.catalog(campaign_id, false).await?;
     let asked = exposure_spell_ids(catalog.iter().map(|tool| &tool.input_schema));
@@ -347,12 +361,16 @@ async fn server_list_tools(
         if !exposure.exposed(&entry.input_schema) {
             continue;
         }
-        let (schema, derivations) = model_input_schema(&entry.input_schema, &participant_ids, Some(&castable))?;
+        let (schema, derivations) =
+            model_input_schema(&entry.input_schema, &participant_ids, Some(&castable))?;
         let spell = schema["properties"].get("spell");
-        if spell.and_then(Json::as_object).and_then(|spell| spell.get("enum")) == Some(&Json::Array(Vec::new())) {
+        if spell.and_then(Json::as_object).and_then(|spell| spell.get("enum"))
+            == Some(&Json::Array(Vec::new()))
+        {
             continue;
         }
-        let description = if entry.description.is_empty() { entry.capability.clone() } else { entry.description };
+        let description =
+            if entry.description.is_empty() { entry.capability.clone() } else { entry.description };
         let mut tool = ModelMechanicsTool::new(
             entry.package_id,
             entry.package_version,
@@ -371,9 +389,11 @@ async fn server_list_tools(
         Err(error) if is_command_rejected(&error) => None,
         Err(error) => return Err(error),
     };
-    let structured = accepted_plan.as_ref().is_some_and(|plan| plan.get("campaign_plan").is_some_and(Json::is_object));
-    let readable =
-        accepted_plan.as_ref().is_some_and(|plan| plan.get("campaign_plan_markdown").is_some_and(Json::is_string));
+    let structured =
+        accepted_plan.as_ref().is_some_and(|plan| plan.get("campaign_plan").is_some_and(Json::is_object));
+    let readable = accepted_plan
+        .as_ref()
+        .is_some_and(|plan| plan.get("campaign_plan_markdown").is_some_and(Json::is_string));
     if session_id.is_none() && !structured && !readable {
         return Ok(projected);
     }

@@ -598,7 +598,9 @@ impl TurnOwner for Recorded {
             serde_json::json!([campaign_id])
         };
         let result = self.next_result("catalog", args);
-        Box::pin(async move { result.map(|value| value.as_array().unwrap().iter().map(catalog_entry).collect()) })
+        Box::pin(
+            async move { result.map(|value| value.as_array().unwrap().iter().map(catalog_entry).collect()) },
+        )
     }
     fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
         let result = self.next_result("accepted_campaign_plan", serde_json::json!([campaign_id]));

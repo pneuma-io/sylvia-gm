@@ -46,8 +46,8 @@ fn tool_json(tool: &ModelMechanicsTool) -> J {
 
 #[tokio::test]
 async fn tool_listings_match_python() {
-    let vectors: J =
-        serde_json::from_str(include_str!("vectors/listing_vectors.json")).expect("vector file is valid JSON");
+    let vectors: J = serde_json::from_str(include_str!("vectors/listing_vectors.json"))
+        .expect("vector file is valid JSON");
     let cases = expand(&vectors["cases"], &vectors["shared"]);
     let cases = cases.as_array().expect("cases");
     let mut seen = std::collections::BTreeSet::new();
@@ -81,7 +81,11 @@ async fn tool_listings_match_python() {
                 inner = &held[0];
             }
             assert_eq!(J::from(error.code.as_str()), inner["code"], "{name}");
-            assert_eq!(error.error_type.unwrap_or("CommandRejected"), raised["class"].as_str().unwrap(), "{name}");
+            assert_eq!(
+                error.error_type.unwrap_or("CommandRejected"),
+                raised["class"].as_str().unwrap(),
+                "{name}"
+            );
         } else {
             let tools = result.unwrap_or_else(|error| panic!("{name}: {error:?}"));
             let python = case["tools"].as_array().unwrap();

@@ -137,7 +137,11 @@ pub struct ExposureContext<'a> {
 
 impl<'a> ExposureContext<'a> {
     /// `ExposureContext(state, castable_spell_ids=..., asked_spell_ids=...)`.
-    pub fn new(state: &'a JsonMap, castable_spell_ids: &BTreeSet<String>, asked_spell_ids: &BTreeSet<String>) -> Self {
+    pub fn new(
+        state: &'a JsonMap,
+        castable_spell_ids: &BTreeSet<String>,
+        asked_spell_ids: &BTreeSet<String>,
+    ) -> Self {
         let unasked: BTreeSet<String> = asked_spell_ids.difference(castable_spell_ids).cloned().collect();
         let mut present_spells = castable_spell_ids.clone();
         present_spells.extend(spell_ids_in_state(state, &unasked));

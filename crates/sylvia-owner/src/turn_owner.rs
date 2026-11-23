@@ -150,8 +150,9 @@ impl TurnOwner for OwnerReads {
         include_unexposed: bool,
     ) -> BoxFuture<'a, CodedResult<Vec<CatalogEntry>>> {
         Box::pin(async move {
-            let tools =
-                content_reads::catalog(self.store(), campaign_id, include_unexposed).await.map_err(store_error)?;
+            let tools = content_reads::catalog(self.store(), campaign_id, include_unexposed)
+                .await
+                .map_err(store_error)?;
             Ok(tools
                 .into_iter()
                 .map(|tool| CatalogEntry {
