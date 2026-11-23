@@ -59,7 +59,7 @@ fn differs_from(value: &Json, integer: i64) -> bool {
                 true
             } else {
                 let x = number.as_f64().unwrap();
-                !(x.fract() == 0.0 && x >= -9.3e18 && x <= 9.3e18 && x as i128 == i128::from(integer))
+                !(x.fract() == 0.0 && (-9.3e18..=9.3e18).contains(&x) && x as i128 == i128::from(integer))
             }
         }
         _ => true,
@@ -131,7 +131,7 @@ fn text(value: &Json, key: &str) -> String {
 }
 
 fn sort_references(items: &mut [Json]) {
-    items.sort_by(|a, b| (text(a, "kind"), text(a, "id")).cmp(&(text(b, "kind"), text(b, "id"))));
+    items.sort_by_key(|item| (text(item, "kind"), text(item, "id")));
 }
 
 /// `admit_spatial_result(scene, value)`: a result's closed shape and snapshot provenance.

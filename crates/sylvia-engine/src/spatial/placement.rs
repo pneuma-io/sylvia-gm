@@ -361,10 +361,10 @@ pub(crate) fn resolve_placement(scene: &CompiledScene, query: &JsonMap) -> JsonM
         .find(|item| item.kind == "entity" && item.id == moving)
         .expect("an admitted mover");
     let maximum = query["max_candidates"].as_u64().expect("an admitted limit") as usize;
-    let zone = match query.get("containing_zone_id").and_then(Json::as_str) {
-        Some(id) => Some(scene.zones.iter().find(|item| item.id == id).expect("an admitted zone")),
-        None => None,
-    };
+    let zone = query
+        .get("containing_zone_id")
+        .and_then(Json::as_str)
+        .map(|id| scene.zones.iter().find(|item| item.id == id).expect("an admitted zone"));
     if let Some(reference) = query.get("reference_face") {
         // Exact arithmetic.
         let target = &reference["target"];
