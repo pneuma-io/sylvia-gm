@@ -312,7 +312,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `config/provider_settings.py:2163` | `set_session_model_once_settings` | len() against a limit | `or len(session_id) > 512` | |
 | `provider/_claude_install.py:175` | `verify_manifest` | len() against a limit | `primary = {(fields[11] if len(fields) > 11 else fields[2]).upper() for fields in valid}` | `sylvia-provider` install_vectors |
 | `provider/_claude_runtime.py:379` | `ClaudeConnection._read` | len() against a limit | `if len(line.encode("utf-8")) > MAX_FRAME_BYTES or not line.endswith("\n"):` | `sylvia-provider` runtime_process |
-| `provider/_lifecycle.py:38` | `LifecycleTiming.record` | len() against a limit | `if len(self._spans) < 24:` | |
+| `provider/_lifecycle.py:38` | `LifecycleTiming.record` | len() against a limit | `if len(self._spans) < 24:` || `sylvia-provider` chatgpt_rules_vectors |
 | `provider/_openai_compat.py:644` | `_responses_service_tier` | len() against a limit | `if isinstance(value, str) and 0 < len(value) <= 32 and value.isascii():` | |
 | `provider/_openai_compat.py:855` | `OpenAICompatProvider._response_continuation_options` | len() against a limit | `and len(context_id) <= 256):` || yes |
 | `provider/_reasoning.py:41` | `reasoning_values` | len() against a limit | `or len(values) > 16` | |

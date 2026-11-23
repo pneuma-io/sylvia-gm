@@ -1,0 +1,4592 @@
+{
+ "python": "3.12.11",
+ "settings": [
+  {
+   "environ": {},
+   "setting": "answer"
+  },
+  {
+   "environ": {
+    "SYLVIA_CHATGPT_THREAD": "fresh"
+   },
+   "setting": "fresh"
+  },
+  {
+   "environ": {
+    "SYLVIA_CHATGPT_THREAD": " Stable "
+   },
+   "setting": "stable"
+  },
+  {
+   "environ": {
+    "SYLVIA_CHATGPT_THREAD": "ANSWER-DRAFT"
+   },
+   "setting": "answer-draft"
+  },
+  {
+   "environ": {
+    "SYLVIA_CHATGPT_THREAD": "answer"
+   },
+   "setting": "answer"
+  },
+  {
+   "environ": {
+    "SYLVIA_CHATGPT_THREAD": "bogus"
+   },
+   "setting": "answer"
+  },
+  {
+   "environ": {
+    "SYLVIA_GM_CONTEXT_MODE": "legacy"
+   },
+   "setting": "fresh"
+  },
+  {
+   "environ": {
+    "SYLVIA_GM_CONTEXT_MODE": "ledger"
+   },
+   "setting": "answer"
+  },
+  {
+   "environ": {
+    "SYLVIA_GM_CONTEXT_MODE": "legacy",
+    "SYLVIA_CHATGPT_THREAD": "stable"
+   },
+   "setting": "stable"
+  },
+  {
+   "environ": {
+    "SYLVIA_GM_CONTEXT_MODE": "nonsense"
+   },
+   "setting": "answer"
+  }
+ ],
+ "usages": [
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 100,
+      "outputTokens": 10,
+      "totalTokens": 110
+     }
+    }
+   },
+   "parsed": {
+    "tokens": [
+     100,
+     10,
+     110,
+     null
+    ],
+    "cache": [
+     null,
+     null,
+     null,
+     100
+    ]
+   },
+   "figures": {
+    "input": 100,
+    "cached": null,
+    "output": 10
+   }
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 100,
+      "outputTokens": 10,
+      "totalTokens": 110,
+      "cachedInputTokens": 80,
+      "reasoningOutputTokens": 4,
+      "cacheWriteInputTokens": 3
+     }
+    }
+   },
+   "parsed": {
+    "tokens": [
+     100,
+     10,
+     110,
+     4
+    ],
+    "cache": [
+     80,
+     3,
+     20,
+     100
+    ]
+   },
+   "figures": {
+    "input": 100,
+    "cached": 80,
+    "output": 10
+   }
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 100,
+      "outputTokens": 10,
+      "totalTokens": 110,
+      "cachedInputTokens": 150
+     }
+    }
+   },
+   "parsed": {
+    "tokens": [
+     100,
+     10,
+     110,
+     null
+    ],
+    "cache": [
+     150,
+     null,
+     0,
+     100
+    ]
+   },
+   "figures": {
+    "input": 100,
+    "cached": 150,
+    "output": 10
+   }
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 100,
+      "outputTokens": 10,
+      "totalTokens": 110,
+      "cachedInputTokens": -1,
+      "reasoningOutputTokens": true
+     }
+    }
+   },
+   "parsed": {
+    "tokens": [
+     100,
+     10,
+     110,
+     null
+    ],
+    "cache": [
+     null,
+     null,
+     null,
+     100
+    ]
+   },
+   "figures": {
+    "input": 100,
+    "cached": null,
+    "output": 10
+   }
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 1.0,
+      "outputTokens": 10,
+      "totalTokens": 110
+     }
+    }
+   },
+   "parsed": null
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 100,
+      "outputTokens": 10,
+      "totalTokens": -5
+     }
+    }
+   },
+   "parsed": null
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": {
+      "inputTokens": 1,
+      "outputTokens": 1
+     }
+    }
+   },
+   "parsed": null
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "total": {
+      "inputTokens": 100,
+      "outputTokens": 10,
+      "totalTokens": 110
+     }
+    }
+   },
+   "parsed": null
+  },
+  {
+   "params": {
+    "tokenUsage": {
+     "last": [
+      1
+     ]
+    }
+   },
+   "parsed": null
+  },
+  {
+   "params": {
+    "tokenUsage": 5
+   },
+   "parsed": null
+  },
+  {
+   "params": [
+    1
+   ],
+   "parsed": null
+  },
+  {
+   "params": null,
+   "parsed": null
+  },
+  {
+   "params": {},
+   "parsed": null
+  }
+ ],
+ "requests": [
+  {
+   "messages": [
+    {
+     "role": "system",
+     "content": "You are the GM."
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "tools": [
+    {
+     "type": "function",
+     "function": {
+      "name": "roll",
+      "description": "Roll dice.",
+      "parameters": {
+       "type": "object",
+       "properties": {
+        "n": {
+         "type": "integer"
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "function",
+     "function": {
+      "name": "look",
+      "description": "Look.",
+      "parameters": {
+       "type": "object"
+      }
+     }
+    }
+   ],
+   "dynamic": [
+    {
+     "type": "function",
+     "name": "roll",
+     "description": "Roll dice.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {
+       "n": {
+        "type": "integer"
+       }
+      }
+     }
+    },
+    {
+     "type": "function",
+     "name": "look",
+     "description": "Look.",
+     "inputSchema": {
+      "type": "object"
+     }
+    }
+   ],
+   "items": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "I open the door."
+      }
+     ],
+     "type": "message"
+    }
+   ],
+   "system": [
+    "You are the GM."
+   ]
+  },
+  {
+   "messages": [
+    {
+     "role": "system",
+     "content": "You are the GM."
+    },
+    {
+     "role": "system",
+     "content": "Second."
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": "Rolling.",
+     "tool_calls": [
+      {
+       "id": "call_1",
+       "type": "function",
+       "function": {
+        "name": "roll",
+        "arguments": "{\"n\": 2}"
+       }
+      }
+     ]
+    },
+    {
+     "role": "tool",
+     "tool_call_id": "call_1",
+     "content": "7"
+    },
+    {
+     "role": "assistant",
+     "content": "It creaks."
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "tools": [
+    {
+     "type": "function",
+     "function": {
+      "name": "roll",
+      "description": "Roll dice.",
+      "parameters": {
+       "type": "object",
+       "properties": {
+        "n": {
+         "type": "integer"
+        }
+       }
+      }
+     }
+    },
+    {
+     "type": "function",
+     "function": {
+      "name": "look",
+      "description": "Look.",
+      "parameters": {
+       "type": "object"
+      }
+     }
+    }
+   ],
+   "dynamic": [
+    {
+     "type": "function",
+     "name": "roll",
+     "description": "Roll dice.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {
+       "n": {
+        "type": "integer"
+       }
+      }
+     }
+    },
+    {
+     "type": "function",
+     "name": "look",
+     "description": "Look.",
+     "inputSchema": {
+      "type": "object"
+     }
+    }
+   ],
+   "items": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "I open the door."
+      }
+     ],
+     "type": "message"
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Rolling."
+      }
+     ],
+     "type": "message"
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "It creaks."
+      }
+     ],
+     "type": "message"
+    },
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "I open the door."
+      }
+     ],
+     "type": "message"
+    }
+   ],
+   "system": [
+    "You are the GM.",
+    "Second."
+   ]
+  },
+  {
+   "messages": [
+    {
+     "role": "user",
+     "content": "I open the door."
+    }
+   ],
+   "tools": null,
+   "dynamic": [],
+   "items": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "I open the door."
+      }
+     ],
+     "type": "message"
+    }
+   ],
+   "system": []
+  },
+  {
+   "messages": [
+    {
+     "role": "system",
+     "content": "You are the GM."
+    },
+    {
+     "role": "user",
+     "content": "I open the door."
+    },
+    {
+     "role": "assistant",
+     "content": null,
+     "tool_calls": [
+      {
+       "id": "call_1",
+       "type": "function",
+       "function": {
+        "name": "roll",
+        "arguments": "{\"n\": 2}"
+       }
+      }
+     ]
+    },
+    {
+     "role": "tool",
+     "tool_call_id": "call_1",
+     "content": "7"
+    }
+   ],
+   "tools": [
+    {
+     "type": "function",
+     "function": {
+      "name": "roll",
+      "description": "Roll dice.",
+      "parameters": {
+       "type": "object",
+       "properties": {
+        "n": {
+         "type": "integer"
+        }
+       }
+      }
+     }
+    }
+   ],
+   "dynamic": [
+    {
+     "type": "function",
+     "name": "roll",
+     "description": "Roll dice.",
+     "inputSchema": {
+      "type": "object",
+      "properties": {
+       "n": {
+        "type": "integer"
+       }
+      }
+     }
+    }
+   ],
+   "items": [
+    {
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "I open the door."
+      }
+     ],
+     "type": "message"
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "system": [
+    "You are the GM."
+   ]
+  },
+  {
+   "messages": [],
+   "tools": [],
+   "dynamic": [],
+   "items": [],
+   "system": []
+  }
+ ],
+ "tails": [
+  {
+   "name": "spoken-call-result",
+   "tail": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Rolling."
+      }
+     ]
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "spoken": "Rolling.",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": []
+   },
+   "in_place": {
+    "result": "7",
+    "texts": []
+   }
+  },
+  {
+   "name": "reasoning-first",
+   "tail": [
+    {
+     "type": "reasoning",
+     "summary": []
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Rol"
+      }
+     ]
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "ling."
+      }
+     ]
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "spoken": "Rolling.",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": []
+   },
+   "in_place": {
+    "result": "7",
+    "texts": []
+   }
+  },
+  {
+   "name": "silent-call",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "Next."
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "user",
+      "content": [
+       {
+        "type": "input_text",
+        "text": "Next."
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "result": "7",
+    "texts": [
+     "Next."
+    ]
+   }
+  },
+  {
+   "name": "dropped-draft",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "spoken": "Rolling.",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "model_text_dropped",
+     "The request dropped the model's own text."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "model_text_dropped",
+     "The request dropped the model's own text."
+    ]
+   }
+  },
+  {
+   "name": "dropped-draft-ok",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "spoken": "Rolling.",
+   "dropped_draft_ok": true,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": []
+   },
+   "in_place": {
+    "result": "7",
+    "texts": []
+   }
+  },
+  {
+   "name": "text-differs",
+   "tail": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Other."
+      }
+     ]
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "spoken": "Rolling.",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "model_text_differs",
+     "The request does not hold the model's own text."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "model_text_differs",
+     "The request does not hold the model's own text."
+    ]
+   }
+  },
+  {
+   "name": "text-where-none",
+   "tail": [
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Extra."
+      }
+     ]
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "model_text_differs",
+     "The request does not hold the model's own text."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "model_text_differs",
+     "The request does not hold the model's own text."
+    ]
+   }
+  },
+  {
+   "name": "no-result",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   }
+  },
+  {
+   "name": "other-call",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_2",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_2",
+     "output": "7"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   }
+  },
+  {
+   "name": "result-for-other",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_2",
+     "output": "7"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   }
+  },
+  {
+   "name": "empty",
+   "tail": [],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "error": [
+     "_KeptThreadMismatchError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "no_call_result",
+     "The request does not answer the kept tool call."
+    ]
+   }
+  },
+  {
+   "name": "user-after",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "Then I run."
+      }
+     ]
+    },
+    {
+     "type": "message",
+     "role": "user",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "Fast."
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "user",
+      "content": [
+       {
+        "type": "input_text",
+        "text": "Then I run."
+       }
+      ]
+     },
+     {
+      "type": "message",
+      "role": "user",
+      "content": [
+       {
+        "type": "input_text",
+        "text": "Fast."
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "result": "7",
+    "texts": [
+     "Then I run.",
+     "Fast."
+    ]
+   }
+  },
+  {
+   "name": "copy-of-result",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "{\"said\": \"The goblin falls.\"}"
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "The goblin falls."
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "{\"said\": \"The goblin falls.\"}"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+       {
+        "type": "output_text",
+        "text": "The goblin falls."
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "result": "{\"said\": \"The goblin falls.\"}",
+    "texts": []
+   }
+  },
+  {
+   "name": "copy-of-arguments",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"narration\": \"You roll.\"}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "You roll."
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"narration\": \"You roll.\"}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+       {
+        "type": "output_text",
+        "text": "You roll."
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "result": "7",
+    "texts": []
+   }
+  },
+  {
+   "name": "assistant-other",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "Something new."
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+       {
+        "type": "output_text",
+        "text": "Something new."
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "tail_not_deliverable",
+     "The request adds a message the open turn cannot take."
+    ]
+   }
+  },
+  {
+   "name": "assistant-empty",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": ""
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+       {
+        "type": "output_text",
+        "text": ""
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "tail_not_deliverable",
+     "The request adds a message the open turn cannot take."
+    ]
+   }
+  },
+  {
+   "name": "non-message-after",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "function_call",
+     "call_id": "call_3",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "function_call",
+      "call_id": "call_3",
+      "name": "roll",
+      "arguments": "{\"n\": 2}",
+      "namespace": "sylvia"
+     }
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "tail_not_deliverable",
+     "The request adds more than messages after the result."
+    ]
+   }
+  },
+  {
+   "name": "result-not-text",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": {
+      "a": "\u00e9",
+      "b": [
+       1,
+       "two"
+      ]
+     }
+    },
+    {
+     "type": "message",
+     "role": "assistant",
+     "content": [
+      {
+       "type": "output_text",
+       "text": "two"
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": {
+      "a": "\u00e9",
+      "b": [
+       1,
+       "two"
+      ]
+     }
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "assistant",
+      "content": [
+       {
+        "type": "output_text",
+        "text": "two"
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "result": "{\"a\": \"\u00e9\", \"b\": [1, \"two\"]}",
+    "texts": []
+   }
+  },
+  {
+   "name": "result-missing",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1"
+    },
+    "rest": []
+   },
+   "in_place": {
+    "result": "null",
+    "texts": []
+   }
+  },
+  {
+   "name": "content-text-only",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "user",
+     "content": "plain"
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "user",
+      "content": "plain"
+     }
+    ]
+   },
+   "in_place": {
+    "result": "7",
+    "texts": [
+     "plain"
+    ]
+   }
+  },
+  {
+   "name": "content-odd-parts",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "user",
+     "content": [
+      {
+       "text": 5
+      },
+      "x",
+      {
+       "y": 1
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "user",
+      "content": [
+       {
+        "text": 5
+       },
+       "x",
+       {
+        "y": 1
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "result": "7",
+    "texts": [
+     "5"
+    ]
+   }
+  },
+  {
+   "name": "system-role-after",
+   "tail": [
+    {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    {
+     "type": "message",
+     "role": "system",
+     "content": [
+      {
+       "type": "input_text",
+       "text": "x"
+      }
+     ]
+    }
+   ],
+   "spoken": "",
+   "dropped_draft_ok": false,
+   "call_tail": {
+    "call": {
+     "type": "function_call",
+     "call_id": "call_1",
+     "name": "roll",
+     "arguments": "{\"n\": 2}",
+     "namespace": "sylvia"
+    },
+    "output": {
+     "type": "function_call_output",
+     "call_id": "call_1",
+     "output": "7"
+    },
+    "rest": [
+     {
+      "type": "message",
+      "role": "system",
+      "content": [
+       {
+        "type": "input_text",
+        "text": "x"
+       }
+      ]
+     }
+    ]
+   },
+   "in_place": {
+    "error": [
+     "_AnswerInPlaceError",
+     "tail_not_deliverable",
+     "The request adds a message the open turn cannot take."
+    ]
+   }
+  }
+ ],
+ "credits": [
+  {
+   "exchange_id": null,
+   "figures": {
+    "input": 100,
+    "cached": 80,
+    "output": 10
+   },
+   "received": [
+    {
+     "model": "gpt-6-sol",
+     "reported": true,
+     "tokens": [
+      100,
+      10,
+      110,
+      4
+     ],
+     "cache": [
+      80,
+      null,
+      20,
+      100
+     ]
+    },
+    {
+     "model": "gpt-6-sol",
+     "reported": true,
+     "tokens": [
+      100,
+      10,
+      110,
+      4
+     ],
+     "cache": [
+      80,
+      null,
+      20,
+      100
+     ]
+    }
+   ],
+   "owed": false
+  },
+  {
+   "exchange_id": "ex-1",
+   "figures": {
+    "input": 100,
+    "cached": 80,
+    "output": 10,
+    "exchange_id": "ex-1"
+   },
+   "received": [
+    {
+     "model": "gpt-6-sol",
+     "reported": true,
+     "tokens": [
+      100,
+      10,
+      110,
+      4
+     ],
+     "cache": [
+      80,
+      null,
+      20,
+      100
+     ]
+    },
+    {
+     "model": "gpt-6-sol",
+     "reported": true,
+     "tokens": [
+      100,
+      10,
+      110,
+      4
+     ],
+     "cache": [
+      80,
+      null,
+      20,
+      100
+     ]
+    }
+   ],
+   "owed": false
+  }
+ ],
+ "failures": [
+  {
+   "class": "ProviderConnectionError",
+   "failed": true
+  },
+  {
+   "class": "StaleConnectionError",
+   "failed": false
+  },
+  {
+   "class": "ModelNotFoundError",
+   "failed": true
+  },
+  {
+   "class": "AuthenticationError",
+   "failed": true
+  },
+  {
+   "class": "ProviderError",
+   "failed": true
+  },
+  {
+   "class": "RateLimitError",
+   "failed": false
+  },
+  {
+   "class": "TokenLimitError",
+   "failed": false
+  },
+  {
+   "class": "ContextCompactionRequiredError",
+   "failed": false
+  },
+  {
+   "class": "ModelCapacityError",
+   "failed": false
+  },
+  {
+   "class": "InvalidResponseError",
+   "failed": false
+  },
+  {
+   "class": "IncompleteProviderStreamError",
+   "failed": false
+  },
+  {
+   "class": "ProviderTimeoutError",
+   "failed": false
+  },
+  {
+   "class": "_KeptThreadMismatchError",
+   "failed": true
+  },
+  {
+   "class": "CodexConnectionError",
+   "failed": false
+  },
+  {
+   "class": "ValueError",
+   "failed": false
+  },
+  {
+   "class": "CancelledError",
+   "failed": false
+  }
+ ],
+ "pools": [
+  {
+   "name": "keep-and-take",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "len"
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      },
+      {
+       "b": 2
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    1,
+    {
+     "chosen": "t1",
+     "close": []
+    },
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "longest-wins",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "short",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "long",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      },
+      {
+       "b": 2
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "same-long",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      },
+      {
+       "b": 2
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      },
+      {
+       "b": 2
+      },
+      {
+       "c": 3
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    [],
+    [],
+    {
+     "chosen": "long",
+     "close": []
+    },
+    2
+   ],
+   "closed": []
+  },
+  {
+   "name": "must-extend",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    {
+     "chosen": null,
+     "close": [
+      "t1"
+     ]
+    },
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "earlier-forms-close",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "other-session",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "z": 0
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "Changed.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    [],
+    {
+     "chosen": null,
+     "close": [
+      "t1"
+     ]
+    },
+    1
+   ],
+   "closed": []
+  },
+  {
+   "name": "other-model-stays",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h1",
+     "model": "gpt-6-luna",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    {
+     "chosen": null,
+     "close": []
+    },
+    1
+   ],
+   "closed": []
+  },
+  {
+   "name": "other-home-closes",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h2",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      },
+      {
+       "b": 2
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    {
+     "chosen": null,
+     "close": [
+      "t1"
+     ]
+    },
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "tools-differ",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "look"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      },
+      {
+       "b": 2
+      }
+     ]
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    {
+     "chosen": null,
+     "close": [
+      "t1"
+     ]
+    },
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "limit",
+   "limit": 2,
+   "ops": [
+    {
+     "op": "keep",
+     "name": "a",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "b",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "b": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "c",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "c": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "a"
+    ],
+    2
+   ],
+   "closed": []
+  },
+  {
+   "name": "limit-zero",
+   "limit": 0,
+   "ops": [
+    {
+     "op": "keep",
+     "name": "a",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "len"
+    }
+   ],
+   "results": [
+    [
+     "a"
+    ],
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "generation",
+   "ops": [
+    {
+     "op": "generation",
+     "home": "/h1"
+    },
+    {
+     "op": "keep",
+     "name": "t1",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "release",
+     "home": "/h1"
+    },
+    {
+     "op": "generation",
+     "home": "/h1"
+    },
+    {
+     "op": "keep",
+     "name": "stale",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "fresh",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 1,
+     "pending": false
+    },
+    {
+     "op": "len"
+    },
+    {
+     "op": "release"
+    },
+    {
+     "op": "generation",
+     "home": "/h1"
+    },
+    {
+     "op": "generation",
+     "home": "/h2"
+    }
+   ],
+   "results": [
+    0,
+    [],
+    [
+     "t1"
+    ],
+    1,
+    [
+     "stale"
+    ],
+    [],
+    1,
+    [
+     "fresh"
+    ],
+    2,
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "release-by-model",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "a",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "b",
+     "home": "/h1",
+     "model": "gpt-6-luna",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "b": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "release",
+     "model": "gpt-6-luna"
+    },
+    {
+     "op": "len"
+    },
+    {
+     "op": "models"
+    }
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "b"
+    ],
+    1,
+    [
+     "gpt-6-sol"
+    ]
+   ],
+   "closed": []
+  },
+  {
+   "name": "release-by-home-and-model",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "a",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "b",
+     "home": "/h2",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "b": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "release",
+     "home": "/h2",
+     "model": "gpt-6-sol"
+    },
+    {
+     "op": "len"
+    },
+    {
+     "op": "generation",
+     "home": "/h1"
+    }
+   ],
+   "results": [
+    [],
+    [],
+    [
+     "b"
+    ],
+    1,
+    0
+   ],
+   "closed": []
+  },
+  {
+   "name": "ordinals",
+   "ops": [
+    {
+     "op": "next_ordinal",
+     "home": "/h1",
+     "take": false
+    },
+    {
+     "op": "next_ordinal",
+     "home": "/h1",
+     "take": true
+    },
+    {
+     "op": "next_ordinal",
+     "home": "/h1",
+     "take": true
+    },
+    {
+     "op": "next_ordinal",
+     "home": "/h2",
+     "take": false
+    },
+    {
+     "op": "next_ordinal",
+     "home": "/h1",
+     "take": false
+    }
+   ],
+   "results": [
+    1,
+    1,
+    2,
+    1,
+    3
+   ],
+   "closed": []
+  },
+  {
+   "name": "abandoned",
+   "ops": [
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 3,
+     "figures": {
+      "input": 5
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h2",
+     "ordinal": 1,
+     "figures": {
+      "input": 6
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 1,
+     "figures": {
+      "input": 7
+     }
+    },
+    {
+     "op": "take_abandoned",
+     "home": "/h1",
+     "ordinal": 4
+    },
+    {
+     "op": "take_abandoned",
+     "home": "/h1",
+     "ordinal": 9
+    },
+    {
+     "op": "take_abandoned",
+     "home": "/h2",
+     "ordinal": 2
+    }
+   ],
+   "results": [
+    null,
+    null,
+    null,
+    [
+     {
+      "response": "previous",
+      "requests_ago": 1,
+      "closed_unanswered": true,
+      "input": 5
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 3,
+      "closed_unanswered": true,
+      "input": 7
+     }
+    ],
+    [],
+    [
+     {
+      "response": "previous",
+      "requests_ago": 1,
+      "closed_unanswered": true,
+      "input": 6
+     }
+    ]
+   ],
+   "closed": []
+  },
+  {
+   "name": "abandoned-limit",
+   "ops": [
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 0,
+     "figures": {
+      "n": 0
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 1,
+     "figures": {
+      "n": 1
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 2,
+     "figures": {
+      "n": 2
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 3,
+     "figures": {
+      "n": 3
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 4,
+     "figures": {
+      "n": 4
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 5,
+     "figures": {
+      "n": 5
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 6,
+     "figures": {
+      "n": 6
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 7,
+     "figures": {
+      "n": 7
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 8,
+     "figures": {
+      "n": 8
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 9,
+     "figures": {
+      "n": 9
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 10,
+     "figures": {
+      "n": 10
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 11,
+     "figures": {
+      "n": 11
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 12,
+     "figures": {
+      "n": 12
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 13,
+     "figures": {
+      "n": 13
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 14,
+     "figures": {
+      "n": 14
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 15,
+     "figures": {
+      "n": 15
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 16,
+     "figures": {
+      "n": 16
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 17,
+     "figures": {
+      "n": 17
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 18,
+     "figures": {
+      "n": 18
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 19,
+     "figures": {
+      "n": 19
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 20,
+     "figures": {
+      "n": 20
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 21,
+     "figures": {
+      "n": 21
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 22,
+     "figures": {
+      "n": 22
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 23,
+     "figures": {
+      "n": 23
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 24,
+     "figures": {
+      "n": 24
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 25,
+     "figures": {
+      "n": 25
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 26,
+     "figures": {
+      "n": 26
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 27,
+     "figures": {
+      "n": 27
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 28,
+     "figures": {
+      "n": 28
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 29,
+     "figures": {
+      "n": 29
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 30,
+     "figures": {
+      "n": 30
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 31,
+     "figures": {
+      "n": 31
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 32,
+     "figures": {
+      "n": 32
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 33,
+     "figures": {
+      "n": 33
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 34,
+     "figures": {
+      "n": 34
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 35,
+     "figures": {
+      "n": 35
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 36,
+     "figures": {
+      "n": 36
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 37,
+     "figures": {
+      "n": 37
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 38,
+     "figures": {
+      "n": 38
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 39,
+     "figures": {
+      "n": 39
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 40,
+     "figures": {
+      "n": 40
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 41,
+     "figures": {
+      "n": 41
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 42,
+     "figures": {
+      "n": 42
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 43,
+     "figures": {
+      "n": 43
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 44,
+     "figures": {
+      "n": 44
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 45,
+     "figures": {
+      "n": 45
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 46,
+     "figures": {
+      "n": 46
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 47,
+     "figures": {
+      "n": 47
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 48,
+     "figures": {
+      "n": 48
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 49,
+     "figures": {
+      "n": 49
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 50,
+     "figures": {
+      "n": 50
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 51,
+     "figures": {
+      "n": 51
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 52,
+     "figures": {
+      "n": 52
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 53,
+     "figures": {
+      "n": 53
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 54,
+     "figures": {
+      "n": 54
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 55,
+     "figures": {
+      "n": 55
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 56,
+     "figures": {
+      "n": 56
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 57,
+     "figures": {
+      "n": 57
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 58,
+     "figures": {
+      "n": 58
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 59,
+     "figures": {
+      "n": 59
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 60,
+     "figures": {
+      "n": 60
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 61,
+     "figures": {
+      "n": 61
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 62,
+     "figures": {
+      "n": 62
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 63,
+     "figures": {
+      "n": 63
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 64,
+     "figures": {
+      "n": 64
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 65,
+     "figures": {
+      "n": 65
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 66,
+     "figures": {
+      "n": 66
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 67,
+     "figures": {
+      "n": 67
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 68,
+     "figures": {
+      "n": 68
+     }
+    },
+    {
+     "op": "abandon",
+     "home": "/h1",
+     "ordinal": 69,
+     "figures": {
+      "n": 69
+     }
+    },
+    {
+     "op": "take_abandoned",
+     "home": "/h1",
+     "ordinal": 70
+    }
+   ],
+   "results": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    [
+     {
+      "response": "earlier",
+      "requests_ago": 64,
+      "closed_unanswered": true,
+      "n": 6
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 63,
+      "closed_unanswered": true,
+      "n": 7
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 62,
+      "closed_unanswered": true,
+      "n": 8
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 61,
+      "closed_unanswered": true,
+      "n": 9
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 60,
+      "closed_unanswered": true,
+      "n": 10
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 59,
+      "closed_unanswered": true,
+      "n": 11
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 58,
+      "closed_unanswered": true,
+      "n": 12
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 57,
+      "closed_unanswered": true,
+      "n": 13
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 56,
+      "closed_unanswered": true,
+      "n": 14
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 55,
+      "closed_unanswered": true,
+      "n": 15
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 54,
+      "closed_unanswered": true,
+      "n": 16
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 53,
+      "closed_unanswered": true,
+      "n": 17
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 52,
+      "closed_unanswered": true,
+      "n": 18
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 51,
+      "closed_unanswered": true,
+      "n": 19
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 50,
+      "closed_unanswered": true,
+      "n": 20
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 49,
+      "closed_unanswered": true,
+      "n": 21
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 48,
+      "closed_unanswered": true,
+      "n": 22
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 47,
+      "closed_unanswered": true,
+      "n": 23
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 46,
+      "closed_unanswered": true,
+      "n": 24
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 45,
+      "closed_unanswered": true,
+      "n": 25
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 44,
+      "closed_unanswered": true,
+      "n": 26
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 43,
+      "closed_unanswered": true,
+      "n": 27
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 42,
+      "closed_unanswered": true,
+      "n": 28
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 41,
+      "closed_unanswered": true,
+      "n": 29
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 40,
+      "closed_unanswered": true,
+      "n": 30
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 39,
+      "closed_unanswered": true,
+      "n": 31
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 38,
+      "closed_unanswered": true,
+      "n": 32
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 37,
+      "closed_unanswered": true,
+      "n": 33
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 36,
+      "closed_unanswered": true,
+      "n": 34
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 35,
+      "closed_unanswered": true,
+      "n": 35
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 34,
+      "closed_unanswered": true,
+      "n": 36
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 33,
+      "closed_unanswered": true,
+      "n": 37
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 32,
+      "closed_unanswered": true,
+      "n": 38
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 31,
+      "closed_unanswered": true,
+      "n": 39
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 30,
+      "closed_unanswered": true,
+      "n": 40
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 29,
+      "closed_unanswered": true,
+      "n": 41
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 28,
+      "closed_unanswered": true,
+      "n": 42
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 27,
+      "closed_unanswered": true,
+      "n": 43
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 26,
+      "closed_unanswered": true,
+      "n": 44
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 25,
+      "closed_unanswered": true,
+      "n": 45
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 24,
+      "closed_unanswered": true,
+      "n": 46
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 23,
+      "closed_unanswered": true,
+      "n": 47
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 22,
+      "closed_unanswered": true,
+      "n": 48
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 21,
+      "closed_unanswered": true,
+      "n": 49
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 20,
+      "closed_unanswered": true,
+      "n": 50
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 19,
+      "closed_unanswered": true,
+      "n": 51
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 18,
+      "closed_unanswered": true,
+      "n": 52
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 17,
+      "closed_unanswered": true,
+      "n": 53
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 16,
+      "closed_unanswered": true,
+      "n": 54
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 15,
+      "closed_unanswered": true,
+      "n": 55
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 14,
+      "closed_unanswered": true,
+      "n": 56
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 13,
+      "closed_unanswered": true,
+      "n": 57
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 12,
+      "closed_unanswered": true,
+      "n": 58
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 11,
+      "closed_unanswered": true,
+      "n": 59
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 10,
+      "closed_unanswered": true,
+      "n": 60
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 9,
+      "closed_unanswered": true,
+      "n": 61
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 8,
+      "closed_unanswered": true,
+      "n": 62
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 7,
+      "closed_unanswered": true,
+      "n": 63
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 6,
+      "closed_unanswered": true,
+      "n": 64
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 5,
+      "closed_unanswered": true,
+      "n": 65
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 4,
+      "closed_unanswered": true,
+      "n": 66
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 3,
+      "closed_unanswered": true,
+      "n": 67
+     },
+     {
+      "response": "earlier",
+      "requests_ago": 2,
+      "closed_unanswered": true,
+      "n": 68
+     },
+     {
+      "response": "previous",
+      "requests_ago": 1,
+      "closed_unanswered": true,
+      "n": 69
+     }
+    ]
+   ],
+   "closed": []
+  },
+  {
+   "name": "idle-expiry",
+   "idle": 0.2,
+   "pending_idle": 30.0,
+   "ops": [
+    {
+     "op": "keep",
+     "name": "idle",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "waiting",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "w": 1
+      }
+     ],
+     "generation": 0,
+     "pending": true
+    },
+    {
+     "op": "sleep",
+     "seconds": 0.8
+    },
+    {
+     "op": "len"
+    },
+    {
+     "op": "take",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "w": 1
+      },
+      {
+       "x": 2
+      }
+     ]
+    }
+   ],
+   "results": [
+    [],
+    [],
+    null,
+    1,
+    {
+     "chosen": "waiting",
+     "close": []
+    }
+   ],
+   "closed": [
+    "idle"
+   ]
+  },
+  {
+   "name": "close-all",
+   "ops": [
+    {
+     "op": "keep",
+     "name": "a",
+     "home": "/h1",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "a": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "keep",
+     "name": "b",
+     "home": "/h2",
+     "model": "gpt-6-sol",
+     "instructions": "GM.",
+     "tools": [
+      {
+       "name": "roll"
+      }
+     ],
+     "items": [
+      {
+       "b": 1
+      }
+     ],
+     "generation": 0,
+     "pending": false
+    },
+    {
+     "op": "close_all"
+    },
+    {
+     "op": "len"
+    },
+    {
+     "op": "generation",
+     "home": "/h2"
+    }
+   ],
+   "results": [
+    [],
+    [],
+    null,
+    0,
+    1
+   ],
+   "closed": [
+    "a",
+    "b"
+   ]
+  }
+ ],
+ "lifecycles": [
+  {
+   "records": [
+    [
+     "process_boot",
+     1100,
+     1500,
+     "completed",
+     null
+    ],
+    [
+     "initialize",
+     1500,
+     1900,
+     "completed",
+     null
+    ],
+    [
+     "turn_stream",
+     1400,
+     2400,
+     "error",
+     "turn_start"
+    ]
+   ],
+   "now": 3000,
+   "status": "completed",
+   "snapshot": {
+    "schema_version": 1,
+    "clock": "perf_counter_ns",
+    "started_utc": "2026-11-23T09:30:00+00:00",
+    "scope": "adapter_lifecycle_not_model_service_time",
+    "status": "completed",
+    "elapsed_ns": 2000,
+    "covered_ns": 1300,
+    "unclassified_ns": 700,
+    "spans": [
+     {
+      "name": "process_boot",
+      "parent": null,
+      "start_ns": 100,
+      "end_ns": 500,
+      "duration_ns": 400,
+      "status": "completed"
+     },
+     {
+      "name": "turn_stream",
+      "parent": "turn_start",
+      "start_ns": 400,
+      "end_ns": 1400,
+      "duration_ns": 1000,
+      "status": "error"
+     },
+     {
+      "name": "initialize",
+      "parent": null,
+      "start_ns": 500,
+      "end_ns": 900,
+      "duration_ns": 400,
+      "status": "completed"
+     }
+    ],
+    "runtime_start_detail": "observed"
+   }
+  },
+  {
+   "records": [
+    [
+     "bogus",
+     1100,
+     1200,
+     "completed",
+     null
+    ],
+    [
+     "turn_start",
+     900,
+     1200,
+     "completed",
+     null
+    ],
+    [
+     "turn_start",
+     1300,
+     1200,
+     "completed",
+     null
+    ],
+    [
+     "turn_start",
+     1300,
+     1400,
+     "weird",
+     null
+    ],
+    [
+     "shutdown",
+     1000,
+     1000,
+     "cancelled",
+     null
+    ]
+   ],
+   "now": 1000,
+   "status": "error",
+   "snapshot": {
+    "schema_version": 1,
+    "clock": "perf_counter_ns",
+    "started_utc": "2026-11-23T09:30:00+00:00",
+    "scope": "adapter_lifecycle_not_model_service_time",
+    "status": "error",
+    "elapsed_ns": 0,
+    "covered_ns": 0,
+    "unclassified_ns": 0,
+    "spans": [
+     {
+      "name": "shutdown",
+      "parent": null,
+      "start_ns": 0,
+      "end_ns": 0,
+      "duration_ns": 0,
+      "status": "cancelled"
+     }
+    ],
+    "runtime_start_detail": "unavailable"
+   }
+  },
+  {
+   "records": [
+    [
+     "thread_start",
+     1000,
+     1000,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1001,
+     1002,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1002,
+     1004,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1003,
+     1006,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1004,
+     1008,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1005,
+     1010,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1006,
+     1012,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1007,
+     1014,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1008,
+     1016,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1009,
+     1018,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1010,
+     1020,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1011,
+     1022,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1012,
+     1024,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1013,
+     1026,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1014,
+     1028,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1015,
+     1030,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1016,
+     1032,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1017,
+     1034,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1018,
+     1036,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1019,
+     1038,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1020,
+     1040,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1021,
+     1042,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1022,
+     1044,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1023,
+     1046,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1024,
+     1048,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1025,
+     1050,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1026,
+     1052,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1027,
+     1054,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1028,
+     1056,
+     "completed",
+     null
+    ],
+    [
+     "thread_start",
+     1029,
+     1058,
+     "completed",
+     null
+    ]
+   ],
+   "now": 5000,
+   "status": "completed",
+   "snapshot": {
+    "schema_version": 1,
+    "clock": "perf_counter_ns",
+    "started_utc": "2026-11-23T09:30:00+00:00",
+    "scope": "adapter_lifecycle_not_model_service_time",
+    "status": "completed",
+    "elapsed_ns": 4000,
+    "covered_ns": 45,
+    "unclassified_ns": 3955,
+    "spans": [
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 0,
+      "end_ns": 0,
+      "duration_ns": 0,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 1,
+      "end_ns": 2,
+      "duration_ns": 1,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 2,
+      "end_ns": 4,
+      "duration_ns": 2,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 3,
+      "end_ns": 6,
+      "duration_ns": 3,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 4,
+      "end_ns": 8,
+      "duration_ns": 4,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 5,
+      "end_ns": 10,
+      "duration_ns": 5,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 6,
+      "end_ns": 12,
+      "duration_ns": 6,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 7,
+      "end_ns": 14,
+      "duration_ns": 7,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 8,
+      "end_ns": 16,
+      "duration_ns": 8,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 9,
+      "end_ns": 18,
+      "duration_ns": 9,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 10,
+      "end_ns": 20,
+      "duration_ns": 10,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 11,
+      "end_ns": 22,
+      "duration_ns": 11,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 12,
+      "end_ns": 24,
+      "duration_ns": 12,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 13,
+      "end_ns": 26,
+      "duration_ns": 13,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 14,
+      "end_ns": 28,
+      "duration_ns": 14,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 15,
+      "end_ns": 30,
+      "duration_ns": 15,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 16,
+      "end_ns": 32,
+      "duration_ns": 16,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 17,
+      "end_ns": 34,
+      "duration_ns": 17,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 18,
+      "end_ns": 36,
+      "duration_ns": 18,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 19,
+      "end_ns": 38,
+      "duration_ns": 19,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 20,
+      "end_ns": 40,
+      "duration_ns": 20,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 21,
+      "end_ns": 42,
+      "duration_ns": 21,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 22,
+      "end_ns": 44,
+      "duration_ns": 22,
+      "status": "completed"
+     },
+     {
+      "name": "thread_start",
+      "parent": null,
+      "start_ns": 23,
+      "end_ns": 46,
+      "duration_ns": 23,
+      "status": "completed"
+     }
+    ],
+    "runtime_start_detail": "unavailable"
+   }
+  },
+  {
+   "records": [
+    [
+     "turn_stream",
+     2000,
+     2500,
+     "completed",
+     null
+    ],
+    [
+     "account_read",
+     1200,
+     1300,
+     "completed",
+     null
+    ],
+    [
+     "history_injection",
+     2100,
+     2200,
+     "completed",
+     null
+    ]
+   ],
+   "now": 900,
+   "status": "cancelled",
+   "snapshot": {
+    "schema_version": 1,
+    "clock": "perf_counter_ns",
+    "started_utc": "2026-11-23T09:30:00+00:00",
+    "scope": "adapter_lifecycle_not_model_service_time",
+    "status": "cancelled",
+    "elapsed_ns": -100,
+    "covered_ns": 600,
+    "unclassified_ns": -700,
+    "spans": [
+     {
+      "name": "account_read",
+      "parent": null,
+      "start_ns": 200,
+      "end_ns": 300,
+      "duration_ns": 100,
+      "status": "completed"
+     },
+     {
+      "name": "turn_stream",
+      "parent": null,
+      "start_ns": 1000,
+      "end_ns": 1500,
+      "duration_ns": 500,
+      "status": "completed"
+     },
+     {
+      "name": "history_injection",
+      "parent": null,
+      "start_ns": 1100,
+      "end_ns": 1200,
+      "duration_ns": 100,
+      "status": "completed"
+     }
+    ],
+    "runtime_start_detail": "unavailable"
+   }
+  }
+ ]
+}
