@@ -303,7 +303,8 @@ pub(crate) fn participant_adaptation_admitted_on(
     }
     // `sqlite_campaign.artifact_from_adaptation_row(row)`.
     let row = Named { columns: &columns, values: rows.swap_remove(0) };
-    let adapted_data = Json::Object(load_payload(&row.text("data_json")?)?);
+    // `_parse_mapping(row["data_json"])`, with its `ValueError` for a stored value that is not an object.
+    let adapted_data = Json::Object(crate::schema::parse_mapping(&row.text("data_json")?)?);
     let data = Json::Object(fields.data.clone());
     // Python builds the whole comparison tuple before `all`, so the data history is read
     // whenever the data differ.
