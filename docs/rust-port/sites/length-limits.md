@@ -331,10 +331,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `session/_prompt_assembler.py:661` | `PromptAssembler._build_npc_block` | len() against a limit | `if len(candidate_line) > 120:` | |
 | `session/_prompt_assembler.py:767` | `PromptAssembler.build_history_with_indices` | len() against a limit | `if len(content) > 500:` | |
 | `session/_reveal_guard.py:110` | `RevealGuard.build_do_not_reveal_section` | len() against a limit | `if len(result) > 2000:` | |
-| `tools/_builder_handlers.py:125` | `tool_read_file` | len() against a limit | `if len(content) > 100_000:` | |
-| `tools/_builder_handlers.py:307` | `tool_search_files` | len() against a limit | `"content_complete": len(line) <= 200,` | |
-| `tools/_builder_handlers.py:310` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | |
-| `tools/_builder_handlers.py:312` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | |
+| `tools/_builder_handlers.py:125` | `tool_read_file` | len() against a limit | `if len(content) > 100_000:` | `sylvia-agent` builder_tool_vectors |
+| `tools/_builder_handlers.py:307` | `tool_search_files` | len() against a limit | `"content_complete": len(line) <= 200,` | `sylvia-agent` builder_tool_vectors |
+| `tools/_builder_handlers.py:310` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | `sylvia-agent` builder_tool_vectors |
+| `tools/_builder_handlers.py:312` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | `sylvia-agent` builder_tool_vectors |
 
 ## Lane 5: Owner, clients and release
 

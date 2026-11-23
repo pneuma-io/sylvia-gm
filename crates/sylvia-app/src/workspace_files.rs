@@ -50,10 +50,33 @@ pub(crate) fn os_error(error: &std::io::Error, path: &Path) -> DomainError {
         std::io::ErrorKind::NotFound => ("FileNotFoundError", 2, "No such file or directory".to_owned()),
         std::io::ErrorKind::PermissionDenied => ("PermissionError", 13, "Permission denied".to_owned()),
         std::io::ErrorKind::AlreadyExists => ("FileExistsError", 17, "File exists".to_owned()),
+        std::io::ErrorKind::NotADirectory => ("NotADirectoryError", 20, "Not a directory".to_owned()),
+        std::io::ErrorKind::IsADirectory => ("IsADirectoryError", 21, "Is a directory".to_owned()),
         _ => ("OSError", error.raw_os_error().unwrap_or_default(), error.to_string()),
     };
     let name = sylvia_base::pystr::repr(&path.display().to_string());
     DomainError::uncaught(class, format!("[Errno {errno}] {text}: {name}"))
+}
+
+/// The `OSError` from `Path.mkdir`. On Windows `os.mkdir` reports the Win32 error, so Python
+/// prints `[WinError N] message: 'path'` (the system message without its final period); other
+/// platforms print the errno form.
+fn mkdir_error(error: &std::io::Error, path: &Path) -> DomainError {
+    #[cfg(windows)]
+    if let Some(code) = error.raw_os_error() {
+        let class = match error.kind() {
+            std::io::ErrorKind::NotFound => "FileNotFoundError",
+            std::io::ErrorKind::PermissionDenied => "PermissionError",
+            std::io::ErrorKind::AlreadyExists => "FileExistsError",
+            _ => "OSError",
+        };
+        let text = error.to_string();
+        let text = text.strip_suffix(&format!(" (os error {code})")).unwrap_or(&text);
+        let text = text.trim_end_matches('.');
+        let name = sylvia_base::pystr::repr(&path.display().to_string());
+        return DomainError::uncaught(class, format!("[WinError {code}] {text}: {name}"));
+    }
+    os_error(error, path)
 }
 
 /// `content_version(content)`: the exact bytes read or written, line endings included.
@@ -130,7 +153,7 @@ pub fn write_text(path: &Path, content: &str, expected_version: Option<&str>) ->
     let _guard = MUTATION_LOCK.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
     check_version(path, expected_version)?;
     if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent).map_err(|error| os_error(&error, parent))?;
+        std::fs::create_dir_all(parent).map_err(|error| mkdir_error(&error, parent))?;
     }
     replace_atomically(path, ".sylvia-builder-write-", data)?;
     Ok(content_version(data))
