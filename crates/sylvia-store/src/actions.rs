@@ -32,8 +32,9 @@ pub(crate) fn dump(value: &Json) -> String {
 /// `_decode_canonical_json`: the stored text must parse, refusing non-standard constants, and
 /// be exactly the canonical text of its value (which also refuses repeated members).
 pub(crate) fn load_json(text: &str) -> StoreResult<Json> {
-    let parsed = sylvia_base::pyjson::loads(text)
-        .map_err(|_| value_error("Stored JSON is not the exact canonical representation"))?;
+    // `_decode_canonical_json`: text `json.loads` refuses raises its `JSONDecodeError`; only
+    // text it reads that is not the exact canonical form is the canonical-representation error.
+    let parsed = sylvia_base::pyjson::loads(text).map_err(crate::error::json_error)?;
     if dump(&parsed) != text {
         return Err(value_error("Stored JSON is not the exact canonical representation"));
     }

@@ -196,9 +196,11 @@ impl AuthorityStore {
     }
 }
 
-/// Whether a Python class is `CommandRejected` or one of its subclasses (`errors.py`).
+/// Whether a Python class is `CommandRejected` or one of its subclasses (`errors.py`). Every
+/// store rejection carries its class (`DomainError::rejection` always sets it), so an untyped
+/// coded error is not one, and propagates.
 fn is_command_rejected(error_type: Option<&str>) -> bool {
-    matches!(error_type, None | Some("CommandRejected" | "MechanicsRejected" | "RulesetPreconditionRejected"))
+    matches!(error_type, Some("CommandRejected" | "MechanicsRejected" | "RulesetPreconditionRejected"))
 }
 
 /// `_validate_participant_mutations(connection, campaign_id, package_id, package_version,

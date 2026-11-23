@@ -16,7 +16,9 @@ consequence and the entity's new maxima) and the level-up replayed after the com
 is not earned, refused before any reservation; a Constitution gain applied to earlier levels; a
 level-up declined; a participant quarantined through SQL while its level-up waits (the answer
 refused, the reservation kept) and validated again (the answer committing); and experience points
-short of a level. Each step records its answer (a receipt or an awaiting-choice receipt) or the
+short of a level; then the store's ownership check on its own: a replacement its owner may make, the same with the
+participant schema corrupted through SQL (Python's `JSONDecodeError` propagates; only
+`CommandRejected` and its subclasses answer `False`), and again once restored. Each step records its answer (a receipt or an awaiting-choice receipt) or the
 failure's class, code and message. The record keeps the installed tables' digests
 (`installed_table_digests`), the setup's rows (`setup_tables`) and the final rows of each table
 the run changed (`final_changed_tables`), values typed as `{"real": hex}` or `{"blob": hex}`;
@@ -52,7 +54,7 @@ from sylvia_gm.application.authority import (  # noqa: E402
     ResolveMechanicsChoiceCommand,
 )
 from sylvia_gm.application.bundled_packages import bundled_srd_archive  # noqa: E402
-from sylvia_gm.domain.authority import WriterRole  # noqa: E402
+from sylvia_gm.domain.authority import MechanicOutcome, ParticipantMutation, WriterRole  # noqa: E402
 from tests.test_srd_advancement import build, create  # noqa: E402
 from tests.test_srd_second_wind import PACKAGE_ID  # noqa: E402
 
@@ -209,6 +211,31 @@ def main() -> None:
 
             award("xp", xp=100)
             act("xp: a level not yet earned", "xp", "level_up_srd_character", proposal("xp"), "not-ready")
+
+            # The store's ownership check on its own: only `CommandRejected` and its subclasses
+            # answer False; a stored schema that is not JSON raises Python's `JSONDecodeError`.
+            def owned(name: str, campaign: str) -> None:
+                participant = owner.snapshot(campaign).participants[0]
+                package = owner.snapshot(campaign).package_lock.entries[0]
+                command = {"campaign_id": campaign, "package_id": package.package_id,
+                           "package_version": package.version, "package_sha256": package.sha256,
+                           "participant_id": participant.participant_id,
+                           "data": plain(participant.data)}
+                record(name, "owned", command, lambda: owner._store.mechanic_mutations_are_owned(  # noqa: SLF001
+                    campaign_id=campaign, package_id=package.package_id, package_version=package.version,
+                    package_sha256=package.sha256,
+                    outcome=MechanicOutcome(result={}, participant_mutations=(
+                        ParticipantMutation(participant.participant_id, participant.data),))))
+
+            owned("store: a replacement its owner may make", "advancement")
+            schema = "UPDATE package_participant_artifacts SET schema_json = ? WHERE package_id = ?"
+            original = sqlite3.connect(database).execute(
+                "SELECT schema_json FROM package_participant_artifacts WHERE package_id = ?",
+                [PACKAGE_ID]).fetchone()[0]
+            sql("store: the participant schema corrupted", schema, ["{", PACKAGE_ID])
+            owned("store: a stored schema that is not JSON", "advancement")
+            sql("store: the participant schema restored", schema, [original, PACKAGE_ID])
+            owned("store: the replacement again", "advancement")
         installed_base.checkpoint(database)
         changed = installed_base.changed_rows(base, database)
     record_out = {"python": sys.version.split()[0], "owner_id": OWNER, "install_id": INSTALL_ID,

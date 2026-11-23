@@ -18,9 +18,10 @@ use sylvia_app::authority::actions::{
     execute_action, resolve_mechanics_choice, ActionError, ActionExecution,
 };
 use sylvia_app::bundled_packages::{BundledPackages, BundledSources};
-use sylvia_base::Json;
+use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
-    ActionCommand, MechanicsChoiceRequest, ResolveMechanicsChoiceCommand, WriterRole,
+    ActionCommand, MechanicOutcome, MechanicsChoiceRequest, ParticipantMutation,
+    ResolveMechanicsChoiceCommand, WriterRole,
 };
 use sylvia_domain::DomainError;
 use sylvia_store::{AuthorityStore, StoreHandle};
@@ -72,6 +73,51 @@ fn failure(error: ActionError) -> Json {
     }
 }
 
+/// The generator's `owned` step: the store's `mechanic_mutations_are_owned` for one participant
+/// replacement, called directly. A failure is recorded as Python's `getattr(error, "code", None)`
+/// gives it: only the authority classes carry a code.
+async fn owned_check(handle: &StoreHandle, command: &Json) -> Json {
+    let text = |key: &str| command[key].as_str().unwrap().to_owned();
+    let (campaign_id, package_id, version, sha256) =
+        (text("campaign_id"), text("package_id"), text("package_version"), text("package_sha256"));
+    let outcome = MechanicOutcome {
+        result: JsonMap::new(),
+        mutations: Vec::new(),
+        consequences: Vec::new(),
+        choice: None,
+        participant_mutations: vec![ParticipantMutation {
+            participant_id: text("participant_id"),
+            data: command["data"].as_object().unwrap().clone(),
+        }],
+    };
+    let checked = handle
+        .call(move |store| {
+            store.mechanic_mutations_are_owned(&campaign_id, &package_id, &version, &sha256, &outcome)
+        })
+        .await;
+    match checked {
+        Ok(owned) => json!({"ok": owned}),
+        Err(error) => {
+            let coded = error.rejection().unwrap_or_else(|| panic!("an uncaught store failure: {error}"));
+            let class = coded.error_type.unwrap_or("CommandRejected");
+            let authority = matches!(
+                class,
+                "AuthorityError"
+                    | "SchemaIdentityError"
+                    | "OwnerConflict"
+                    | "WrongOwner"
+                    | "WrongWriter"
+                    | "StaleRevision"
+                    | "IdempotencyConflict"
+                    | "CommandRejected"
+                    | "MechanicsRejected"
+                    | "RulesetPreconditionRejected"
+            );
+            json!({"error": class, "code": if authority { Json::from(coded.code) } else { Json::Null }, "message": coded.message})
+        }
+    }
+}
+
 fn request(choice: &MechanicsChoiceRequest) -> Json {
     let options: Vec<Json> = choice
         .options
@@ -114,7 +160,7 @@ async fn participant_mutations_commit_as_pythons_owner_commits_them() {
     )
     .unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 20);
+    assert_eq!(runs.len(), 25);
     let owner_id = record["owner_id"].as_str().unwrap().to_owned();
     let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join("participant-mutations");
     if let Err(error) = std::fs::remove_dir_all(&folder) {
@@ -165,6 +211,14 @@ async fn participant_mutations_commit_as_pythons_owner_commits_them() {
             connection
                 .execute(command["statement"].as_str().unwrap(), rusqlite::params_from_iter(parameters))
                 .unwrap();
+            continue;
+        }
+        if run["kind"] == "owned" {
+            let got = owned_check(&handle, command).await;
+            let (got, want) = (got.to_string(), run["outcome"].to_string());
+            if got != want {
+                failures.push(format!("#{index} {}\n  Rust   {got}\n  Python {want}", run["name"]));
+            }
             continue;
         }
         let outcome = match run["kind"].as_str().unwrap() {
