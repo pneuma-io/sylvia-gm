@@ -35,7 +35,11 @@ pub(crate) fn current_combat_state(state: &JsonMap) -> JsonMap {
 
 /// `_require_checked_campaign_file_narration(tools, aliases, narration_held=...)`: the GM's one
 /// settled response becomes part of its final Campaign File decision.
-pub(crate) fn require_checked_campaign_file_narration(tools: &mut [Json], aliases: &ToolAliases, narration_held: bool) {
+pub(crate) fn require_checked_campaign_file_narration(
+    tools: &mut [Json],
+    aliases: &ToolAliases,
+    narration_held: bool,
+) {
     for provider_tool in tools.iter_mut() {
         let Some(Json::Object(function)) = provider_tool.get_mut("function") else { continue };
         let catalog_tool = function.get("name").and_then(Json::as_str).and_then(|alias| aliases.get(alias));
@@ -159,9 +163,12 @@ pub async fn prepare_provider_round(
     let owner = adapter.turn_owner()?;
     let mut model_catalog: Vec<ModelMechanicsTool> = state.locals.current_catalog.value()?;
     let opening_update_required = d::opening_needs_campaign_file_update(state)?;
-    let supported = state.locals.current_catalog.get()?.iter().any(|tool| {
-        is_campaign_file_update(tool) && !truthy(tool.input_schema.get("minProperties"))
-    });
+    let supported = state
+        .locals
+        .current_catalog
+        .get()?
+        .iter()
+        .any(|tool| is_campaign_file_update(tool) && !truthy(tool.input_schema.get("minProperties")));
     state.locals.campaign_file_disposition_supported.set(supported);
     // Keep every valid next operation available, but do not let a committed Ruleset result skip
     // the Campaign File checkpoint by ending in prose.
@@ -170,8 +177,14 @@ pub async fn prepare_provider_round(
     if d::campaign_file_needs_narration(state)? {
         model_catalog = Vec::new();
     } else if d::campaign_file_must_be_settled(state)? {
-        model_catalog =
-            state.locals.current_catalog.get()?.iter().filter(|tool| is_campaign_file_update(tool)).cloned().collect();
+        model_catalog = state
+            .locals
+            .current_catalog
+            .get()?
+            .iter()
+            .filter(|tool| is_campaign_file_update(tool))
+            .cloned()
+            .collect();
         if model_catalog.is_empty() {
             return Err(coded(
                 "campaign_file_update_unavailable",
@@ -198,7 +211,9 @@ pub async fn prepare_provider_round(
     if d::saved_gm_boundary_should_be_read(state)? {
         // An already active private game must resume its GM decision before narration.
         let (_, private_boundary) = owner.model_context_snapshot(&campaign_id).await?;
-        if let Some(private_boundary) = private_boundary.filter(|boundary| boundary.owner == ModelDecisionOwner::Gm) {
+        if let Some(private_boundary) =
+            private_boundary.filter(|boundary| boundary.owner == ModelDecisionOwner::Gm)
+        {
             state.locals.decision_boundary.set(Some(private_boundary));
         }
     }
@@ -220,7 +235,9 @@ pub async fn prepare_provider_round(
         record.insert("focused_actor_id".into(), text(&boundary.focused_actor_id));
         record.insert(
             "eligible_actor_ids".into(),
-            Json::Array(boundary.eligible_actors.iter().map(|actor| actor.actor_id.as_str().into()).collect()),
+            Json::Array(
+                boundary.eligible_actors.iter().map(|actor| actor.actor_id.as_str().into()).collect(),
+            ),
         );
         record.insert("campaign_revision".into(), boundary.campaign_revision.into());
         owner.record_admin_full_audit(record)?;
@@ -233,8 +250,7 @@ pub async fn prepare_provider_round(
             let mut selected = Vec::new();
             for tool in state.locals.current_catalog.get()? {
                 if matches!(tool.category.as_str(), "reference" | "narrative_state")
-                    || (Json::from(tool.package_id.as_str()) == key("package_id")?
-                        && Json::from(tool.name.as_str()) == key("intent")?)
+                    || (key("package_id")? == tool.package_id.as_str() && key("intent")? == tool.name.as_str())
                 {
                     selected.push(tool.clone());
                 }
@@ -261,7 +277,8 @@ pub async fn prepare_provider_round(
                     })
                     .cloned()
                     .collect();
-                if !selected.iter().any(|tool| tool.model_behavior == ModelToolBehavior::ResolvesPlayerIntent) {
+                if !selected.iter().any(|tool| tool.model_behavior == ModelToolBehavior::ResolvesPlayerIntent)
+                {
                     return Err(coded(
                         "player_intent_resolution_unavailable",
                         "Ruleset left player intent pending without exposing a resolver",
@@ -356,7 +373,11 @@ fn replace_fresh_state(messages: &mut [Tagged], refreshed: Tagged) {
         let message = &message.message;
         let owned = message.get("role").and_then(Json::as_str) == Some("system")
             || truthy(message.get("_fresh_application_data"));
-        owned && message.get("content").map_or_else(String::new, py_str).starts_with("SYLVIA_GM_FRESH_CAMPAIGN_STATE ")
+        owned
+            && message
+                .get("content")
+                .map_or_else(String::new, py_str)
+                .starts_with("SYLVIA_GM_FRESH_CAMPAIGN_STATE ")
     });
     if let Some(index) = found {
         messages[index] = refreshed;

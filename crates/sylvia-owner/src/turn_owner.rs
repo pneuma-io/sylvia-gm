@@ -32,7 +32,10 @@ impl TurnOwner for OwnerReads {
         Box::pin(async { Err(pending("campaign_preparation_boundary")) })
     }
 
-    fn current_package_lock<'a>(&'a self, _campaign_id: &'a str) -> BoxFuture<'a, CodedResult<PackageLockRecord>> {
+    fn current_package_lock<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<PackageLockRecord>> {
         Box::pin(async { Err(pending("current_package_lock")) })
     }
 

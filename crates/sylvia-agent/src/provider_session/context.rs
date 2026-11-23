@@ -46,7 +46,8 @@ pub struct ProviderSessionAdapter {
 }
 
 /// The ranker a turn's adapter keeps ([`RankReferences`], owned).
-pub type RankFn = dyn Fn(&str, &[campaign_memory::KnowledgeReference]) -> CodedResult<Vec<JsonMap>> + Send + Sync;
+pub type RankFn =
+    dyn Fn(&str, &[campaign_memory::KnowledgeReference]) -> CodedResult<Vec<JsonMap>> + Send + Sync;
 
 fn value_error(message: &str) -> CodedError {
     CodedError::rejected(message).with_error_type("ValueError")

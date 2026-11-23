@@ -52,8 +52,12 @@ impl ModelMechanicsTool {
 }
 
 /// `ACTION_SEQUENCE_TOOL_NAMES`.
-pub const ACTION_SEQUENCE_TOOL_NAMES: [&str; 4] =
-    ["read_action_sequence_controls", "read_action_sequence", "compose_action_sequence", "execute_action_sequence"];
+pub const ACTION_SEQUENCE_TOOL_NAMES: [&str; 4] = [
+    "read_action_sequence_controls",
+    "read_action_sequence",
+    "compose_action_sequence",
+    "execute_action_sequence",
+];
 
 impl ModelMechanicsTool {
     /// A tool from its exported fields (`dataclasses.asdict`, `model_behavior` as its value).
@@ -70,7 +74,8 @@ impl ModelMechanicsTool {
         tool.parameter_derivations = value["parameter_derivations"].as_object().cloned();
         tool.description = text("description");
         tool.category = text("category");
-        tool.model_behavior = ModelToolBehavior::parse(&text("model_behavior")).expect("an exported behavior");
+        tool.model_behavior =
+            ModelToolBehavior::parse(&text("model_behavior")).expect("an exported behavior");
         tool
     }
 }
@@ -84,8 +89,14 @@ pub fn action_sequence_model_tools() -> Vec<ModelMechanicsTool> {
     TOOLS
         .get_or_init(|| {
             let exported: serde_json::Value =
-                sylvia_base::pyjson::loads(include_str!("action_sequence_tools.json")).expect("an exported JSON list");
-            exported.as_array().expect("an exported JSON list").iter().map(ModelMechanicsTool::from_export).collect()
+                sylvia_base::pyjson::loads(include_str!("action_sequence_tools.json"))
+                    .expect("an exported JSON list");
+            exported
+                .as_array()
+                .expect("an exported JSON list")
+                .iter()
+                .map(ModelMechanicsTool::from_export)
+                .collect()
         })
         .clone()
 }

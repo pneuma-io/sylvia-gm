@@ -4,6 +4,49 @@
    "phase": "prepare_round_catalog",
    "variant": null,
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -199,15 +242,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "06b83b93a529422dbffa8cb935563267"
+     "hex": "ee322949f32546c9bd526a518a341e29"
     },
     {
      "event": "uuid",
-     "hex": "16ed95d0ef004a209553450378ae542f"
+     "hex": "6ac3520a235949bc948a989e99be6164"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "request_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -1065,8 +1108,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "required_transitions": []
     }
    }
@@ -1075,6 +1118,49 @@
    "phase": "prepare_round_catalog",
    "variant": "participant OOC only",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -1270,15 +1356,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "f1ecff6ebd764b8492e0455d758cc8e0"
+     "hex": "3dad7560851e46ac9f4b39d8bb4d3ca3"
     },
     {
      "event": "uuid",
-     "hex": "557220af47944a4d9e233643ace88e97"
+     "hex": "e9f4e5d1b19f4ee7923e72d7a0bf091c"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-557220af47944a4d9e233643ace88e97",
+     "request_id": "mcp-discovery-e9f4e5d1b19f4ee7923e72d7a0bf091c",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -2136,8 +2222,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-557220af47944a4d9e233643ace88e97",
-     "inference_id": "inference-f1ecff6ebd764b8492e0455d758cc8e0",
+     "discovery_id": "mcp-discovery-e9f4e5d1b19f4ee7923e72d7a0bf091c",
+     "inference_id": "inference-3dad7560851e46ac9f4b39d8bb4d3ca3",
      "required_transitions": []
     }
    }
@@ -2146,6 +2232,49 @@
    "phase": "prepare_round_catalog",
    "variant": "cancelled",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -2355,6 +2484,49 @@
    "phase": "prepare_round_catalog",
    "variant": "combat review",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -2550,15 +2722,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "bb80e1f246aa479b9ddde54aca0be045"
+     "hex": "d126446d00bd4e5b8e80cf2800741f4f"
     },
     {
      "event": "uuid",
-     "hex": "853349652ede44fb9cf320bf19bd4d62"
+     "hex": "b9d0b7afa12a42739b885126e21c73d4"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-853349652ede44fb9cf320bf19bd4d62",
+     "request_id": "mcp-discovery-b9d0b7afa12a42739b885126e21c73d4",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -3647,8 +3819,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-853349652ede44fb9cf320bf19bd4d62",
-     "inference_id": "inference-bb80e1f246aa479b9ddde54aca0be045",
+     "discovery_id": "mcp-discovery-b9d0b7afa12a42739b885126e21c73d4",
+     "inference_id": "inference-d126446d00bd4e5b8e80cf2800741f4f",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -3674,6 +3846,49 @@
    "phase": "prepare_round_catalog",
    "variant": "combat review, player turn",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -3869,15 +4084,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "262d3877feb14b14ad101fcabcc00856"
+     "hex": "1ae8bc87608144b59dcecac69e1a014e"
     },
     {
      "event": "uuid",
-     "hex": "6ecd7af344cd4eb785f8b189dc4db0cd"
+     "hex": "d69b849648194baabf673244161747fa"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-6ecd7af344cd4eb785f8b189dc4db0cd",
+     "request_id": "mcp-discovery-d69b849648194baabf673244161747fa",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -4966,8 +5181,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-6ecd7af344cd4eb785f8b189dc4db0cd",
-     "inference_id": "inference-262d3877feb14b14ad101fcabcc00856",
+     "discovery_id": "mcp-discovery-d69b849648194baabf673244161747fa",
+     "inference_id": "inference-1ae8bc87608144b59dcecac69e1a014e",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -4993,6 +5208,49 @@
    "phase": "prepare_round_catalog",
    "variant": "queue tools after a stopped sequence",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -5188,15 +5446,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "1b9eceda475b46d38cef0dcef389c5b3"
+     "hex": "3c1ea2adef9246f298f66b6758ac398b"
     },
     {
      "event": "uuid",
-     "hex": "19114692f8f045c1b5a5334f0723db33"
+     "hex": "b0dc993dbbea44a594ffd0c9e53fa1eb"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-19114692f8f045c1b5a5334f0723db33",
+     "request_id": "mcp-discovery-b0dc993dbbea44a594ffd0c9e53fa1eb",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -6108,8 +6366,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-19114692f8f045c1b5a5334f0723db33",
-     "inference_id": "inference-1b9eceda475b46d38cef0dcef389c5b3",
+     "discovery_id": "mcp-discovery-b0dc993dbbea44a594ffd0c9e53fa1eb",
+     "inference_id": "inference-3c1ea2adef9246f298f66b6758ac398b",
      "required_transitions": []
     }
    }
@@ -6118,6 +6376,49 @@
    "phase": "prepare_round_catalog",
    "variant": "queue tools",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -6313,15 +6614,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "a3fbf2de514b4aaa9de1dd70f00459c1"
+     "hex": "68b335177db44ee5b63ab61e4030e767"
     },
     {
      "event": "uuid",
-     "hex": "0c25f80fff6c4dc591a48717ee5830f3"
+     "hex": "d2acf5168137428cbf063499fca475a0"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-0c25f80fff6c4dc591a48717ee5830f3",
+     "request_id": "mcp-discovery-d2acf5168137428cbf063499fca475a0",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -7367,8 +7668,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-0c25f80fff6c4dc591a48717ee5830f3",
-     "inference_id": "inference-a3fbf2de514b4aaa9de1dd70f00459c1",
+     "discovery_id": "mcp-discovery-d2acf5168137428cbf063499fca475a0",
+     "inference_id": "inference-68b335177db44ee5b63ab61e4030e767",
      "required_transitions": []
     }
    }
@@ -7377,6 +7678,49 @@
    "phase": "prepare_provider_round",
    "variant": null,
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -7891,10 +8235,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -8165,8 +8509,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -9613,6 +9957,49 @@
    "phase": "prepare_provider_round",
    "variant": "player boundary",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -10239,10 +10626,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -10369,7 +10756,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -10521,8 +10908,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -12226,6 +12613,49 @@
    "phase": "prepare_provider_round",
    "variant": "player intent pending",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -12852,10 +13282,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -12982,7 +13412,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -13134,8 +13564,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -13668,6 +14098,49 @@
    "phase": "prepare_provider_round",
    "variant": "player intent pending without a resolver",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -14182,10 +14655,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -14312,7 +14785,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -15246,6 +15719,49 @@
    "phase": "prepare_provider_round",
    "variant": "GM boundary",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -15872,10 +16388,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -16002,7 +16518,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
        "owner": "gm",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -16154,8 +16670,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -16781,6 +17297,49 @@
    "phase": "prepare_provider_round",
    "variant": "preparation",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -17407,10 +17966,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -17543,7 +18102,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+       "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -17695,8 +18254,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -19233,6 +19792,49 @@
    "phase": "prepare_provider_round",
    "variant": "Campaign File narration pending",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -19747,10 +20349,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -20021,8 +20623,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -20155,6 +20757,49 @@
    "phase": "prepare_provider_round",
    "variant": "Campaign File must be settled",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -20669,10 +21314,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -20943,8 +21588,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -22158,6 +22803,49 @@
    "phase": "prepare_provider_round",
    "variant": "held narration",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -22672,10 +23360,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -22946,8 +23634,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -24392,6 +25080,49 @@
    "phase": "prepare_provider_round",
    "variant": "engine transition review",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -25018,10 +25749,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -25292,8 +26023,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -26980,6 +27711,49 @@
    "phase": "prepare_provider_round",
    "variant": "participant OOC only",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -27494,10 +28268,10 @@
      "current_player_message": null,
      "current_user_wire_text": null,
      "direct_response": false,
-     "discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+     "discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+     "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -27720,8 +28494,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
-      "mcp_discovery_id": "mcp-discovery-16ed95d0ef004a209553450378ae542f",
+      "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
+      "mcp_discovery_id": "mcp-discovery-6ac3520a235949bc948a989e99be6164",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -29168,6 +29942,49 @@
    "phase": "prepare_round_catalog",
    "variant": null,
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -29252,7 +30069,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -29275,7 +30092,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -29292,7 +30109,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -29301,7 +30118,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -29324,11 +30141,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -29476,7 +30293,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -29549,15 +30366,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "f30fcc32f48245d19dbaf0a845d117ec"
+     "hex": "3fb943a03a78479c90bc0a2033bf89a3"
     },
     {
      "event": "uuid",
-     "hex": "1d20398cce994cd5b58a7407a5d95d18"
+     "hex": "33e8e7a8e19943ad861673396d4aff6e"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "request_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -30435,8 +31252,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "required_transitions": []
     }
    }
@@ -30445,6 +31262,49 @@
    "phase": "prepare_round_catalog",
    "variant": "participant OOC only",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -30529,7 +31389,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -30552,7 +31412,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -30569,7 +31429,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -30578,7 +31438,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -30601,11 +31461,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -30753,7 +31613,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -30826,15 +31686,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "ca8f411d62bb4fef9fe5c8ef0e87f21e"
+     "hex": "4efaddb25c124cc5b268aae4db915473"
     },
     {
      "event": "uuid",
-     "hex": "6b9f3ce4535c4ef78b78a14452bf6d14"
+     "hex": "77688053341c462f8459572ac18f589c"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-6b9f3ce4535c4ef78b78a14452bf6d14",
+     "request_id": "mcp-discovery-77688053341c462f8459572ac18f589c",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -31712,8 +32572,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-6b9f3ce4535c4ef78b78a14452bf6d14",
-     "inference_id": "inference-ca8f411d62bb4fef9fe5c8ef0e87f21e",
+     "discovery_id": "mcp-discovery-77688053341c462f8459572ac18f589c",
+     "inference_id": "inference-4efaddb25c124cc5b268aae4db915473",
      "required_transitions": []
     }
    }
@@ -31722,6 +32582,49 @@
    "phase": "prepare_round_catalog",
    "variant": "cancelled",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -31806,7 +32709,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -31829,7 +32732,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -31846,7 +32749,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -31855,7 +32758,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -31878,11 +32781,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -32030,7 +32933,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -32117,6 +33020,49 @@
    "phase": "prepare_round_catalog",
    "variant": "combat review",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -32201,7 +33147,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -32224,7 +33170,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -32241,7 +33187,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -32250,7 +33196,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -32273,11 +33219,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -32425,7 +33371,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -32498,15 +33444,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "a6a3415e95f946eda1deafe03904ec42"
+     "hex": "6a6d43636bf144cfa40cf7dcc24bc29b"
     },
     {
      "event": "uuid",
-     "hex": "d046dc0e25064951897d14e911b08840"
+     "hex": "3cac0d273e514b3796e651077349fd7c"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-d046dc0e25064951897d14e911b08840",
+     "request_id": "mcp-discovery-3cac0d273e514b3796e651077349fd7c",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -33682,8 +34628,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-d046dc0e25064951897d14e911b08840",
-     "inference_id": "inference-a6a3415e95f946eda1deafe03904ec42",
+     "discovery_id": "mcp-discovery-3cac0d273e514b3796e651077349fd7c",
+     "inference_id": "inference-6a6d43636bf144cfa40cf7dcc24bc29b",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -33709,6 +34655,49 @@
    "phase": "prepare_round_catalog",
    "variant": "combat review, player turn",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -33793,7 +34782,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -33816,7 +34805,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -33833,7 +34822,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -33842,7 +34831,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -33865,11 +34854,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -34017,7 +35006,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -34090,15 +35079,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "644fc46c1ead486d8b644b76bb8c12d5"
+     "hex": "8db32be618e046bea94655da8312ad2a"
     },
     {
      "event": "uuid",
-     "hex": "bc479763de2a4d1681d64adb549a2d45"
+     "hex": "88ef103abb7640388b54a37bac237101"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-bc479763de2a4d1681d64adb549a2d45",
+     "request_id": "mcp-discovery-88ef103abb7640388b54a37bac237101",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -35272,8 +36261,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-bc479763de2a4d1681d64adb549a2d45",
-     "inference_id": "inference-644fc46c1ead486d8b644b76bb8c12d5",
+     "discovery_id": "mcp-discovery-88ef103abb7640388b54a37bac237101",
+     "inference_id": "inference-8db32be618e046bea94655da8312ad2a",
      "required_transitions": [
       {
        "__class__": "ModelMechanicsTool",
@@ -35299,6 +36288,49 @@
    "phase": "prepare_round_catalog",
    "variant": "queue tools after a stopped sequence",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -35383,7 +36415,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -35406,7 +36438,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -35423,7 +36455,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -35432,7 +36464,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -35455,11 +36487,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -35607,7 +36639,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -35680,15 +36712,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "1b194a85dc314f16a8f80ef3704698cb"
+     "hex": "7cea73cd7cfd428e942d1ca7ceb72d92"
     },
     {
      "event": "uuid",
-     "hex": "45c3751474934179ab72a5770d97e1fb"
+     "hex": "98ccc5e59f19495d9033740de2fc8aec"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-45c3751474934179ab72a5770d97e1fb",
+     "request_id": "mcp-discovery-98ccc5e59f19495d9033740de2fc8aec",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -36620,8 +37652,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-45c3751474934179ab72a5770d97e1fb",
-     "inference_id": "inference-1b194a85dc314f16a8f80ef3704698cb",
+     "discovery_id": "mcp-discovery-98ccc5e59f19495d9033740de2fc8aec",
+     "inference_id": "inference-7cea73cd7cfd428e942d1ca7ceb72d92",
      "required_transitions": []
     }
    }
@@ -36630,6 +37662,49 @@
    "phase": "prepare_round_catalog",
    "variant": "queue tools",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -36714,7 +37789,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -36737,7 +37812,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -36754,7 +37829,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -36763,7 +37838,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -36786,11 +37861,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -36938,7 +38013,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -37011,15 +38086,15 @@
    "events": [
     {
      "event": "uuid",
-     "hex": "a382e71746cb479ab5e708f148e192bd"
+     "hex": "532d36b4c2164dd785356f4c4b094a4e"
     },
     {
      "event": "uuid",
-     "hex": "9548f3e68ca94a9a9d8d65050c76690f"
+     "hex": "2a3127eed8c24dc895f7278582a6aef4"
     },
     {
      "event": "catalog",
-     "request_id": "mcp-discovery-9548f3e68ca94a9a9d8d65050c76690f",
+     "request_id": "mcp-discovery-2a3127eed8c24dc895f7278582a6aef4",
      "result": [
       {
        "__class__": "ModelMechanicsTool",
@@ -38085,8 +39160,8 @@
        "model_behavior": "optional"
       }
      ],
-     "discovery_id": "mcp-discovery-9548f3e68ca94a9a9d8d65050c76690f",
-     "inference_id": "inference-a382e71746cb479ab5e708f148e192bd",
+     "discovery_id": "mcp-discovery-2a3127eed8c24dc895f7278582a6aef4",
+     "inference_id": "inference-532d36b4c2164dd785356f4c4b094a4e",
      "required_transitions": []
     }
    }
@@ -38095,6 +39170,49 @@
    "phase": "prepare_provider_round",
    "variant": null,
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -38179,7 +39297,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -38202,7 +39320,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -38219,7 +39337,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -38228,7 +39346,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -38251,11 +39369,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -38776,10 +39894,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -38812,7 +39930,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -39089,8 +40207,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -39546,7 +40664,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -39607,7 +40725,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -40590,6 +41708,49 @@
    "phase": "prepare_provider_round",
    "variant": "player boundary",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -40674,7 +41835,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -40697,7 +41858,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -40714,7 +41875,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -40723,7 +41884,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -40746,11 +41907,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -41383,10 +42544,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -41419,7 +42580,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -41532,7 +42693,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -41704,8 +42865,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -42295,7 +43456,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -42356,7 +43517,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -43462,6 +44623,49 @@
    "phase": "prepare_provider_round",
    "variant": "player intent pending",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -43546,7 +44750,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -43569,7 +44773,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -43586,7 +44790,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -43595,7 +44799,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -43618,11 +44822,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -44255,10 +45459,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -44291,7 +45495,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -44404,7 +45608,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -44576,8 +45780,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -44804,7 +46008,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -44865,7 +46069,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -45163,6 +46367,49 @@
    "phase": "prepare_provider_round",
    "variant": "player intent pending without a resolver",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -45247,7 +46494,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -45270,7 +46517,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -45287,7 +46534,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -45296,7 +46543,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -45319,11 +46566,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -45844,10 +47091,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -45880,7 +47127,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -45993,7 +47240,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -46927,6 +48174,49 @@
    "phase": "prepare_provider_round",
    "variant": "GM boundary",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -47011,7 +48301,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -47034,7 +48324,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -47051,7 +48341,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -47060,7 +48350,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -47083,11 +48373,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -47720,10 +49010,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -47756,7 +49046,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -47869,7 +49159,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
        "owner": "gm",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -48041,8 +49331,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -48317,7 +49607,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -48378,7 +49668,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -48721,6 +50011,49 @@
    "phase": "prepare_provider_round",
    "variant": "preparation",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -48805,7 +50138,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -48828,7 +50161,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -48845,7 +50178,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -48854,7 +50187,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -48877,11 +50210,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -49514,10 +50847,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -49550,7 +50883,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -49669,7 +51002,7 @@
        "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
-       "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+       "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
        "owner": "player",
        "actor_id": "actor-1",
        "actor_name": "Mara",
@@ -49841,8 +51174,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -50358,7 +51691,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -50419,7 +51752,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -51432,6 +52765,49 @@
    "phase": "prepare_provider_round",
    "variant": "Campaign File narration pending",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -51516,7 +52892,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -51539,7 +52915,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -51556,7 +52932,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -51565,7 +52941,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -51588,11 +52964,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -52113,10 +53489,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -52149,7 +53525,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -52426,8 +53802,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -52478,7 +53854,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -52539,7 +53915,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -52613,6 +53989,49 @@
    "phase": "prepare_provider_round",
    "variant": "Campaign File must be settled",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -52697,7 +54116,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -52720,7 +54139,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -52737,7 +54156,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -52746,7 +54165,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -52769,11 +54188,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -53294,10 +54713,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -53330,7 +54749,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -53607,8 +55026,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -53975,7 +55394,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -54036,7 +55455,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -54875,6 +56294,49 @@
    "phase": "prepare_provider_round",
    "variant": "held narration",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -54959,7 +56421,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -54982,7 +56444,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -54999,7 +56461,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -55008,7 +56470,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -55031,11 +56493,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -55556,10 +57018,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -55592,7 +57054,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -55869,8 +57331,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -56326,7 +57788,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -56387,7 +57849,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -57368,6 +58830,49 @@
    "phase": "prepare_provider_round",
    "variant": "engine transition review",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -57452,7 +58957,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -57475,7 +58980,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -57492,7 +58997,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -57501,7 +59006,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -57524,11 +59029,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -58161,10 +59666,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -58197,7 +59702,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -58474,8 +59979,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -59043,7 +60548,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -59104,7 +60609,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -60215,6 +61720,49 @@
    "phase": "prepare_provider_round",
    "variant": "participant OOC only",
    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+   "adapter": {
+    "owner_id": "sylvia-compare",
+    "gm_system_prompt": null,
+    "campaign_plan_text": "# Storm Courier\n\nThis is an open-ended narrative sandbox with no Ruleset or game mechanics. Use the player's setup below as the starting brief. When it leaves the character or opening situation unspecified, ask the player before establishing those details. Preserve player choices and boundaries.\n\n## Player setup\n\nA courier shelters from a storm.\n",
+    "campaign_plan": null
+   },
+   "model": {
+    "__class__": "ModelInfo",
+    "id": "standin/standin-narrator",
+    "name": "Stand-in Narrator",
+    "provider_name": "Stand-in",
+    "provider_key": "standin",
+    "provider_mode": "custom",
+    "recommended": false,
+    "premium": false,
+    "context_window": null,
+    "declared_context_window": null,
+    "declared_context_source": "unknown",
+    "runtime_context_window": null,
+    "runtime_context_source": "unknown",
+    "configured_context_window": null,
+    "context_window_source": "unknown",
+    "declared_context_observed_at": null,
+    "runtime_context_observed_at": null,
+    "configured_context_observed_at": null,
+    "context_observed_at": null,
+    "configured_runtime_mismatch": false,
+    "configured_declared_mismatch": false,
+    "max_output_tokens": 4096,
+    "builder_output_tokens": 4096,
+    "cost_per_1k_tokens": 0.0,
+    "transport": "chat_completions",
+    "provider_model_id": "standin-narrator",
+    "supports_streaming": null,
+    "supports_tools": null,
+    "supported_reasoning_efforts": null,
+    "default_reasoning_effort": null,
+    "reasoning_control": null,
+    "reasoning_source": "unknown",
+    "speed_options": null,
+    "speed_control": null,
+    "speed_source": "unknown"
+   },
    "input": {
     "session": {
      "__class__": "SessionRecord",
@@ -60299,7 +61847,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 4,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-assistant-tools",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-assistant-tools",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -60322,7 +61870,7 @@
          ]
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_calls",
         "native_continuation": {
          "anthropic_required": false,
@@ -60339,7 +61887,7 @@
        "__class__": "SessionMessage",
        "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
        "sequence": 5,
-       "message_id": "inference-06b83b93a529422dbffa8cb935563267-tool-results",
+       "message_id": "inference-ee322949f32546c9bd526a518a341e29-tool-results",
        "kind": "evidence",
        "content": {
         "activity": {
@@ -60348,7 +61896,7 @@
          "source_order": 2
         },
         "basis_message_id": "message-campaign-start-b09f62ecc70c549a5e1e0115",
-        "inference_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "inference_id": "inference-ee322949f32546c9bd526a518a341e29",
         "kind": "provider_tool_results",
         "results": [
          {
@@ -60371,11 +61919,11 @@
        "content": {
         "activity": "campaign_opened",
         "activity_timing": {
-         "elapsed_ms": 1750,
+         "elapsed_ms": 6609,
          "last_operation": "action",
          "operation": null,
          "phase": "completed",
-         "quiet_ms": 31,
+         "quiet_ms": 32,
          "revision": 6
         },
         "attempt_id": "attempt-campaign-start-b09f62ecc70c549a5e1e0115",
@@ -60896,10 +62444,10 @@
      },
      "current_user_wire_text": "I shake the rain from my cloak and ask the keeper for news of the road.",
      "direct_response": false,
-     "discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+     "discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
      "empty_completion_corrections_used": 0,
      "entity_display_names": {},
-     "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
+     "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
      "max_empty_completion_corrections": 2,
      "max_missing_required_tool_corrections": 3,
      "max_private_deliberation_corrections": 2,
@@ -60932,7 +62480,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -61161,8 +62709,8 @@
     {
      "event": "audit_context",
      "context": {
-      "inference_id": "inference-f30fcc32f48245d19dbaf0a845d117ec",
-      "mcp_discovery_id": "mcp-discovery-1d20398cce994cd5b58a7407a5d95d18",
+      "inference_id": "inference-3fb943a03a78479c90bc0a2033bf89a3",
+      "mcp_discovery_id": "mcp-discovery-33e8e7a8e19943ad861673396d4aff6e",
       "campaign_id": "campaign-draft-545cb9c056418f3f78c66f20",
       "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
       "round": 1,
@@ -61618,7 +63166,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,
@@ -61679,7 +63227,7 @@
         }
        ],
        "_native_reference": {
-        "response_id": "inference-06b83b93a529422dbffa8cb935563267",
+        "response_id": "inference-ee322949f32546c9bd526a518a341e29",
         "requirement": {
          "anthropic_required": false,
          "chat_completion_required": false,

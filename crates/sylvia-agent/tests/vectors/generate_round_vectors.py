@@ -58,7 +58,8 @@ def cases(rows: list[dict[str, object]]) -> list[dict[str, object]]:
         event = row["event"]
         if event == "phase_start":
             current = {"phase": row["phase"], "variant": row["variant"], "turn_id": row["turn_id"],
-                       "input": row["input"], "before": row["state"], "events": []}
+                       "adapter": row["adapter"], "model": row["model"], "input": row["input"],
+                       "before": row["state"], "events": []}
         elif event == "phase_end" and current is not None:
             # Only what the phase changed; every other local is as before.
             before, after = current["before"], row["state"]  # type: ignore[index]

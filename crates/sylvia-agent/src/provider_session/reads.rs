@@ -99,7 +99,10 @@ pub trait TurnOwner: OpeningReads {
     ) -> BoxFuture<'a, CodedResult<Option<ModelDecisionBoundary>>>;
 
     /// `current_package_lock(campaign_id)`.
-    fn current_package_lock<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<PackageLockRecord>>;
+    fn current_package_lock<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<PackageLockRecord>>;
 
     /// `record_admin_full_audit(payload)`: kept only while Admin Full Audit is on.
     fn record_admin_full_audit(&self, payload: JsonMap) -> CodedResult<()>;

@@ -220,6 +220,8 @@ original_init = _provider_session.ProviderSessionAdapter.__init__
 
 def traced_init(self, owner, provider, **kwargs):  # type: ignore[no-untyped-def]
     original_init(self, Traced(owner), provider, **kwargs)
+    self._trace_adapter = plain({key: value for key, value in kwargs.items()  # noqa: SLF001
+                                 if key != "record_warning"})
 
 
 _provider_session.ProviderSessionAdapter.__init__ = traced_init
@@ -364,7 +366,9 @@ def traced_call(function, self, state, provider_input, turn_id, variant):  # typ
     provider = self._provider  # noqa: SLF001
     self._provider = AuditedProvider(provider)  # noqa: SLF001
     log({"event": "phase_start", "phase": function.__name__, "variant": variant,
-         "turn_id": turn_id, "input": dump_input(provider_input), "state": dump_state(state)})
+         "turn_id": turn_id, "adapter": getattr(self, "_trace_adapter", None),
+         "model": plain(getattr(provider, "model_info", None)),
+         "input": dump_input(provider_input), "state": dump_state(state)})
     ACTIVE["value"] = True
     try:
         result = function(self, state, provider_input, turn_id=turn_id)
