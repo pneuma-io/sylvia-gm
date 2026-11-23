@@ -1,6 +1,7 @@
 //! The reads a Game Master provider round makes that the opening does not (lane 4's T2), the
 //! application half: `AuthorityOwner.current_package_lock`, `provider_continuation`,
-//! `actor_context`, `campaign_preparation_boundary` and `campaign_narrative_options`, with
+//! `actor_context`, `campaign_preparation_boundary`, `model_decision_boundary` and
+//! `campaign_narrative_options`, with
 //! `_character_update_tool`, `_character_update_options` and `_inventory_tool`.
 
 use super::content_reads::{
@@ -75,6 +76,28 @@ pub async fn campaign_preparation_boundary(
                 return Ok(None);
             }
             crate::decision_scope::project_campaign_preparation_scope(&snapshot.state, &declared)
+                .map_err(super::snapshots::projection_rejected)
+        })
+        .await
+}
+
+/// `AuthorityOwner.model_decision_boundary(campaign_id)`: the Ruleset-declared Player or GM
+/// decision boundary now, through lane 2's `project_model_decision_scope`. Unlike
+/// `model_context_snapshot`, it does not replace an isolated participant's state. A projection
+/// failure is a `CommandRejected`.
+pub async fn model_decision_boundary(
+    store: &StoreHandle,
+    campaign_id: &str,
+) -> StoreResult<Option<ModelDecisionBoundary>> {
+    let campaign_id = campaign_id.to_owned();
+    store
+        .call(move |store| {
+            let snapshot = store.snapshot(&campaign_id)?;
+            let Some(declared) = super::content_reads::decision_scope_declaration(store, &snapshot.state)?
+            else {
+                return Ok(None);
+            };
+            crate::decision_scope::project_model_decision_scope(&snapshot.state, &declared)
                 .map_err(super::snapshots::projection_rejected)
         })
         .await
