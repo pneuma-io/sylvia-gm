@@ -66,6 +66,13 @@ pub struct Part {
     /// Content made of this many `a` bytes instead, for size limits.
     #[serde(default)]
     pub repeat: Option<usize>,
+    /// Content taken from the response body of the earlier step with this id (a download sent
+    /// back as an upload). The session runner fills `content_bytes` from it.
+    #[serde(default)]
+    pub content_from_step: Option<String>,
+    /// The bytes `content_from_step` names, filled in before the step is sent.
+    #[serde(skip)]
+    pub content_bytes: Option<Vec<u8>>,
 }
 
 const BOUNDARY: &str = "sylvia-compare-boundary-5f2c";
@@ -263,9 +270,10 @@ fn request_bytes(step: &HttpStep, authority: &str) -> (Vec<u8>, Vec<(String, Str
                 body.extend_from_slice(format!("{name}: {value}\r\n").as_bytes());
             }
             body.extend_from_slice(b"\r\n");
-            match part.repeat {
-                Some(count) => body.resize(body.len() + count, b'a'),
-                None => body.extend_from_slice(part.content.as_bytes()),
+            match (part.repeat, &part.content_bytes) {
+                (Some(count), _) => body.resize(body.len() + count, b'a'),
+                (None, Some(bytes)) => body.extend_from_slice(bytes),
+                (None, None) => body.extend_from_slice(part.content.as_bytes()),
             }
             body.extend_from_slice(b"\r\n");
         }
