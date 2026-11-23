@@ -7,7 +7,8 @@
 use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
-use sylvia_app::authority::turn_reads;
+use sylvia_agent::stateless_mcp::listing::CatalogEntry;
+use sylvia_app::authority::{content_reads, turn_reads};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
@@ -140,6 +141,52 @@ impl TurnOwner for OwnerReads {
                 .append_agent_message(session_id, message_id, kind, content)
                 .await
                 .map_err(store_error)
+        })
+    }
+
+    fn catalog<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        include_unexposed: bool,
+    ) -> BoxFuture<'a, CodedResult<Vec<CatalogEntry>>> {
+        Box::pin(async move {
+            let tools =
+                content_reads::catalog(self.store(), campaign_id, include_unexposed).await.map_err(store_error)?;
+            Ok(tools
+                .into_iter()
+                .map(|tool| CatalogEntry {
+                    package_id: tool.package_id,
+                    package_version: tool.package_version,
+                    package_sha256: tool.package_sha256,
+                    name: tool.name,
+                    capability: tool.capability,
+                    input_schema: tool.input_schema,
+                    description: tool.description,
+                    model_behavior: tool.model_behavior,
+                })
+                .collect())
+        })
+    }
+
+    fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        Box::pin(async move {
+            let id = campaign_id.to_owned();
+            let plan = self
+                .store()
+                .call(move |store| store.accepted_campaign_plan(&id))
+                .await
+                .map_err(store_error)?;
+            match plan {
+                Some(plan) => Ok(plan.content().clone()),
+                None => Err(CodedError::rejected("Accepted Campaign Plan is unavailable")
+                    .with_error_type("CommandRejected")),
+            }
+        })
+    }
+
+    fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        Box::pin(async move {
+            turn_reads::campaign_narrative_options(self.store(), session_id).await.map_err(store_error)
         })
     }
 }

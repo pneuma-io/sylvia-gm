@@ -9,6 +9,7 @@ pub mod turn_state;
 use serde_json::Value as J;
 use std::sync::Mutex;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
+use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
@@ -584,5 +585,42 @@ impl TurnOwner for Recorded {
             serde_json::json!([session_id, message_id, kind.as_str(), content]),
         );
         ready(session_message(&result))
+    }
+    fn catalog<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        include_unexposed: bool,
+    ) -> BoxFuture<'a, CodedResult<Vec<CatalogEntry>>> {
+        // Python passes `include_unexposed` only for the fixed list.
+        let args = if include_unexposed {
+            serde_json::json!([campaign_id, true])
+        } else {
+            serde_json::json!([campaign_id])
+        };
+        let result = self.next_result("catalog", args);
+        Box::pin(async move { result.map(|value| value.as_array().unwrap().iter().map(catalog_entry).collect()) })
+    }
+    fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        let result = self.next_result("accepted_campaign_plan", serde_json::json!([campaign_id]));
+        Box::pin(async move { result.map(|plan| map(&plan["content"])) })
+    }
+    fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        let result = self.next_result("campaign_narrative_options", serde_json::json!([session_id]));
+        Box::pin(async move { result.map(|value| map(&value)) })
+    }
+}
+
+/// One recorded `CatalogTool`: the fields the listing reads.
+pub fn catalog_entry(value: &J) -> CatalogEntry {
+    let text = |key: &str| value[key].as_str().unwrap().to_owned();
+    CatalogEntry {
+        package_id: text("package_id"),
+        package_version: text("package_version"),
+        package_sha256: text("package_sha256"),
+        name: text("name"),
+        capability: text("capability"),
+        input_schema: map(&value["input_schema"]),
+        description: text("description"),
+        model_behavior: ModelToolBehavior::parse(value["model_behavior"].as_str().unwrap()).unwrap(),
     }
 }

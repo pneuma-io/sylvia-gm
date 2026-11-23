@@ -1,0 +1,445 @@
+{
+ "knowledge_search": {
+  "name": "search_campaign_knowledge",
+  "description": "READ-ONLY discovery: find a small set of exact Campaign State, Campaign Plan, Setting, Ruleset, or Character File references when you do not already know their IDs or paths. Results identify candidate references and provenance; they are not the facts themselves. Follow a relevant result with an exact read through read_campaign_reference. Campaign State remains current truth. Similar names may identify different records. If results are empty or irrelevant, refine with a known name/subject and source, or read an available index reference; do not infer that a fact does not exist.",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "query": {
+     "type": "string",
+     "minLength": 1,
+     "maxLength": 500,
+     "description": "A natural question or a person, place, subject, relationship, current location, rule, or prepared item."
+    },
+    "sources": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "enum": "__SOURCES__"
+     },
+     "minItems": 1,
+     "maxItems": "__SOURCE_COUNT__",
+     "uniqueItems": true,
+     "description": "Optional authority sources to search. Omit to search every source available to this campaign."
+    },
+    "limit": {
+     "type": "integer",
+     "minimum": 1,
+     "maximum": 8,
+     "default": 5
+    },
+    "offset": {
+     "type": "integer",
+     "minimum": 0,
+     "default": 0,
+     "description": "Follow next_offset with the same query, sources, and limit to continue a byte-bounded page. Restart at 0 if campaign_revision changes."
+    }
+   },
+   "required": [
+    "query"
+   ],
+   "additionalProperties": false
+  }
+ },
+ "reference_read": {
+  "name": "read_campaign_reference",
+  "description": "READ-ONLY: retrieve current Campaign State or one additional available Plan, Setting, Ruleset, or Character File. A participant reference returns that admitted character's authored summary and structured baseline when available. This tool cannot update, write, save, or commit Campaign File state. Campaign State is current truth; Plan and Setting material are preparation and defaults. Read for a concrete missing fact that changes present adjudication, or consult Plan preparation when choosing a new situation, assessing objective completion, or closing an episode. Read the smallest relevant item, not to decorate or expand narration. Retrieved detail remains private unless the current action and vantage reveal it. Do not reread Plan or Setting material already projected into the current request. An ID, title or reference path does not include the source contents. For an engine-owned structured input format, read source engine_format, path spatial_scene before constructing a combat scene; it returns the installed schema, example and requirements.",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "source": {
+     "type": "string",
+     "enum": "__SOURCES_AND_ENGINE__"
+    },
+    "path": {
+     "type": "string",
+     "description": "For campaign_state prefer a stable Campaign File record ID from search_campaign_knowledge. 'current' reads all state and may exceed the byte bound in a mature campaign. For campaign_plan use 'structured' for the whole Plan, 'structured/structure/<act-id>' for one act, 'structured/objectives/<objective-id>' for one objective and its completion conditions, or 'readable'. For a longer readable Plan use 'readable/page/0' and follow the returned next_path; each page is bounded. For participant use its exact participant ID to retrieve that Character File. For campaign_setting or ruleset use an exact admitted package path. Append '#heading-slug' to read one Markdown section without reading the rest of its file. Large UTF-8 files return bounded '#text/<character-offset>' excerpts. Follow next_path or search_campaign_knowledge for a relevant excerpt. For engine_format use spatial_scene (the installed scene schema and example)."
+    }
+   },
+   "required": [
+    "source",
+    "path"
+   ],
+   "additionalProperties": false
+  }
+ },
+ "campaign_file": {
+  "name": "update_campaign_file",
+  "description": "Use character_updates for Ruleset-declared ordinary inventory/currency bookkeeping. Read the participant campaign reference for current fields, exact schema and revision first; submit complete replacement field values preserving unrelated holdings. Narrative attributes/facts alone never change equipment or money. Send related character changes and transaction facts together; rejection saves neither. Do not narrate success before acceptance or call failure a stale panel. Combat outcomes require their mechanics. When inventory_updates is offered, it is the active fallback for this campaign. Read campaign_state path inventory for its current holdings and revision; establish owner/holder entities in the same call when needed. Use holdings to establish or correct counts and transfers to move existing quantities. Loans, storage and returns preserve ownership; only explicit gifts/sales change it. Never infer currency exchange rates or use the fallback to bypass a Ruleset rejection. Update your durable Campaign File to the complete decided post-action truth in effect when control returns to the player. If Sylvia is holding a player-facing response, review it against that truth before committing. Store every lasting truth the response establishes or changes, including newly introduced people, places, objects, clues, relationships, promises, knowledge, scene state, and Plan Progress together in one call. Record the GM-owned outcome, not a summary of the player's request and not transient atmosphere. Use Ruleset tools for mechanics. The whole update is validated and committed together before the player sees the response. Any player-facing response and this disposition must describe the same post-action truth. Sylvia releases a settled response only after this call succeeds; it must not advance beyond or contradict the admitted durable state. Set state_change to 'unchanged' and omit all state collections only when the response changes no durable Campaign File truth; that records an unchanged decision without creating a database revision. An unchanged assessment asserts that location, scene, time, physical positions, player or NPC decisions, knowledge, relationships, people, places, objects, reveals, and Plan status are all exactly unchanged from the supplied pre-action State. An unsuccessful outcome can still change location, time, knowledge, or scene facts; record those consequences even when the player's goal remains unmet. Restating supplied Campaign State is not a change. Omit unchanged collections; an included collection must contain at least one change.",
+  "state_change": "state_change",
+  "state_change_summary": "state_change_summary",
+  "assessment_properties": {
+   "state_change": {
+    "type": "string",
+    "enum": [
+     "changed",
+     "unchanged"
+    ],
+    "description": "After you compare the complete response with pre-action Campaign State, declare whether any durable truth changed. Use 'changed' when any supplied collection records new post-action truth, otherwise use 'unchanged'."
+   },
+   "state_change_summary": {
+    "type": "string",
+    "minLength": 1,
+    "maxLength": 1000,
+    "description": "Brief private accounting of what durably changed, or why the response leaves Campaign State exactly unchanged. This assessment is audited but is not itself stored as campaign truth. Maximum 1000 characters, including spaces and newlines. Aim for one or two short sentences well below the maximum; put full facts in their own records instead of repeating them here."
+   }
+  },
+  "collections": [
+   [
+    "record_entity",
+    "entities"
+   ],
+   [
+    "record_memory",
+    "facts"
+   ],
+   [
+    "update_scene",
+    "scenes"
+   ],
+   [
+    "reveal_secret",
+    "reveals"
+   ],
+   [
+    "update_plan_progress",
+    "plan_progress"
+   ],
+   [
+    "update_character",
+    "character_updates"
+   ],
+   [
+    "update_inventory",
+    "inventory_updates"
+   ]
+  ],
+  "collection": {
+   "type": "array",
+   "minItems": 1,
+   "maxItems": 64,
+   "items": "__ITEMS__",
+   "description": "Every change of this kind established by the current GM response. Omit this collection when none changed."
+  },
+  "required": [
+   "state_change",
+   "state_change_summary"
+  ],
+  "items": {
+   "record_entity": {
+    "type": "object",
+    "properties": {
+     "entity_id": {
+      "type": "string",
+      "description": "Stable campaign identity. Reuse it when the same person, place, creature, or object changes later."
+     },
+     "entity_kind": {
+      "type": "string",
+      "description": "Plain entity kind, such as person, place, creature, or object."
+     },
+     "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300,
+      "description": "Current name, 1-300 characters, appropriate to this record's visibility. An unrevealed true name from Plan or Setting preparation belongs in a gm_private entity record, not a player_known one."
+     },
+     "attributes": {
+      "type": "object",
+      "description": "Current campaign-specific facts, such as location, condition, allegiance, or status. Include the complete current values that should remain true. For a player character, never infer posture, alertness, equipment use, or another action from inventory alone."
+     },
+     "visibility": {
+      "type": "string",
+      "enum": [
+       "player_known",
+       "gm_private"
+      ],
+      "description": "Knowledge boundary for the entire entity record, including its name and attributes. Use player_known only when every included detail has been established for the player; otherwise use gm_private."
+     },
+     "known_by": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Exact identities that have actually learned this entity state in the fiction. Do not include the player merely because the GM knows it or plans a future reveal."
+     },
+     "source_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Optional admitted Setting or participant source path for this identity. Omit when there is no admitted source; never send an empty string."
+     }
+    },
+    "required": [
+     "attributes",
+     "entity_id",
+     "entity_kind",
+     "known_by",
+     "name",
+     "visibility"
+    ],
+    "additionalProperties": false
+   },
+   "record_memory": {
+    "type": "object",
+    "properties": {
+     "fact_id": {
+      "type": "string",
+      "description": "A stable identifier for this lasting campaign fact. Reuse it when a plan is completed, an obligation fulfilled, or this truth corrected. Write the complete current truth, including the outcome; earlier versions remain in history. If separate records already describe the old plan and its outcome, update the old plan record to say it is completed or superseded instead of leaving it as a current instruction."
+     },
+     "category": {
+      "type": "string",
+      "enum": [
+       "decision",
+       "relationship",
+       "discovery",
+       "promise",
+       "consequence",
+       "continuity"
+      ],
+      "description": "The kind of lasting fact established by play."
+     },
+     "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "The concise campaign-specific truth to remember (1-2000 characters). Keep separate lasting facts in separate records."
+     },
+     "visibility": {
+      "type": "string",
+      "enum": [
+       "player_known",
+       "gm_private"
+      ],
+      "description": "Knowledge boundary for the entire fact as written. Use player_known only when released play, player-authored text, or prior player-known Campaign State establishes every detail; otherwise use gm_private."
+     },
+     "known_by": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Exact identities that have actually learned this truth in the fiction. Do not include the player merely because the GM knows it or plans a future reveal."
+     },
+     "subjects": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Optional stable entity identifiers this fact is about."
+     }
+    },
+    "required": [
+     "category",
+     "fact_id",
+     "known_by",
+     "text",
+     "visibility"
+    ],
+    "additionalProperties": false
+   },
+   "update_scene": {
+    "type": "object",
+    "properties": {
+     "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "The concise current scene situation established by play (1-2000 characters). Never add a player action or equipment posture that player text, the participant artifact, or existing Campaign State did not establish."
+     },
+     "location_id": {
+      "type": "string",
+      "description": "Optional stable current location identifier."
+     }
+    },
+    "required": [
+     "summary"
+    ],
+    "additionalProperties": false
+   },
+   "reveal_secret": {
+    "type": "object",
+    "properties": {
+     "secret_id": {
+      "type": "string",
+      "enum": [],
+      "description": "An established secret currently eligible to be revealed."
+     },
+     "audience": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "Exact identities that learned the secret in play."
+     }
+    },
+    "required": [
+     "audience",
+     "secret_id"
+    ],
+    "additionalProperties": false
+   },
+   "update_plan_progress": {
+    "type": "object",
+    "properties": {
+     "plan_item_id": {
+      "type": "string",
+      "description": "Exact private Campaign Plan item identity from this enum."
+     },
+     "progress_status": {
+      "type": "string",
+      "enum": [
+       "introduced",
+       "engaged",
+       "deferred",
+       "resolved",
+       "retired"
+      ],
+      "description": "What play has actually done with this prepared item, never what the Plan hoped would happen. 'Introduced' means the GM made it available while the player's response remains unresolved; 'engaged' requires a player choice that interacts with it; 'deferred' means the player clearly declined, avoided, or left the introduced material behind. Deferred material remains possible but is not a current obligation. 'Resolved' means play has met all authored completion conditions and the closing event, including an explicitly allowed failure outcome. An act requires all of its linked objectives; side work cannot replace them. 'Retired' means play has made the item inapplicable, not that the act was completed. For ending:<id>, read the final act/structured/ending and resolve only after required acts/objectives and the selected immediate aftermath. This opens the player's continue/finish card; leave the after-story for their explicit Finish choice. Plan Progress is a bookmark, not a turn log: omit it when the status and practical meaning have not changed."
+     },
+     "progress_summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000,
+      "description": "Short private reason, 1-2000 characters, grounded only in what play established. Describe what was offered or changed, and record an express player choice when it changes the status. Refresh a superseded summary when the outcome, evidence, or remaining obligation changes even if the status stays engaged. Do not rewrite an existing summary merely to mention the current turn when its status and practical meaning are unchanged. Otherwise leave the player's response unresolved. Never infer the player's interest, intent, acceptance, route, or next action. Do not describe the player as weighing, considering, interested in, or drawn to an option unless player text establishes it; use neutral no-choice-yet wording instead."
+     }
+    },
+    "required": [
+     "plan_item_id",
+     "progress_status",
+     "progress_summary"
+    ],
+    "additionalProperties": false
+   }
+  },
+  "scene_act": {
+   "type": "string",
+   "enum": "__ACTS__",
+   "description": "Optional Campaign Plan preparation item associated with what play reached."
+  },
+  "inventory": {
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "expected_revision"
+   ],
+   "properties": {
+    "expected_revision": {
+     "type": "integer",
+     "minimum": 0
+    },
+    "holdings": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "holder_id",
+       "holding_id",
+       "item_id",
+       "kind",
+       "known_by",
+       "name",
+       "owner_id",
+       "quantity",
+       "stackable",
+       "visibility"
+      ],
+      "properties": {
+       "holding_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "item_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "owner_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "holder_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "name": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 300
+       },
+       "kind": {
+        "type": "string",
+        "enum": [
+         "item",
+         "currency"
+        ]
+       },
+       "stackable": {
+        "type": "boolean"
+       },
+       "quantity": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991
+       },
+       "visibility": {
+        "type": "string",
+        "enum": [
+         "player_known",
+         "gm_private"
+        ],
+        "description": "Release boundary for the entire holding. Use player_known only when all included details are established for the player; otherwise use gm_private."
+       },
+       "known_by": {
+        "type": "array",
+        "items": {
+         "type": "string",
+         "minLength": 1
+        },
+        "uniqueItems": true,
+        "description": "Exact character identities that know this holding in the fiction. This does not override visibility or reveal private information to the player."
+       }
+      }
+     },
+     "maxItems": 64,
+     "description": "Establish or correct holdings by stable holding_id; other holdings remain unchanged. Zero quantity retains identity without a visible item. Quantities are whole units of the named currency; no exchange rate is inferred."
+    },
+    "transfers": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+       "source_id",
+       "destination_id",
+       "quantity",
+       "holder_id"
+      ],
+      "properties": {
+       "source_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "destination_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "holder_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "owner_id": {
+        "type": "string",
+        "minLength": 1
+       },
+       "quantity": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+       }
+      }
+     },
+     "maxItems": 64,
+     "description": "Move existing quantities after holding updates. Omit owner_id for loans/storage/returns; supply it only for an explicit ownership change. Partial moves need a different destination_id."
+    }
+   }
+  }
+ }
+}
