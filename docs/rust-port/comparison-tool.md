@@ -131,7 +131,9 @@ header. A session adds its own under `rules`:
   recording is written, so a protected credential never reaches the repository. The work
   folder still holds the raw data; never commit a work folder.
 - `volatile_files`: files that must exist but whose content is not compared.
-- `ignore_pointers`: exact JSON pointers into the recording, for the rare single value.
+- `ignore_pointers`: exact JSON pointers into the recording, for the rare single value. A
+  pointer may name an object member or an array item (one header's value is
+  `/model_requests/<n>/headers/<i>/1`).
 - `ignore_headers_row_8`: the one rule that covers a Rust difference rather than a Python run
   difference, because `differences.md` row 8 agrees it: the HTTP client's own request headers
   (Python's OpenAI SDK and httpx send `User-Agent: AsyncOpenAI/Python ...` or `python-httpx/...`,
@@ -213,10 +215,21 @@ reply, following `JourneyGM` in `tests/stop_resume_owner_fixture.py`:
 | `[hold]` | streams the role chunk and "Partial narration that Stop must discard.", then holds the connection until the owner closes it | a reply in progress, until Stop |
 | `[fail]` | streams the same partial chunk and drops the connection mid-body, the first time it sees that player message; later requests with it are answered | a lost provider connection (`provider_error`), then a Retry that succeeds |
 | `[late]` | holds before answering until a `release` step, then answers | a slow reply |
+| `[call:<suffix> <json>]` | calls the first offered tool (in request order) named `<suffix>` or ending `_<suffix>`, with `<json>` as its arguments byte for byte | a GM tool call, such as a rules check or an attack |
+
+`[call:...]` scripts a mechanics turn. The suffix is ASCII letters, digits and underscores; one
+space and one JSON value follow, then `]`, and anything else is left as plain text. A message
+may carry several markers: they are called in order, one a round, each after the previous
+one's result. Once the last marker's result is the last message, or the next marker's tool is
+not offered, the stand-in answers as it would without markers: the Campaign File update, then
+the narration. A marker call's id is `standin-mechanic-<n>`, where `<n>` is one more than the
+number of assistant tool-call messages in the request, so every platform records the same id;
+the Campaign File call keeps `standin-call-1`. `journey` narration echoes the message without
+its markers, as it does `[hold]`, `[fail]` and `[late]`. A message without `[call:...]` gets
+the same replies as before the marker existed.
 
 It is a small HTTP/1.1 server on `std::net`, because holding a stream open and dropping one
-mid-body need control of the socket. It does not yet script tool-using mechanics turns (a
-rules check, an attack); lane 4 says what those need.
+mid-body need control of the socket.
 
 ## Sessions so far
 
@@ -232,7 +245,23 @@ rules check, an attack); lane 4 says what those need.
 | `builder-chat-edit` | Renaming and deleting Builder chats before any exists: missing parameters, display names, identities, the exact deletion confirmation, an unknown chat | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update` | The desktop updater as 0.4.1 ships it (no trusted key): the unavailable state, every refusal, the request and host checks, the reservation, abort and shutdown rules, both update gates, and the startup check with seeded receipts and launch fields | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update-recovery` | The recovery-only owner: an update interrupted mid-apply met by the desktop's update context, its bounded recovery pipe, the refused methods and shutdown, and launches without a reply or with the ordinary refusal | recorded on Windows and Linux; five reproductions on each |
+| `srd-mechanics-turn` | An SRD Lite campaign from the bundled A Debt in Iron plan with its fixed character, the GM opening, and one player turn in which the GM makes a skill check (`[call:d20_test ...]`, not spatial) and then updates the Campaign File; reads | recorded on Windows and Linux; five reproductions on each |
 | `provider-settings` | Provider connections on an empty folder: saving a custom service (identity, headers, sealed key) and a local runtime, the refusals for a mismatched transport, a bad header and an unknown preset, the default model, new-chat defaults with their effort and speed checks, removal, and the resolver reloading after each change | recorded on Windows and Linux; reproduces on a second run |
+
+`srd-mechanics-turn` declares more rules than the others, because a mechanic is random on
+every Python run:
+- **Ids:** its `action_id` (`action-<hex>`) and its provider idempotency key
+  (`provider-<hex>`) are fresh `uuid4` values, so they are aliases.
+- **Hashes:** the `payload_hash` of the `actions` and `idempotency_records` rows hashes them,
+  so it is ignored.
+- **Dice:** the tool's dice seed hashes the `action_id`, so the roll differs every run. The
+  session's check has target number 1, so the outcome does not. Only the roll's own values are
+  ignored: `_d20_test`/`d20_test` `results` and `total`, the adjusted total, the result card's
+  `equation` roll and total and its `details` value. The `scrub` rules replace the same values
+  inside the JSON text of tool results and narration facts. The roll's digits also change the
+  size of the request that carries them, so that one request's `Content-Length` value is an
+  `ignore_pointers` entry; its body is still compared. Everything else about the check must
+  match: the outcome, the modifiers, the card and the resulting state.
 
 `stop-redirect`, `fail-retry` and `reopen` follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop

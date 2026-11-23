@@ -13,6 +13,14 @@
 //! - `[fail]` sends a partial chunk and drops the connection mid-stream, the first time a given
 //!   player message is seen; the owner sees a lost connection. Later requests are answered.
 //! - `[late]` holds before answering until the session releases it, then answers.
+//! - `[call:<suffix> <json>]` makes the GM call a tool: on a request that offers a tool named
+//!   `<suffix>` or ending `_<suffix>` (the first such tool, in request order), the stand-in
+//!   answers with a call to it whose arguments are `<json>` byte for byte. A message may carry
+//!   several; they are called in order, one a round. Once the last one's result is the last
+//!   message (or a marker's tool is not offered), the stand-in answers as it would without
+//!   them: the Campaign File update, then the narration. A marker call's id is
+//!   `standin-mechanic-<n>`, `<n>` counting the request's assistant tool-call messages, so every
+//!   platform's recording agrees. The marker is left out of the echoed narration.
 //!
 //! The session drives the holds with two step kinds (see `session.rs`): `wait_held` blocks
 //! until the stand-in holds one more request than it had been waited for, and `release`
@@ -432,19 +440,125 @@ fn content_text(content: Option<&Json>) -> String {
     }
 }
 
+/// One `[call:<suffix> <json>]` marker: the tool suffix, the arguments as written, and where
+/// the marker is in the message (byte offsets).
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct CallMarker {
+    suffix: String,
+    arguments: String,
+    span: (usize, usize),
+}
+
+/// The `[call:...]` markers of a player message, in order. A marker is `[call:`, a suffix of
+/// ASCII letters, digits and underscores, one space, one JSON value and `]`; anything else is
+/// plain text.
+fn call_markers(text: &str) -> Vec<CallMarker> {
+    const OPEN: &str = "[call:";
+    let mut markers = Vec::new();
+    let mut from = 0;
+    while let Some(found) = text[from..].find(OPEN) {
+        let start = from + found;
+        from = start + OPEN.len();
+        let rest = &text[from..];
+        let suffix_len = rest.find(|c: char| !(c.is_ascii_alphanumeric() || c == '_')).unwrap_or(rest.len());
+        if suffix_len == 0 || !rest[suffix_len..].starts_with(' ') {
+            continue;
+        }
+        let json_start = from + suffix_len + 1;
+        let mut values = serde_json::Deserializer::from_str(&text[json_start..]).into_iter::<Json>();
+        let Some(Ok(_)) = values.next() else { continue };
+        let json_end = json_start + values.byte_offset();
+        if !text[json_end..].starts_with(']') {
+            continue;
+        }
+        markers.push(CallMarker {
+            suffix: rest[..suffix_len].to_owned(),
+            arguments: text[json_start..json_end].to_owned(),
+            span: (start, json_end + 1),
+        });
+        from = json_end + 1;
+    }
+    markers
+}
+
+/// `text` without its `[call:...]` markers.
+fn without_call_markers(text: &str) -> String {
+    let mut kept = String::new();
+    let mut from = 0;
+    for marker in call_markers(text) {
+        kept.push_str(&text[from..marker.span.0]);
+        from = marker.span.1;
+    }
+    kept.push_str(&text[from..]);
+    kept
+}
+
+/// The first offered tool whose name is `suffix` or ends `_<suffix>`.
+fn offered_tool(request: &Json, suffix: &str) -> Option<String> {
+    request.get("tools")?.as_array()?.iter().find_map(|tool| {
+        let name = tool.get("function")?.get("name")?.as_str()?;
+        (name == suffix || name.ends_with(&format!("_{suffix}"))).then(|| name.to_owned())
+    })
+}
+
+/// A marker call's id prefix.
+const MECHANIC_CALL: &str = "standin-mechanic-";
+
+fn calls_of(message: &Json) -> impl Iterator<Item = &str> {
+    message
+        .get("tool_calls")
+        .and_then(Json::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|call| call.get("id").and_then(Json::as_str))
+}
+
+/// The marker call this request should get, if any: the next marker after those already
+/// called since the latest player message, unless the last message is another tool's result.
+fn marker_call(request: &Json, player: &str) -> Option<Reply> {
+    let markers = call_markers(player);
+    if markers.is_empty() {
+        return None;
+    }
+    let messages = request.get("messages").and_then(Json::as_array)?;
+    let last = messages.last()?;
+    let last_is_tool_result = last.get("role").and_then(Json::as_str) == Some("tool");
+    let last_is_marker_result = last_is_tool_result
+        && last.get("tool_call_id").and_then(Json::as_str).is_some_and(|id| id.starts_with(MECHANIC_CALL));
+    if last_is_tool_result && !last_is_marker_result {
+        return None;
+    }
+    let player_index = messages.iter().rposition(|message| {
+        message.get("role").and_then(Json::as_str) == Some("user")
+            && content_text(message.get("content")) == player
+    })?;
+    let called = messages[player_index + 1..]
+        .iter()
+        .filter(|message| calls_of(message).any(|id| id.starts_with(MECHANIC_CALL)))
+        .count();
+    let marker = markers.get(called)?;
+    let tool = offered_tool(request, &marker.suffix)?;
+    let round = messages.iter().filter(|message| calls_of(message).next().is_some()).count() + 1;
+    Some(Reply::ToolCall { tool, arguments: marker.arguments.clone(), id: format!("{MECHANIC_CALL}{round}") })
+}
+
 /// `scripted_reply`: Python's `str.strip()` also strips `\x1c`-`\x1f`.
 fn journey_reply(player: &str) -> String {
     static MARKERS: OnceLock<Regex> = OnceLock::new();
     let markers = MARKERS.get_or_init(|| Regex::new(r"\[(hold|fail|late)\]").expect("static pattern"));
-    let without = markers.replace_all(player, "");
+    let player = without_call_markers(player);
+    let without = markers.replace_all(&player, "");
     let stripped = without.trim_matches(|c: char| c.is_whitespace() || ('\x1c'..='\x1f').contains(&c));
     format!("The Game Master answers: {stripped}")
 }
 
 enum Reply {
-    ToolCall { tool: String, arguments: String },
+    ToolCall { tool: String, arguments: String, id: String },
     Text(String),
 }
+
+/// The id of the stand-in's Campaign File call.
+const CAMPAIGN_FILE_CALL: &str = "standin-call-1";
 
 fn campaign_file_tool_name(request: &Json) -> Option<String> {
     request.get("tools")?.as_array()?.iter().find_map(|tool| {
@@ -455,14 +569,17 @@ fn campaign_file_tool_name(request: &Json) -> Option<String> {
 }
 
 fn plan_reply(request: &Json, player: &str, narration: Narration) -> Reply {
+    if let Some(reply) = marker_call(request, player) {
+        return reply;
+    }
     let tool = campaign_file_tool_name(request);
-    let last_is_tool_result = request
-        .get("messages")
-        .and_then(Json::as_array)
-        .and_then(|messages| messages.last())
-        .and_then(|last| last.get("role"))
-        .and_then(Json::as_str)
-        == Some("tool");
+    let last = request.get("messages").and_then(Json::as_array).and_then(|messages| messages.last());
+    // A marker call's result is not the Campaign File's: the update still follows it.
+    let last_is_tool_result = last.and_then(|last| last.get("role")).and_then(Json::as_str) == Some("tool")
+        && !last
+            .and_then(|last| last.get("tool_call_id"))
+            .and_then(Json::as_str)
+            .is_some_and(|id| id.starts_with(MECHANIC_CALL));
     match narration {
         Narration::Fixed => match tool {
             Some(tool) if !last_is_tool_result => {
@@ -471,7 +588,7 @@ fn plan_reply(request: &Json, player: &str, narration: Narration) -> Reply {
                     "state_change_summary": "The stand-in reply changes no durable campaign truth.",
                     "revised_player_facing_response": [{"kind": "narration", "text": TURN_REPLY}],
                 });
-                Reply::ToolCall { tool, arguments: arguments.to_string() }
+                Reply::ToolCall { tool, arguments: arguments.to_string(), id: CAMPAIGN_FILE_CALL.into() }
             }
             Some(_) => Reply::Text(TURN_REPLY.into()),
             None => Reply::Text(NARRATION.into()),
@@ -486,7 +603,11 @@ fn plan_reply(request: &Json, player: &str, narration: Narration) -> Reply {
                         "state_change_summary": "No durable state changes.",
                         "revised_player_facing_response": [{"kind": "narration", "text": reply}],
                     });
-                    Reply::ToolCall { tool, arguments: pyjson::dumps(&arguments, Dump::DEFAULT) }
+                    Reply::ToolCall {
+                        tool,
+                        arguments: pyjson::dumps(&arguments, Dump::DEFAULT),
+                        id: CAMPAIGN_FILE_CALL.into(),
+                    }
                 }
                 _ => Reply::Text(reply),
             }
@@ -500,9 +621,9 @@ fn usage() -> Json {
 
 fn completion_body(reply: &Reply) -> Json {
     let (message, finish) = match reply {
-        Reply::ToolCall { tool, arguments } => (
+        Reply::ToolCall { tool, arguments, id } => (
             json!({"role": "assistant", "content": null, "tool_calls": [{
-                "id": "standin-call-1", "type": "function",
+                "id": id, "type": "function",
                 "function": {"name": tool, "arguments": arguments},
             }]}),
             "tool_calls",
@@ -534,10 +655,10 @@ fn content_chunk(text: &str) -> Json {
 fn stream_events(reply: &Reply) -> Vec<Json> {
     let mut events = vec![role_chunk()];
     match reply {
-        Reply::ToolCall { tool, arguments } => {
+        Reply::ToolCall { tool, arguments, id } => {
             events.push(chunk(
                 json!({"tool_calls": [{
-                    "index": 0, "id": "standin-call-1", "type": "function",
+                    "index": 0, "id": id, "type": "function",
                     "function": {"name": tool, "arguments": ""},
                 }]}),
                 None,
@@ -652,6 +773,85 @@ mod tests {
         assert!(
             matches!(plan_reply(&json!({"messages": []}), "", Narration::Fixed), Reply::Text(text) if text == NARRATION)
         );
+    }
+
+    fn call_reply(request: &Json, player: &str) -> Option<(String, String, String)> {
+        match plan_reply(request, player, Narration::Journey) {
+            Reply::ToolCall { tool, arguments, id } => Some((tool, arguments, id)),
+            Reply::Text(_) => None,
+        }
+    }
+
+    #[test]
+    fn call_markers_match_exact_and_suffix_names_in_request_order() {
+        let tools = json!([
+            {"function": {"name": "tool_aaa_skill_check"}},
+            {"function": {"name": "skill_check"}},
+            {"function": {"name": "tool_bbb_update_campaign_file"}},
+        ]);
+        let player = "I search [call:skill_check {\"skill\": \"perception\",  \"dc\":12}] the room.";
+        let request = json!({"tools": tools, "messages": [{"role": "user", "content": player}]});
+        // The first offered match, with the arguments exactly as written.
+        assert_eq!(
+            call_reply(&request, player),
+            Some((
+                "tool_aaa_skill_check".into(),
+                "{\"skill\": \"perception\",  \"dc\":12}".into(),
+                "standin-mechanic-1".into()
+            ))
+        );
+        let exact = json!({"tools": [{"function": {"name": "skill_check"}}], "messages": [{"role": "user", "content": player}]});
+        assert_eq!(call_reply(&exact, player).map(|reply| reply.0), Some("skill_check".into()));
+        // No offered match: today's reply (here the Campaign File update).
+        let other = "[call:attack {}] go";
+        let unmatched = json!({"tools": tools, "messages": [{"role": "user", "content": other}]});
+        assert_eq!(call_reply(&unmatched, other).map(|reply| reply.2), Some("standin-call-1".into()));
+    }
+
+    #[test]
+    fn call_markers_run_in_order_then_fall_back() {
+        let player = "[call:first {\"a\":1}] then [call:second [1, 2]] done";
+        let tools = json!([
+            {"function": {"name": "tool_x_first"}}, {"function": {"name": "tool_x_second"}},
+            {"function": {"name": "tool_x_update_campaign_file"}},
+        ]);
+        let mut messages = vec![json!({"role": "user", "content": player})];
+        let request = |messages: &Vec<Json>| json!({"tools": tools, "messages": messages});
+        let first = call_reply(&request(&messages), player).unwrap();
+        assert_eq!(
+            (first.0.as_str(), first.1.as_str(), first.2.as_str()),
+            ("tool_x_first", "{\"a\":1}", "standin-mechanic-1")
+        );
+        messages.push(json!({"role": "assistant", "tool_calls": [{"id": first.2}]}));
+        messages.push(json!({"role": "tool", "tool_call_id": first.2, "content": "{}"}));
+        let second = call_reply(&request(&messages), player).unwrap();
+        assert_eq!(
+            (second.0.as_str(), second.1.as_str(), second.2.as_str()),
+            ("tool_x_second", "[1, 2]", "standin-mechanic-2")
+        );
+        messages.push(json!({"role": "assistant", "tool_calls": [{"id": second.2}]}));
+        messages.push(json!({"role": "tool", "tool_call_id": second.2, "content": "{}"}));
+        // After the last marker's result: the Campaign File update, then the narration.
+        let update = call_reply(&request(&messages), player).unwrap();
+        assert_eq!((update.0.as_str(), update.2.as_str()), ("tool_x_update_campaign_file", "standin-call-1"));
+        messages.push(json!({"role": "assistant", "tool_calls": [{"id": update.2}]}));
+        messages.push(json!({"role": "tool", "tool_call_id": update.2, "content": "{}"}));
+        assert_eq!(call_reply(&request(&messages), player), None);
+    }
+
+    #[test]
+    fn call_markers_leave_the_echoed_narration() {
+        assert_eq!(
+            journey_reply("I swing [call:attack {\"target\": \"wolf-1\"}] at the wolf."),
+            "The Game Master answers: I swing  at the wolf."
+        );
+        assert_eq!(
+            without_call_markers("[call:bad no json] and [call: {}] stay"),
+            "[call:bad no json] and [call: {}] stay"
+        );
+        assert!(call_markers("[call:x {\"a\": \"]\"}]")
+            .first()
+            .is_some_and(|marker| marker.arguments == "{\"a\": \"]\"}"));
     }
 
     #[test]
