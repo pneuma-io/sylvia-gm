@@ -66,6 +66,8 @@ pub struct SpatialBridge {
     query_results: HashMap<(String, String, bool, Vec<u8>), JsonMap>,
     state_parameters: IndexMap<String, String>,
     aggregates: IndexMap<String, Vec<String>>,
+    shots: Vec<JsonMap>,
+    shots_unavailable: bool,
 }
 
 impl std::fmt::Debug for SpatialBridge {
@@ -319,6 +321,78 @@ impl SpatialBridge {
     /// `spatial_evidence`.
     pub fn evidence(&self) -> &[JsonMap] {
         &self.evidence
+    }
+
+    /// `record_shot_effect(request)`: project one shot against the snapshot it fired on. An
+    /// invalid request, an unknown snapshot, another map or a suppressed cue only marks the
+    /// presentation unavailable; a partial or failed action never plays back. `scene_of` is the
+    /// bridge's `_spatial_engine` read of a scene path.
+    pub fn record_shot(
+        &mut self,
+        request: &Value,
+        scene_of: impl FnOnce(&str) -> Result<Json, ExecError>,
+    ) -> Result<(), ExecError> {
+        match self.shot(request, scene_of) {
+            Ok(Some(cue)) => self.shots.push(cue),
+            Ok(None) => self.shots_unavailable = true,
+            Err(error) => {
+                // `except (TypeError, ValueError, KeyError, PackageRuntimeError)`;
+                // `SpatialValidationError` is a `ValueError`.
+                let caught = matches!(
+                    error.class_name(),
+                    "TypeError"
+                        | "ValueError"
+                        | "KeyError"
+                        | "PackageRuntimeError"
+                        | "SpatialValidationError"
+                );
+                if !caught {
+                    return Err(error);
+                }
+                self.shots_unavailable = true;
+            }
+        }
+        Ok(())
+    }
+
+    fn shot(
+        &mut self,
+        request: &Value,
+        scene_of: impl FnOnce(&str) -> Result<Json, ExecError>,
+    ) -> Result<Option<JsonMap>, ExecError> {
+        let Value::Dict(map) = request else { return Ok(None) };
+        if self.shots.len() >= 256 {
+            return Ok(None);
+        }
+        let Some(Value::Dict(reference)) = map.get("snapshot") else { return Ok(None) };
+        let snapshot = match reference.get("snapshot_id") {
+            Some(Value::Str(identity)) => self.snapshots.get(&**identity).cloned(),
+            _ => None,
+        };
+        let Some(snapshot) = snapshot else { return Ok(None) };
+        let Some(Value::Str(scene_path)) = map.get("scene") else { return Ok(None) };
+        let scene = scene_of(scene_path)?;
+        if self.engine(scene_path, &scene)?.snapshot().map_id != snapshot.map_id {
+            return Ok(None);
+        }
+        let mut cue_request = JsonMap::new();
+        for (key, value) in map.iter().filter(|(key, _)| *key != "scene" && *key != "snapshot") {
+            cue_request.insert(key.clone(), input_json(value)?);
+        }
+        Ok(super::shot_effects::project_shot_effect(&cue_request, &Json::Object(snapshot.as_payload())))
+    }
+
+    /// `shot_presentation`: the cues recorded and whether any shot could not be shown.
+    pub fn shot_presentation(&self) -> Option<JsonMap> {
+        if self.shots.is_empty() && !self.shots_unavailable {
+            return None;
+        }
+        let mut presentation = JsonMap::new();
+        presentation.insert("version".into(), Json::from(1));
+        presentation
+            .insert("shots".into(), Json::Array(self.shots.iter().cloned().map(Json::Object).collect()));
+        presentation.insert("unavailable".into(), Json::Bool(self.shots_unavailable));
+        Some(presentation)
     }
 }
 

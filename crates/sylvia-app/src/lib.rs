@@ -64,6 +64,7 @@ pub mod reusable_plans;
 pub mod ruleless_play;
 pub mod ruleset_source;
 pub mod setting_character_requirements;
+pub mod spatial_preview;
 pub mod srd_lite_character_compatibility;
 pub mod srd_lite_weapon_set_migration;
 pub mod tactical_grid;

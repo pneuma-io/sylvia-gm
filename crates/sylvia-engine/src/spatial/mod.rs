@@ -9,6 +9,7 @@ mod convex;
 mod engine;
 mod mutation;
 mod placement;
+pub mod player_known;
 mod query;
 mod result;
 mod scene;

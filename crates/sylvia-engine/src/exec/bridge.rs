@@ -131,6 +131,10 @@ pub trait StateBridge {
     fn register_state_parameter(&mut self, _name: &str, _source: &str) {}
     /// `register_spatial_aggregate(name, source)`.
     fn register_spatial_aggregate(&mut self, _name: &str, _source: &Value) {}
+    /// `record_shot_effect(request)`; a bridge without one ignores shots.
+    fn record_shot_effect(&mut self, _request: &Value) -> Result<(), ExecError> {
+        Ok(())
+    }
 }
 
 /// `_mutable_json(value)`: mappings to `dict` with `str` keys, sequences to `list`, the rest
@@ -547,5 +551,13 @@ impl StateBridge for MemoryStateBridge {
 
     fn register_spatial_aggregate(&mut self, name: &str, source: &Value) {
         self.spatial.register_aggregate(name, source);
+    }
+
+    fn record_shot_effect(&mut self, request: &Value) -> Result<(), ExecError> {
+        // The scene read touches only package state, never the spatial part held aside here.
+        let mut spatial = std::mem::take(&mut self.spatial);
+        let result = spatial.record_shot(request, |path| self.scene_at(path));
+        self.spatial = spatial;
+        result
     }
 }
