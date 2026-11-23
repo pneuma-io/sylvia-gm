@@ -214,7 +214,7 @@ impl SpatialBridge {
                         fixed["position"].as_array().expect("a position").iter().map(proof_number).collect(),
                     ),
                 ]);
-                let digest: String = sylvia_base::hash::sha256(&canonical_json_bytes(&facts))
+                let digest: String = sylvia_base::hash::sha256(canonical_json_bytes(&facts))
                     .iter()
                     .map(|b| format!("{b:02x}"))
                     .collect();
