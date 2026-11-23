@@ -187,7 +187,10 @@ fn narrative_basis(store: &AuthorityStore, session_id: &str) -> StoreResult<Narr
 
 /// `_character_update_tool(campaign_id)` past its transition check: the active Ruleset's one
 /// bookkeeping mechanic, if it declares one.
-fn character_update_options(store: &AuthorityStore, campaign_id: &str) -> StoreResult<JsonMap> {
+pub(super) fn character_update_tool(
+    store: &AuthorityStore,
+    campaign_id: &str,
+) -> StoreResult<Option<super::content_reads::CatalogTool>> {
     let tools: Vec<_> = catalog_on(store, campaign_id, true, false)?
         .into_iter()
         .filter(|tool| tool.input_schema.contains_key("x-sylvia-gm-character-update"))
@@ -195,7 +198,13 @@ fn character_update_options(store: &AuthorityStore, campaign_id: &str) -> StoreR
     if tools.len() > 1 {
         return Err(rejected("Character bookkeeping declaration is ambiguous"));
     }
-    let Some(tool) = tools.into_iter().next() else { return Ok(JsonMap::new()) };
+    Ok(tools.into_iter().next())
+}
+
+/// `_character_update_options(campaign_id)`: the bookkeeping tool's exact package schema with
+/// the revision it must name.
+fn character_update_options(store: &AuthorityStore, campaign_id: &str) -> StoreResult<JsonMap> {
+    let Some(tool) = character_update_tool(store, campaign_id)? else { return Ok(JsonMap::new()) };
     // `_character_update_options`: the exact package schema with the revision it must name.
     let object = |value: Option<&Json>, key: &str| match value {
         Some(Json::Object(object)) => Ok(object.clone()),
@@ -234,7 +243,10 @@ fn character_update_options(store: &AuthorityStore, campaign_id: &str) -> StoreR
 
 /// `_inventory_tool(campaign_id)` past its transition check: the one declaration that selects
 /// inventory, whatever the current turn, writer or mechanic restrictions.
-fn inventory_tool(store: &AuthorityStore, campaign_id: &str) -> StoreResult<Option<ToolDeclaration>> {
+pub(super) fn inventory_tool(
+    store: &AuthorityStore,
+    campaign_id: &str,
+) -> StoreResult<Option<ToolDeclaration>> {
     let basis = store.package_catalog_basis(campaign_id)?;
     let mut tools: Vec<ToolDeclaration> = basis
         .declarations

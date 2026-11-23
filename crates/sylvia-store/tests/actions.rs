@@ -60,6 +60,7 @@ fn command(op: &Json) -> CommitAction {
         },
         status: ActionStatus::parse(&text(op, "status")).unwrap(),
         choice_resolution: None,
+        campaign_file_commands: Vec::new(),
     }
 }
 

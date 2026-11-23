@@ -235,6 +235,12 @@ def main() -> None:
             sql("store: the participant schema corrupted", schema, ["{", PACKAGE_ID])
             owned("store: a stored schema that is not JSON", "advancement")
             sql("store: the participant schema restored", schema, [original, PACKAGE_ID])
+            # `_decode_canonical_json`'s hooks, each with its own `ValueError`.
+            sql("store: a schema with a repeated member", schema, ['{"type":"object","type":"object"}', PACKAGE_ID])
+            owned("store: a stored schema with a repeated member", "advancement")
+            sql("store: a schema with a non-standard constant", schema, ['{"maximum":NaN}', PACKAGE_ID])
+            owned("store: a stored schema with NaN", "advancement")
+            sql("store: the participant schema restored again", schema, [original, PACKAGE_ID])
             owned("store: the replacement again", "advancement")
         installed_base.checkpoint(database)
         changed = installed_base.changed_rows(base, database)

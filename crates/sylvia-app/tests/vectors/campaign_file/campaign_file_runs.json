@@ -1,0 +1,972 @@
+{
+ "python": "3.12.11",
+ "owner_id": "campaign-file-runs",
+ "runs": [
+  {
+   "name": "a scene",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "scene-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Rain falls in the glass orchard.",
+      "location_id": "glass-orchard"
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "scene-1",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "scene-1-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 1
+      }
+     ],
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "the same scene again",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "scene-2",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Rain falls in the glass orchard.",
+      "location_id": "glass-orchard"
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_unchanged",
+     "operation_id": "scene-2",
+     "change_count": 0,
+     "campaign_revision": 1,
+     "state_changed": false
+    }
+   }
+  },
+  {
+   "name": "its exact replay",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "scene-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Rain falls in the glass orchard.",
+      "location_id": "glass-orchard"
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "scene-1",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "scene-1-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 1
+      }
+     ],
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "memory and entities together",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "notes-1",
+    "updates": [
+     {
+      "operation": "record_memory",
+      "fact_id": "orchard-oath",
+      "category": "continuity",
+      "text": "The keeper promised shelter until dawn.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     },
+     {
+      "operation": "record_entity",
+      "entity_id": "mira",
+      "entity_kind": "person",
+      "name": "Mira",
+      "attributes": {},
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     },
+     {
+      "operation": "record_entity",
+      "entity_id": "waystation",
+      "entity_kind": "place",
+      "name": "Waystation",
+      "attributes": {},
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     },
+     {
+      "operation": "record_entity",
+      "entity_id": "chest",
+      "entity_kind": "object",
+      "name": "Chest",
+      "attributes": {},
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "notes-1",
+     "change_count": 4,
+     "changes": [
+      {
+       "operation_id": "notes-1-1",
+       "record_id": "orchard-oath",
+       "kind": "fact",
+       "resulting_revision": 2
+      },
+      {
+       "operation_id": "notes-1-2",
+       "record_id": "mira",
+       "kind": "entity",
+       "resulting_revision": 3
+      },
+      {
+       "operation_id": "notes-1-3",
+       "record_id": "waystation",
+       "kind": "entity",
+       "resulting_revision": 4
+      },
+      {
+       "operation_id": "notes-1-4",
+       "record_id": "chest",
+       "kind": "entity",
+       "resulting_revision": 5
+      }
+     ],
+     "resulting_revision": 5
+    }
+   }
+  },
+  {
+   "name": "no updates",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "empty-1",
+    "updates": [],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_file_update_invalid",
+    "message": "Campaign File update is invalid"
+   }
+  },
+  {
+   "name": "repeated provenance",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "repeat-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Still raining."
+     }
+    ],
+    "basis_message_ids": [
+     "m1",
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_file_update_invalid",
+    "message": "Campaign File update is invalid"
+   }
+  },
+  {
+   "name": "unknown provenance",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "unknown-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Still raining."
+     }
+    ],
+    "basis_message_ids": [
+     "m9"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_file_provenance_unavailable",
+    "message": "Campaign File provenance is unavailable"
+   }
+  },
+  {
+   "name": "an unavailable act",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "act-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "A phantom act.",
+      "act_id": "act-1"
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_file_update_invalid",
+    "message": "Campaign File update 1 is invalid"
+   }
+  },
+  {
+   "name": "a submitted internal operation",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "internal-1",
+    "updates": [
+     {
+      "operation": "prepared_inventory",
+      "payload": {}
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Internal inventory operations cannot be submitted"
+   }
+  },
+  {
+   "name": "an unknown operation",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "unknown-op-1",
+    "updates": [
+     {
+      "operation": "rewrite_history"
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_file_update_invalid",
+    "message": "Campaign File update 1 is invalid"
+   }
+  },
+  {
+   "name": "one record changed twice",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "twice-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "First."
+     },
+     {
+      "operation": "update_scene",
+      "summary": "Second."
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_file_duplicate_record",
+    "message": "Campaign File update changes one record more than once"
+   }
+  },
+  {
+   "name": "character bookkeeping without a Ruleset",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "character-1",
+    "updates": [
+     {
+      "operation": "update_character",
+      "participant_id": "mira",
+      "expected_revision": 0,
+      "fields": {}
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Character bookkeeping is unavailable"
+   }
+  },
+  {
+   "name": "a TURN that is not open",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "closed-turn-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Elsewhere."
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": "turn-missing"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign continuity TURN is not open"
+   }
+  },
+  {
+   "name": "a stored message with NaN",
+   "kind": "sql",
+   "command": {
+    "statement": "UPDATE agent_session_messages SET content_json = ? WHERE session_id = ? AND message_id = ?",
+    "parameters": [
+     "{\"text\":NaN}",
+     "session-planless",
+     "m2"
+    ]
+   },
+   "outcome": null
+  },
+  {
+   "name": "its session read",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "nan-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "Unreadable."
+     }
+    ],
+    "basis_message_ids": [
+     "m1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "TypeError",
+    "code": null,
+    "message": "Value is not JSON-compatible"
+   }
+  },
+  {
+   "name": "the stored message restored",
+   "kind": "sql",
+   "command": {
+    "statement": "UPDATE agent_session_messages SET content_json = ? WHERE session_id = ? AND message_id = ?",
+    "parameters": [
+     "{\"text\":\"I ask for arrows.\"}",
+     "session-planless",
+     "m2"
+    ]
+   },
+   "outcome": null
+  },
+  {
+   "name": "the fallback inventory",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "inventory-1",
+    "updates": [
+     {
+      "operation": "update_inventory",
+      "expected_revision": 5,
+      "holdings": [
+       {
+        "holding_id": "arrows-store",
+        "item_id": "ordinary-arrow",
+        "name": "Arrow",
+        "kind": "item",
+        "stackable": true,
+        "quantity": 5,
+        "owner_id": "waystation",
+        "holder_id": "chest",
+        "visibility": "player_known",
+        "known_by": [
+         "player"
+        ]
+       }
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "m2"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "inventory-1",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "inventory-1-1",
+       "record_id": "sylvia-fallback-inventory",
+       "kind": "entity",
+       "resulting_revision": 6
+      }
+     ],
+     "resulting_revision": 6
+    }
+   }
+  },
+  {
+   "name": "a transfer",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "inventory-2",
+    "updates": [
+     {
+      "operation": "update_inventory",
+      "expected_revision": 6,
+      "transfers": [
+       {
+        "source_id": "arrows-store",
+        "destination_id": "arrows-mira",
+        "quantity": 2,
+        "holder_id": "mira"
+       }
+      ]
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "borrowed-arrows",
+      "category": "continuity",
+      "text": "Mira borrowed two arrows.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "m2"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "inventory-2",
+     "change_count": 2,
+     "changes": [
+      {
+       "operation_id": "inventory-2-1",
+       "record_id": "sylvia-fallback-inventory",
+       "kind": "entity",
+       "resulting_revision": 7
+      },
+      {
+       "operation_id": "inventory-2-2",
+       "record_id": "borrowed-arrows",
+       "kind": "fact",
+       "resulting_revision": 8
+      }
+     ],
+     "resulting_revision": 8
+    }
+   }
+  },
+  {
+   "name": "the transfer's replay",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "inventory-2",
+    "updates": [
+     {
+      "operation": "update_inventory",
+      "expected_revision": 6,
+      "transfers": [
+       {
+        "source_id": "arrows-store",
+        "destination_id": "arrows-mira",
+        "quantity": 2,
+        "holder_id": "mira"
+       }
+      ]
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "borrowed-arrows",
+      "category": "continuity",
+      "text": "Mira borrowed two arrows.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "m2"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "inventory-2",
+     "change_count": 2,
+     "changes": [
+      {
+       "operation_id": "inventory-2-1",
+       "record_id": "sylvia-fallback-inventory",
+       "kind": "entity",
+       "resulting_revision": 7
+      },
+      {
+       "operation_id": "inventory-2-2",
+       "record_id": "borrowed-arrows",
+       "kind": "fact",
+       "resulting_revision": 8
+      }
+     ],
+     "resulting_revision": 8
+    }
+   }
+  },
+  {
+   "name": "a conflicting replay",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "inventory-2",
+    "updates": [
+     {
+      "operation": "update_inventory",
+      "expected_revision": 6,
+      "transfers": [
+       {
+        "source_id": "arrows-store",
+        "destination_id": "arrows-mira",
+        "quantity": 2,
+        "holder_id": "mira"
+       }
+      ]
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "borrowed-arrows",
+      "category": "continuity",
+      "text": "Mira borrowed three arrows.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "m2"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Inventory update identity was reused with different content"
+   }
+  },
+  {
+   "name": "a stale inventory revision",
+   "kind": "update",
+   "command": {
+    "session_id": "session-planless",
+    "update_id": "inventory-3",
+    "updates": [
+     {
+      "operation": "update_inventory",
+      "expected_revision": 6,
+      "holdings": [
+       {
+        "holding_id": "arrows-store",
+        "item_id": "ordinary-arrow",
+        "name": "Arrow",
+        "kind": "item",
+        "stackable": true,
+        "quantity": 9,
+        "owner_id": "waystation",
+        "holder_id": "chest",
+        "visibility": "player_known",
+        "known_by": [
+         "player"
+        ]
+       }
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "m2"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Campaign continuity expected revision is stale"
+   }
+  },
+  {
+   "name": "a protected fact before its reveal",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "fact-1",
+    "updates": [
+     {
+      "operation": "record_memory",
+      "fact_id": "rewired",
+      "category": "continuity",
+      "text": "The beacon was rewired by the duty operator.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign memory cannot reveal a protected secret"
+   }
+  },
+  {
+   "name": "a secret revealed",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "reveal-1",
+    "updates": [
+     {
+      "operation": "reveal_secret",
+      "secret_id": "legacy-secret-0",
+      "audience": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "reveal-1",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "reveal-1-1",
+       "record_id": "legacy-secret-0",
+       "kind": "reveal",
+       "resulting_revision": 3
+      }
+     ],
+     "resulting_revision": 3
+    }
+   }
+  },
+  {
+   "name": "the same reveal again",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "reveal-2",
+    "updates": [
+     {
+      "operation": "reveal_secret",
+      "secret_id": "legacy-secret-0",
+      "audience": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_unchanged",
+     "operation_id": "reveal-2",
+     "change_count": 0,
+     "campaign_revision": 3,
+     "state_changed": false
+    }
+   }
+  },
+  {
+   "name": "the protected fact once revealed",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "fact-2",
+    "updates": [
+     {
+      "operation": "record_memory",
+      "fact_id": "rewired",
+      "category": "continuity",
+      "text": "The beacon was rewired by the duty operator.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "fact-2",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "fact-2-1",
+       "record_id": "rewired",
+       "kind": "fact",
+       "resulting_revision": 4
+      }
+     ],
+     "resulting_revision": 4
+    }
+   }
+  },
+  {
+   "name": "an unrevealed secret's fact kept private",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "fact-3",
+    "updates": [
+     {
+      "operation": "record_memory",
+      "fact_id": "second-recorder",
+      "category": "continuity",
+      "text": "The station keeps a second recorder.",
+      "visibility": "gm_private",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "fact-3",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "fact-3-1",
+       "record_id": "second-recorder",
+       "kind": "fact",
+       "resulting_revision": 5
+      }
+     ],
+     "resulting_revision": 5
+    }
+   }
+  },
+  {
+   "name": "Plan Progress",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "progress-1",
+    "updates": [
+     {
+      "operation": "update_plan_progress",
+      "plan_item_id": "understand-signal",
+      "progress_status": "engaged",
+      "progress_summary": "The recorder comparison has begun."
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": "turn-planned-play"
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "progress-1",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "progress-1-1",
+       "record_id": "understand-signal",
+       "kind": "plan_progress",
+       "resulting_revision": 6
+      }
+     ],
+     "resulting_revision": 6
+    }
+   }
+  },
+  {
+   "name": "an ending claimed too early",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "progress-2",
+    "updates": [
+     {
+      "operation": "update_plan_progress",
+      "plan_item_id": "ending:signal-settled",
+      "progress_status": "resolved",
+      "progress_summary": "Claimed early."
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_ending_not_ready",
+    "message": "Resolve the required acts and objectives before recording the ending"
+   }
+  },
+  {
+   "name": "a scene with its act",
+   "kind": "update",
+   "command": {
+    "session_id": "session-dm-planned",
+    "update_id": "scene-act-1",
+    "updates": [
+     {
+      "operation": "update_scene",
+      "summary": "The reply repeats with one changed word.",
+      "act_id": "act-1",
+      "location_id": "relay-room"
+     }
+    ],
+    "basis_message_ids": [
+     "p1"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "scene-act-1",
+     "change_count": 1,
+     "changes": [
+      {
+       "operation_id": "scene-act-1-1",
+       "record_id": "current_scene",
+       "kind": "scene",
+       "resulting_revision": 7
+      }
+     ],
+     "resulting_revision": 7
+    }
+   }
+  }
+ ]
+}

@@ -387,94 +387,63 @@ impl AuthorityStore {
         &self,
         commands: &[CampaignContinuityCommand],
     ) -> StoreResult<Vec<CampaignContinuityReceipt>> {
-        let Some(first) = commands.first() else {
-            return Err(rejected("Campaign continuity batch is empty", "command_rejected"));
-        };
-        if commands.len() > 64 {
-            return Err(rejected("Campaign continuity batch is too large", "command_rejected"));
-        }
-        let mut operation_ids = BTreeSet::new();
-        let mut prepared = Vec::with_capacity(commands.len());
-        for (index, command) in commands.iter().enumerate() {
-            for (value, label) in [
-                (&command.campaign_id, "Campaign continuity campaign"),
-                (&command.operation_id, "Campaign continuity operation"),
-                (&command.session_id, "Campaign continuity session"),
-                (&command.turn_id, "Campaign continuity turn"),
-                (&command.record_id, "Campaign continuity record"),
-            ] {
-                validate_authority_identity(value, label, false)?;
-            }
-            for message_id in &command.basis_message_ids {
-                validate_authority_identity(message_id, "Campaign continuity basis message", false)?;
-            }
-            if !["scene", "fact", "entity", "reveal", "plan_progress"].contains(&command.kind.as_str()) {
-                return Err(rejected("Campaign continuity kind is unsupported", "command_rejected"));
-            }
-            if !["active", "retired"].contains(&command.status.as_str()) {
-                return Err(rejected("Campaign continuity status is unsupported", "command_rejected"));
-            }
-            if command.expected_revision < 0
-                || !canonical_payload_is_safe(&Json::Object(command.payload.clone()))
-            {
-                return Err(rejected("Campaign continuity payload is invalid", "command_rejected"));
-            }
-            let offset = i64::try_from(index).unwrap_or(i64::MAX);
-            if command.campaign_id != first.campaign_id
-                || command.session_id != first.session_id
-                || command.turn_id != first.turn_id
-                || Some(command.expected_revision) != first.expected_revision.checked_add(offset)
-            {
-                return Err(rejected("Campaign continuity batch basis is inconsistent", "command_rejected"));
-            }
-            if !operation_ids.insert(command.operation_id.clone()) {
-                return Err(rejected(
-                    "Campaign continuity batch operation is duplicated",
-                    "command_rejected",
-                ));
-            }
-            let mut semantic = JsonMap::new();
-            semantic.insert("operation_id".into(), command.operation_id.clone().into());
-            semantic.insert("operation_kind".into(), "commit_campaign_continuity".into());
-            semantic.insert("campaign_id".into(), command.campaign_id.clone().into());
-            semantic.insert("session_id".into(), command.session_id.clone().into());
-            semantic.insert("turn_id".into(), command.turn_id.clone().into());
-            semantic.insert("kind".into(), command.kind.clone().into());
-            semantic.insert("record_id".into(), command.record_id.clone().into());
-            semantic.insert("status".into(), command.status.clone().into());
-            semantic.insert("payload".into(), Json::Object(command.payload.clone()));
-            semantic.insert(
-                "basis_message_ids".into(),
-                Json::Array(command.basis_message_ids.iter().cloned().map(Json::String).collect()),
-            );
-            let semantic = Json::Object(owned_payload(&Json::Object(semantic))?);
-            let sha256 = sha256_hex(canonical_json_bytes(&semantic));
-            prepared.push((command, semantic, sha256));
-        }
+        let prepared = prepare_batch(commands)?;
         let connection = self.connect()?;
-        let result = (|| -> StoreResult<Vec<CampaignContinuityReceipt>> {
-            connection.execute_batch("BEGIN IMMEDIATE")?;
-            self.ensure_campaign_schema(&connection)?;
+        let result = connection
+            .execute_batch("BEGIN IMMEDIATE")
+            .map_err(StoreError::from)
+            .and_then(|()| self.batch_on(&connection, &prepared, true));
+        if !connection.is_autocommit() {
+            let _ = connection.execute_batch("ROLLBACK");
+        }
+        result
+    }
+
+    /// `commit_campaign_continuity_batch(commands, _connection=connection)`: the batch inside the
+    /// caller's transaction (`commit_action`'s Campaign File mechanics), which commits or rolls
+    /// back with the caller's own work.
+    pub(crate) fn commit_campaign_continuity_batch_in(
+        &self,
+        connection: &rusqlite::Connection,
+        commands: &[CampaignContinuityCommand],
+    ) -> StoreResult<Vec<CampaignContinuityReceipt>> {
+        let prepared = prepare_batch(commands)?;
+        self.batch_on(connection, &prepared, false)
+    }
+
+    /// The batch on `connection` after its checks; `own_transaction` when this call began the
+    /// transaction, and so commits it (or rolls back a replay).
+    fn batch_on(
+        &self,
+        connection: &rusqlite::Connection,
+        prepared: &[(&CampaignContinuityCommand, Json, String)],
+        own_transaction: bool,
+    ) -> StoreResult<Vec<CampaignContinuityReceipt>> {
+        let first = prepared[0].0;
+        (|| -> StoreResult<Vec<CampaignContinuityReceipt>> {
+            self.ensure_campaign_schema(connection)?;
             let hits = prepared
                 .iter()
                 .map(|(command, _, sha256)| {
-                    continuity_operation_hit(&connection, &command.operation_id, sha256)
+                    continuity_operation_hit(connection, &command.operation_id, sha256)
                 })
                 .collect::<StoreResult<Vec<_>>>()?;
             if hits.iter().any(Option::is_some) {
                 if !hits.iter().all(Option::is_some) {
                     return Err(schema_identity("Campaign continuity batch replay is partial"));
                 }
-                connection.execute_batch("ROLLBACK")?;
+                if own_transaction {
+                    connection.execute_batch("ROLLBACK")?;
+                }
                 return Ok(hits.into_iter().flatten().collect());
             }
             let campaign = first_row(
-                &connection,
+                connection,
                 "SELECT lifecycle, writer, revision, current_lock_id FROM campaigns WHERE campaign_id = ?",
                 &first.campaign_id,
             )?;
             let session = first_row(
-                &connection,
+                connection,
                 "SELECT campaign_id, role, status FROM agent_sessions WHERE session_id = ?",
                 &first.session_id,
             )?;
@@ -516,7 +485,7 @@ impl AuthorityStore {
                 ));
             };
             let mut receipts = Vec::with_capacity(prepared.len());
-            for (command, semantic, sha256) in &prepared {
+            for (command, semantic, sha256) in prepared {
                 let resulting_revision = command
                     .expected_revision
                     .checked_add(1)
@@ -546,7 +515,7 @@ impl AuthorityStore {
                     ],
                 )?;
                 append_record(
-                    &connection,
+                    connection,
                     &ContinuityAppend {
                         campaign_id: &command.campaign_id,
                         entry_id: &command.operation_id,
@@ -571,7 +540,7 @@ impl AuthorityStore {
                     resulting_revision,
                 });
             }
-            let count = i64::try_from(commands.len()).unwrap_or(i64::MAX);
+            let count = i64::try_from(prepared.len()).unwrap_or(i64::MAX);
             let final_revision = first
                 .expected_revision
                 .checked_add(count)
@@ -586,16 +555,14 @@ impl AuthorityStore {
                     "Campaign continuity revision fence rejected admission",
                 ));
             }
-            if let Some(fault) = &self.faults.before_commit {
-                fault()?;
+            if own_transaction {
+                if let Some(fault) = &self.faults.before_commit {
+                    fault()?;
+                }
+                connection.execute_batch("COMMIT")?;
             }
-            connection.execute_batch("COMMIT")?;
             Ok(receipts)
-        })();
-        if !connection.is_autocommit() {
-            let _ = connection.execute_batch("ROLLBACK");
-        }
-        result
+        })()
     }
 
     /// The current continuity view of one campaign (`sqlite_continuity.read_view`, read alone).
@@ -1055,4 +1022,72 @@ pub(crate) fn seed_accepted_plans(connection: &Connection) -> StoreResult<()> {
         }
     }
     Ok(())
+}
+
+/// `commit_campaign_continuity_batch`'s checks before any connection: each command's identities,
+/// kind, status, payload and shared basis, with its semantic payload and digest.
+fn prepare_batch(
+    commands: &[CampaignContinuityCommand],
+) -> StoreResult<Vec<(&CampaignContinuityCommand, Json, String)>> {
+    let Some(first) = commands.first() else {
+        return Err(rejected("Campaign continuity batch is empty", "command_rejected"));
+    };
+    if commands.len() > 64 {
+        return Err(rejected("Campaign continuity batch is too large", "command_rejected"));
+    }
+    let mut operation_ids = BTreeSet::new();
+    let mut prepared = Vec::with_capacity(commands.len());
+    for (index, command) in commands.iter().enumerate() {
+        for (value, label) in [
+            (&command.campaign_id, "Campaign continuity campaign"),
+            (&command.operation_id, "Campaign continuity operation"),
+            (&command.session_id, "Campaign continuity session"),
+            (&command.turn_id, "Campaign continuity turn"),
+            (&command.record_id, "Campaign continuity record"),
+        ] {
+            validate_authority_identity(value, label, false)?;
+        }
+        for message_id in &command.basis_message_ids {
+            validate_authority_identity(message_id, "Campaign continuity basis message", false)?;
+        }
+        if !["scene", "fact", "entity", "reveal", "plan_progress"].contains(&command.kind.as_str()) {
+            return Err(rejected("Campaign continuity kind is unsupported", "command_rejected"));
+        }
+        if !["active", "retired"].contains(&command.status.as_str()) {
+            return Err(rejected("Campaign continuity status is unsupported", "command_rejected"));
+        }
+        if command.expected_revision < 0 || !canonical_payload_is_safe(&Json::Object(command.payload.clone()))
+        {
+            return Err(rejected("Campaign continuity payload is invalid", "command_rejected"));
+        }
+        let offset = i64::try_from(index).unwrap_or(i64::MAX);
+        if command.campaign_id != first.campaign_id
+            || command.session_id != first.session_id
+            || command.turn_id != first.turn_id
+            || Some(command.expected_revision) != first.expected_revision.checked_add(offset)
+        {
+            return Err(rejected("Campaign continuity batch basis is inconsistent", "command_rejected"));
+        }
+        if !operation_ids.insert(command.operation_id.clone()) {
+            return Err(rejected("Campaign continuity batch operation is duplicated", "command_rejected"));
+        }
+        let mut semantic = JsonMap::new();
+        semantic.insert("operation_id".into(), command.operation_id.clone().into());
+        semantic.insert("operation_kind".into(), "commit_campaign_continuity".into());
+        semantic.insert("campaign_id".into(), command.campaign_id.clone().into());
+        semantic.insert("session_id".into(), command.session_id.clone().into());
+        semantic.insert("turn_id".into(), command.turn_id.clone().into());
+        semantic.insert("kind".into(), command.kind.clone().into());
+        semantic.insert("record_id".into(), command.record_id.clone().into());
+        semantic.insert("status".into(), command.status.clone().into());
+        semantic.insert("payload".into(), Json::Object(command.payload.clone()));
+        semantic.insert(
+            "basis_message_ids".into(),
+            Json::Array(command.basis_message_ids.iter().cloned().map(Json::String).collect()),
+        );
+        let semantic = Json::Object(owned_payload(&Json::Object(semantic))?);
+        let sha256 = sha256_hex(canonical_json_bytes(&semantic));
+        prepared.push((command, semantic, sha256));
+    }
+    Ok(prepared)
 }
