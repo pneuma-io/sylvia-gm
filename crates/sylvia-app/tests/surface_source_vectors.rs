@@ -3,7 +3,9 @@
 //! Regenerate with `tests/vectors/generate_surface_source_vectors.py` (needs the snapshot's Python).
 
 use serde_json::{json, Value as Json};
-use sylvia_app::tactical_grid::{resolve_surface_source, SurfaceParticipant};
+use sylvia_app::tactical_grid::{
+    resolve_surface_source, resolve_surface_source_with_state_paths, StatePaths, SurfaceParticipant,
+};
 use sylvia_domain::error::DomainError;
 
 /// A participant with whichever attributes the case gives.
@@ -44,6 +46,14 @@ fn class(error: &DomainError) -> &'static str {
     }
 }
 
+/// The paths in a stable order: a keyed value a later entry replaces keeps its position in
+/// Python's dict, so only the set of paths is the contract.
+fn sorted(paths: &StatePaths) -> Vec<Json> {
+    let mut paths: Vec<Json> = paths.paths().iter().map(|path| json!(path)).collect();
+    paths.sort_by_key(|path| path.to_string());
+    paths
+}
+
 #[test]
 fn surface_sources_resolve_as_python() {
     let vectors: Json =
@@ -55,8 +65,13 @@ fn surface_sources_resolve_as_python() {
     for (index, case) in cases.iter().enumerate() {
         let participants: Vec<Fixture> =
             case["participants"].as_array().unwrap().iter().map(fixture).collect();
-        let actual = match resolve_surface_source(&case["source"], state, &participants) {
-            Ok(value) => json!({"result": value}),
+        let actual = match resolve_surface_source_with_state_paths(&case["source"], state, &participants) {
+            Ok((value, paths)) => {
+                let plain =
+                    resolve_surface_source(&case["source"], state, &participants).expect("the same answer");
+                assert_eq!(plain, value, "resolve_surface_source answers as the state-path form does");
+                json!({"result": value, "state_paths": sorted(&paths)})
+            }
             Err(error) => json!({"error": [class(&error), error.to_string()]}),
         };
         let mut wanted = serde_json::Map::new();
@@ -64,6 +79,11 @@ fn surface_sources_resolve_as_python() {
             if let Some(value) = case.get(key) {
                 wanted.insert(key.into(), value.clone());
             }
+        }
+        if let Some(paths) = case.get("state_paths") {
+            let mut paths: Vec<Json> = paths.as_array().unwrap().clone();
+            paths.sort_by_key(|path| path.to_string());
+            wanted.insert("state_paths".into(), Json::Array(paths));
         }
         let (actual, wanted) =
             (serde_json::to_string(&actual).unwrap(), serde_json::to_string(&wanted).unwrap());
