@@ -29,6 +29,7 @@ pub mod protocol;
 pub mod providers;
 pub mod run;
 pub mod services;
+pub mod session_reasoning;
 pub mod turn_owner;
 pub mod urllib;
 pub mod util;
