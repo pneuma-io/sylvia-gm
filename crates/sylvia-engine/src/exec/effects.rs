@@ -588,11 +588,13 @@ fn handle_nested_call(
                 }
             }
         }
-        NestedMode::Procedure => resolved,
+        NestedMode::Procedure | NestedMode::Preflight => resolved,
     };
-    // The package's nested executor passes the bridge's combat state; a procedure's passes a copy.
+    // The package's nested executor passes the bridge's combat state, a preflight's passes its
+    // parent's own, and a procedure's passes a copy.
     let combat = match (ctx.nested_mode, &ctx.combat) {
         (NestedMode::Package, Combat::Bridge) => Combat::Bridge,
+        (NestedMode::Preflight, combat) => combat.clone(),
         (_, _) => Combat::own(ctx.combat_state()),
     };
     let budget = ctx.budget;

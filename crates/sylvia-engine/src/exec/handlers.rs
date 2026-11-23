@@ -700,13 +700,16 @@ fn private_name(name: &str) -> bool {
     name.len() > 1 && name.starts_with('_') && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
 }
 
+#[cfg(feature = "vector-hooks")]
 thread_local! {
     static IDENTITY_SHUFFLE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
 /// Vector tooling only: run `body` with `shuffle` leaving its collection in order, as the
 /// generators replace Python's `SystemRandom.shuffle`, so outcomes that store a shuffled
-/// collection compare exactly. Nothing in the product calls it.
+/// collection compare exactly. Only the `vector-hooks` feature, which only the vector tests
+/// enable, compiles it: no product build contains it (`docs/rust-port/check.sh` checks the owner).
+#[cfg(feature = "vector-hooks")]
 #[doc(hidden)]
 pub fn with_identity_shuffle_for_vectors<R>(body: impl FnOnce() -> R) -> R {
     let previous = IDENTITY_SHUFFLE.with(|flag| flag.replace(true));
@@ -734,7 +737,11 @@ pub(crate) fn handle_shuffle(
         .map(super::context::deep_copy)
         .collect();
     // `secrets.SystemRandom().shuffle(values)`: OS randomness, as in Python.
-    if !IDENTITY_SHUFFLE.with(std::cell::Cell::get) {
+    #[cfg(feature = "vector-hooks")]
+    let identity = IDENTITY_SHUFFLE.with(std::cell::Cell::get);
+    #[cfg(not(feature = "vector-hooks"))]
+    let identity = false;
+    if !identity {
         crate::pyrandom::PyRandom::from_entropy().shuffle(&mut values);
     }
     ctx.vars.insert(destination, Value::list(values));
