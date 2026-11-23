@@ -732,26 +732,26 @@ pub fn validate_package_runtime(
 
 /// `_parse_runtime(package_id=..., runtime_bytes=...)`, the execution parse.
 ///
-/// Python keeps the 16 most recently used parsed runtimes in the process, by their exact bytes,
-/// and reuses an authoring parse of the same bytes. An authoring parse that succeeds has no
-/// duplicate keys, so the execution parse of those bytes builds the same data: neither the cache
-/// nor the reuse can change a result. This keeps the same bound, keyed by the package id and the
-/// bytes' SHA-256, so a catalog's helpers parse a runtime once.
+/// Python keeps the 16 most recently used parsed runtimes in the process, keyed by the package
+/// id and the exact bytes, and reuses an authoring parse of the same bytes. An authoring parse
+/// that succeeds has no duplicate keys, so the execution parse of those bytes builds the same
+/// data: neither the cache nor the reuse can change a result. This keeps the same bound and the
+/// same key. A lookup compares the bytes as Python's dict does once a hash matches, by length and
+/// then by content. It never hashes them: a SHA-256 of SRD Lite's 14.5 MB runtime took about
+/// 64 ms on every call, where the comparison is a single memory compare. Two different runtimes
+/// can never share an entry.
 pub(crate) fn parse_runtime(
     package_id: &str,
     runtime_bytes: &[u8],
 ) -> Outcome<std::sync::Arc<RuntimeTables>> {
     use std::sync::{Arc, Mutex, OnceLock};
-    type Key = (String, [u8; 32]);
-    type Entries = Vec<(Key, Arc<RuntimeTables>)>;
-    static PARSED: OnceLock<Mutex<Entries>> = OnceLock::new();
+    static PARSED: OnceLock<Mutex<Vec<ParsedRuntime>>> = OnceLock::new();
     let parsed = PARSED.get_or_init(|| Mutex::new(Vec::new()));
-    let key = (package_id.to_owned(), sylvia_base::hash::sha256(runtime_bytes));
     {
         let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        if let Some(index) = entries.iter().position(|(known, _)| *known == key) {
+        if let Some(index) = entries.iter().position(|entry| entry.is(package_id, runtime_bytes)) {
             let entry = entries.remove(index);
-            let runtime = entry.1.clone();
+            let runtime = entry.runtime.clone();
             entries.push(entry);
             return Ok(runtime);
         }
@@ -759,12 +759,34 @@ pub(crate) fn parse_runtime(
     // A failed parse is not kept, as Python keeps only parsed runtimes.
     let runtime = Arc::new(load_runtime(package_id, runtime_bytes, false)?);
     let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    entries.retain(|(known, _)| *known != key);
-    entries.push((key, runtime.clone()));
+    entries.retain(|entry| !entry.is(package_id, runtime_bytes));
+    entries.push(ParsedRuntime {
+        package_id: package_id.to_owned(),
+        bytes: runtime_bytes.into(),
+        runtime: runtime.clone(),
+    });
     while entries.len() > PARSED_RUNTIME_LIMIT {
         entries.remove(0);
     }
     Ok(runtime)
+}
+
+/// One kept parse and its key: the package id and its own copy of the exact bytes, as Python's
+/// key holds the bytes object.
+struct ParsedRuntime {
+    package_id: String,
+    bytes: Box<[u8]>,
+    runtime: std::sync::Arc<RuntimeTables>,
+}
+
+impl ParsedRuntime {
+    /// Whether this entry's key is `(package_id, runtime_bytes)`.
+    fn is(&self, package_id: &str, runtime_bytes: &[u8]) -> bool {
+        if self.package_id != package_id || self.bytes.len() != runtime_bytes.len() {
+            return false;
+        }
+        self.bytes[..] == *runtime_bytes
+    }
 }
 
 /// `_PARSED_RUNTIMES`' bound: at most this many parsed runtimes stay in the process.
@@ -946,3 +968,84 @@ pub use crate::package_mechanic::{
     materialize_package_mechanic, materialize_player_action_checker, materialize_player_action_previewer,
     MechanicFailure, PackageMechanic, PlayerActionChecker, PlayerActionPreviewer, PortPending,
 };
+
+#[cfg(test)]
+mod parse_cache_tests {
+    use super::*;
+    use std::sync::Arc;
+
+    /// A one-tool runtime for `package_id` (its state namespace) whose description is `description`.
+    fn runtime(package_id: &str, description: &str) -> Vec<u8> {
+        format!(
+            "sylvia_gm_runtime:
+  format: 1
+  state_namespace: {package_id}
+tools:
+  wave:
+    description: {description}
+    parameters:
+    - name: pressure
+      type: integer
+      required: true
+    effects: []
+"
+        )
+        .into_bytes()
+    }
+
+    fn declaration() -> ToolDeclaration {
+        let schema = serde_json::json!({
+            "additionalProperties": false, "properties": {"pressure": {"type": "integer"}},
+            "required": ["pressure"], "type": "object",
+        });
+        ToolDeclaration {
+            name: "wave".into(),
+            capability: "test.cache".into(),
+            input_schema: schema.as_object().unwrap().clone(),
+            state_predicates: Vec::new(),
+            turn_statuses: vec!["open".into()],
+            writers: vec!["dm".into()],
+        }
+    }
+
+    fn description(package_id: &str, bytes: &[u8]) -> String {
+        package_tool_description(package_id, &declaration(), bytes).expect("a valid runtime")
+    }
+
+    #[test]
+    fn different_runtimes_of_the_same_length_never_share_an_entry() {
+        let package = "test.cache.lengths";
+        let (first, second) = (runtime(package, "Wave hello."), runtime(package, "Bow, hello."));
+        assert_eq!(first.len(), second.len());
+        assert_eq!(description(package, &first), "Wave hello.");
+        assert_eq!(description(package, &second), "Bow, hello.");
+        assert_eq!(description(package, &first), "Wave hello.");
+        assert_eq!(description(package, &second), "Bow, hello.");
+    }
+
+    #[test]
+    fn the_package_id_is_part_of_the_key() {
+        // A runtime names its package's state namespace, so these bytes parse only for their own
+        // package: a key without the package id would hand the other package this parse.
+        let bytes = runtime("test.cache.owner", "Wave hello.");
+        assert!(parse_runtime("test.cache.owner", &bytes).is_ok());
+        match parse_runtime("test.cache.other", &bytes) {
+            Err(PackageRuntimeFailure::Rejected(error)) => {
+                assert_eq!(error.message, "Package runtime contract does not match its manifest");
+            }
+            Err(other) => panic!("another failure: {other:?}"),
+            Ok(_) => panic!("another package's parse was reused"),
+        }
+    }
+
+    #[test]
+    fn equal_bytes_reuse_the_parse() {
+        let package = "test.cache.reuse";
+        let bytes = runtime(package, "Nod once.");
+        let parsed = parse_runtime(package, &bytes).unwrap();
+        assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &bytes).unwrap()));
+        // Another allocation of the same bytes is the same key, as Python's bytes equality is.
+        let copy = bytes.clone();
+        assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &copy).unwrap()));
+    }
+}
