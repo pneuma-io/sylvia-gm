@@ -1,0 +1,951 @@
+{
+  "name": "webui-exports",
+  "description": "The WebUI host's campaign export and recovery end to end: a stand-in model connected, a No Ruleset campaign made through the interview, exported through the host and downloaded twice; the refused export identities and an unknown campaign; the same identity exported and downloaded again; the first download uploaded back as a recovery while the campaign exists (refused), the campaign trashed and purged, the download recovered, the same archive under the wrong suffix, and the campaign index after; an unknown download; then Stop.",
+  "webui": true,
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "date",
+      "server",
+      "etag",
+      "last-modified",
+      "diagnostic_id"
+    ],
+    "alias": [
+      {
+        "name": "download",
+        "pattern": "/api/download/[A-Za-z0-9_-]{32}",
+        "keys": [
+          "download",
+          "path"
+        ]
+      }
+    ],
+    "scrub": [
+      {
+        "pattern": "sylvia_webui_<port>=[A-Za-z0-9_-]{43}",
+        "with": "sylvia_webui_<port>=<session>"
+      },
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "http": {
+        "method": "GET",
+        "path": "/app.html",
+        "headers": [
+          [
+            "Sec-Fetch-Site",
+            "none"
+          ],
+          [
+            "Sec-Fetch-Mode",
+            "navigate"
+          ],
+          [
+            "Sec-Fetch-Dest",
+            "document"
+          ]
+        ]
+      },
+      "save_cookie": true
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c0",
+          "method": "save_provider_settings",
+          "params": {
+            "provider_id": "standin",
+            "preset_id": "custom",
+            "display_name": "Stand-in",
+            "base_url": "${standin_url}",
+            "credential": "${standin_key}",
+            "model_id": "${standin_model}",
+            "model_name": "Stand-in Narrator",
+            "context_window": 4000000,
+            "max_output_tokens": 4096,
+            "transport": "chat_completions"
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c2",
+          "method": "model_choices"
+        }
+      },
+      "save": {
+        "provider_id": "/json/result/0/provider_id",
+        "model_id": "/json/result/0/model_id"
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c3",
+          "method": "create_guided_campaign_draft",
+          "params": {
+            "operation_id": "storm-draft",
+            "display_name": "Storm Courier",
+            "provider_id": "${provider_id}",
+            "model_id": "${model_id}"
+          }
+        }
+      },
+      "save": {
+        "campaign_id": "/json/result/campaign_id",
+        "builder_session_id": "/json/result/builder_session_id"
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c4",
+          "method": "advance_guided_campaign_draft",
+          "params": {
+            "operation_id": "storm-ruleset",
+            "campaign_id": "${campaign_id}",
+            "builder_session_id": "${builder_session_id}",
+            "expected_construction_revision": 0,
+            "current_step": "ruleset",
+            "visible_answer": "No Ruleset",
+            "answer": {
+              "candidate_id": null
+            }
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c5",
+          "method": "advance_guided_campaign_draft",
+          "params": {
+            "operation_id": "storm-name",
+            "campaign_id": "${campaign_id}",
+            "builder_session_id": "${builder_session_id}",
+            "expected_construction_revision": 1,
+            "current_step": "name",
+            "visible_answer": "Storm Courier",
+            "answer": {
+              "display_name": "Storm Courier"
+            }
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c6",
+          "method": "advance_guided_campaign_draft",
+          "params": {
+            "operation_id": "storm-boundaries",
+            "campaign_id": "${campaign_id}",
+            "builder_session_id": "${builder_session_id}",
+            "expected_construction_revision": 2,
+            "current_step": "boundaries_preferences",
+            "visible_answer": "None; Mystery",
+            "answer": {
+              "boundaries": "None",
+              "preferences": "Mystery"
+            }
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c7",
+          "method": "advance_guided_campaign_draft",
+          "params": {
+            "operation_id": "storm-requests",
+            "campaign_id": "${campaign_id}",
+            "builder_session_id": "${builder_session_id}",
+            "expected_construction_revision": 3,
+            "current_step": "specific_requests",
+            "visible_answer": "No additional requests",
+            "answer": {
+              "no_additional_requests": true,
+              "requests": ""
+            }
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c8",
+          "method": "start_guided_campaign",
+          "params": {
+            "operation_id": "storm-start",
+            "campaign_id": "${campaign_id}",
+            "builder_session_id": "${builder_session_id}",
+            "display_name": "Storm Courier",
+            "candidate_id": null,
+            "setting_id": null,
+            "plan_id": null,
+            "player_character_id": null,
+            "companion_ids": [],
+            "premise": "A courier shelters from a storm."
+          }
+        }
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "c9",
+          "method": "finalize_campaign_construction",
+          "params": {
+            "campaign_id": "${campaign_id}",
+            "dm_provider_id": "${provider_id}",
+            "dm_model_id": "${model_id}"
+          }
+        }
+      },
+      "save": {
+        "session_id": "/json/result/handoff/dm_session_id",
+        "turn_id": "/json/result/dm_turn_id"
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "x1",
+          "method": "export_campaign_file",
+          "params": {
+            "operation_id": "storm-export-1",
+            "campaign_id": "${campaign_id}",
+            "export_id": "storm-export"
+          }
+        }
+      },
+      "save": {
+        "download": "/json/result/download"
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "GET",
+        "path": "${download}",
+        "headers": [
+          [
+            "Cookie",
+            "${cookie}"
+          ],
+          [
+            "Sec-Fetch-Site",
+            "same-origin"
+          ],
+          [
+            "Sec-Fetch-Mode",
+            "navigate"
+          ],
+          [
+            "Sec-Fetch-Dest",
+            "document"
+          ]
+        ]
+      }
+    },
+    {
+      "http": {
+        "method": "GET",
+        "path": "${download}",
+        "headers": [
+          [
+            "Cookie",
+            "${cookie}"
+          ],
+          [
+            "Sec-Fetch-Site",
+            "same-origin"
+          ],
+          [
+            "Sec-Fetch-Mode",
+            "navigate"
+          ],
+          [
+            "Sec-Fetch-Dest",
+            "document"
+          ]
+        ]
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "x2",
+          "method": "export_campaign_file",
+          "params": {
+            "operation_id": "storm-export-bad",
+            "campaign_id": "${campaign_id}",
+            "export_id": "../storm"
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "x3",
+          "method": "export_campaign_file",
+          "params": {
+            "operation_id": "storm-export-number",
+            "campaign_id": "${campaign_id}",
+            "export_id": 5
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "x4",
+          "method": "export_campaign_file",
+          "params": {
+            "operation_id": "storm-export-missing",
+            "campaign_id": "no-such-campaign",
+            "export_id": "missing-export"
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "x5",
+          "method": "export_campaign_file",
+          "params": {
+            "operation_id": "storm-export-2",
+            "campaign_id": "${campaign_id}",
+            "export_id": "storm-export"
+          }
+        }
+      },
+      "save": {
+        "download_again": "/json/result/download"
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "GET",
+        "path": "${download_again}",
+        "headers": [
+          [
+            "Cookie",
+            "${cookie}"
+          ],
+          [
+            "Sec-Fetch-Site",
+            "same-origin"
+          ],
+          [
+            "Sec-Fetch-Mode",
+            "navigate"
+          ],
+          [
+            "Sec-Fetch-Dest",
+            "document"
+          ]
+        ]
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/recovery",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{\"recovery_id\": \"storm-recovery\"}"
+          },
+          {
+            "name": "file",
+            "filename": "storm.sylvia-gm-campaign",
+            "headers": [
+              [
+                "Content-Type",
+                "application/octet-stream"
+              ]
+            ],
+            "content_from_step": "s11"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "i0",
+          "method": "campaign_index"
+        }
+      },
+      "save": {
+        "revision": "/json/result/0/revision",
+        "dm_session_id": "/json/result/0/session_id"
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "t1",
+          "method": "trash_campaign",
+          "params": {
+            "operation_id": "storm-trash",
+            "campaign_id": "${campaign_id}",
+            "expected_revision": "${revision}",
+            "designated_session_id": "${dm_session_id}"
+          }
+        }
+      },
+      "save": {
+        "trashed_revision": "/json/result/resulting_revision"
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "p1",
+          "method": "purge_campaign",
+          "params": {
+            "operation_id": "storm-purge",
+            "campaign_id": "${campaign_id}",
+            "expected_revision": "${trashed_revision}",
+            "confirmation": "permanently purge ${campaign_id}"
+          }
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/recovery",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{\"recovery_id\": \"storm-recovery-2\"}"
+          },
+          {
+            "name": "file",
+            "filename": "storm.sylvia-gm-campaign",
+            "headers": [
+              [
+                "Content-Type",
+                "application/octet-stream"
+              ]
+            ],
+            "content_from_step": "s11"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/upload/recovery",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "multipart": [
+          {
+            "name": "params",
+            "content": "{\"recovery_id\": \"storm-recovery-zip\"}"
+          },
+          {
+            "name": "file",
+            "filename": "storm.zip",
+            "headers": [
+              [
+                "Content-Type",
+                "application/octet-stream"
+              ]
+            ],
+            "content_from_step": "s11"
+          }
+        ]
+      },
+      "timeout_s": 600
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/command",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {
+          "id": "i1",
+          "method": "campaign_index"
+        }
+      }
+    },
+    {
+      "http": {
+        "method": "GET",
+        "path": "/api/download/not-a-download",
+        "headers": [
+          [
+            "Cookie",
+            "${cookie}"
+          ],
+          [
+            "Sec-Fetch-Site",
+            "same-origin"
+          ],
+          [
+            "Sec-Fetch-Mode",
+            "navigate"
+          ],
+          [
+            "Sec-Fetch-Dest",
+            "document"
+          ]
+        ]
+      }
+    },
+    {
+      "http": {
+        "method": "POST",
+        "path": "/api/stop",
+        "headers": [
+          [
+            "Origin",
+            "${origin}"
+          ],
+          [
+            "X-Sylvia-WebUI",
+            "1"
+          ],
+          [
+            "Content-Type",
+            "application/json"
+          ],
+          [
+            "Cookie",
+            "${cookie}"
+          ]
+        ],
+        "json": {}
+      }
+    }
+  ]
+}

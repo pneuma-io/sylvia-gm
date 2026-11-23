@@ -191,6 +191,11 @@ session can send what a browser never would:
   or chunked framing, and `Connection: close`, are added.
 - The body is one of `json`, `text`, `repeat` (that many `a` bytes) or `multipart` (parts with
   `name`, `filename`, `headers`, `content` or `repeat`). `chunked: N` sends it in pieces of N bytes.
+- A part with `"content_from_step": "<step id>"` carries the body of that earlier step's
+  response, byte for byte, so a download can go back as an upload (`webui-exports` recovers
+  the campaign archive it downloaded).
+- `"save": {"name": "/json/result/..."}` keeps a value from the recorded response, as an owner
+  step's `save` does; the pointer is into the recorded response (`status`, `headers`, `json`).
 - `${origin}` and `${authority}` are what the browser sends as Origin and Host; `${address}` is
   where the host listens. `"save_cookie": true` keeps the cookies a response sets as `${cookie}`.
 
@@ -242,6 +247,7 @@ mid-body need control of the socket.
 | `reopen` | Stop and a failed reply, each followed by a restart on the same data folder; the offer survives, a redirect and a Manual Retry answer | recorded on Windows and Linux; reproduces on a second run |
 | `webui-guard` | The local WebUI host's boundary, request by request: cookie, Host, Origin, Sec-Fetch, the same-origin header, command checks and idempotency, renamed arguments, asset path tricks, downloads, upload names and size limits, unknown routes, Stop | recorded on Windows and Linux; five reproductions on each |
 | `webui-remote` | Private HTTPS mode: the sign-in page, the remote Host only, access-key sign-in, the remote cookie, sign-out, the sign-in budget, Stop | recorded on Windows and Linux; five reproductions on each |
+| `webui-exports` | The campaign export and recovery through the WebUI host: a campaign made through the interview (stand-in model), exported and downloaded (byte-identical between the hosts), the refused export identities and an unknown campaign, an export under the same identity again, the download uploaded back as a recovery (refused while the campaign exists, recovered after trash and purge, refused under the wrong suffix), an unknown download, Stop. `etag` and `last-modified` follow the download file's modification time and are not compared | recorded on Windows and Linux; five reproductions on each |
 | `builder-chat-edit` | Renaming and deleting Builder chats before any exists: missing parameters, display names, identities, the exact deletion confirmation, an unknown chat | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update` | The desktop updater as 0.4.1 ships it (no trusted key): the unavailable state, every refusal, the request and host checks, the reservation, abort and shutdown rules, both update gates, and the startup check with seeded receipts and launch fields | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update-recovery` | The recovery-only owner: an update interrupted mid-apply met by the desktop's update context, its bounded recovery pipe, the refused methods and shutdown, and launches without a reply or with the ordinary refusal | recorded on Windows and Linux; five reproductions on each |

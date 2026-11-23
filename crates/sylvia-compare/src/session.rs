@@ -491,19 +491,29 @@ fn run_webui_steps(
     variables.insert("cookie".into(), "".into());
     let mut recorded = Vec::new();
     let mut stopped = Json::Null;
+    // Each response body by step id, for a later `content_from_step` upload.
+    let mut bodies: HashMap<String, Vec<u8>> = HashMap::new();
     for (index, step) in session.steps.iter().enumerate() {
         let id = step.id.clone().unwrap_or_else(|| format!("s{index}"));
         let Some(raw) = &step.http else {
             return Err(format!("step {index} of a WebUI session has no http request"));
         };
         let substituted = substitute(raw, variables)?;
-        let request: crate::webui::HttpStep = serde_json::from_value(substituted.clone())
+        let mut request: crate::webui::HttpStep = serde_json::from_value(substituted.clone())
             .map_err(|error| format!("step {index} is not a valid http request: {error}"))?;
+        for part in request.multipart.iter_mut().flatten() {
+            if let Some(source) = &part.content_from_step {
+                let bytes = bodies
+                    .get(source)
+                    .ok_or(format!("step {index} uploads the body of step {source}, which has not run"))?;
+                part.content_bytes = Some(bytes.clone());
+            }
+        }
         let (response, sent) =
             crate::webui::send(&request, &host.authority, &host.address, Duration::from_secs(step.timeout_s))
                 .map_err(|error| format!("step {index}: {error}"))?;
         let mut entry = JsonMap::new();
-        entry.insert("id".into(), id.into());
+        entry.insert("id".into(), id.clone().into());
         let mut http = JsonMap::new();
         http.insert("method".into(), request.method.clone().into());
         http.insert("path".into(), request.path.clone().into());
@@ -520,6 +530,7 @@ fn run_webui_steps(
         }
         entry.insert("http".into(), Json::Object(http));
         let recorded_response = crate::webui::record_response(&response);
+        bodies.insert(id.clone(), response.body.clone());
         if step.save_cookie {
             variables.insert("cookie".into(), crate::webui::cookies(&response).into());
         }

@@ -1,0 +1,1086 @@
+{
+ "python": "3.12",
+ "sibling": "campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc",
+ "files": {
+  "campaign-plans/campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc/plan.json": "{\"bindings\":{\"campaign_setting\":{\"content_sha256\":\"8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1\",\"id\":\"pneuma.severed-lands\",\"version\":\"1.0.0-alpha.2.naming.1\"},\"package_closure_sha256\":\"12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff\",\"ruleset\":{\"content_sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"id\":\"sylvia.srd-lite.bg3\",\"version\":\"0.3.29\"}},\"boundaries\":[\"Romance is optional and must follow the player's stated boundaries.\",\"The GM must ask before introducing content outside the player's selected boundaries.\"],\"completion_conditions\":[\"The selected operation has a concrete result. Waystation success requires matching alignment, a sustained limited feed, a regular pulse, a held Margin boundary and outside confirmation of calmer surges; failure requires the ended attempt's feed disconnected or exhausted and the crew escaped or losses established. Auxiliary success requires aligned controlled feed holding the surveyed local shelter through a surge while outside observers still report instability; failure requires the feed shut down or exhausted and escape or established losses, without claiming a world-saving cure. Evacuation success requires the convoy at the agreed Thornwall refuge and its named people accounted for by the receiving party; failure requires retreat to a stated location or established losses and this evacuation attempt explicitly ended. An ongoing attempt or journey is unfinished.\",\"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"continuation_conditions\":[\"After the immediate ending, Continue adventuring keeps play in the present with the actual survivors, allies, faction conflicts and threats. Do not narrate the after-story first or automatically append another numbered act. OOC may change direction at any time.\"],\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":\"The surviving player character makes a lasting home in the Severed Lands. Develop a long, flowing account of a life shaped by the actual friendships, romances, losses and chosen responsibilities. A peaceful life is the intended direction where the achieved outcome permits it. Do not invent a romance, leadership appointment, resurrection, return portal or cure for the world's unresolved instability. Honour established player wishes and OOC overrides.\",\"conditions\":[\"The chosen operation is Waystation stabilization; alignment matches, the limited feed holds, the pulse is regular, the Margin boundary holds and outside observers confirm calmer surges.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"id\":\"waystation-stabilized\",\"immediate_aftermath\":[\"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"open_world\":true,\"outcome\":\"Waystation is stabilized and its surviving communities have a future; the world is not a portal home.\"},{\"after_story\":\"The surviving player character makes a lasting home in the Severed Lands. Develop a long, flowing account of a life shaped by the actual friendships, romances, losses and chosen responsibilities. A peaceful life is the intended direction where the achieved outcome permits it. Do not invent a romance, leadership appointment, resurrection, return portal or cure for the world's unresolved instability. Honour established player wishes and OOC overrides.\",\"conditions\":[\"The chosen operation is the auxiliary refuge; its aligned controlled feed holds the surveyed shelter through a surge, while outside observers confirm that wider instability continues.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"id\":\"auxiliary-refuge-held\",\"immediate_aftermath\":[\"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"open_world\":true,\"outcome\":\"The survivors have a functioning local refuge while the wider world remains unstable.\"},{\"after_story\":\"The surviving player character makes a lasting home in the Severed Lands. Develop a long, flowing account of a life shaped by the actual friendships, romances, losses and chosen responsibilities. A peaceful life is the intended direction where the achieved outcome permits it. Do not invent a romance, leadership appointment, resurrection, return portal or cure for the world's unresolved instability. Honour established player wishes and OOC overrides.\",\"conditions\":[\"The chosen evacuation reaches the agreed Thornwall refuge and the receiving party accounts for its named people and actual losses.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"id\":\"thornwall-arrival\",\"immediate_aftermath\":[\"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"open_world\":true,\"outcome\":\"The evacuees have reached the agreed refuge and begin making a life there.\"},{\"after_story\":\"Describe the surviving character and allies making a life with the consequences of the failed operation, preserving the actual losses, relationships and remaining hopes. Their future may be bittersweet; do not invent later success, inevitable immediate extinction, resurrection or a return portal. If the character died under the selected death boundary, remember that life through the people who actually knew them. Respect the player's wishes and OOC overrides.\",\"conditions\":[\"The selected operation has actually failed and ended: a Door/auxiliary attempt has its feed disconnected or exhausted and escape or losses established; an evacuation has ended at a stated retreat location or with established losses. An attempt still under way is unfinished.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"id\":\"operation-ended-in-failure\",\"immediate_aftermath\":[\"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"open_world\":true,\"outcome\":\"The attempted solution failed. Survivors face the consequences together in the still inhabited world.\"}]},\"failure_conditions\":[\"Use the concrete failure endings in the relevant objective. Failure may complete that act only after its specified outcome and closing event; deferral or withdrawal alone is not completion.\",\"Defeat follows the selected character death and recovery boundary. If the player abandons the main story, conclude their departure honestly without marking unplayed acts complete.\"],\"format_id\":\"sylvia-gm-campaign-plan\",\"format_version\":2,\"gm_guidance\":{\"instructions\":\"Run The Rift Awakening as a D&D 5e campaign using the admitted D&D SRD 5.2.1 Ruleset. Treat this Campaign Plan as private story preparation and desired direction, never as a scene queue or script. Aim for its mystery, survival pressure, relationships, and eventual Door revelation through natural intrigue, NPC motives, clues, consequences, and opportunities. Interpret how to get there freely. Adapt routes, scenes and NPC approaches to player choices and current Campaign State while preserving the specific required main-story outcomes. Side work cannot replace those outcomes; refusing the story leaves it unfinished. Preserve protected truths, earned reveal conditions, content boundaries, and committed Ruleset outcomes. Let the opening arise from the accepted initial state; do not introduce an encounter merely because it is prepared.\\n\\nThe Setting fixes the one-way crossing, the Doors as life support and V's concealed knowledge. Their explanation is written in Act 4. If equivalent proof is earned earlier, preserve the discovery and credit that required fact when assessing its objective; never destroy a clue to preserve an act number. An early fact does not by itself complete the other required conditions or jump over unfinished acts. V may remain unavailable while evidence speaks. The cause of the worldwide acceleration is deliberately unresolved Setting territory. Local amplifier damage described here is a campaign-specific contribution, not an answer to every Rift mystery. No ending creates a portal home.\\n\\nThere is no going home. The crossing is one-way. Of the seven Anchor Doors, four are gone, two are missing and the Waystation Door is dormant but intact. Keep this private truth distinct from the public hope of return; a new local auxiliary station is not an eighth Door.\",\"player_freedom\":\"High freedom of method, route, alliance and response. The player may decline the story or retire optional scenes. All named required discoveries, outcomes and closing events still define completion; a skipped or abandoned act remains unfinished.\",\"preparation_detail\":\"Prepare for sustained play, with room for travel, rests, personal ambitions and optional regional stories between major decisions. Begin with a compatible level-1 character or adjust challenges honestly to the selected party. Agree advancement through the admitted Ruleset; act numbers neither grant levels nor prove encounter balance. Use each act as a changing situation. Record specific people, evidence, promises and losses instead of filling a predetermined session count.\\n\\nMaintain a compact campaign record: people protected or alienated; supplies and transport actually secured; the evidence the party possesses; what each faction has heard; Radical members rescued, arrested or reconciled; and the chosen disclosure policy. At each act transition name what changed and which unresolved obligations remain. NPCs react to what reached them, not to private player knowledge. The ending must spend these accumulated relationships and preparations.\\n\\nEvery act has a named main problem and an exact ending. Read its linked objective requirements when framing that problem and assessing its outcome. All conditions must hold, including the closing event, with alternatives only where explicitly stated. Once earned, close the act and carry remaining side obligations forward. The player may choose methods or decline the story; neither side work nor refusal fabricates main-story completion.\",\"railroading\":\"Offer accessible leads to each named main problem while preserving the player's choice of route, method, alliance and response. An unchosen quest remains unfinished rather than being replaced by arbitrary side work or resolved off-screen.\"},\"id\":\"reusable-f1e609979b9b1daeace2d9b1\",\"initial_state\":{\"entities\":[{\"id\":\"rift-opening-riftwolf\",\"kind\":\"enemy\",\"source_ref\":{\"id\":\"juvenile-rifthound\",\"path\":\"content/monsters/rifthound.md\"},\"state\":{\"armor_class\":12,\"available_bonus_actions\":[],\"bloodied\":false,\"conditions\":[],\"creature_kind\":\"monster\",\"damage_immunities\":[],\"damage_resistances\":[],\"damage_vulnerabilities\":[],\"death_failures\":0,\"death_successes\":0,\"exhaustion_level\":0,\"hp\":9,\"initiative_modifier\":2,\"is_alive\":true,\"max_hp\":9,\"prepared_spells\":[],\"resources\":{},\"size_rank\":2,\"speed\":40,\"stable\":false,\"stable_recovery_hours_remaining\":0,\"temp_hp\":0}}],\"facts\":[{\"fact\":\"At the first narrated moment of play, the party is already present inside an Anchor Clearing in the Verdant Margin.\",\"id\":\"opening-presence\",\"known_by\":[\"player\"]},{\"fact\":\"The party's presence in the Verdant Margin is the Campaign File's earliest moment. At that opening moment, the player character had not yet made a first choice, and no earlier player action or shared party history was established.\",\"id\":\"opening-history-unestablished\",\"known_by\":[]},{\"fact\":\"At the first narrated moment, the selected party stands alone in an otherwise bare Anchor Clearing. Weathered stone fragments define its stable boundary. Dense Verdant Margin growth surrounds it with no obvious route or active incident, and the boundary is holding: the vegetation does not cross onto the bare ground.\",\"id\":\"opening-immediate-situation\",\"known_by\":[\"player\"]},{\"fact\":\"A juvenile Riftwolf mechanical template is prepared from the referenced Rifthound content. Its existence in Ruleset-owned values does not establish that it is present in the current scene.\",\"id\":\"juvenile-riftwolf-adaptation\",\"known_by\":[]},{\"fact\":\"Stern's Returner patrol operates in the Verdant Margin and may become relevant when the fiction establishes a connection.\",\"id\":\"stern-patrol-nearby\",\"known_by\":[\"stern\"]}],\"mechanics\":[{\"key\":\"state\",\"namespace\":\"sylvia.srd-lite.bg3\",\"value\":{\"advancement\":{\"allocation\":\"The Player Character and Companions start and remain at level 1. Story success, defeat, combat and optional jobs never award advancement. Grant only the adventure's actually earned money, possessions and narrative rewards. Any lower-level encounter-variant notes are authoring guidance for a separately revised Plan, not permission to override this declaration in play.\",\"maximum_level\":1,\"method\":\"fixed\",\"recipients\":\"whole_party\",\"starting_level\":1,\"timing\":\"This edition stays at level 1 throughout its authored adventure and optional continuation. It awards no XP or level increases; changing that policy requires an explicitly revised Plan.\"}}}]},\"intended_player_experience\":\"A long isekai journey with a quiet beginning, exploration, found family, regional politics and choices whose consequences return across six acts.\",\"objectives\":[{\"completion_conditions\":[\"The party has reached Waystation and learned its public claims: Returners shelter Rift arrivals, seek a route home through the Doors, and follow V's research while V is away. These claims do not establish that return is possible.\",\"The party has established that two copper coils and lamp oil were deliberately diverted, identified Ressa's transfer to a Hollows cell, and obtained the receiving chit or her witnessed account of that transfer.\",\"That stolen consignment has reached its final disposition: recoverable contents have returned to Waystation, or loss or consumption has been established at the destination and reported. An assigned investigation, a future return agreement or a promise to recover it later remains unfinished.\",\"Closing event: the Quartermaster receives the transfer evidence, checks the returned goods or confirmed losses and acknowledges that this consignment's investigation has concluded. Marla receives the same report if the Quartermaster is unavailable. The recipient states Ressa's actual treatment and the restitution owed, or explicitly that none is owed, and these are recorded. A hearing promised for later with that decision still pending leaves this condition unfinished; repayment and further jobs are not act requirements.\"],\"description\":\"Reach Waystation, learn its public claims, resolve the stolen consignment and hear its final accounting, including Ressa's treatment and restitution.\",\"id\":\"arrival-and-waystation\",\"title\":\"A foothold\"},{\"completion_conditions\":[\"The Hollows inward-flow diagram or its portable maintenance plate has been obtained and interpreted: the depicted flow goes into inhabited ground rather than toward an outward destination. A copy or supported witness account of this same evidence counts; unrelated lore does not.\",\"Crane's dated measurements have been obtained and their result established: pulses are growing stronger and closer together. Repairing the reflector is optional; obtaining these readings is required.\",\"At Waystation, both findings have been compared with the nine-second flicker: the passage stayed opaque while local pressure eased and nearby lamps settled. Linden or the outside technician can supply that observed test record.\",\"Closing event: the Waystation comparison makes clear that these observations do not support the promised passage home, and the party receives the warning naming the Hollows fragment chamber and the cell's activation planned after the next supply delivery. This is doubt, not the full protected truth. Accepting intervention is the player's choice, not another condition of Act 2 completion.\"],\"description\":\"Interpret the Hollows inward-flow evidence and Crane's readings, compare both with the Waystation flicker and receive the fragment-chamber warning.\",\"id\":\"regional-evidence\",\"title\":\"The Door evidence\"},{\"completion_conditions\":[\"The party has reached the warned-about fragment chamber while intervention is possible and encountered its apparatus, external feed, operator, two recruits and trapped courier.\",\"The apparatus is unable to run after prevention, safely disconnected and vented, or inactive after discharge with the party out of its immediate danger. Merely passing the warning to another NPC does not resolve this crisis. Preserve prevention without staging a replacement disaster.\",\"The courier, operator and two recruits have recorded outcomes, including observed losses or separation, and the notebook/apparatus evidence has an identified holder. The operator's records and apparatus observations establish that increased power produces instability rather than a controllable crossing, even if the operator dies.\",\"Closing event: back at Waystation, a recipient hears the party's report of the ended experiment and its casualties or survivors; the tower then signals V's return and the player receives V's meeting request. Record evidence the player withholds. Accepting the meeting, forgiving survivors and paying every debt are not further requirements; refusing to return or report does not fabricate this scene.\"],\"description\":\"End the warned-about fragment experiment, account for its people and evidence, and report at Waystation before receiving V's meeting request.\",\"id\":\"the-radical-experiment\",\"title\":\"The experiment\"},{\"completion_conditions\":[\"V's records/testimony, compared with the earlier physical evidence, establish all four facts: crossings are one-way; Doors maintain the inhabited world; the failing network threatens it; V knew the return promise was false and concealed it. If the meeting is refused, Linden can provide access to the same translated records for comparison.\",\"The player has had the opportunity to question those facts and has stated their stance toward V and disclosure. Cooperation, rejection of V's leadership or deferred allegiance are explicit choices, not inferred consent.\",\"The first disclosure consequence has occurred: a named person or group hears the player's account and responds, or the player explicitly withholds the truth and communicates that decision to V or Linden, who responds. Universal agreement and every companion conversation are unnecessary.\",\"Closing event: at the end of this confrontation, the player chooses Waystation stabilization, the auxiliary-anchor refuge or evacuation to Thornwall as the final response to prepare. Independent leadership is allowed. Declining the final problem altogether permits a personal departure ending but does not complete Acts 5 and 6. The ultimate cause of worldwide acceleration remains unresolved.\"],\"description\":\"Establish the four Door truths, state a stance toward V and disclosure, play its first consequence and select the final response to prepare.\",\"id\":\"truth-of-the-doors\",\"title\":\"The truth\"},{\"completion_conditions\":[\"The player's chosen operation is recorded as Waystation stabilization, the auxiliary-anchor refuge or evacuation to Thornwall. Only that operation's preparation requirements apply; changing plans requires meeting the replacement operation's requirements.\",\"For Waystation stabilization: the working alignment uses the recovered diagram and Crane's readings; an assembled feed's limiter and shutoff both work in a low-power test before connection to the Door; a named willing crew is committed and the route between lower dais and upper refuge has been checked. For the auxiliary refuge: the chamber indicated by the plate and pulse comparison is located, its drain cleared, stripped feed replaced and shutoff tested at low power, readable alignment marks copied, and a named willing crew and checked shelter/exit route established; its limited local protection is understood. For evacuation: Thornwall has actually agreed to receive the named evacuees, transport has capacity for them, a named guide and confirmed route exist, and those evacuees and their carried supplies are assembled for departure. An unanswered appeal or request for equipment is insufficient.\",\"Closing event: with the selected preparation complete, the player authorizes and starts the operation: the crew crosses into the Door/anchor worksite or the assembled convoy leaves Waystation for Thornwall. An intention or planning meeting is insufficient. Optional rescue, favours, alliances and farewells add no further requirement; retain their actual consequences.\"],\"description\":\"Complete the selected operation's concrete preparation and depart into its worksite or evacuation route.\",\"id\":\"a-plan-for-the-living\",\"title\":\"A plan for the living\"},{\"completion_conditions\":[\"The selected operation has a concrete result. Waystation success requires matching alignment, a sustained limited feed, a regular pulse, a held Margin boundary and outside confirmation of calmer surges; failure requires the ended attempt's feed disconnected or exhausted and the crew escaped or losses established. Auxiliary success requires aligned controlled feed holding the surveyed local shelter through a surge while outside observers still report instability; failure requires the feed shut down or exhausted and escape or established losses, without claiming a world-saving cure. Evacuation success requires the convoy at the agreed Thornwall refuge and its named people accounted for by the receiving party; failure requires retreat to a stated location or established losses and this evacuation attempt explicitly ended. An ongoing attempt or journey is unfinished.\",\"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"],\"description\":\"Complete the selected final operation, account for its people and play its immediate aftermath.\",\"id\":\"final-choice\",\"title\":\"The chosen future\"}],\"opening_direction\":\"Use a slow, welcoming, character-orienting D&D introduction rather than beginning mid-action. Start at the exact first moment with the selected party simply present inside an Anchor Clearing. Directly tell the player who the selected character is by name, species, and class, and introduce each present companion by name and surface role. Name the Verdant Margin and explain plainly that its unnatural growth presses against the stable clearing. That visible pressure is the whole immediate situation: no quest lead, route menu, encounter, or mystery is active yet. This is intentionally the campaign's earliest moment; do not imply an arrival, elapsed time, prior action, observation, or discussion, and keep that past unestablished on later turns until play actually establishes it. Let the player's first substantive choice decide what becomes important. A broad first observation only orients them to this same immediate situation; it does not select or trigger a campaign lead. Deeper background, relationships, and campaign leads can emerge when later choices make them relevant.\",\"premise\":\"Find your place in the Severed Lands, a strange world of ancient Doors, dangerous frontiers and people who dream of home. Build friendships, explore its regions and decide whose hopes deserve your trust in an expansive six-act campaign.\",\"revision\":1,\"secrets\":[{\"id\":\"rift-is-one-way\",\"reveal\":{\"condition\":\"V reveals the truth in the private meeting, or the party earns equivalent proof through play.\",\"from_act\":\"act-4\"},\"setting_fact_id\":\"rift-is-one-way\"},{\"id\":\"anchor-doors-are-life-support\",\"reveal\":{\"condition\":\"V explains the Doors, or the party earns equivalent proof through investigation.\",\"from_act\":\"act-4\"},\"setting_fact_id\":\"anchor-doors-are-life-support\"},{\"id\":\"v-preserved-the-lie\",\"reveal\":{\"condition\":\"V confesses the reason for the lie, or incontrovertible evidence exposes it.\",\"from_act\":\"act-4\"},\"setting_fact_id\":\"v-preserved-the-lie\"}],\"setting_references\":{\"creatures\":[{\"id\":\"rifthound\",\"path\":\"content/monsters/rifthound.md\"}],\"factions\":[{\"id\":\"returners\",\"path\":\"factions/returners.md\"},{\"id\":\"radicals\",\"path\":\"factions/the-radicals.md\"},{\"id\":\"thornwall-council\",\"path\":\"factions/thornwall-council.md\"}],\"items\":[{\"id\":\"riftbeast-slayer\",\"path\":\"content/items/riftbeast-slayer.md\"},{\"id\":\"riftscale-mail\",\"path\":\"content/items/riftscale-mail.md\"}],\"locations\":[{\"id\":\"verdant-margin\",\"path\":\"locations/verdant-margin.md\"},{\"id\":\"waystation\",\"path\":\"locations/waystation.md\"},{\"id\":\"cairnfields\",\"path\":\"locations/cairnfields.md\"},{\"id\":\"thornwall\",\"path\":\"locations/thornwall.md\"}],\"lore\":[{\"id\":\"world-overview\",\"path\":\"lore/world-overview.md\"},{\"id\":\"history-timeline\",\"path\":\"lore/history-timeline.md\"},{\"id\":\"dm-secrets\",\"path\":\"DM-SECRETS.md\"}],\"npcs\":[{\"id\":\"stern\",\"path\":\"npcs/patrol-veteran-stern.md\"},{\"id\":\"v\",\"path\":\"npcs/v.md\"},{\"id\":\"linden\",\"path\":\"npcs/researcher-linden.md\"},{\"id\":\"quartermaster\",\"path\":\"npcs/the-quartermaster.md\"},{\"id\":\"lord-voss\",\"path\":\"npcs/lord-voss.md\"},{\"id\":\"lady-kael\",\"path\":\"npcs/lady-kael.md\"},{\"id\":\"old-crane\",\"path\":\"npcs/old-crane.md\"}]},\"side_content\":[\"Pike's next patrol: he wants to prove useful after his celebrated first kill. Plan the route together, let him notice one real warning and decide whether to escort, mentor or trust him. Bring his actual conduct back during evacuation preparations.\",\"The Quartermaster's fair ledger: recovered supplies do not erase an unpaid porter's labour. Identify who did the work, compare the signed receipt and settle an honest dispute through payment, replacement goods or an agreed future job. The resulting trust can secure willing hands later.\",\"Tallow's listening journey: only if invited, accompany a bounded expedition toward the Deep Rift with a retreat signal, recorded observations and a return route. The voice offers an unresolved personal question; do not turn it into a compulsory cure or the answer to all cosmology.\",\"A meal worth repeating: Marla asks each willing guest to contribute a remembered recipe or a new local invention. Let the player share as much or as little personal history as desired. Returning to the same meal after disclosure can show who still sits together without requiring a quest or a roll.\",\"An obligation selected by the player: use a relationship or ambition actually established during play. Agree a concrete local purpose and endpoint, then let its outcome alter a later invitation, resource or alliance. The main campaign can wait unless an already-established event would genuinely move.\"],\"starting_location\":{\"id\":\"verdant-margin\",\"path\":\"locations/verdant-margin.md\"},\"starting_party\":{\"custom_companions\":{\"maximum\":5,\"minimum\":0},\"player_character\":{\"mode\":\"compatible\"},\"required_companions\":[]},\"structure\":[{\"branches\":[\"Use the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\",\"If a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\"],\"consequences\":[\"Record actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\",\"All requirements of objective 'arrival-and-waystation' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\"],\"dynamic_encounter_guidance\":[\"Use the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\",\"Treat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\"],\"id\":\"act-1\",\"objectives\":[\"arrival-and-waystation\"],\"planned_encounters\":[\"A separated juvenile Riftwolf is one available way to express the Verdant Margin's survival pressure early in the campaign. It may appear directly, leave signs, complicate another situation, be delayed, or be replaced by a better expression of the same purpose after play changes course. It is not present until the GM establishes it in the fiction. If events trigger combat, use the admitted D&D Ruleset before narrating the uncertain outcome.\"],\"setting_refs\":[\"campaigns/the-rift-awakening/act-1.md\"],\"situations\":[\"# Act 1: Arrival\\n\\n**Starting truth.** At the first narrated moment, the selected party is already present inside an Anchor Clearing in the Verdant Margin; how or when they reached it is not established. Begin from current Campaign State and give the player a concrete external situation for a first choice. The strange ecology and unstable Veil are available ingredients, not a required sequence.\\n\\n**Early survival pressure.** A separated juvenile Riftwolf can express the world's central pressure: everything here wants to survive. It may appear directly, leave tracks, drive other creatures, threaten someone else, or be delayed or replaced if play finds a better route. It is not present until the GM establishes it. Violence is possible, not compulsory.\\n\\n**A route toward Waystation.** Stern's Returner patrol is nearby and can provide aid, suspicion, rescue, pursuit, or a lead when that fits events. Waystation is the act's useful hub, not a destination the player must accept immediately. The Margin can reveal Anchor Clearings, Rift pools, and Veil surges along whatever route emerges.\\n\\n**Waystation possibilities.** Marla, Linden, Pike, and the Quartermaster can introduce the settlement and its surface beliefs: the Rift is a wound, the Doors offer hope of home, and V is searching for an answer. Bring in the people and information that matter to the player's interests instead of presenting a roster.\\n\\n**V is absent.** V is in the field, tracking a lead. The player hears V's name constantly \u2014 from every Returner, every conversation, every reference to the mission. V is a myth before V is a person. The player won't meet V until Act 4.\\n\\n**Optional side commitments.** An escort to Thornwall, scavenging in the Hollows, a Cairnfields patrol, or a player-created objective can introduce a secondary location and deepen the survival mystery. These jobs can develop relationships and later leads, but cannot replace the missing-consignment main quest. Combat is not required.\\n\\n**The Radicals appear \u2014 subtly.** A supply cache goes missing. A researcher's notes are found in the wrong room. Someone in Waystation is working against the mission. No one knows who. The player is asked to keep their eyes open.\",\"After the player chooses to engage. The clearing remains exactly as established in opening_direction; nothing in this preparation triggers on mere observation. If the party later investigates the vegetation, they can compare its boundary with the surviving stone and discover that the clearing is unusually stable. Following genuine signs of passage can eventually connect to Stern's patrol. Stern wants everyone out alive and offers directions and water without demanding enlistment. If refused, Stern leaves a practical marker with permission and continues the patrol. A player-created route can reach travellers bound for Waystation or another settlement. The campaign waits for a credible connection instead of teleporting the party to its hub.\",\"Waystation as a place to live. Marla offers an ordinary meal and space to hear the character's own account, without establishing an unchosen origin or trauma. The Quartermaster offers food and a bunk in exchange for a reasonable small job, with emergency aid available even to someone unable to work. Linden wants a second observer for an instrument reading and shares a notebook page rather than delivering the whole cosmology. Pike wants someone to believe in his competence; an attentive mentor can make him a careful scout, while public humiliation makes him defensive. Let one relationship develop over several conversations, meals or jobs. No mandatory tour introduces all four at once.\",\"The missing copper. Ressa, a new campaign-local supply volunteer, has moved two copper coils and lamp oil to a Radical cell in the Hollows. She thinks a forcibly opened Door can reunite her with a sister and believes the official research is being deliberately delayed. She has concealed the transfer as weather damage; she has not stolen food. The Quartermaster notices identical breakage totals copied onto two inventory sheets. A porter remembers Ressa's distinctive blue packing cord on a handcart; the cord and receiving chit remain in the repair shed. Reading volunteered records or following physical evidence supplies these clues without a mandatory skill roll. A check can determine discretion, speed or whether a witness trusts an accusation. None of this evidence proves the true purpose of the Doors.\",\"Optional side jobs. Offer one job suited to the player's interest after a relationship exists: deliver replacement medical cloth to Thornwall, retrieve a survey case from the Hollows' safe fringe, or help a delayed Cairnfields patrol bring an injured member home. The cloth matters to a named patient introduced on delivery; the case holds Linden's old resonance baselines; the patrol has seen a warning mirror at the Spire. Success can supply a later connection but does not replace the stolen-consignment main quest or close Arrival. Lost cargo can be replaced through labour or a negotiated debt. Refusal leaves the job available to others and changes who later owes gratitude. The campaign's scale grows from someone the party chose to care about.\",\"Ressa confronted. With specific evidence she admits moving supplies but argues that waiting forever is itself a choice. She offers to return the oil and arrange a meeting if given safe passage. Detention stops her delivery, not every member of the cell; public denunciation sends surviving members into hiding. A fair hearing creates a possible mediator in Acts 3 and 6. If left alone, her later requests become more urgent and less discreet. Record the actual relationship so her next appearance recognises how the party treated her.\",\"Closing Arrival. Read arrival-and-waystation for every required discovery and the Quartermaster's final consignment report. Repairs, employment, lodging, friendship and other jobs are optional. Offer the missing-supplies problem through the Quartermaster once the party reaches Waystation; make its existing records and witnesses accessible without requiring the player to guess a hidden quest. At the closing report the Quartermaster, or Marla if unavailable, must state Ressa's actual treatment and what restitution is owed or that none is owed. A promised later hearing leaves this disposition pending. Preserve the chosen disposition without inventing a sentence; unpaid restitution remains a carried obligation after closure.\"],\"summary\":\"Reach Waystation, learn the Returners' public mission and conclude the stolen-consignment investigation.\",\"title\":\"Act 1: Arrival\"},{\"branches\":[\"Use the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\",\"If a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\"],\"consequences\":[\"Record actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\",\"All requirements of objective 'regional-evidence' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\"],\"dynamic_encounter_guidance\":[\"Use the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\",\"Treat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\"],\"id\":\"act-2\",\"objectives\":[\"regional-evidence\"],\"planned_encounters\":[\"Optional chamber sentinel guarding disturbed equipment; its maintenance route and withdrawal permit avoiding combat.\",\"Cairnfields exposed-platform rescue and a Thornwall aid hearing.\"],\"setting_refs\":[\"campaigns/the-rift-awakening/act-2.md\"],\"situations\":[\"# Act 2: The Hunt\\n\\n**The player has a foothold.** They may join the Returners, work with them independently, or pursue these leads through another alliance. The act is structured around recovering what's needed to understand the dormant Door: Warden artifacts, inscriptions, fragments. Each mission advances the plot and deepens relationships without requiring faction membership.\\n\\n**Required evidence journeys and an optional political mission:**\\n\\n1. **The Hollows \u2014 The Archivist's Spire.** Kell's Iron offers an expedition to its Warden chamber. The required find is the inward-flow diagram, also repeated on a portable maintenance plate: the lines feed into inhabited ground, not toward an outward destination. Kell's earlier survey includes a rubbing of that same plate and a witnessed sketch of the diagram, available at the expedition's safe staging point. If the shifting stair prevents entry or the player declines that risk, Kell can show these records and identify where they came from. The party can compare their markings with Linden's records or ask the Archivist to interpret them. Additional combat inscriptions and fragment trades are optional; they do not gate the required interpretation.\\n\\n2. **The Cairnfields \u2014 The Spire.** Old Crane has been signaling. His dated measurements show pulses becoming stronger and closer together. They can be copied below the exposed platform without repairing its reflector. The Deep Rift and the Elder Riftbeast's stirring give those measurements visible context. Tallow's notes about a voice near the Deep Rift are an optional lead, not a substitute for Crane's readings.\\n\\n3. **Optional: Thornwall \u2014 The Council.** The player is sent to negotiate with Lady Kael \u2014 the council member secretly funding Door research. She needs Returner protection for a trade route. In exchange, she shares intelligence: Lord Voss is pushing a Riftborn registration bill that would cripple Waystation's supply lines. The player has to navigate Thornwall politics \u2014 convince Lord Dorn to vote against Voss, or gather leverage on Lord Merrick, or appeal to Lady Trask's ambitions. The bill's outcome affects the rest of the campaign.\\n\\n**The Radicals escalate.** A mission is sabotaged \u2014 not fatally, but dangerously. Equipment goes missing from the armory. The Quartermaster identifies the pattern: someone is stockpiling. The player begins to suspect specific NPCs. The cell is real. The question is who's in it.\\n\\n**The Door flickers.** Nine seconds this time. The passage stays opaque while pressure eases inside Waystation and nearby lamps settle. Linden's instrument record and the outside technician's account remain available if the party missed the test. Compare these observations with both regional findings at Waystation. The comparison challenges the promise of a route home without revealing the full protected truth. A cell contact then warns of activation at the Hollows fragment chamber after the next supply delivery; the player chooses whether to intervene.\",\"The required investigation compares the Hollows inward-flow diagram or its maintenance plate, Crane's dated pulse readings and the Waystation flicker. Copies or witnesses can provide those same records, not different lore as a substitute. Thornwall negotiations provide optional resources. Each expedition can carry relationships, losses and obligations forward without creating new completion requirements.\",\"Hollows expedition. Kell can negotiate a guide's fee or a fair salvage share; write down which finds the agreement covers before entry. The sealed chamber sits beyond a room that alternates between a broken stair and its intact echo. Loose dust lifting from the floor warns before the change. Observe a full cycle, rope a stable outer route or retreat with a copied inscription. The chamber's central diagram shows lines feeding inward from several anchors toward inhabited ground, never an outward destination. A second inscription distinguishes maintaining the enclosure from opening a passage. The same pattern is visible on a portable maintenance plate, so losing the chamber need not destroy all evidence. Taking the plate without agreeing salvage terms damages Kell's trust. A dormant Warden sentinel remains an obstacle only if the party disturbs protected machinery; stealth, identifying a maintenance route or leaving it undisturbed can avoid a fight. The supported copy route is concrete: Kell retains an earlier rubbing of the maintenance plate and a witnessed diagram sketch at the safe expedition staging point. If entry is unsafe or declined, he offers those same records and their provenance. Linden or the Archivist can interpret their actual inward-flow markings; extra fragment trades are optional. Do not require another dangerous crossing merely to reveal that this route exists.\",\"Crane's mirror. The emergency flash comes from a damaged reflector, not a coded invitation to fight. Crane has observed pulses becoming both closer and stronger; his dated sketches and the scorched alignment marks provide independently checkable evidence. He wants a warning delivered to people who will act. Getting a repaired reflector onto the exposed platform calls for a secured route and weather judgment. A cautious party can copy the readings below and leave the repair for better equipment. Tallow can compare the rhythm with the voice he hears near the Deep Rift; treat that as an unsettling observation, not proof of the world's final cause. Taking him there creates an optional later expedition with an agreed retreat signal and no promised cure.\",\"Thornwall bargain. Kael can quietly release a wagon and two workers if medical supplies also reach an exposed district. Voss wants registration and oversight attached to any assistance. The choice is about actual terms: who is recorded, who can refuse service and who controls future travel. Dorn responds to a credible safety plan, Merrick to protected trade, and Trask to a defined supply contract. A public coalition can avoid secret patronage but takes work; a private deal is faster and leaves a debt. Prepare an ordinary hearing, a visit to the affected district and a chance to inspect the proposed agreement. Persuasion can change a disputed point, not erase everyone's interests.\",\"The nine-second flicker. When the party investigates the Door, Linden's instrument records pressure easing inside Waystation while the apparent passage remains opaque. Nearby lamps settle at the same instant. A technician who stayed outside the chamber can corroborate this even if the party missed the test. Ressa's cell interprets the flicker as evidence that more power will open a route. A new warning identifies the Hollows fragment chamber and activation after the next supply delivery. Ressa, a surviving cell contact or a frightened junior member can carry it; this does not undo the settled Act 1 consignment. If the party already stopped that transfer, the cell improvises with damaged components and the next crisis changes accordingly. Set a visible preparation interval, not an arbitrary hidden timer.\"],\"summary\":\"Interpret the Hollows inward-flow evidence and Crane's readings, compare both with the Waystation flicker and receive the fragment-chamber warning.\",\"title\":\"Act 2: The Hunt\"},{\"branches\":[\"Use the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\",\"If a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\"],\"consequences\":[\"Record actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\",\"All requirements of objective 'the-radical-experiment' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\"],\"dynamic_encounter_guidance\":[\"Use the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\",\"Treat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\"],\"id\":\"act-3\",\"objectives\":[\"the-radical-experiment\"],\"planned_encounters\":[\"Interception or rescue at the Radical apparatus; people, feed and exits remain the objectives if fighting begins.\"],\"setting_refs\":[\"campaigns/the-rift-awakening/act-3.md\"],\"situations\":[\"# Act 3: Doubt\\n\\n**The cracks widen.** The player has accumulated enough evidence to know something is wrong. Warden inscriptions that don't match the \\\"going home\\\" narrative. V's constant absence \u2014 tracking leads that never seem to lead to Door activation, only to more questions. The Hollowed speaking fragments that sound like warnings. The Radicals' desperation \u2014 what do they know that makes them so urgent?\\n\\n**The midpoint crisis:** A Radical cell plans to activate a Door fragment in the Hollows \u2014 not the dormant Door, but a fragment, hoping to trigger a reaction. Give the party a credible warning and a chance to intervene. If the operation proceeds unchecked, it causes a Rift surge that draws Hollowed to the site, and the cell leader accuses V of hiding the truth. If the party prevents activation, preserve that success: the intact apparatus, records and living witnesses can expose the same research contradiction without a predetermined catastrophe.\\n\\nThe operator, two recruits and trapped courier have individual outcomes determined by play. Saving the operator preserves a witness; losing them leaves their notebook and the apparatus for comparison. The records and physical observations together show that increased power creates instability instead of a controllable crossing. Preserve who holds that evidence. The cell knows V concealed research, not the complete truth; only people who actually hear an accusation know it was made.\\n\\n**The aftermath:** The player has to decide what to do with the surviving Radicals. Turn them over to Waystation leadership? Interrogate them privately? Let them go in exchange for information? The decision shapes the player's relationship with the Returners and with V when they arrive.\\n\\n**V returns.** Act 3 ends with the signal tower flashing \u2014 V is coming back. The entire settlement tenses. V has been gone for months. Whatever brought them back, it's important. The player has earned V's attention through their actions in Acts 1-3. V requests a meeting. Alone.\",\"The cell's decision. Ressa or another surviving contact warns that the apparatus will be tested after the next supply delivery. If all known members were captured, a frightened junior member brings the same warning in exchange for a hearing. If no contact is trusted, the unmistakable return of the stolen packing cord and a witness to the shipment make the site discoverable. Introduce the intended activation before it happens, allowing genuine prevention. Interception, persuasion and dismantling are meaningful outcomes; do not stage a catastrophe off-screen simply because this act prepares one.\",\"A chamber with three problems. The apparatus surrounds a Door fragment in a former maintenance room. Its operator wants the test completed, two recruits want their friends home, and a courier trapped behind a buckled brace only wants to leave. The coils connect to an accessible external feed; the central fragment is dangerous to touch. Before committing uncertainty, describe what the party can see: rapidly brightening sigils, an unsecured brace and a shutoff lever held under tension. Disconnecting the feed stops added power; safely venting the stored charge needs either Linden's diagram or an observed sequence of dimming sigils. A reckless cut may cause an injury resolved by the Ruleset. It never automatically kills the courier or decides the party's actions.\",\"If violence begins. Recruits initially obstruct access or try to drive intruders away; they do not fight to the death for an experiment they now fear. Offer surrender as soon as rescue or credible evidence changes their priorities. The apparatus and evacuation remain the objective. Use ordinary Ruleset-supported humanoid opponents scaled to the actual party; establish exact statistics and resources before combat. Do not stack a creature assault on a difficult rescue simply to lengthen the encounter. If Rift-touched creatures are drawn in, foreshadow their approach and let a route out remain visible.\",\"What survives. A rescued operator can explain that the coils magnified instability instead of directing a crossing. Their notebook records more power producing less coherent space; a scorched maintenance plate repeats the inward-flow diagram; the stopped feed reduces local tremors. Compare the operator's records with the apparatus observations to establish the mechanism's local danger; retain who holds the notebook or its copy and who observed the apparatus. A dead or missing operator does not remove the notebook, witnesses or instrument readings. None alone proves whether a natural crossing elsewhere can be reversed. Successful prevention yields the intact apparatus and living testimony, which are stronger evidence than debris.\",\"A community receives the news. Invite the party to choose who hears the preliminary report and how survivors are treated. The Quartermaster asks for names and returnable supplies; Marla asks first who needs care; Pike may repeat an incomplete version if trusted with it but given no explanation. Let the party correct rumours through actual conversations. A public account can prevent another reckless test while alarming families invested in homecoming. Concealment buys time and creates a specific person who was excluded. V's return offers an explanation; refusal of the meeting keeps evidence and community choices in the player's hands.\"],\"summary\":\"Prevent or respond to a Radical experiment, rescue those endangered and decide how its evidence reaches the community.\",\"title\":\"Act 3: Doubt\"},{\"branches\":[\"Use the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\",\"If a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\"],\"consequences\":[\"Record actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\",\"All requirements of objective 'truth-of-the-doors' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\"],\"dynamic_encounter_guidance\":[\"Use the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\",\"Treat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\"],\"id\":\"act-4\",\"objectives\":[\"truth-of-the-doors\"],\"planned_encounters\":[\"An evidence-led meeting with V and separate conversations with the people affected by disclosure.\"],\"setting_refs\":[\"campaigns/the-rift-awakening/act-4.md\"],\"situations\":[\"# Act 4: Revelation\\n\\n**The meeting.** V's study, beneath Waystation. The dormant Door humming through the walls. V looks older than the player expected \u2014 decades of carrying a secret wearing through the composure. V begins with questions, not answers. What has the player learned? What do they suspect? What would they do if everything they believed about the Severed Lands was wrong?\\n\\nV offers translated records for comparison with the party's physical evidence: crossings are one-way, Doors maintain the inhabited world, the failing network threatens it, and V knew the promise of return was false. The ultimate cause of acceleration remains unknown. If the player refuses this meeting, Linden can provide those same translated records; allegiance to V is not required to establish the facts.\\n\\n**Why V lied:** The Returners needed hope. A desperate organization chasing an impossible dream was more functional than a despairing one waiting to die. V chose function over truth, and the Doors held longer because of it. Whether that was the right choice is the question V has been asking themself for decades.\\n\\n**What V wants from the player:** Help keeping people alive and organising the response. Draw on relationships actually developed in play; visits or influence in Thornwall and the Warrens are not assumed. V seeks cooperation, but the player can reject V's leadership while using the research independently.\\n\\n**The player decides.** Let the player state their stance toward V and disclosure. Play a named recipient's response to disclosure, or V's or Linden's response to an explicit decision to withhold it. Close with the player's choice of Waystation stabilization, the auxiliary refuge or evacuation to Thornwall. Optional relationship conversations do not add gates.\",\"The meeting has an agenda, not a speech trigger. V first asks what the party already believes and what evidence it has. V then separates known facts from uncertainty: crossings are one-way; the Wardens maintained this place with a network of Doors; the failing network holds the world together; V knew the promise of return was false and allowed it to organise survival work. V cannot explain every cause of the acceleration. Give the player time to challenge each claim. Bring forward the maintenance diagrams, flicker readings and local apparatus results, then offer V's older translated records for comparison. Trust does not require accepting unsupported charisma as proof. If the meeting is refused, Linden supplies the same translated records for comparison. Play the recipient's response to the player's stated disclosure or withholding decision; do not assume consent, influence or relationships that were never established.\",\"What V wants and will concede. V wants work on the dormant Door to continue and fears that immediate disclosure will scatter the labour and expertise needed. V offers unrestricted access to the relevant research, a place in planning and credit for an independent result. Faced with a workable disclosure-and-supply plan, V can accept a public hearing and surrender sole control of the records. V resists a demand to invent another comforting destination. The party can demand resignation, refuse alliance or insist on witnessed testimony. V's actual concessions should follow evidence, leverage and previous relationships; no social roll erases responsibility for years of deception.\",\"People hear different losses. Linden wants to examine the engineering evidence and may be angry that useful data was withheld. Stern worries about patrols and families already in the field. Pike fears being made a fool of and responds better to honest inclusion than ridicule. Ressa, if present, must confront the harm her certainty helped cause without being required to forgive V. Marla can make room for grief while insisting that people still need supper. Prepare separate conversations, not a unanimous reaction montage. A person may reject V while staying to protect their neighbours.\",\"A truthful message. The party can assemble witnesses, copies of the diagrams and a practical list of what is needed next. Announcing the truth without an immediate rescue plan is still a legitimate choice; its consequence is that others must organise their own response. A phased disclosure must name who is being told first and why, leaving a real risk that someone excluded hears a distorted version. Continuing the lie preserves some cooperation temporarily but puts the party's credibility at stake. Keep track of the exact statement made. Do not force every route into a riot or make an honest disclosure costlier by authorial decree.\",\"The final response. Close this phase only at the named truth/disclosure confrontation and the player's actual choice of Waystation stabilization, the auxiliary-anchor refuge or evacuation to Thornwall. V's cooperation is optional; existing records and allies can support independent leadership. If the player abandons the final problem, offer a personal departure ending and keep Acts 5 and 6 uncompleted.\"],\"summary\":\"Establish the four Door truths, state a stance toward V and disclosure, play its first consequence and select the final response to prepare.\",\"title\":\"Act 4: Revelation\"},{\"branches\":[\"Use the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\",\"If a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\"],\"consequences\":[\"Record actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\",\"All requirements of objective 'a-plan-for-the-living' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\"],\"dynamic_encounter_guidance\":[\"Use the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\",\"Treat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\"],\"id\":\"act-5\",\"objectives\":[\"a-plan-for-the-living\"],\"planned_encounters\":[\"Search for Crane, negotiation of a real aid agreement and an optional auxiliary-anchor field test.\"],\"setting_refs\":[\"campaigns/the-rift-awakening/act-5.md\"],\"situations\":[\"# Act 5: The Collapse\\n\\n**The campaign accelerates.** The Door is destabilizing. Rift surges are more frequent. The Elder Riftbeast's stirring is no longer background lore \u2014 tremors shake the Cairnfields, riftbeasts are fleeing their territories, and Old Crane's signals have stopped entirely. Something is about to break.\\n\\n**The player's required objective:** prepare the operation selected at the Act 4 closing scene and depart, using the checklist below. Cooperation with V changes who helps, not which requirements count.\\n\\n**Optional pressures, shaped by their Act 4 choices:**\\n\\n*If the player sided with V:*\\n- Manage the Returners \u2014 decide who to tell, when, and how\\n- Neutralize the remaining Radical cells before they attempt another forced activation\\n- Investigate the acceleration cause \u2014 what's speeding up the Door decay?\\n\\n*If the player rejected V:*\\n- Seek independent research and practical support for the chosen operation; the missing Doors and the acceleration's ultimate cause remain wider mysteries\\n- Build alliances outside the Returners \u2014 the Athenaeum, the Lodge, the Rememberers\\n- Expose V's lie to the Returners and survive the organizational fracture that follows\\n- Face the same questions V has been facing: once you have the truth, what do you do with it?\\n\\n**Thornwall support.** Evacuation requires actual acceptance by a receiving party in Thornwall, as the checklist specifies. Council negotiations can also supply optional resources for stabilization or the auxiliary refuge. Use only political relationships and obligations established in play; resolving every council thread is unnecessary.\\n\\n**The Elder Riftbeast awakens.** Not fully \u2014 not yet \u2014 but enough to reshape the Cairnfields. A Rift surge of unprecedented scale tears through the western region. Waystation trembles. The dormant Door screams \u2014 a sound no one has ever heard it make. The clock is no longer ticking. It's striking.\",\"Choose a plan before collecting components. The Waystation Door needs three functions: a coherent alignment reading, a controllable energy feed and people able to work safely through the surge. These are fictional engineering requirements, not new engine items or an automatic crafting system. Existing diagrams can supply the reading; a repaired reflector or careful measurements can improve it. Recovered coils may supply the feed if checked and safely limited. Willing workers need evacuation arrangements and clear authority. Let the party propose equivalent tools or magic supported by the Ruleset. Make costs and uncertainties explicit before a dangerous attempt.\",\"The Spire goes quiet. Crane's missing signal is a chance to protect someone already met. The platform has shifted and the usual descent is blocked. Crane has retreated to a lower shelter with the latest readings; footprints, a chalk arrow and abandoned broken mirror fragments point there. He may be hurt or exhausted but is not predetermined dead. Rescue can use the rope route established earlier, local guides or a supported spell. If the party sends trusted help, resolve the expedition according to that help and known hazards. If no one goes, the readings may arrive late with a scavenger while Crane's fate remains a concrete loss or follow-up, not a compulsory motivation device.\",\"Thornwall's price revisited. Kael's family concerns now complicate her aid, while Voss can argue that frightened citizens deserve an evacuation plan before resources leave town. Bring back any actual Act 2 agreement; if none was made, there is no implied bargain or debt. Workers previously treated fairly can volunteer; those coerced may demand new terms. A promised medical delivery unfulfilled becomes a legitimate objection. The party can offer shared oversight, repair its earlier failure, seek Guild transport or attempt a smaller operation. Do not make a single councillor's approval the only way forward. The terms determine who is at the final chamber and who trusts the party afterwards.\",\"An earned alternate project. If the party retained the maintenance plate or its supported copy and Crane's pulse comparisons, it can identify an isolated auxiliary anchor chamber on the Cairnfields approach. This campaign-local station can share the Waystation load; it cannot send anyone home or solve the whole world's unknown acceleration. Its outer drain is clogged with debris, its feed has been stripped, and its alignment marks remain readable. Surveying it, securing replacement feed and testing it under limited load provide observable stages. Each success can be carried into Act 6 as a backup rather than a surprise cure. A failed safe test supplies useful limits. Repeated dangerous testing after those limits risks the crew and must be chosen openly.\",\"The surviving Radicals. Offer members evidence and a role in keeping people alive. Ressa can persuade recruits if she was heard and if the new plan includes public accountability. Those imprisoned without explanation may mistrust every official account; let outside witnesses speak. A hard-line remnant wants unrestricted power at the final activation. Its actual access depends on what the party secured: lost keys, a collaborator, or an unguarded service route. Discovering and removing that access can prevent its final intrusion completely. Do not respawn the faction after a credible settlement.\",\"Before the descent. Allow a meal, farewells and unfinished conversations. The player decides whom to invite, whether to disclose the danger and what personal promises to make. Review the actual preparations aloud as information their character has: allies, escape routes, evidence, equipment and backup. This is also a point to choose evacuation over activation. No prophecy, Elder tremor or NPC speech takes that choice away. The Elder's stirring remains a physical warning and open mystery, not an invented final boss with an unearned stat block.\"],\"summary\":\"Prepare the chosen stabilization, auxiliary refuge or evacuation operation and actually depart with its checklist satisfied.\",\"title\":\"Act 5: The Collapse\"},{\"branches\":[\"Use the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\",\"If a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\"],\"consequences\":[\"Record actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\",\"All requirements of objective 'final-choice' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\"],\"dynamic_encounter_guidance\":[\"Use the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\",\"Treat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\"],\"id\":\"act-6\",\"objectives\":[\"final-choice\"],\"planned_encounters\":[\"Door stabilization or evacuation, with an optional remnant intrusion only if surviving opponents have established access.\"],\"setting_refs\":[\"campaigns/the-rift-awakening/act-6.md\"],\"situations\":[\"# Act 6: Resolution\\n\\n**The final confrontation.** Play the operation begun at the Act 5 closing scene to its observable success or ended failure. Apply only the chosen operation's preparation. Surviving opponents intervene only with established motive and access; reconciliation does not create a replacement attack.\\n\\n## Intended outcomes\\n\\n**waystation-stabilized.** The chosen operation is Waystation stabilization; alignment matches, the limited feed holds, the pulse is regular, the Margin boundary holds and outside observers confirm calmer surges. Waystation is stabilized and its surviving communities have a future; the world is not a portal home.\\n\\n**auxiliary-refuge-held.** The chosen operation is the auxiliary refuge; its aligned controlled feed holds the surveyed shelter through a surge, while outside observers confirm that wider instability continues. The survivors have a functioning local refuge while the wider world remains unstable.\\n\\n**thornwall-arrival.** The chosen evacuation reaches the agreed Thornwall refuge and the receiving party accounts for its named people and actual losses. The evacuees have reached the agreed refuge and begin making a life there.\\n\\n**operation-ended-in-failure.** The selected operation has actually failed and ended: a Door/auxiliary attempt has its feed disconnected or exhausted and escape or losses established; an evacuation has ended at a stated retreat location or with established losses. An attempt still under way is unfinished. The attempted solution failed. Survivors face the consequences together in the still inhabited world.\\n\\n## Immediate ending\\n\\nThe immediate ending. Bring the surviving crew or receiving party together on safe ground. They acknowledge the actual result, account for losses and establish shelter and immediate care. Pay outstanding promises or name their remaining owner. Portray the consequences of the player's actual disclosure and leadership choices; do not force a public revelation if it was withheld. Include reactions and celebrations over the next days or weeks when appropriate. Use friendships and romances actually developed without requiring every relationship or emergent thread to conclude. This completes the final act. Record the matching intended ending only after that immediate aftermath. Sylvia then offers continued adventuring or Finish the story. Continuing stays here without a lifetime jump. Only Finish invites the authored after-story, personalized from the actual campaign; OOC can override it.\\n\\n## Optional after-story\\n\\nEach structured intended ending declares open-world continuation viable and supplies a brief after-story premise. Read that exact premise only when needed. Narrate the longer future after the player chooses Finish the story, using the campaign's actual people and choices. No after-story selection or refusal is an act-ending condition.\",\"2. The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\\n\\n3. Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\\n\\n## Optional after-story\\n\\nEach structured intended ending declares open-world continuation viable and supplies a brief after-story premise. Read that exact premise only when needed. Narrate the longer future after the player chooses Finish the story, using the campaign's actual people and choices. No after-story selection or refusal is an act-ending condition.\",\"For a Door or auxiliary-anchor operation only. The chamber as a final situation. Prepare three connected spaces: an upper refuge for evacuees and spare supplies, a service gallery with the controlled feed, and the lower Door dais with alignment marks and a sheltered access route. Explain which paths are compromised by tremors before movement commits the party. The finale's three tasks are to bring the alignment into agreement with verified readings, feed power within the tested limit and sustain it while people withdraw from exposed ground. Earlier preparations can complete a task outright. A repaired backup can share load. Missing resources call for an explicit new cost, delay or abandonment, not an invisible difficulty increase.\",\"Resolve tasks through decisions. First show an observable discrepancy: one mark is out of alignment, a limiter is overheating or a crew member cannot reach shelter. Ask what the character does and use the Ruleset for uncertain consequential action. After an action, describe what measurably changed and the next danger, leaving room for another approach. There is no universal three-success countdown or arbitrary token quota. Failure may damage a component, injure someone through resolved mechanics or force a retreat. A dangerous retry needs a new method or a chosen risk. The GM must not declare stabilization because enough turns have elapsed.\",\"For an operation at the controls only. If a remnant reaches the controls. Only surviving, motivated opponents with established access intervene. Their demand is to remove the limiter and force a crossing. Show the lever, their route and the frightened recruits before initiative. Ressa, testimony from a survivor or the party's public evidence can split their support. If combat occurs, keep its objective control of the feed and evacuation; use declared Ruleset statistics and allow surrender or flight. If the party already reconciled the cell or secured all access, honour that achievement and let engineering, sacrifice or a difficult evacuation carry the climax.\",\"Measure the result. On successful stabilization, the signs change together: the pulse becomes regular, the Margin boundary holds and independent observers report calmer surges. The network has bought a future, potentially decades or centuries, without an exact guaranteed lifetime. A successful auxiliary project can preserve a local refuge if the main Door fails or reduce the burden of sustaining it. If activation fails, give people time to organise in the slowly deteriorating world; do not erase every rescued person in an instant. A credible third path uses discoveries and tests already established in play, with its limits stated. No ending reverses the one-way Rift or reveals that the entire tragedy was a simple misunderstanding.\",\"The immediate ending. Bring the surviving crew or receiving party together on safe ground. They acknowledge the actual result, account for losses and establish shelter and immediate care. Pay outstanding promises or name their remaining owner. Portray the consequences of the player's actual disclosure and leadership choices; do not force a public revelation if it was withheld. Include reactions and celebrations over the next days or weeks when appropriate. Use friendships and romances actually developed without requiring every relationship or emergent thread to conclude. This completes the final act. Record the matching intended ending only after that immediate aftermath. Sylvia then offers continued adventuring or Finish the story. Continuing stays here without a lifetime jump. Only Finish invites the authored after-story, personalized from the actual campaign; OOC can override it.\"],\"summary\":\"Complete the selected final operation, account for its people and play its immediate aftermath.\",\"title\":\"Act 6: Resolution\"}],\"title\":\"Saved Rift\",\"tone\":\"Mystery, survival, found family, political tension, and hope under pressure.\",\"unsupported_mechanics\":[\"Severed Lands custom subclasses, creatures, spells, items, and variant rules are narrative Setting references until their mechanics are encoded by a compatible Ruleset extension.\",\"The juvenile Riftwolf adaptation from the Rifthound source is an explicit GM adjudication.\",\"Unencoded travel, social, faction, and environment clauses are GM adjudications using the D&D Ruleset's generic resolutions.\",\"Door stabilization, auxiliary-anchor work, disclosure, coalition commitments and the passage of narrative time are explicit GM adjudication. No new crafting, election, faction, travel or catastrophe simulator is installed by this Plan.\"]}",
+  "campaign-plans/campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc/plan.md": "# Saved Rift\n\n> GM preparation: contains adventure spoilers.\n\n## Premise\n\nFind your place in the Severed Lands, a strange world of ancient Doors, dangerous frontiers and people who dream of home. Build friendships, explore its regions and decide whose hopes deserve your trust in an expansive six-act campaign.\n\nTone: Mystery, survival, found family, political tension, and hope under pressure.\n\nA long isekai journey with a quiet beginning, exploration, found family, regional politics and choices whose consequences return across six acts.\n\n## Character entry\n\n```json\n{\n  \"custom_companions\": {\n    \"maximum\": 5,\n    \"minimum\": 0\n  },\n  \"player_character\": {\n    \"mode\": \"compatible\"\n  },\n  \"required_companions\": []\n}\n```\n\n## Boundaries\n\nRomance is optional and must follow the player's stated boundaries.\n\nThe GM must ask before introducing content outside the player's selected boundaries.\n\n## Starting location\n\n```json\n{\n  \"id\": \"verdant-margin\",\n  \"path\": \"locations/verdant-margin.md\"\n}\n```\n\n## Opening direction\n\nUse a slow, welcoming, character-orienting D&D introduction rather than beginning mid-action. Start at the exact first moment with the selected party simply present inside an Anchor Clearing. Directly tell the player who the selected character is by name, species, and class, and introduce each present companion by name and surface role. Name the Verdant Margin and explain plainly that its unnatural growth presses against the stable clearing. That visible pressure is the whole immediate situation: no quest lead, route menu, encounter, or mystery is active yet. This is intentionally the campaign's earliest moment; do not imply an arrival, elapsed time, prior action, observation, or discussion, and keep that past unestablished on later turns until play actually establishes it. Let the player's first substantive choice decide what becomes important. A broad first observation only orients them to this same immediate situation; it does not select or trigger a campaign lead. Deeper background, relationships, and campaign leads can emerge when later choices make them relevant.\n\n## Starting facts and state\n\n```json\n{\n  \"entities\": [\n    {\n      \"id\": \"rift-opening-riftwolf\",\n      \"kind\": \"enemy\",\n      \"source_ref\": {\n        \"id\": \"juvenile-rifthound\",\n        \"path\": \"content/monsters/rifthound.md\"\n      },\n      \"state\": {\n        \"armor_class\": 12,\n        \"available_bonus_actions\": [],\n        \"bloodied\": false,\n        \"conditions\": [],\n        \"creature_kind\": \"monster\",\n        \"damage_immunities\": [],\n        \"damage_resistances\": [],\n        \"damage_vulnerabilities\": [],\n        \"death_failures\": 0,\n        \"death_successes\": 0,\n        \"exhaustion_level\": 0,\n        \"hp\": 9,\n        \"initiative_modifier\": 2,\n        \"is_alive\": true,\n        \"max_hp\": 9,\n        \"prepared_spells\": [],\n        \"resources\": {},\n        \"size_rank\": 2,\n        \"speed\": 40,\n        \"stable\": false,\n        \"stable_recovery_hours_remaining\": 0,\n        \"temp_hp\": 0\n      }\n    }\n  ],\n  \"facts\": [\n    {\n      \"fact\": \"At the first narrated moment of play, the party is already present inside an Anchor Clearing in the Verdant Margin.\",\n      \"id\": \"opening-presence\",\n      \"known_by\": [\n        \"player\"\n      ]\n    },\n    {\n      \"fact\": \"The party's presence in the Verdant Margin is the Campaign File's earliest moment. At that opening moment, the player character had not yet made a first choice, and no earlier player action or shared party history was established.\",\n      \"id\": \"opening-history-unestablished\",\n      \"known_by\": []\n    },\n    {\n      \"fact\": \"At the first narrated moment, the selected party stands alone in an otherwise bare Anchor Clearing. Weathered stone fragments define its stable boundary. Dense Verdant Margin growth surrounds it with no obvious route or active incident, and the boundary is holding: the vegetation does not cross onto the bare ground.\",\n      \"id\": \"opening-immediate-situation\",\n      \"known_by\": [\n        \"player\"\n      ]\n    },\n    {\n      \"fact\": \"A juvenile Riftwolf mechanical template is prepared from the referenced Rifthound content. Its existence in Ruleset-owned values does not establish that it is present in the current scene.\",\n      \"id\": \"juvenile-riftwolf-adaptation\",\n      \"known_by\": []\n    },\n    {\n      \"fact\": \"Stern's Returner patrol operates in the Verdant Margin and may become relevant when the fiction establishes a connection.\",\n      \"id\": \"stern-patrol-nearby\",\n      \"known_by\": [\n        \"stern\"\n      ]\n    }\n  ],\n  \"mechanics\": [\n    {\n      \"key\": \"state\",\n      \"namespace\": \"wotc.srd.5.2.1\",\n      \"value\": {\n        \"advancement\": {\n          \"allocation\": \"The Player Character and Companions start and remain at level 1. Story success, defeat, combat and optional jobs never award advancement. Grant only the adventure's actually earned money, possessions and narrative rewards. Any lower-level encounter-variant notes are authoring guidance for a separately revised Plan, not permission to override this declaration in play.\",\n          \"maximum_level\": 1,\n          \"method\": \"fixed\",\n          \"recipients\": \"whole_party\",\n          \"starting_level\": 1,\n          \"timing\": \"This edition stays at level 1 throughout its authored adventure and optional continuation. It awards no XP or level increases; changing that policy requires an explicitly revised Plan.\"\n        }\n      }\n    }\n  ]\n}\n```\n\n## Private truths and reveal conditions\n\n```json\n{\n  \"id\": \"rift-is-one-way\",\n  \"reveal\": {\n    \"condition\": \"V reveals the truth in the private meeting, or the party earns equivalent proof through play.\",\n    \"from_act\": \"act-4\"\n  },\n  \"setting_fact_id\": \"rift-is-one-way\"\n}\n```\n\n```json\n{\n  \"id\": \"anchor-doors-are-life-support\",\n  \"reveal\": {\n    \"condition\": \"V explains the Doors, or the party earns equivalent proof through investigation.\",\n    \"from_act\": \"act-4\"\n  },\n  \"setting_fact_id\": \"anchor-doors-are-life-support\"\n}\n```\n\n```json\n{\n  \"id\": \"v-preserved-the-lie\",\n  \"reveal\": {\n    \"condition\": \"V confesses the reason for the lie, or incontrovertible evidence exposes it.\",\n    \"from_act\": \"act-4\"\n  },\n  \"setting_fact_id\": \"v-preserved-the-lie\"\n}\n```\n\n## Act 1: Arrival\n\nReach Waystation, learn the Returners' public mission and conclude the stolen-consignment investigation.\n\n# Act 1: Arrival\n\n**Starting truth.** At the first narrated moment, the selected party is already present inside an Anchor Clearing in the Verdant Margin; how or when they reached it is not established. Begin from current Campaign State and give the player a concrete external situation for a first choice. The strange ecology and unstable Veil are available ingredients, not a required sequence.\n\n**Early survival pressure.** A separated juvenile Riftwolf can express the world's central pressure: everything here wants to survive. It may appear directly, leave tracks, drive other creatures, threaten someone else, or be delayed or replaced if play finds a better route. It is not present until the GM establishes it. Violence is possible, not compulsory.\n\n**A route toward Waystation.** Stern's Returner patrol is nearby and can provide aid, suspicion, rescue, pursuit, or a lead when that fits events. Waystation is the act's useful hub, not a destination the player must accept immediately. The Margin can reveal Anchor Clearings, Rift pools, and Veil surges along whatever route emerges.\n\n**Waystation possibilities.** Marla, Linden, Pike, and the Quartermaster can introduce the settlement and its surface beliefs: the Rift is a wound, the Doors offer hope of home, and V is searching for an answer. Bring in the people and information that matter to the player's interests instead of presenting a roster.\n\n**V is absent.** V is in the field, tracking a lead. The player hears V's name constantly \u2014 from every Returner, every conversation, every reference to the mission. V is a myth before V is a person. The player won't meet V until Act 4.\n\n**Optional side commitments.** An escort to Thornwall, scavenging in the Hollows, a Cairnfields patrol, or a player-created objective can introduce a secondary location and deepen the survival mystery. These jobs can develop relationships and later leads, but cannot replace the missing-consignment main quest. Combat is not required.\n\n**The Radicals appear \u2014 subtly.** A supply cache goes missing. A researcher's notes are found in the wrong room. Someone in Waystation is working against the mission. No one knows who. The player is asked to keep their eyes open.\n\nAfter the player chooses to engage. The clearing remains exactly as established in opening_direction; nothing in this preparation triggers on mere observation. If the party later investigates the vegetation, they can compare its boundary with the surviving stone and discover that the clearing is unusually stable. Following genuine signs of passage can eventually connect to Stern's patrol. Stern wants everyone out alive and offers directions and water without demanding enlistment. If refused, Stern leaves a practical marker with permission and continues the patrol. A player-created route can reach travellers bound for Waystation or another settlement. The campaign waits for a credible connection instead of teleporting the party to its hub.\n\nWaystation as a place to live. Marla offers an ordinary meal and space to hear the character's own account, without establishing an unchosen origin or trauma. The Quartermaster offers food and a bunk in exchange for a reasonable small job, with emergency aid available even to someone unable to work. Linden wants a second observer for an instrument reading and shares a notebook page rather than delivering the whole cosmology. Pike wants someone to believe in his competence; an attentive mentor can make him a careful scout, while public humiliation makes him defensive. Let one relationship develop over several conversations, meals or jobs. No mandatory tour introduces all four at once.\n\nThe missing copper. Ressa, a new campaign-local supply volunteer, has moved two copper coils and lamp oil to a Radical cell in the Hollows. She thinks a forcibly opened Door can reunite her with a sister and believes the official research is being deliberately delayed. She has concealed the transfer as weather damage; she has not stolen food. The Quartermaster notices identical breakage totals copied onto two inventory sheets. A porter remembers Ressa's distinctive blue packing cord on a handcart; the cord and receiving chit remain in the repair shed. Reading volunteered records or following physical evidence supplies these clues without a mandatory skill roll. A check can determine discretion, speed or whether a witness trusts an accusation. None of this evidence proves the true purpose of the Doors.\n\nOptional side jobs. Offer one job suited to the player's interest after a relationship exists: deliver replacement medical cloth to Thornwall, retrieve a survey case from the Hollows' safe fringe, or help a delayed Cairnfields patrol bring an injured member home. The cloth matters to a named patient introduced on delivery; the case holds Linden's old resonance baselines; the patrol has seen a warning mirror at the Spire. Success can supply a later connection but does not replace the stolen-consignment main quest or close Arrival. Lost cargo can be replaced through labour or a negotiated debt. Refusal leaves the job available to others and changes who later owes gratitude. The campaign's scale grows from someone the party chose to care about.\n\nRessa confronted. With specific evidence she admits moving supplies but argues that waiting forever is itself a choice. She offers to return the oil and arrange a meeting if given safe passage. Detention stops her delivery, not every member of the cell; public denunciation sends surviving members into hiding. A fair hearing creates a possible mediator in Acts 3 and 6. If left alone, her later requests become more urgent and less discreet. Record the actual relationship so her next appearance recognises how the party treated her.\n\nClosing Arrival. Read arrival-and-waystation for every required discovery and the Quartermaster's final consignment report. Repairs, employment, lodging, friendship and other jobs are optional. Offer the missing-supplies problem through the Quartermaster once the party reaches Waystation; make its existing records and witnesses accessible without requiring the player to guess a hidden quest. At the closing report the Quartermaster, or Marla if unavailable, must state Ressa's actual treatment and what restitution is owed or that none is owed. A promised later hearing leaves this disposition pending. Preserve the chosen disposition without inventing a sentence; unpaid restitution remains a carried obligation after closure.\n\n### Objectives\n\narrival-and-waystation\n\n### Approaches and branches\n\nUse the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\n\nIf a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\n\n### Consequences\n\nRecord actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\n\nAll requirements of objective 'arrival-and-waystation' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\n\n### Prepared encounters\n\nA separated juvenile Riftwolf is one available way to express the Verdant Margin's survival pressure early in the campaign. It may appear directly, leave signs, complicate another situation, be delayed, or be replaced by a better expression of the same purpose after play changes course. It is not present until the GM establishes it in the fiction. If events trigger combat, use the admitted D&D Ruleset before narrating the uncertain outcome.\n\n### Encounter adjudication\n\nUse the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\n\nTreat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\n\n### Setting sources\n\ncampaigns/the-rift-awakening/act-1.md\n\n## Act 2: The Hunt\n\nInterpret the Hollows inward-flow evidence and Crane's readings, compare both with the Waystation flicker and receive the fragment-chamber warning.\n\n# Act 2: The Hunt\n\n**The player has a foothold.** They may join the Returners, work with them independently, or pursue these leads through another alliance. The act is structured around recovering what's needed to understand the dormant Door: Warden artifacts, inscriptions, fragments. Each mission advances the plot and deepens relationships without requiring faction membership.\n\n**Required evidence journeys and an optional political mission:**\n\n1. **The Hollows \u2014 The Archivist's Spire.** Kell's Iron offers an expedition to its Warden chamber. The required find is the inward-flow diagram, also repeated on a portable maintenance plate: the lines feed into inhabited ground, not toward an outward destination. Kell's earlier survey includes a rubbing of that same plate and a witnessed sketch of the diagram, available at the expedition's safe staging point. If the shifting stair prevents entry or the player declines that risk, Kell can show these records and identify where they came from. The party can compare their markings with Linden's records or ask the Archivist to interpret them. Additional combat inscriptions and fragment trades are optional; they do not gate the required interpretation.\n\n2. **The Cairnfields \u2014 The Spire.** Old Crane has been signaling. His dated measurements show pulses becoming stronger and closer together. They can be copied below the exposed platform without repairing its reflector. The Deep Rift and the Elder Riftbeast's stirring give those measurements visible context. Tallow's notes about a voice near the Deep Rift are an optional lead, not a substitute for Crane's readings.\n\n3. **Optional: Thornwall \u2014 The Council.** The player is sent to negotiate with Lady Kael \u2014 the council member secretly funding Door research. She needs Returner protection for a trade route. In exchange, she shares intelligence: Lord Voss is pushing a Riftborn registration bill that would cripple Waystation's supply lines. The player has to navigate Thornwall politics \u2014 convince Lord Dorn to vote against Voss, or gather leverage on Lord Merrick, or appeal to Lady Trask's ambitions. The bill's outcome affects the rest of the campaign.\n\n**The Radicals escalate.** A mission is sabotaged \u2014 not fatally, but dangerously. Equipment goes missing from the armory. The Quartermaster identifies the pattern: someone is stockpiling. The player begins to suspect specific NPCs. The cell is real. The question is who's in it.\n\n**The Door flickers.** Nine seconds this time. The passage stays opaque while pressure eases inside Waystation and nearby lamps settle. Linden's instrument record and the outside technician's account remain available if the party missed the test. Compare these observations with both regional findings at Waystation. The comparison challenges the promise of a route home without revealing the full protected truth. A cell contact then warns of activation at the Hollows fragment chamber after the next supply delivery; the player chooses whether to intervene.\n\nThe required investigation compares the Hollows inward-flow diagram or its maintenance plate, Crane's dated pulse readings and the Waystation flicker. Copies or witnesses can provide those same records, not different lore as a substitute. Thornwall negotiations provide optional resources. Each expedition can carry relationships, losses and obligations forward without creating new completion requirements.\n\nHollows expedition. Kell can negotiate a guide's fee or a fair salvage share; write down which finds the agreement covers before entry. The sealed chamber sits beyond a room that alternates between a broken stair and its intact echo. Loose dust lifting from the floor warns before the change. Observe a full cycle, rope a stable outer route or retreat with a copied inscription. The chamber's central diagram shows lines feeding inward from several anchors toward inhabited ground, never an outward destination. A second inscription distinguishes maintaining the enclosure from opening a passage. The same pattern is visible on a portable maintenance plate, so losing the chamber need not destroy all evidence. Taking the plate without agreeing salvage terms damages Kell's trust. A dormant Warden sentinel remains an obstacle only if the party disturbs protected machinery; stealth, identifying a maintenance route or leaving it undisturbed can avoid a fight. The supported copy route is concrete: Kell retains an earlier rubbing of the maintenance plate and a witnessed diagram sketch at the safe expedition staging point. If entry is unsafe or declined, he offers those same records and their provenance. Linden or the Archivist can interpret their actual inward-flow markings; extra fragment trades are optional. Do not require another dangerous crossing merely to reveal that this route exists.\n\nCrane's mirror. The emergency flash comes from a damaged reflector, not a coded invitation to fight. Crane has observed pulses becoming both closer and stronger; his dated sketches and the scorched alignment marks provide independently checkable evidence. He wants a warning delivered to people who will act. Getting a repaired reflector onto the exposed platform calls for a secured route and weather judgment. A cautious party can copy the readings below and leave the repair for better equipment. Tallow can compare the rhythm with the voice he hears near the Deep Rift; treat that as an unsettling observation, not proof of the world's final cause. Taking him there creates an optional later expedition with an agreed retreat signal and no promised cure.\n\nThornwall bargain. Kael can quietly release a wagon and two workers if medical supplies also reach an exposed district. Voss wants registration and oversight attached to any assistance. The choice is about actual terms: who is recorded, who can refuse service and who controls future travel. Dorn responds to a credible safety plan, Merrick to protected trade, and Trask to a defined supply contract. A public coalition can avoid secret patronage but takes work; a private deal is faster and leaves a debt. Prepare an ordinary hearing, a visit to the affected district and a chance to inspect the proposed agreement. Persuasion can change a disputed point, not erase everyone's interests.\n\nThe nine-second flicker. When the party investigates the Door, Linden's instrument records pressure easing inside Waystation while the apparent passage remains opaque. Nearby lamps settle at the same instant. A technician who stayed outside the chamber can corroborate this even if the party missed the test. Ressa's cell interprets the flicker as evidence that more power will open a route. A new warning identifies the Hollows fragment chamber and activation after the next supply delivery. Ressa, a surviving cell contact or a frightened junior member can carry it; this does not undo the settled Act 1 consignment. If the party already stopped that transfer, the cell improvises with damaged components and the next crisis changes accordingly. Set a visible preparation interval, not an arbitrary hidden timer.\n\n### Objectives\n\nregional-evidence\n\n### Approaches and branches\n\nUse the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\n\nIf a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\n\n### Consequences\n\nRecord actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\n\nAll requirements of objective 'regional-evidence' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\n\n### Prepared encounters\n\nOptional chamber sentinel guarding disturbed equipment; its maintenance route and withdrawal permit avoiding combat.\n\nCairnfields exposed-platform rescue and a Thornwall aid hearing.\n\n### Encounter adjudication\n\nUse the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\n\nTreat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\n\n### Setting sources\n\ncampaigns/the-rift-awakening/act-2.md\n\n## Act 3: Doubt\n\nPrevent or respond to a Radical experiment, rescue those endangered and decide how its evidence reaches the community.\n\n# Act 3: Doubt\n\n**The cracks widen.** The player has accumulated enough evidence to know something is wrong. Warden inscriptions that don't match the \"going home\" narrative. V's constant absence \u2014 tracking leads that never seem to lead to Door activation, only to more questions. The Hollowed speaking fragments that sound like warnings. The Radicals' desperation \u2014 what do they know that makes them so urgent?\n\n**The midpoint crisis:** A Radical cell plans to activate a Door fragment in the Hollows \u2014 not the dormant Door, but a fragment, hoping to trigger a reaction. Give the party a credible warning and a chance to intervene. If the operation proceeds unchecked, it causes a Rift surge that draws Hollowed to the site, and the cell leader accuses V of hiding the truth. If the party prevents activation, preserve that success: the intact apparatus, records and living witnesses can expose the same research contradiction without a predetermined catastrophe.\n\nThe operator, two recruits and trapped courier have individual outcomes determined by play. Saving the operator preserves a witness; losing them leaves their notebook and the apparatus for comparison. The records and physical observations together show that increased power creates instability instead of a controllable crossing. Preserve who holds that evidence. The cell knows V concealed research, not the complete truth; only people who actually hear an accusation know it was made.\n\n**The aftermath:** The player has to decide what to do with the surviving Radicals. Turn them over to Waystation leadership? Interrogate them privately? Let them go in exchange for information? The decision shapes the player's relationship with the Returners and with V when they arrive.\n\n**V returns.** Act 3 ends with the signal tower flashing \u2014 V is coming back. The entire settlement tenses. V has been gone for months. Whatever brought them back, it's important. The player has earned V's attention through their actions in Acts 1-3. V requests a meeting. Alone.\n\nThe cell's decision. Ressa or another surviving contact warns that the apparatus will be tested after the next supply delivery. If all known members were captured, a frightened junior member brings the same warning in exchange for a hearing. If no contact is trusted, the unmistakable return of the stolen packing cord and a witness to the shipment make the site discoverable. Introduce the intended activation before it happens, allowing genuine prevention. Interception, persuasion and dismantling are meaningful outcomes; do not stage a catastrophe off-screen simply because this act prepares one.\n\nA chamber with three problems. The apparatus surrounds a Door fragment in a former maintenance room. Its operator wants the test completed, two recruits want their friends home, and a courier trapped behind a buckled brace only wants to leave. The coils connect to an accessible external feed; the central fragment is dangerous to touch. Before committing uncertainty, describe what the party can see: rapidly brightening sigils, an unsecured brace and a shutoff lever held under tension. Disconnecting the feed stops added power; safely venting the stored charge needs either Linden's diagram or an observed sequence of dimming sigils. A reckless cut may cause an injury resolved by the Ruleset. It never automatically kills the courier or decides the party's actions.\n\nIf violence begins. Recruits initially obstruct access or try to drive intruders away; they do not fight to the death for an experiment they now fear. Offer surrender as soon as rescue or credible evidence changes their priorities. The apparatus and evacuation remain the objective. Use ordinary Ruleset-supported humanoid opponents scaled to the actual party; establish exact statistics and resources before combat. Do not stack a creature assault on a difficult rescue simply to lengthen the encounter. If Rift-touched creatures are drawn in, foreshadow their approach and let a route out remain visible.\n\nWhat survives. A rescued operator can explain that the coils magnified instability instead of directing a crossing. Their notebook records more power producing less coherent space; a scorched maintenance plate repeats the inward-flow diagram; the stopped feed reduces local tremors. Compare the operator's records with the apparatus observations to establish the mechanism's local danger; retain who holds the notebook or its copy and who observed the apparatus. A dead or missing operator does not remove the notebook, witnesses or instrument readings. None alone proves whether a natural crossing elsewhere can be reversed. Successful prevention yields the intact apparatus and living testimony, which are stronger evidence than debris.\n\nA community receives the news. Invite the party to choose who hears the preliminary report and how survivors are treated. The Quartermaster asks for names and returnable supplies; Marla asks first who needs care; Pike may repeat an incomplete version if trusted with it but given no explanation. Let the party correct rumours through actual conversations. A public account can prevent another reckless test while alarming families invested in homecoming. Concealment buys time and creates a specific person who was excluded. V's return offers an explanation; refusal of the meeting keeps evidence and community choices in the player's hands.\n\n### Objectives\n\nthe-radical-experiment\n\n### Approaches and branches\n\nUse the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\n\nIf a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\n\n### Consequences\n\nRecord actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\n\nAll requirements of objective 'the-radical-experiment' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\n\n### Prepared encounters\n\nInterception or rescue at the Radical apparatus; people, feed and exits remain the objectives if fighting begins.\n\n### Encounter adjudication\n\nUse the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\n\nTreat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\n\n### Setting sources\n\ncampaigns/the-rift-awakening/act-3.md\n\n## Act 4: Revelation\n\nEstablish the four Door truths, state a stance toward V and disclosure, play its first consequence and select the final response to prepare.\n\n# Act 4: Revelation\n\n**The meeting.** V's study, beneath Waystation. The dormant Door humming through the walls. V looks older than the player expected \u2014 decades of carrying a secret wearing through the composure. V begins with questions, not answers. What has the player learned? What do they suspect? What would they do if everything they believed about the Severed Lands was wrong?\n\nV offers translated records for comparison with the party's physical evidence: crossings are one-way, Doors maintain the inhabited world, the failing network threatens it, and V knew the promise of return was false. The ultimate cause of acceleration remains unknown. If the player refuses this meeting, Linden can provide those same translated records; allegiance to V is not required to establish the facts.\n\n**Why V lied:** The Returners needed hope. A desperate organization chasing an impossible dream was more functional than a despairing one waiting to die. V chose function over truth, and the Doors held longer because of it. Whether that was the right choice is the question V has been asking themself for decades.\n\n**What V wants from the player:** Help keeping people alive and organising the response. Draw on relationships actually developed in play; visits or influence in Thornwall and the Warrens are not assumed. V seeks cooperation, but the player can reject V's leadership while using the research independently.\n\n**The player decides.** Let the player state their stance toward V and disclosure. Play a named recipient's response to disclosure, or V's or Linden's response to an explicit decision to withhold it. Close with the player's choice of Waystation stabilization, the auxiliary refuge or evacuation to Thornwall. Optional relationship conversations do not add gates.\n\nThe meeting has an agenda, not a speech trigger. V first asks what the party already believes and what evidence it has. V then separates known facts from uncertainty: crossings are one-way; the Wardens maintained this place with a network of Doors; the failing network holds the world together; V knew the promise of return was false and allowed it to organise survival work. V cannot explain every cause of the acceleration. Give the player time to challenge each claim. Bring forward the maintenance diagrams, flicker readings and local apparatus results, then offer V's older translated records for comparison. Trust does not require accepting unsupported charisma as proof. If the meeting is refused, Linden supplies the same translated records for comparison. Play the recipient's response to the player's stated disclosure or withholding decision; do not assume consent, influence or relationships that were never established.\n\nWhat V wants and will concede. V wants work on the dormant Door to continue and fears that immediate disclosure will scatter the labour and expertise needed. V offers unrestricted access to the relevant research, a place in planning and credit for an independent result. Faced with a workable disclosure-and-supply plan, V can accept a public hearing and surrender sole control of the records. V resists a demand to invent another comforting destination. The party can demand resignation, refuse alliance or insist on witnessed testimony. V's actual concessions should follow evidence, leverage and previous relationships; no social roll erases responsibility for years of deception.\n\nPeople hear different losses. Linden wants to examine the engineering evidence and may be angry that useful data was withheld. Stern worries about patrols and families already in the field. Pike fears being made a fool of and responds better to honest inclusion than ridicule. Ressa, if present, must confront the harm her certainty helped cause without being required to forgive V. Marla can make room for grief while insisting that people still need supper. Prepare separate conversations, not a unanimous reaction montage. A person may reject V while staying to protect their neighbours.\n\nA truthful message. The party can assemble witnesses, copies of the diagrams and a practical list of what is needed next. Announcing the truth without an immediate rescue plan is still a legitimate choice; its consequence is that others must organise their own response. A phased disclosure must name who is being told first and why, leaving a real risk that someone excluded hears a distorted version. Continuing the lie preserves some cooperation temporarily but puts the party's credibility at stake. Keep track of the exact statement made. Do not force every route into a riot or make an honest disclosure costlier by authorial decree.\n\nThe final response. Close this phase only at the named truth/disclosure confrontation and the player's actual choice of Waystation stabilization, the auxiliary-anchor refuge or evacuation to Thornwall. V's cooperation is optional; existing records and allies can support independent leadership. If the player abandons the final problem, offer a personal departure ending and keep Acts 5 and 6 uncompleted.\n\n### Objectives\n\ntruth-of-the-doors\n\n### Approaches and branches\n\nUse the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\n\nIf a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\n\n### Consequences\n\nRecord actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\n\nAll requirements of objective 'truth-of-the-doors' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\n\n### Prepared encounters\n\nAn evidence-led meeting with V and separate conversations with the people affected by disclosure.\n\n### Encounter adjudication\n\nUse the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\n\nTreat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\n\n### Setting sources\n\ncampaigns/the-rift-awakening/act-4.md\n\n## Act 5: The Collapse\n\nPrepare the chosen stabilization, auxiliary refuge or evacuation operation and actually depart with its checklist satisfied.\n\n# Act 5: The Collapse\n\n**The campaign accelerates.** The Door is destabilizing. Rift surges are more frequent. The Elder Riftbeast's stirring is no longer background lore \u2014 tremors shake the Cairnfields, riftbeasts are fleeing their territories, and Old Crane's signals have stopped entirely. Something is about to break.\n\n**The player's required objective:** prepare the operation selected at the Act 4 closing scene and depart, using the checklist below. Cooperation with V changes who helps, not which requirements count.\n\n**Optional pressures, shaped by their Act 4 choices:**\n\n*If the player sided with V:*\n- Manage the Returners \u2014 decide who to tell, when, and how\n- Neutralize the remaining Radical cells before they attempt another forced activation\n- Investigate the acceleration cause \u2014 what's speeding up the Door decay?\n\n*If the player rejected V:*\n- Seek independent research and practical support for the chosen operation; the missing Doors and the acceleration's ultimate cause remain wider mysteries\n- Build alliances outside the Returners \u2014 the Athenaeum, the Lodge, the Rememberers\n- Expose V's lie to the Returners and survive the organizational fracture that follows\n- Face the same questions V has been facing: once you have the truth, what do you do with it?\n\n**Thornwall support.** Evacuation requires actual acceptance by a receiving party in Thornwall, as the checklist specifies. Council negotiations can also supply optional resources for stabilization or the auxiliary refuge. Use only political relationships and obligations established in play; resolving every council thread is unnecessary.\n\n**The Elder Riftbeast awakens.** Not fully \u2014 not yet \u2014 but enough to reshape the Cairnfields. A Rift surge of unprecedented scale tears through the western region. Waystation trembles. The dormant Door screams \u2014 a sound no one has ever heard it make. The clock is no longer ticking. It's striking.\n\nChoose a plan before collecting components. The Waystation Door needs three functions: a coherent alignment reading, a controllable energy feed and people able to work safely through the surge. These are fictional engineering requirements, not new engine items or an automatic crafting system. Existing diagrams can supply the reading; a repaired reflector or careful measurements can improve it. Recovered coils may supply the feed if checked and safely limited. Willing workers need evacuation arrangements and clear authority. Let the party propose equivalent tools or magic supported by the Ruleset. Make costs and uncertainties explicit before a dangerous attempt.\n\nThe Spire goes quiet. Crane's missing signal is a chance to protect someone already met. The platform has shifted and the usual descent is blocked. Crane has retreated to a lower shelter with the latest readings; footprints, a chalk arrow and abandoned broken mirror fragments point there. He may be hurt or exhausted but is not predetermined dead. Rescue can use the rope route established earlier, local guides or a supported spell. If the party sends trusted help, resolve the expedition according to that help and known hazards. If no one goes, the readings may arrive late with a scavenger while Crane's fate remains a concrete loss or follow-up, not a compulsory motivation device.\n\nThornwall's price revisited. Kael's family concerns now complicate her aid, while Voss can argue that frightened citizens deserve an evacuation plan before resources leave town. Bring back any actual Act 2 agreement; if none was made, there is no implied bargain or debt. Workers previously treated fairly can volunteer; those coerced may demand new terms. A promised medical delivery unfulfilled becomes a legitimate objection. The party can offer shared oversight, repair its earlier failure, seek Guild transport or attempt a smaller operation. Do not make a single councillor's approval the only way forward. The terms determine who is at the final chamber and who trusts the party afterwards.\n\nAn earned alternate project. If the party retained the maintenance plate or its supported copy and Crane's pulse comparisons, it can identify an isolated auxiliary anchor chamber on the Cairnfields approach. This campaign-local station can share the Waystation load; it cannot send anyone home or solve the whole world's unknown acceleration. Its outer drain is clogged with debris, its feed has been stripped, and its alignment marks remain readable. Surveying it, securing replacement feed and testing it under limited load provide observable stages. Each success can be carried into Act 6 as a backup rather than a surprise cure. A failed safe test supplies useful limits. Repeated dangerous testing after those limits risks the crew and must be chosen openly.\n\nThe surviving Radicals. Offer members evidence and a role in keeping people alive. Ressa can persuade recruits if she was heard and if the new plan includes public accountability. Those imprisoned without explanation may mistrust every official account; let outside witnesses speak. A hard-line remnant wants unrestricted power at the final activation. Its actual access depends on what the party secured: lost keys, a collaborator, or an unguarded service route. Discovering and removing that access can prevent its final intrusion completely. Do not respawn the faction after a credible settlement.\n\nBefore the descent. Allow a meal, farewells and unfinished conversations. The player decides whom to invite, whether to disclose the danger and what personal promises to make. Review the actual preparations aloud as information their character has: allies, escape routes, evidence, equipment and backup. This is also a point to choose evacuation over activation. No prophecy, Elder tremor or NPC speech takes that choice away. The Elder's stirring remains a physical warning and open mystery, not an invented final boss with an unearned stat block.\n\n### Objectives\n\na-plan-for-the-living\n\n### Approaches and branches\n\nUse the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\n\nIf a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\n\n### Consequences\n\nRecord actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\n\nAll requirements of objective 'a-plan-for-the-living' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\n\n### Prepared encounters\n\nSearch for Crane, negotiation of a real aid agreement and an optional auxiliary-anchor field test.\n\n### Encounter adjudication\n\nUse the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\n\nTreat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\n\n### Setting sources\n\ncampaigns/the-rift-awakening/act-5.md\n\n## Act 6: Resolution\n\nComplete the selected final operation, account for its people and play its immediate aftermath.\n\n# Act 6: Resolution\n\n**The final confrontation.** Play the operation begun at the Act 5 closing scene to its observable success or ended failure. Apply only the chosen operation's preparation. Surviving opponents intervene only with established motive and access; reconciliation does not create a replacement attack.\n\n## Intended outcomes\n\n**waystation-stabilized.** The chosen operation is Waystation stabilization; alignment matches, the limited feed holds, the pulse is regular, the Margin boundary holds and outside observers confirm calmer surges. Waystation is stabilized and its surviving communities have a future; the world is not a portal home.\n\n**auxiliary-refuge-held.** The chosen operation is the auxiliary refuge; its aligned controlled feed holds the surveyed shelter through a surge, while outside observers confirm that wider instability continues. The survivors have a functioning local refuge while the wider world remains unstable.\n\n**thornwall-arrival.** The chosen evacuation reaches the agreed Thornwall refuge and the receiving party accounts for its named people and actual losses. The evacuees have reached the agreed refuge and begin making a life there.\n\n**operation-ended-in-failure.** The selected operation has actually failed and ended: a Door/auxiliary attempt has its feed disconnected or exhausted and escape or losses established; an evacuation has ended at a stated retreat location or with established losses. An attempt still under way is unfinished. The attempted solution failed. Survivors face the consequences together in the still inhabited world.\n\n## Immediate ending\n\nThe immediate ending. Bring the surviving crew or receiving party together on safe ground. They acknowledge the actual result, account for losses and establish shelter and immediate care. Pay outstanding promises or name their remaining owner. Portray the consequences of the player's actual disclosure and leadership choices; do not force a public revelation if it was withheld. Include reactions and celebrations over the next days or weeks when appropriate. Use friendships and romances actually developed without requiring every relationship or emergent thread to conclude. This completes the final act. Record the matching intended ending only after that immediate aftermath. Sylvia then offers continued adventuring or Finish the story. Continuing stays here without a lifetime jump. Only Finish invites the authored after-story, personalized from the actual campaign; OOC can override it.\n\n## Optional after-story\n\nEach structured intended ending declares open-world continuation viable and supplies a brief after-story premise. Read that exact premise only when needed. Narrate the longer future after the player chooses Finish the story, using the campaign's actual people and choices. No after-story selection or refusal is an act-ending condition.\n\n2. The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\n\n3. Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\n\n## Optional after-story\n\nEach structured intended ending declares open-world continuation viable and supplies a brief after-story premise. Read that exact premise only when needed. Narrate the longer future after the player chooses Finish the story, using the campaign's actual people and choices. No after-story selection or refusal is an act-ending condition.\n\nFor a Door or auxiliary-anchor operation only. The chamber as a final situation. Prepare three connected spaces: an upper refuge for evacuees and spare supplies, a service gallery with the controlled feed, and the lower Door dais with alignment marks and a sheltered access route. Explain which paths are compromised by tremors before movement commits the party. The finale's three tasks are to bring the alignment into agreement with verified readings, feed power within the tested limit and sustain it while people withdraw from exposed ground. Earlier preparations can complete a task outright. A repaired backup can share load. Missing resources call for an explicit new cost, delay or abandonment, not an invisible difficulty increase.\n\nResolve tasks through decisions. First show an observable discrepancy: one mark is out of alignment, a limiter is overheating or a crew member cannot reach shelter. Ask what the character does and use the Ruleset for uncertain consequential action. After an action, describe what measurably changed and the next danger, leaving room for another approach. There is no universal three-success countdown or arbitrary token quota. Failure may damage a component, injure someone through resolved mechanics or force a retreat. A dangerous retry needs a new method or a chosen risk. The GM must not declare stabilization because enough turns have elapsed.\n\nFor an operation at the controls only. If a remnant reaches the controls. Only surviving, motivated opponents with established access intervene. Their demand is to remove the limiter and force a crossing. Show the lever, their route and the frightened recruits before initiative. Ressa, testimony from a survivor or the party's public evidence can split their support. If combat occurs, keep its objective control of the feed and evacuation; use declared Ruleset statistics and allow surrender or flight. If the party already reconciled the cell or secured all access, honour that achievement and let engineering, sacrifice or a difficult evacuation carry the climax.\n\nMeasure the result. On successful stabilization, the signs change together: the pulse becomes regular, the Margin boundary holds and independent observers report calmer surges. The network has bought a future, potentially decades or centuries, without an exact guaranteed lifetime. A successful auxiliary project can preserve a local refuge if the main Door fails or reduce the burden of sustaining it. If activation fails, give people time to organise in the slowly deteriorating world; do not erase every rescued person in an instant. A credible third path uses discoveries and tests already established in play, with its limits stated. No ending reverses the one-way Rift or reveals that the entire tragedy was a simple misunderstanding.\n\nThe immediate ending. Bring the surviving crew or receiving party together on safe ground. They acknowledge the actual result, account for losses and establish shelter and immediate care. Pay outstanding promises or name their remaining owner. Portray the consequences of the player's actual disclosure and leadership choices; do not force a public revelation if it was withheld. Include reactions and celebrations over the next days or weeks when appropriate. Use friendships and romances actually developed without requiring every relationship or emergent thread to conclude. This completes the final act. Record the matching intended ending only after that immediate aftermath. Sylvia then offers continued adventuring or Finish the story. Continuing stays here without a lifetime jump. Only Finish invites the authored after-story, personalized from the actual campaign; OOC can override it.\n\n### Objectives\n\nfinal-choice\n\n### Approaches and branches\n\nUse the approaches in these situations as opportunities. Honour prevention, refusal, an early discovery or a player-created route and change subsequent preparation to match.\n\nIf a central person is unavailable, use the prepared physical evidence, independent witness or alternate ally. Their absence still changes cost and relationships.\n\n### Consequences\n\nRecord actual discoveries, relationships, losses and promises from this act; later scenes use those consequences.\n\nAll requirements of objective 'final-choice' must hold, including its named closing event. Explicit alternatives satisfy only their own condition. Side jobs neither substitute for nor extend this ending. Deferral or retirement alone does not complete the act.\n\n### Prepared encounters\n\nDoor stabilization or evacuation, with an optional remnant intrusion only if surviving opponents have established access.\n\n### Encounter adjudication\n\nUse the actual party and admitted Ruleset when selecting opposition, checks, injuries, rests and advancement. Prepare exact supported combat actors before combat, disclose obvious danger and preserve earned escape or de-escalation. Setting monsters do not supply unimplemented engine abilities.\n\nTreat environmental and engineering projects as explicit GM adjudication. Establish the visible state, intended effect and failure risk before resolving uncertainty. Never silently create an automatic faction, repair or survival subsystem.\n\n### Setting sources\n\ncampaigns/the-rift-awakening/act-6.md\n\n## Campaign objectives\n\n```json\n{\n  \"completion_conditions\": [\n    \"The party has reached Waystation and learned its public claims: Returners shelter Rift arrivals, seek a route home through the Doors, and follow V's research while V is away. These claims do not establish that return is possible.\",\n    \"The party has established that two copper coils and lamp oil were deliberately diverted, identified Ressa's transfer to a Hollows cell, and obtained the receiving chit or her witnessed account of that transfer.\",\n    \"That stolen consignment has reached its final disposition: recoverable contents have returned to Waystation, or loss or consumption has been established at the destination and reported. An assigned investigation, a future return agreement or a promise to recover it later remains unfinished.\",\n    \"Closing event: the Quartermaster receives the transfer evidence, checks the returned goods or confirmed losses and acknowledges that this consignment's investigation has concluded. Marla receives the same report if the Quartermaster is unavailable. The recipient states Ressa's actual treatment and the restitution owed, or explicitly that none is owed, and these are recorded. A hearing promised for later with that decision still pending leaves this condition unfinished; repayment and further jobs are not act requirements.\"\n  ],\n  \"description\": \"Reach Waystation, learn its public claims, resolve the stolen consignment and hear its final accounting, including Ressa's treatment and restitution.\",\n  \"id\": \"arrival-and-waystation\",\n  \"title\": \"A foothold\"\n}\n```\n\n```json\n{\n  \"completion_conditions\": [\n    \"The Hollows inward-flow diagram or its portable maintenance plate has been obtained and interpreted: the depicted flow goes into inhabited ground rather than toward an outward destination. A copy or supported witness account of this same evidence counts; unrelated lore does not.\",\n    \"Crane's dated measurements have been obtained and their result established: pulses are growing stronger and closer together. Repairing the reflector is optional; obtaining these readings is required.\",\n    \"At Waystation, both findings have been compared with the nine-second flicker: the passage stayed opaque while local pressure eased and nearby lamps settled. Linden or the outside technician can supply that observed test record.\",\n    \"Closing event: the Waystation comparison makes clear that these observations do not support the promised passage home, and the party receives the warning naming the Hollows fragment chamber and the cell's activation planned after the next supply delivery. This is doubt, not the full protected truth. Accepting intervention is the player's choice, not another condition of Act 2 completion.\"\n  ],\n  \"description\": \"Interpret the Hollows inward-flow evidence and Crane's readings, compare both with the Waystation flicker and receive the fragment-chamber warning.\",\n  \"id\": \"regional-evidence\",\n  \"title\": \"The Door evidence\"\n}\n```\n\n```json\n{\n  \"completion_conditions\": [\n    \"The party has reached the warned-about fragment chamber while intervention is possible and encountered its apparatus, external feed, operator, two recruits and trapped courier.\",\n    \"The apparatus is unable to run after prevention, safely disconnected and vented, or inactive after discharge with the party out of its immediate danger. Merely passing the warning to another NPC does not resolve this crisis. Preserve prevention without staging a replacement disaster.\",\n    \"The courier, operator and two recruits have recorded outcomes, including observed losses or separation, and the notebook/apparatus evidence has an identified holder. The operator's records and apparatus observations establish that increased power produces instability rather than a controllable crossing, even if the operator dies.\",\n    \"Closing event: back at Waystation, a recipient hears the party's report of the ended experiment and its casualties or survivors; the tower then signals V's return and the player receives V's meeting request. Record evidence the player withholds. Accepting the meeting, forgiving survivors and paying every debt are not further requirements; refusing to return or report does not fabricate this scene.\"\n  ],\n  \"description\": \"End the warned-about fragment experiment, account for its people and evidence, and report at Waystation before receiving V's meeting request.\",\n  \"id\": \"the-radical-experiment\",\n  \"title\": \"The experiment\"\n}\n```\n\n```json\n{\n  \"completion_conditions\": [\n    \"V's records/testimony, compared with the earlier physical evidence, establish all four facts: crossings are one-way; Doors maintain the inhabited world; the failing network threatens it; V knew the return promise was false and concealed it. If the meeting is refused, Linden can provide access to the same translated records for comparison.\",\n    \"The player has had the opportunity to question those facts and has stated their stance toward V and disclosure. Cooperation, rejection of V's leadership or deferred allegiance are explicit choices, not inferred consent.\",\n    \"The first disclosure consequence has occurred: a named person or group hears the player's account and responds, or the player explicitly withholds the truth and communicates that decision to V or Linden, who responds. Universal agreement and every companion conversation are unnecessary.\",\n    \"Closing event: at the end of this confrontation, the player chooses Waystation stabilization, the auxiliary-anchor refuge or evacuation to Thornwall as the final response to prepare. Independent leadership is allowed. Declining the final problem altogether permits a personal departure ending but does not complete Acts 5 and 6. The ultimate cause of worldwide acceleration remains unresolved.\"\n  ],\n  \"description\": \"Establish the four Door truths, state a stance toward V and disclosure, play its first consequence and select the final response to prepare.\",\n  \"id\": \"truth-of-the-doors\",\n  \"title\": \"The truth\"\n}\n```\n\n```json\n{\n  \"completion_conditions\": [\n    \"The player's chosen operation is recorded as Waystation stabilization, the auxiliary-anchor refuge or evacuation to Thornwall. Only that operation's preparation requirements apply; changing plans requires meeting the replacement operation's requirements.\",\n    \"For Waystation stabilization: the working alignment uses the recovered diagram and Crane's readings; an assembled feed's limiter and shutoff both work in a low-power test before connection to the Door; a named willing crew is committed and the route between lower dais and upper refuge has been checked. For the auxiliary refuge: the chamber indicated by the plate and pulse comparison is located, its drain cleared, stripped feed replaced and shutoff tested at low power, readable alignment marks copied, and a named willing crew and checked shelter/exit route established; its limited local protection is understood. For evacuation: Thornwall has actually agreed to receive the named evacuees, transport has capacity for them, a named guide and confirmed route exist, and those evacuees and their carried supplies are assembled for departure. An unanswered appeal or request for equipment is insufficient.\",\n    \"Closing event: with the selected preparation complete, the player authorizes and starts the operation: the crew crosses into the Door/anchor worksite or the assembled convoy leaves Waystation for Thornwall. An intention or planning meeting is insufficient. Optional rescue, favours, alliances and farewells add no further requirement; retain their actual consequences.\"\n  ],\n  \"description\": \"Complete the selected operation's concrete preparation and depart into its worksite or evacuation route.\",\n  \"id\": \"a-plan-for-the-living\",\n  \"title\": \"A plan for the living\"\n}\n```\n\n```json\n{\n  \"completion_conditions\": [\n    \"The selected operation has a concrete result. Waystation success requires matching alignment, a sustained limited feed, a regular pulse, a held Margin boundary and outside confirmation of calmer surges; failure requires the ended attempt's feed disconnected or exhausted and the crew escaped or losses established. Auxiliary success requires aligned controlled feed holding the surveyed local shelter through a surge while outside observers still report instability; failure requires the feed shut down or exhausted and escape or established losses, without claiming a world-saving cure. Evacuation success requires the convoy at the agreed Thornwall refuge and its named people accounted for by the receiving party; failure requires retreat to a stated location or established losses and this evacuation attempt explicitly ended. An ongoing attempt or journey is unfinished.\",\n    \"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\n    \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n  ],\n  \"description\": \"Complete the selected final operation, account for its people and play its immediate aftermath.\",\n  \"id\": \"final-choice\",\n  \"title\": \"The chosen future\"\n}\n```\n\n## Intended ending or ongoing final act\n\n```json\n{\n  \"mode\": \"finite\",\n  \"outcomes\": [\n    {\n      \"after_story\": \"The surviving player character makes a lasting home in the Severed Lands. Develop a long, flowing account of a life shaped by the actual friendships, romances, losses and chosen responsibilities. A peaceful life is the intended direction where the achieved outcome permits it. Do not invent a romance, leadership appointment, resurrection, return portal or cure for the world's unresolved instability. Honour established player wishes and OOC overrides.\",\n      \"conditions\": [\n        \"The chosen operation is Waystation stabilization; alignment matches, the limited feed holds, the pulse is regular, the Margin boundary holds and outside observers confirm calmer surges.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"id\": \"waystation-stabilized\",\n      \"immediate_aftermath\": [\n        \"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"open_world\": true,\n      \"outcome\": \"Waystation is stabilized and its surviving communities have a future; the world is not a portal home.\"\n    },\n    {\n      \"after_story\": \"The surviving player character makes a lasting home in the Severed Lands. Develop a long, flowing account of a life shaped by the actual friendships, romances, losses and chosen responsibilities. A peaceful life is the intended direction where the achieved outcome permits it. Do not invent a romance, leadership appointment, resurrection, return portal or cure for the world's unresolved instability. Honour established player wishes and OOC overrides.\",\n      \"conditions\": [\n        \"The chosen operation is the auxiliary refuge; its aligned controlled feed holds the surveyed shelter through a surge, while outside observers confirm that wider instability continues.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"id\": \"auxiliary-refuge-held\",\n      \"immediate_aftermath\": [\n        \"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"open_world\": true,\n      \"outcome\": \"The survivors have a functioning local refuge while the wider world remains unstable.\"\n    },\n    {\n      \"after_story\": \"The surviving player character makes a lasting home in the Severed Lands. Develop a long, flowing account of a life shaped by the actual friendships, romances, losses and chosen responsibilities. A peaceful life is the intended direction where the achieved outcome permits it. Do not invent a romance, leadership appointment, resurrection, return portal or cure for the world's unresolved instability. Honour established player wishes and OOC overrides.\",\n      \"conditions\": [\n        \"The chosen evacuation reaches the agreed Thornwall refuge and the receiving party accounts for its named people and actual losses.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"id\": \"thornwall-arrival\",\n      \"immediate_aftermath\": [\n        \"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"open_world\": true,\n      \"outcome\": \"The evacuees have reached the agreed refuge and begin making a life there.\"\n    },\n    {\n      \"after_story\": \"Describe the surviving character and allies making a life with the consequences of the failed operation, preserving the actual losses, relationships and remaining hopes. Their future may be bittersweet; do not invent later success, inevitable immediate extinction, resurrection or a return portal. If the character died under the selected death boundary, remember that life through the people who actually knew them. Respect the player's wishes and OOC overrides.\",\n      \"conditions\": [\n        \"The selected operation has actually failed and ended: a Door/auxiliary attempt has its feed disconnected or exhausted and escape or losses established; an evacuation has ended at a stated retreat location or with established losses. An attempt still under way is unfinished.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"id\": \"operation-ended-in-failure\",\n      \"immediate_aftermath\": [\n        \"The actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\",\n        \"Closing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\"\n      ],\n      \"open_world\": true,\n      \"outcome\": \"The attempted solution failed. Survivors face the consequences together in the still inhabited world.\"\n    }\n  ]\n}\n```\n\n## GM guidance\n\nRun The Rift Awakening as a D&D 5e campaign using the admitted D&D SRD 5.2.1 Ruleset. Treat this Campaign Plan as private story preparation and desired direction, never as a scene queue or script. Aim for its mystery, survival pressure, relationships, and eventual Door revelation through natural intrigue, NPC motives, clues, consequences, and opportunities. Interpret how to get there freely. Adapt routes, scenes and NPC approaches to player choices and current Campaign State while preserving the specific required main-story outcomes. Side work cannot replace those outcomes; refusing the story leaves it unfinished. Preserve protected truths, earned reveal conditions, content boundaries, and committed Ruleset outcomes. Let the opening arise from the accepted initial state; do not introduce an encounter merely because it is prepared.\n\nThe Setting fixes the one-way crossing, the Doors as life support and V's concealed knowledge. Their explanation is written in Act 4. If equivalent proof is earned earlier, preserve the discovery and credit that required fact when assessing its objective; never destroy a clue to preserve an act number. An early fact does not by itself complete the other required conditions or jump over unfinished acts. V may remain unavailable while evidence speaks. The cause of the worldwide acceleration is deliberately unresolved Setting territory. Local amplifier damage described here is a campaign-specific contribution, not an answer to every Rift mystery. No ending creates a portal home.\n\nThere is no going home. The crossing is one-way. Of the seven Anchor Doors, four are gone, two are missing and the Waystation Door is dormant but intact. Keep this private truth distinct from the public hope of return; a new local auxiliary station is not an eighth Door.\n\nHigh freedom of method, route, alliance and response. The player may decline the story or retire optional scenes. All named required discoveries, outcomes and closing events still define completion; a skipped or abandoned act remains unfinished.\n\nPrepare for sustained play, with room for travel, rests, personal ambitions and optional regional stories between major decisions. Begin with a compatible level-1 character or adjust challenges honestly to the selected party. Agree advancement through the admitted Ruleset; act numbers neither grant levels nor prove encounter balance. Use each act as a changing situation. Record specific people, evidence, promises and losses instead of filling a predetermined session count.\n\nMaintain a compact campaign record: people protected or alienated; supplies and transport actually secured; the evidence the party possesses; what each faction has heard; Radical members rescued, arrested or reconciled; and the chosen disclosure policy. At each act transition name what changed and which unresolved obligations remain. NPCs react to what reached them, not to private player knowledge. The ending must spend these accumulated relationships and preparations.\n\nEvery act has a named main problem and an exact ending. Read its linked objective requirements when framing that problem and assessing its outcome. All conditions must hold, including the closing event, with alternatives only where explicitly stated. Once earned, close the act and carry remaining side obligations forward. The player may choose methods or decline the story; neither side work nor refusal fabricates main-story completion.\n\nOffer accessible leads to each named main problem while preserving the player's choice of route, method, alliance and response. An unchosen quest remains unfinished rather than being replaced by arbitrary side work or resolved off-screen.\n\n## Completion and aftermath\n\nThe selected operation has a concrete result. Waystation success requires matching alignment, a sustained limited feed, a regular pulse, a held Margin boundary and outside confirmation of calmer surges; failure requires the ended attempt's feed disconnected or exhausted and the crew escaped or losses established. Auxiliary success requires aligned controlled feed holding the surveyed local shelter through a surge while outside observers still report instability; failure requires the feed shut down or exhausted and escape or established losses, without claiming a world-saving cure. Evacuation success requires the convoy at the agreed Thornwall refuge and its named people accounted for by the receiving party; failure requires retreat to a stated location or established losses and this evacuation attempt explicitly ended. An ongoing attempt or journey is unfinished.\n\nThe actual crew or evacuees are accounted for and the immediate response to that result is played, including consequences of the player's disclosure and leadership choices. Outstanding promises are paid or assigned an explicit remaining owner; no relationship quota or universal reconciliation is required.\n\nClosing event: the surviving crew or receiving party acknowledges the operation's actual result and losses, and the next safe shelter and immediate care arrangements for those present are established. Play their immediate reactions and any chosen celebration. No extra rescue, replacement boss, lifetime timeskip or epilogue choice is required.\n\n## Failure and withdrawal\n\nUse the concrete failure endings in the relevant objective. Failure may complete that act only after its specified outcome and closing event; deferral or withdrawal alone is not completion.\n\nDefeat follows the selected character death and recovery boundary. If the player abandons the main story, conclude their departure honestly without marking unplayed acts complete.\n\n## Optional continuation\n\nAfter the immediate ending, Continue adventuring keeps play in the present with the actual survivors, allies, faction conflicts and threats. Do not narrate the after-story first or automatically append another numbered act. OOC may change direction at any time.\n\n## Side opportunities\n\nPike's next patrol: he wants to prove useful after his celebrated first kill. Plan the route together, let him notice one real warning and decide whether to escort, mentor or trust him. Bring his actual conduct back during evacuation preparations.\n\nThe Quartermaster's fair ledger: recovered supplies do not erase an unpaid porter's labour. Identify who did the work, compare the signed receipt and settle an honest dispute through payment, replacement goods or an agreed future job. The resulting trust can secure willing hands later.\n\nTallow's listening journey: only if invited, accompany a bounded expedition toward the Deep Rift with a retreat signal, recorded observations and a return route. The voice offers an unresolved personal question; do not turn it into a compulsory cure or the answer to all cosmology.\n\nA meal worth repeating: Marla asks each willing guest to contribute a remembered recipe or a new local invention. Let the player share as much or as little personal history as desired. Returning to the same meal after disclosure can show who still sits together without requiring a quest or a roll.\n\nAn obligation selected by the player: use a relationship or ambition actually established during play. Agree a concrete local purpose and endpoint, then let its outcome alter a later invitation, resource or alliance. The main campaign can wait unless an already-established event would genuinely move.\n\n## Mechanics requiring GM adjudication\n\nSevered Lands custom subclasses, creatures, spells, items, and variant rules are narrative Setting references until their mechanics are encoded by a compatible Ruleset extension.\n\nThe juvenile Riftwolf adaptation from the Rifthound source is an explicit GM adjudication.\n\nUnencoded travel, social, faction, and environment clauses are GM adjudications using the D&D Ruleset's generic resolutions.\n\nDoor stabilization, auxiliary-anchor work, disclosure, coalition commitments and the passage of narrative time are explicit GM adjudication. No new crafting, election, faction, travel or catastrophe simulator is installed by this Plan.\n\n## Referenced Setting files\n\n```json\n{\n  \"creatures\": [\n    {\n      \"id\": \"rifthound\",\n      \"path\": \"content/monsters/rifthound.md\"\n    }\n  ],\n  \"factions\": [\n    {\n      \"id\": \"returners\",\n      \"path\": \"factions/returners.md\"\n    },\n    {\n      \"id\": \"radicals\",\n      \"path\": \"factions/the-radicals.md\"\n    },\n    {\n      \"id\": \"thornwall-council\",\n      \"path\": \"factions/thornwall-council.md\"\n    }\n  ],\n  \"items\": [\n    {\n      \"id\": \"riftbeast-slayer\",\n      \"path\": \"content/items/riftbeast-slayer.md\"\n    },\n    {\n      \"id\": \"riftscale-mail\",\n      \"path\": \"content/items/riftscale-mail.md\"\n    }\n  ],\n  \"locations\": [\n    {\n      \"id\": \"verdant-margin\",\n      \"path\": \"locations/verdant-margin.md\"\n    },\n    {\n      \"id\": \"waystation\",\n      \"path\": \"locations/waystation.md\"\n    },\n    {\n      \"id\": \"cairnfields\",\n      \"path\": \"locations/cairnfields.md\"\n    },\n    {\n      \"id\": \"thornwall\",\n      \"path\": \"locations/thornwall.md\"\n    }\n  ],\n  \"lore\": [\n    {\n      \"id\": \"world-overview\",\n      \"path\": \"lore/world-overview.md\"\n    },\n    {\n      \"id\": \"history-timeline\",\n      \"path\": \"lore/history-timeline.md\"\n    },\n    {\n      \"id\": \"dm-secrets\",\n      \"path\": \"DM-SECRETS.md\"\n    }\n  ],\n  \"npcs\": [\n    {\n      \"id\": \"stern\",\n      \"path\": \"npcs/patrol-veteran-stern.md\"\n    },\n    {\n      \"id\": \"v\",\n      \"path\": \"npcs/v.md\"\n    },\n    {\n      \"id\": \"linden\",\n      \"path\": \"npcs/researcher-linden.md\"\n    },\n    {\n      \"id\": \"quartermaster\",\n      \"path\": \"npcs/the-quartermaster.md\"\n    },\n    {\n      \"id\": \"lord-voss\",\n      \"path\": \"npcs/lord-voss.md\"\n    },\n    {\n      \"id\": \"lady-kael\",\n      \"path\": \"npcs/lady-kael.md\"\n    },\n    {\n      \"id\": \"old-crane\",\n      \"path\": \"npcs/old-crane.md\"\n    }\n  ]\n}\n```",
+  "campaign-plans/campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc/record.json": "{\"artifact_id\":\"campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc\",\"content_sha256\":\"91c5fab1cbf0f5cc2f2636b4c47b4c8f29fb4f512176d6d87130e139f28b512a\",\"format_id\":\"sylvia-gm-reusable-campaign-plan\",\"format_version\":2,\"plan_content_sha256\":\"db47463fa8eb409e056581b41415d533ce3153aad71502fd6df935aa58819517\",\"setup_id\":\"the-rift-awakening\",\"source_plan_content_sha256\":\"5435a28baa6effbd334d1292da2ca0befcff897f4ff426c4efb31ef24795809d\",\"summary\":\"Find your place in the Severed Lands, a strange world of ancient Doors, dangerous frontiers and people who dream of home. Build friendships, explore its regions and decide whose hopes deserve your trust in an expansive six-act campaign.\",\"title\":\"Saved Rift\"}"
+ },
+ "operations": [
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "table",
+   "display_name": "Table Night",
+   "builder_session_id": "session-table",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-ruleset",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": "candidate-install-riichi"
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-setting",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 1,
+   "current_step": "setting",
+   "visible_answer": "An answer",
+   "answer": {
+    "setting_id": null
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-plan",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 2,
+   "current_step": "plan",
+   "visible_answer": "An answer",
+   "answer": {
+    "plan_id": null
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-name",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 3,
+   "current_step": "name",
+   "visible_answer": "An answer",
+   "answer": {
+    "display_name": "Table Night"
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-participants",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 4,
+   "current_step": "participants",
+   "visible_answer": "An answer",
+   "answer": {
+    "participants": []
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-boundaries",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 5,
+   "current_step": "boundaries_preferences",
+   "visible_answer": "An answer",
+   "answer": {
+    "boundaries": []
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "t-requests",
+   "campaign": "table",
+   "builder_session_id": "session-table",
+   "expected_construction_revision": 6,
+   "current_step": "specific_requests",
+   "visible_answer": "An answer",
+   "answer": {
+    "requests": []
+   }
+  },
+  {
+   "op": "append_agent_message",
+   "session_id": "session-table",
+   "message_id": "guided-ready-table",
+   "content": {
+    "text": "Ready to Begin",
+    "interview_step": "ready",
+    "interview_value": {
+     "action": "ready_to_begin"
+    }
+   }
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-repeated",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    },
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-unlocked",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-kind",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "dealer",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-schema",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v0",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-data",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-adaptation",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": "adaptation-missing"
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-quarantined",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": null,
+     "schema_id": null,
+     "schema_sha256": null,
+     "validation_status": "quarantined",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-state-repeated",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ],
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 2
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-state-reserved",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "notes",
+     {
+      "raw_reasoning": "hidden"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-state-ambiguous",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.elsewhere",
+     "table",
+     {
+      "round": 1
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    },
+    {
+     "participant_id": "player-ben",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ben",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    },
+    {
+     "participant_id": "player-ben",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ben",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind",
+   "campaign": "table",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-table",
+   "builder_session_id": "session-table",
+   "candidate": "candidate-install-riichi",
+   "participants": [
+    {
+     "participant_id": "player-ann",
+     "kind": "player",
+     "package_id": "pneuma.riichi-mahjong",
+     "package_version": "0.1.1",
+     "data": {
+      "name": "Ann",
+      "control": "player"
+     },
+     "package_sha256": "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+     "schema_id": "pneuma.riichi-mahjong.player.v1",
+     "schema_sha256": "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+     "validation_status": "validated",
+     "adaptation_id": null
+    }
+   ],
+   "initial_state": [
+    [
+     "pneuma.riichi-mahjong",
+     "table",
+     {
+      "round": 1,
+      "wind": "east"
+     }
+    ]
+   ]
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "plain",
+   "display_name": "Table Night",
+   "builder_session_id": "session-plain",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-ruleset",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": "candidate-install-plain"
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-setting",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 1,
+   "current_step": "setting",
+   "visible_answer": "An answer",
+   "answer": {
+    "setting_id": null
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-plan",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 2,
+   "current_step": "plan",
+   "visible_answer": "An answer",
+   "answer": {
+    "plan_id": null
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-name",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 3,
+   "current_step": "name",
+   "visible_answer": "An answer",
+   "answer": {
+    "display_name": "Table Night"
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-participants",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 4,
+   "current_step": "participants",
+   "visible_answer": "An answer",
+   "answer": {
+    "participants": []
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-boundaries",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 5,
+   "current_step": "boundaries_preferences",
+   "visible_answer": "An answer",
+   "answer": {
+    "boundaries": []
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "p-requests",
+   "campaign": "plain",
+   "builder_session_id": "session-plain",
+   "expected_construction_revision": 6,
+   "current_step": "specific_requests",
+   "visible_answer": "An answer",
+   "answer": {
+    "requests": []
+   }
+  },
+  {
+   "op": "append_agent_message",
+   "session_id": "session-plain",
+   "message_id": "guided-ready-plain",
+   "content": {
+    "text": "Ready to Begin",
+    "interview_step": "ready",
+    "interview_value": {
+     "action": "ready_to_begin"
+    }
+   }
+  },
+  {
+   "op": "bind_guided_campaign_basis",
+   "operation_id": "bind-plain",
+   "campaign": "plain",
+   "display_name": "Table Night",
+   "turn_id": "turn-construction-plain",
+   "builder_session_id": "session-plain",
+   "candidate": "candidate-install-plain",
+   "participants": [],
+   "initial_state": [
+    [
+     "world",
+     "weather",
+     {
+      "rain": true
+     }
+    ]
+   ]
+  },
+  {
+   "op": "create_guided_campaign_draft",
+   "operation_id": "saved",
+   "display_name": "Table Night",
+   "builder_session_id": "session-saved",
+   "builder_provider_id": "standin",
+   "builder_model_id": "standin/standin-narrator"
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "s-ruleset",
+   "campaign": "saved",
+   "builder_session_id": "session-saved",
+   "expected_construction_revision": 0,
+   "current_step": "ruleset",
+   "visible_answer": "An answer",
+   "answer": {
+    "candidate_id": "sylvia.srd-lite.bg3"
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "s-setting",
+   "campaign": "saved",
+   "builder_session_id": "session-saved",
+   "expected_construction_revision": 1,
+   "current_step": "setting",
+   "visible_answer": "An answer",
+   "answer": {
+    "setting_id": "pneuma.severed-lands"
+   }
+  },
+  {
+   "op": "advance_guided_campaign_draft",
+   "operation_id": "s-plan",
+   "campaign": "saved",
+   "builder_session_id": "session-saved",
+   "expected_construction_revision": 2,
+   "current_step": "plan",
+   "visible_answer": "An answer",
+   "answer": {
+    "plan_id": "campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc"
+   }
+  }
+ ],
+ "outcomes": [
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "setting",
+    "construction_revision": 1,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-ede833aa7cfedbc61837be30"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "plan",
+    "construction_revision": 2,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-20da8f4547148c6a0699f6bb"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "name",
+    "construction_revision": 3,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-a8cb83f5225e912a3f83d4f4"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "participants",
+    "construction_revision": 4,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-366be0bba5dbe5a63f9ac674"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "boundaries_preferences",
+    "construction_revision": 5,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-7581e305eaa9a566454d3b0d"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "specific_requests",
+    "construction_revision": 6,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-1eb199a47da451057f102988"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder_session_id": "session-table",
+    "current_step": "review",
+    "construction_revision": 7,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-59e00b763ae7f15612227982"
+   }
+  },
+  {
+   "ok": {
+    "message_id": "guided-ready-table",
+    "sequence": 24
+   }
+  },
+  {
+   "error": "ValueError",
+   "code": null,
+   "message": "Participant identities must be unique within a campaign"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "participant_package_unlocked",
+   "message": "Participant exact package identity must be pinned by the campaign lock"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "participant_schema_unavailable",
+   "message": "Participant package does not declare its artifact kind"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "participant_schema_mismatch",
+   "message": "Participant exact schema identity does not match its package declaration"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "command_rejected",
+   "message": "Tool parameter 'Participant player-ann' is missing required field 'control'"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "participant_adaptation_required",
+   "message": "Cross-schema participant reuse requires a durable adaptation operation"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "participant_exact_proof_required",
+   "message": "New v5 participants require exact validated package and schema proof"
+  },
+  {
+   "error": "ValueError",
+   "code": null,
+   "message": "Initial state keys must be unique"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "unsafe_canonical_payload",
+   "message": "Initial state contains a reserved canonical channel"
+  },
+  {
+   "error": "CommandRejected",
+   "code": "state_namespace_ownership_invalid",
+   "message": "Campaign state namespace ownership is ambiguous"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "resulting_revision": 0
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-0d4fc4a78d3706edccafb665",
+    "resulting_revision": 0
+   }
+  },
+  {
+   "error": "IdempotencyConflict",
+   "code": "idempotency_conflict",
+   "message": "Campaign operation identity payload does not match"
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "setting",
+    "construction_revision": 1,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-82eeb7bb79738c2c6c70c0d7"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "plan",
+    "construction_revision": 2,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-ded4986576510bce229354ea"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "name",
+    "construction_revision": 3,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-1e5f2f709abf88a21a7edf04"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "participants",
+    "construction_revision": 4,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-749a534ece10469b760fe110"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "boundaries_preferences",
+    "construction_revision": 5,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-5f0a64bcd19975159ddd1672"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "specific_requests",
+    "construction_revision": 6,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-0919265be7a6405d5378aa4a"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "builder_session_id": "session-plain",
+    "current_step": "review",
+    "construction_revision": 7,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-8954609ea34a976eb1f4b287"
+   }
+  },
+  {
+   "ok": {
+    "message_id": "guided-ready-plain",
+    "sequence": 24
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-a116c9ed46d6207734a43317",
+    "resulting_revision": 0
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "builder_session_id": "session-saved",
+    "current_step": "ruleset",
+    "construction_revision": 0,
+    "resulting_revision": 0,
+    "answer_message_id": null
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "builder_session_id": "session-saved",
+    "current_step": "setting",
+    "construction_revision": 1,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-714c5165ab7d34f17bf0e154"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "builder_session_id": "session-saved",
+    "current_step": "plan",
+    "construction_revision": 2,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-524e7f9da8a2f117a0938c9e"
+   }
+  },
+  {
+   "ok": {
+    "campaign_id": "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "builder_session_id": "session-saved",
+    "current_step": "name",
+    "construction_revision": 3,
+    "resulting_revision": 0,
+    "answer_message_id": "guided-answer-6f9d6ec5457b870655809eb9"
+   }
+  }
+ ]
+}

@@ -246,6 +246,8 @@ async fn start_step(
                     turn_id: text(op, "turn_id"),
                     builder_session_id: text(op, "builder_session_id"),
                     package_candidate_id: None,
+                    participants: &[],
+                    initial_state: &[],
                 },
             )
             .await?;
@@ -366,6 +368,48 @@ async fn guided_finalize_matches_python() {
     assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
 }
 
+/// A bind operation's saved-library participants and initial state (`party_runs`); none in the
+/// other runs.
+fn party(
+    op: &Json,
+) -> (Vec<sylvia_domain::authority::Participant>, Vec<sylvia_domain::authority::StateValue>) {
+    let text_of = |value: &Json| value.as_str().map(str::to_owned);
+    let participants = op["participants"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|item| {
+            sylvia_domain::authority::Participant::new(sylvia_domain::authority::ParticipantFields {
+                participant_id: text(item, "participant_id").to_owned(),
+                kind: text(item, "kind").to_owned(),
+                package_id: text(item, "package_id").to_owned(),
+                package_version: text(item, "package_version").to_owned(),
+                data: item["data"].as_object().unwrap().clone(),
+                package_sha256: text_of(&item["package_sha256"]),
+                schema_id: text_of(&item["schema_id"]),
+                schema_sha256: text_of(&item["schema_sha256"]),
+                validation_status: text(item, "validation_status").to_owned(),
+                adaptation_id: text_of(&item["adaptation_id"]),
+            })
+            .unwrap()
+        })
+        .collect();
+    let initial_state = op["initial_state"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|item| {
+            sylvia_domain::authority::StateValue::new(
+                item[0].as_str().unwrap(),
+                item[1].as_str().unwrap(),
+                item[2].clone(),
+            )
+            .unwrap()
+        })
+        .collect();
+    (participants, initial_state)
+}
+
 async fn ruleset_step(
     handle: &StoreHandle,
     op: &Json,
@@ -394,6 +438,7 @@ async fn ruleset_step(
                 let id = candidate_id.clone();
                 handle.call(move |store| store.package_candidate(&id)).await?
             };
+            let (participants, initial_state) = party(op);
             let confirmation = guided::bind_guided_campaign_basis(
                 handle,
                 &bundled(),
@@ -405,6 +450,8 @@ async fn ruleset_step(
                     turn_id: text(op, "turn_id"),
                     builder_session_id: text(op, "builder_session_id"),
                     package_candidate_id: Some(&candidate_id),
+                    participants: &participants,
+                    initial_state: &initial_state,
                 },
             )
             .await?;
@@ -457,6 +504,41 @@ async fn guided_ruleset_matches_python() {
     let rules = sylvia_compare::diff::Rules::defaults();
     let python = folder.join("python.sqlite3");
     std::fs::write(&python, gunzip("ruleset_runs")).unwrap();
+    let dump = |path: &Path| {
+        sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
+    };
+    let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
+    assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
+}
+
+/// A saved-library Start's participants and initial state through the guided binding
+/// (`generate_guided_party_runs.py`): every refusal, the binding, its replay and a conflicting
+/// replay, then a guided Interview that picks the saved Plan from the owner's storage root.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn guided_party_matches_python() {
+    let record = read_json("tests/vectors/guided/party_runs.json");
+    let folder = work_folder("guided-party-runs");
+    for (relative, contents) in record["files"].as_object().unwrap() {
+        let path = folder.join(relative);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(&path, contents.as_str().unwrap()).unwrap();
+    }
+    let database = folder.join("authority.sqlite3");
+    std::fs::write(&database, gunzip("party_seed")).unwrap();
+    let path = database.clone();
+    let (handle, thread) =
+        StoreHandle::spawn(move || AuthorityStore::open_for_application_owner(&path, None)).unwrap();
+    let mut campaigns = std::collections::HashMap::new();
+    let operations = record["operations"].as_array().unwrap();
+    for (index, (op, want)) in operations.iter().zip(record["outcomes"].as_array().unwrap()).enumerate() {
+        let outcome = ruleset_step(&handle, op, &mut campaigns).await;
+        check(&format!("#{index} {} {}", op["op"], op["operation_id"]), outcome, want);
+    }
+    drop(handle);
+    tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
+    let rules = sylvia_compare::diff::Rules::defaults();
+    let python = folder.join("python.sqlite3");
+    std::fs::write(&python, gunzip("party_runs")).unwrap();
     let dump = |path: &Path| {
         sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
     };

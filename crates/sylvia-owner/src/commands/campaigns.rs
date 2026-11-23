@@ -324,6 +324,8 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
             turn_id: &format!("turn-construction-{digest}"),
             builder_session_id: &builder_session_id,
             package_candidate_id: package_candidate_id.as_deref(),
+            participants: &[],
+            initial_state: &[],
         },
     )
     .await
