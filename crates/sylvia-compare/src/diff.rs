@@ -297,7 +297,14 @@ fn walk(
             items
                 .iter()
                 .enumerate()
-                .map(|(index, item)| walk(item, &format!("{pointer}/{index}"), key, rules, seen, counts))
+                .map(|(index, item)| {
+                    let child = format!("{pointer}/{index}");
+                    // An exact pointer may name an array item too, such as one header's value.
+                    if rules.ignore_pointers.contains(&child) {
+                        return Json::String("<ignored>".into());
+                    }
+                    walk(item, &child, key, rules, seen, counts)
+                })
                 .collect(),
         ),
         Json::Object(map) => {
@@ -618,6 +625,23 @@ mod tests {
         // Nested deeper than directly inside `activity_timing`, it is compared.
         let deep = |value: u64| json!({"activity_timing": {"inner": {"revision": value}}});
         assert_eq!(compare(&normal(deep(1)), &normal(deep(2)), 10).len(), 1);
+    }
+
+    #[test]
+    fn an_ignored_pointer_may_name_an_array_item() {
+        let rules = Rules { ignore_pointers: vec!["/requests/0/headers/1/1".into()], ..Rules::default() };
+        let normal = |length: &str, other: &str| {
+            normalise(
+                &json!({"requests": [{"headers": [["Host", other], ["Content-Length", length]]}]}),
+                &rules,
+            )
+            .unwrap()
+        };
+        assert!(compare(&normal("193457", "a"), &normal("193463", "a"), 10).is_empty());
+        // The other header in the same array is still compared.
+        let differences = compare(&normal("1", "a"), &normal("1", "b"), 10);
+        assert_eq!(differences.len(), 1);
+        assert_eq!(differences[0].pointer, "/requests/0/headers/0/1");
     }
 
     #[test]

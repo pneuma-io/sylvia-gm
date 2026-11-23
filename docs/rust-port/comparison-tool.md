@@ -131,7 +131,9 @@ header. A session adds its own under `rules`:
   recording is written, so a protected credential never reaches the repository. The work
   folder still holds the raw data; never commit a work folder.
 - `volatile_files`: files that must exist but whose content is not compared.
-- `ignore_pointers`: exact JSON pointers into the recording, for the rare single value.
+- `ignore_pointers`: exact JSON pointers into the recording, for the rare single value. A
+  pointer may name an object member or an array item (one header's value is
+  `/model_requests/<n>/headers/<i>/1`).
 - `ignore_headers_row_8`: the one rule that covers a Rust difference rather than a Python run
   difference, because `differences.md` row 8 agrees it: the HTTP client's own request headers
   (Python's OpenAI SDK and httpx send `User-Agent: AsyncOpenAI/Python ...` or `python-httpx/...`,

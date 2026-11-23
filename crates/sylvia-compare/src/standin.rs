@@ -529,7 +529,8 @@ fn marker_call(request: &Json, player: &str) -> Option<Reply> {
         return None;
     }
     let player_index = messages.iter().rposition(|message| {
-        message.get("role").and_then(Json::as_str) == Some("user") && content_text(message.get("content")) == player
+        message.get("role").and_then(Json::as_str) == Some("user")
+            && content_text(message.get("content")) == player
     })?;
     let called = messages[player_index + 1..]
         .iter()
@@ -793,7 +794,11 @@ mod tests {
         // The first offered match, with the arguments exactly as written.
         assert_eq!(
             call_reply(&request, player),
-            Some(("tool_aaa_skill_check".into(), "{\"skill\": \"perception\",  \"dc\":12}".into(), "standin-mechanic-1".into()))
+            Some((
+                "tool_aaa_skill_check".into(),
+                "{\"skill\": \"perception\",  \"dc\":12}".into(),
+                "standin-mechanic-1".into()
+            ))
         );
         let exact = json!({"tools": [{"function": {"name": "skill_check"}}], "messages": [{"role": "user", "content": player}]});
         assert_eq!(call_reply(&exact, player).map(|reply| reply.0), Some("skill_check".into()));
@@ -813,11 +818,17 @@ mod tests {
         let mut messages = vec![json!({"role": "user", "content": player})];
         let request = |messages: &Vec<Json>| json!({"tools": tools, "messages": messages});
         let first = call_reply(&request(&messages), player).unwrap();
-        assert_eq!((first.0.as_str(), first.1.as_str(), first.2.as_str()), ("tool_x_first", "{\"a\":1}", "standin-mechanic-1"));
+        assert_eq!(
+            (first.0.as_str(), first.1.as_str(), first.2.as_str()),
+            ("tool_x_first", "{\"a\":1}", "standin-mechanic-1")
+        );
         messages.push(json!({"role": "assistant", "tool_calls": [{"id": first.2}]}));
         messages.push(json!({"role": "tool", "tool_call_id": first.2, "content": "{}"}));
         let second = call_reply(&request(&messages), player).unwrap();
-        assert_eq!((second.0.as_str(), second.1.as_str(), second.2.as_str()), ("tool_x_second", "[1, 2]", "standin-mechanic-2"));
+        assert_eq!(
+            (second.0.as_str(), second.1.as_str(), second.2.as_str()),
+            ("tool_x_second", "[1, 2]", "standin-mechanic-2")
+        );
         messages.push(json!({"role": "assistant", "tool_calls": [{"id": second.2}]}));
         messages.push(json!({"role": "tool", "tool_call_id": second.2, "content": "{}"}));
         // After the last marker's result: the Campaign File update, then the narration.
@@ -834,8 +845,13 @@ mod tests {
             journey_reply("I swing [call:attack {\"target\": \"wolf-1\"}] at the wolf."),
             "The Game Master answers: I swing  at the wolf."
         );
-        assert_eq!(without_call_markers("[call:bad no json] and [call: {}] stay"), "[call:bad no json] and [call: {}] stay");
-        assert!(call_markers("[call:x {\"a\": \"]\"}]").first().is_some_and(|marker| marker.arguments == "{\"a\": \"]\"}"));
+        assert_eq!(
+            without_call_markers("[call:bad no json] and [call: {}] stay"),
+            "[call:bad no json] and [call: {}] stay"
+        );
+        assert!(call_markers("[call:x {\"a\": \"]\"}]")
+            .first()
+            .is_some_and(|marker| marker.arguments == "{\"a\": \"]\"}"));
     }
 
     #[test]
