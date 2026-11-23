@@ -30,6 +30,7 @@ pub mod builder_session_migration;
 pub mod builder_tools;
 pub mod bundled_campaign_plans;
 pub mod bundled_packages;
+pub mod bundled_starter_characters;
 pub mod campaign_library_selection;
 pub mod campaign_plan_materializer;
 pub mod campaign_plan_sources;
