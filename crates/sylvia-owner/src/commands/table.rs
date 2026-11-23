@@ -84,7 +84,7 @@ pub const REGISTRY: &[Command] = &[
     ported("provider_settings", "providers", true, true),
     pending("open_provider_setup", "providers", true, true),
     pending("chatgpt_connection", "providers", false, true),
-    pending("claude_connection", "providers", false, true),
+    ported("claude_connection", "providers", false, true),
     pending("admin_full_audit_status", "providers", true, true),
     pending("admin_full_audit_record", "providers", true, true),
     pending("export_admin_full_audit", "providers", false, true),

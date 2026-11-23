@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 52 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 53 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -76,7 +76,7 @@ Ported: 52 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `provider_settings` | `providers.handle_provider_settings` | yes | yes | `startup` |
 | `open_provider_setup` | `providers.handle_open_provider_setup` | yes | no | |
 | `chatgpt_connection` | `providers.handle_chatgpt_connection` | no | no | |
-| `claude_connection` | `providers.handle_claude_connection` | no | no | |
+| `claude_connection` | `providers.handle_claude_connection` | no | yes | `account-connections` |
 | `admin_full_audit_status` | `providers.handle_admin_full_audit_status` | yes | no | |
 | `admin_full_audit_record` | `providers.handle_admin_full_audit_record` | yes | no | |
 | `export_admin_full_audit` | `providers.handle_export_admin_full_audit` | no | no | |

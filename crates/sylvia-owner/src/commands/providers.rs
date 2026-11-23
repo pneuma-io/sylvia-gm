@@ -303,3 +303,84 @@ pub fn catalog_model_info(
     model.transport = wire;
     Ok(Some(model.post_init()))
 }
+
+/// A download client that could not be built (a bad proxy setting): every request fails as a
+/// connection error, as Python's installer fails when its `httpx.Client` cannot be made.
+struct UnavailableTransport(String);
+
+impl sylvia_provider::http::HttpTransport for UnavailableTransport {
+    fn send(
+        &self,
+        _request: sylvia_provider::http::HttpRequest,
+    ) -> sylvia_provider::provider::BoxFuture<
+        '_,
+        Result<sylvia_provider::http::HttpResponse, sylvia_provider::http::TransportError>,
+    > {
+        let message = self.0.clone();
+        Box::pin(async move { Err(sylvia_provider::http::TransportError::Connection(message)) })
+    }
+}
+
+/// The installer's system: the download client (`httpx.Client(timeout=httpx.Timeout(30.0,
+/// read=60.0), follow_redirects=False)`) and the free-space reading.
+fn claude_install_system() -> sylvia_provider::claude_install::InstallSystem {
+    let mut settings =
+        sylvia_provider::net::ClientSettings::from_system(sylvia_provider::claude_install::INSTALL_TIMEOUTS);
+    settings.follow_redirects = false;
+    let transport: std::sync::Arc<dyn sylvia_provider::http::HttpTransport> =
+        match sylvia_provider::net::NetworkTransport::new(settings) {
+            Ok(transport) => std::sync::Arc::new(transport),
+            Err(
+                sylvia_provider::proxy::ProxyError::Value(message)
+                | sylvia_provider::proxy::ProxyError::Internal(message),
+            ) => std::sync::Arc::new(UnavailableTransport(message)),
+        };
+    sylvia_provider::claude_install::InstallSystem::new(
+        transport,
+        std::sync::Arc::new(|path: &std::path::Path| crate::desktop_update::storage::disk_free(path)),
+    )
+}
+
+/// `handle_claude_connection`: Sylvia's own Claude Code copy and its sign-in
+/// (`claude_settings_action`). `add_model` needs the provider resolver, which is reloaded after
+/// it; a `ProviderConnectionError` is the owner's protocol refusal with its text. The action
+/// installs, signs in and runs the binary, so it runs on a blocking thread.
+pub async fn handle_claude_connection(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_provider::config::claude_settings::{claude_settings_action, ClaudeSettingsError};
+    let action = params.get("action").cloned().unwrap_or(Json::Null);
+    let adding = action.as_str() == Some("add_model");
+    let resolver = if adding { Some(std::sync::Arc::clone(providers(ctx)?)) } else { ctx.providers.clone() };
+    let options = params.get("options").cloned().unwrap_or(Json::Null);
+    let storage_root = ctx.storage_root.clone();
+    let outcome = tokio::task::spawn_blocking(move || {
+        let default_config = default_config_path();
+        let env = Environment::current();
+        let sources = ConfigSources { default_config: &default_config, seal: &PlatformSeal, env: &env };
+        claude_settings_action(
+            sources,
+            &storage_root,
+            &action,
+            &options,
+            &claude_install_system,
+            &now_isoformat,
+        )
+    })
+    .await
+    .map_err(|error| CodedError::new("internal_error", error.to_string()))?;
+    let result = match outcome {
+        Ok(result) => result,
+        Err(ClaudeSettingsError::Connection(message)) => {
+            return Err(CodedError::rejected(message).with_error_type("OwnerProtocolError"))
+        }
+        Err(ClaudeSettingsError::Config(failure)) => return Err(config_error(failure)),
+        Err(ClaudeSettingsError::Internal(message)) => {
+            return Err(CodedError::new("internal_error", message).with_error_type("Exception"))
+        }
+    };
+    if adding {
+        if let Some(resolver) = resolver {
+            resolver.reload().await?;
+        }
+    }
+    Ok(Json::Object(result))
+}

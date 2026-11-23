@@ -1,0 +1,21 @@
+{
+  "name": "account-connections",
+  "description": "The Claude Code connection on an empty data folder, offline: its status before Sylvia's copy is installed, the refused actions and options, sign-in, model registration and sign-out refused until the copy exists, and cancel; then shut down.",
+  "steps": [
+    {"method": "claude_connection", "params": {"action": "status"}},
+    {"method": "claude_connection", "params": {"action": "nope"}},
+    {"method": "claude_connection", "params": {"action": 5}},
+    {"method": "claude_connection", "params": {"action": "status", "options": 5}},
+    {"method": "claude_connection", "params": {"action": "status", "options": {"bad": 1}}},
+    {"method": "claude_connection", "params": {"action": "login", "options": {"account_type": "subscription"}}},
+    {"method": "claude_connection", "params": {"action": "add_model", "options": {"model": {"id": "claude-opus-5-5", "context_window": null, "max_output_tokens": null}}}},
+    {"method": "claude_connection", "params": {"action": "logout"}},
+    {"method": "claude_connection", "params": {"action": "cancel"}},
+    {"method": "claude_connection", "params": {}},
+    {"method": "shutdown"}
+  ],
+  "rules": {
+    "ignore_keys": ["diagnostic_id"],
+    "volatile_files": ["^diagnostics/"]
+  }
+}

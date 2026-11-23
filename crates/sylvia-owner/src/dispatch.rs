@@ -189,6 +189,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::providers::handle_validate_provider_model(context, params).await
         }
         "save_provider_settings" => commands::providers::handle_save_provider_settings(context, params).await,
+        "claude_connection" => commands::providers::handle_claude_connection(context, params).await,
         "remove_provider_settings" => {
             commands::providers::handle_remove_provider_settings(context, params).await
         }
