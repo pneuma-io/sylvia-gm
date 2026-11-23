@@ -72,9 +72,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `builder/_package_record_edits.py:34` | `_read_record` | len() against a limit | `if len(raw) > _RECORD_BYTE_LIMIT:` |  `sylvia-app` package_record_edit_vectors |
 | `builder/_package_snapshots.py:101` | `_source_selection` | len() against a limit | `if len(raw) > 65536:` | |
 | `builder/_plan_snapshot_materializer.py:168` | `_removed_paths` | len() against a limit | `or len(value) > _REMOVAL_COUNT_LIMIT` | |
-| `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` | |
-| `campaign/rift.py:406` | `materialize_rift_selection` | len() against a limit | `if len(companion_ids) > RIFT_RULESET_COMPANION_MAXIMUM or len(set(companion_ids)) != len(` | |
-| `campaign/rift.py:410` | `materialize_rift_selection` | len() against a limit | `if not isinstance(customization_notes, str) or len(customization_notes) > 4_000:` | |
+| `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` |  `sylvia-app` rift_vectors |
+| `campaign/rift.py:406` | `materialize_rift_selection` | len() against a limit | `if len(companion_ids) > RIFT_RULESET_COMPANION_MAXIMUM or len(set(companion_ids)) != len(` |  `sylvia-app` rift_vectors |
+| `campaign/rift.py:410` | `materialize_rift_selection` | len() against a limit | `if not isinstance(customization_notes, str) or len(customization_notes) > 4_000:` |  `sylvia-app` rift_vectors |
 | `domain/authority.py:652` | `mechanic_outcome_is_safe` | len() against a limit | `or not 2 <= len(choice.options) <= 16` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:653` | `mechanic_outcome_is_safe` | len() against a limit | `or len(choice.prompt.encode("utf-8")) > 4096` | `sylvia-domain` identity_vectors |
 | `domain/authority.py:667` | `mechanic_outcome_is_safe` | len() against a limit | `or len(option.label.encode("utf-8")) > 1024` | `sylvia-domain` identity_vectors |

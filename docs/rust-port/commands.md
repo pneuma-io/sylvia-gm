@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 47 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 48 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -125,7 +125,7 @@ Ported: 47 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `create_gui
 | `begin_campaign_construction` | `campaigns.handle_begin_campaign_construction` | yes | no | |
 | `complete_campaign_construction` | `campaigns.handle_complete_campaign_construction` | no | no | |
 | `model_guidance` | `providers.handle_model_guidance` | yes | no | |
-| `finalize_campaign_construction` | `campaigns.handle_finalize_campaign_construction` | yes | no | |
+| `finalize_campaign_construction` | `campaigns.handle_finalize_campaign_construction` | yes | yes | `fail-retry`, `reopen`, `stop-redirect` and `ruleless-turn` (step 8 matches; each session stops later, at `start_dm_session`); the application operation by the guided `finalize_runs` |
 | `start_dm_session` | `sessions.handle_start_dm_session` | yes | no | |
 | `catalog` | `campaigns.handle_catalog` | yes | no | |
 | `execute_action` | `actions.handle_execute_action` | no | no | |

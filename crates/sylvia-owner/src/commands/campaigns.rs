@@ -506,6 +506,201 @@ pub async fn handle_export_campaign(ctx: &DispatchContext, params: &JsonMap) -> 
     Ok(Json::Object(reply))
 }
 
+/// `_campaign_plan_text(storage_root, campaign_id)`: the readable Campaign Plan the Builder
+/// wrote, `campaigns/<campaign_id>/campaign-plan.md`.
+fn campaign_plan_text(storage_root: &std::path::Path, campaign_id: &str) -> CodedResult<String> {
+    let path = storage_root.join("campaigns").join(campaign_id).join("campaign-plan.md");
+    if !path.is_file() {
+        return Err(rejected("Campaign plan file is missing"));
+    }
+    let unreadable = |_| rejected("Campaign plan file is not readable");
+    if std::fs::metadata(&path).map_err(unreadable)?.len() > MAX_CAMPAIGN_PLAN_BYTES as u64 {
+        return Err(rejected("Campaign plan file exceeds the usability limit"));
+    }
+    let bytes = std::fs::read(&path).map_err(unreadable)?;
+    let text = String::from_utf8(bytes).map_err(|_| rejected("Campaign plan file is not valid UTF-8"))?;
+    if sylvia_base::pystr::strip(&text).is_empty() {
+        return Err(rejected("Campaign plan file is empty or unusable"));
+    }
+    Ok(text)
+}
+
+/// `_campaign_plan_payload(storage_root, campaign_id)`: the optional structured Campaign Plan
+/// beside its readable rendering, `campaign-plan.json`.
+fn campaign_plan_payload(storage_root: &std::path::Path, campaign_id: &str) -> CodedResult<Option<JsonMap>> {
+    let path = storage_root.join("campaigns").join(campaign_id).join("campaign-plan.json");
+    // `Path.exists()` follows links and answers false for a broken one.
+    if std::fs::metadata(&path).is_err() {
+        return Ok(None);
+    }
+    let unreadable = || rejected("Structured Campaign Plan is not readable");
+    let too_large = || rejected("Structured Campaign Plan exceeds the usability limit");
+    if !path.is_file() {
+        return Err(too_large());
+    }
+    if std::fs::metadata(&path).map_err(|_| unreadable())?.len() > MAX_CAMPAIGN_PLAN_BYTES as u64 {
+        return Err(too_large());
+    }
+    // `read_text(encoding="utf-8")` translates newlines before `json.loads`; JSON treats a
+    // carriage return between tokens as whitespace and refuses one inside a string either way.
+    let bytes = std::fs::read(&path).map_err(|_| unreadable())?;
+    let text = String::from_utf8(bytes).map_err(|_| unreadable())?;
+    match sylvia_base::pyjson::loads(&text) {
+        Ok(Json::Object(value)) => Ok(Some(value)),
+        Ok(_) => Err(rejected("Structured Campaign Plan must be an object")),
+        Err(_) => Err(unreadable()),
+    }
+}
+
+/// `handle_finalize_campaign_construction`: the guided Interview's Campaign Plan finalized and
+/// handed to the Game Master, after the Game Master's effort and speed are settled and the
+/// mandatory opening request is measured (lane 4's `preflight_guided_start`), then the DM TURN
+/// opened. It answers the owner's [`Failure`](crate::dispatch::Failure), so a provider error
+/// keeps Python's provider-error reply.
+pub async fn handle_finalize_campaign_construction(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> crate::dispatch::DispatchResult {
+    let campaign_id = required(params, "campaign_id")?;
+    let dm_provider_id = required(params, "dm_provider_id")?;
+    let dm_model_id = required(params, "dm_model_id")?;
+    let plan_text = campaign_plan_text(&ctx.storage_root, &campaign_id)?;
+    let structured_plan = campaign_plan_payload(&ctx.storage_root, &campaign_id)?;
+    // Settle the Game Master effort and speed before the handoff commits, so an unsupported
+    // choice is refused while the Interview is still the active chat.
+    let start = crate::chat_start::chat_start_for(ctx, "dm", &dm_provider_id, &dm_model_id, params).await?;
+    // `ctx.provider_resolver` is always set in the product; without one Python's call fails.
+    let resolver = ctx.providers.as_deref().ok_or_else(|| {
+        sylvia_base::CodedError::new("internal_error", "provider resolver is unavailable")
+            .with_error_type("AttributeError")
+    })?;
+    let reads: std::sync::Arc<dyn crate::preflight::PreflightReads> =
+        std::sync::Arc::new(crate::owner_reads::OwnerReads::new(ctx.store.clone()));
+    crate::preflight::preflight_guided_start(
+        reads,
+        resolver,
+        crate::preflight::GuidedStartPreflight {
+            owner_id: &ctx.owner_id,
+            campaign_id: &campaign_id,
+            provider_id: &dm_provider_id,
+            model_id: &dm_model_id,
+            plan_text: &plan_text,
+            structured_plan: structured_plan.as_ref(),
+            gm_system_prompt: ctx.gm_system_prompt.as_deref(),
+            reasoning_effort: start.reasoning_effort.as_deref(),
+        },
+        &crate::preflight::rank_references,
+        &sylvia_provider::config::env::Environment::current(),
+    )
+    .await?;
+    let model_guidance_override = optional_bool(params, "model_guidance_override")?;
+    let (construction, plan, handoff) = sylvia_app::authority::guided::finalize_campaign_construction(
+        &ctx.store,
+        &sylvia_app::authority::guided::FinalizeConstruction {
+            campaign_id: &campaign_id,
+            dm_provider_id: &dm_provider_id,
+            dm_model_id: &dm_model_id,
+            plan_artifact_text: &plan_text,
+            structured_plan: structured_plan.as_ref(),
+            model_guidance_override,
+        },
+    )
+    .await
+    .map_err(store_error)?;
+    // Saved before this command returns, so the opening call that follows uses it.
+    crate::chat_start::apply_chat_start(ctx, &handoff.fields().dm_session_id, &start).await?;
+    let digest = sylvia_base::hash::sha256_hex(campaign_id.as_bytes())[..24].to_owned();
+    let open = sylvia_app::authority::turns::current_open_turn(&ctx.store, &campaign_id)
+        .await
+        .map_err(store_error)?;
+    let dm_turn_id = match open {
+        Some(turn_id) => turn_id,
+        None => {
+            let turn_id = format!("turn-dm-{digest}");
+            sylvia_app::authority::turns::open_turn(&ctx.store, &campaign_id, &turn_id)
+                .await
+                .map_err(store_error)?;
+            turn_id
+        }
+    };
+    let mut reply = JsonMap::new();
+    reply.insert("construction".into(), construction_json(&construction));
+    reply.insert("plan".into(), plan_json(&plan));
+    reply.insert("handoff".into(), handoff_json(&handoff));
+    reply.insert("chat_start".into(), crate::chat_start::chat_start_projection(&start));
+    reply.insert("dm_turn_id".into(), dm_turn_id.into());
+    reply.insert("dm_attempt_id".into(), format!("attempt-campaign-start-{digest}").into());
+    Ok(Json::Object(reply))
+}
+
+/// `_json_value(CampaignConstructionCompleted)`: its fields in order.
+fn construction_json(construction: &sylvia_domain::authority::CampaignConstructionCompleted) -> Json {
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), construction.campaign_id.as_str().into());
+    value.insert("lane".into(), construction.lane.as_str().into());
+    value.insert(
+        "canonical_representation_sha256".into(),
+        construction.canonical_representation_sha256.as_str().into(),
+    );
+    value.insert("resulting_revision".into(), construction.resulting_revision.into());
+    Json::Object(value)
+}
+
+/// `_json_value(CampaignPlan)`: its fields in order, each enum as its value.
+fn plan_json(plan: &sylvia_domain::session::CampaignPlan) -> Json {
+    let fields = plan.fields();
+    let mut value = JsonMap::new();
+    value.insert("plan_id".into(), fields.plan_id.as_str().into());
+    value.insert("campaign_id".into(), fields.campaign_id.as_str().into());
+    value.insert("package_lock_id".into(), fields.package_lock_id.as_str().into());
+    value.insert("source_session_id".into(), fields.source_session_id.as_str().into());
+    value.insert("content_sha256".into(), fields.content_sha256.as_str().into());
+    value.insert("content".into(), Json::Object(plan.content().clone()));
+    value.insert(
+        "provenance_evidence_ids".into(),
+        Json::Array(fields.provenance_evidence_ids.iter().map(|id| id.as_str().into()).collect()),
+    );
+    value.insert("validation_outcome".into(), fields.validation_outcome.as_str().into());
+    value.insert("acceptance_status".into(), fields.acceptance_status.as_str().into());
+    value.insert("plan_revision".into(), fields.plan_revision.into());
+    value.insert("resulting_campaign_revision".into(), fields.resulting_campaign_revision.into());
+    value.insert("payload_sha256".into(), fields.payload_sha256.as_str().into());
+    Json::Object(value)
+}
+
+/// `_json_value(BuilderDMHandoff)`: its fields in order, with its model guidance decision.
+fn handoff_json(handoff: &sylvia_domain::session::BuilderDMHandoff) -> Json {
+    let fields = handoff.fields();
+    let text = |value: &Option<String>| value.as_deref().map_or(Json::Null, Json::from);
+    let guidance = fields.model_guidance.fields();
+    let mut decision = JsonMap::new();
+    decision.insert("registry_version".into(), guidance.registry_version.as_str().into());
+    decision.insert("model_id".into(), guidance.model_id.as_str().into());
+    decision.insert("minimum_tier_id".into(), text(&guidance.minimum_tier_id));
+    decision.insert("placement_tier_id".into(), text(&guidance.placement_tier_id));
+    decision.insert("placement_evidence_sha256".into(), text(&guidance.placement_evidence_sha256));
+    decision.insert("status".into(), guidance.status.as_str().into());
+    decision.insert("warning_code".into(), text(&guidance.warning_code));
+    decision.insert("override_accepted".into(), guidance.override_accepted.into());
+    let mut value = JsonMap::new();
+    value.insert("handoff_id".into(), fields.handoff_id.as_str().into());
+    value.insert("campaign_id".into(), fields.campaign_id.as_str().into());
+    value.insert("builder_session_id".into(), fields.builder_session_id.as_str().into());
+    value.insert("dm_session_id".into(), fields.dm_session_id.as_str().into());
+    value.insert("package_lock_id".into(), fields.package_lock_id.as_str().into());
+    value.insert("package_candidate_id".into(), text(&fields.package_candidate_id));
+    value.insert("plan_id".into(), fields.plan_id.as_str().into());
+    value.insert("plan_revision".into(), fields.plan_revision.into());
+    value.insert("plan_content_sha256".into(), fields.plan_content_sha256.as_str().into());
+    value.insert("expected_revision".into(), fields.expected_revision.into());
+    value.insert("resulting_campaign_revision".into(), fields.resulting_campaign_revision.into());
+    value.insert("chronology_ordinal".into(), fields.chronology_ordinal.into());
+    value.insert("completed_turn_id".into(), fields.completed_turn_id.as_str().into());
+    value.insert("model_guidance".into(), Json::Object(decision));
+    value.insert("payload_sha256".into(), fields.payload_sha256.as_str().into());
+    Json::Object(value)
+}
+
 /// `handle_recover_campaign`: recover `exports/<export_id>.sylvia-gm-campaign` under the storage
 /// root.
 pub async fn handle_recover_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
@@ -729,7 +924,15 @@ mod tests {
         // Lane 3's Python-made seed and the entries Python's owner projects from it.
         let expected = read_json("crates/sylvia-store/tests/vectors/campaigns/campaign_index.json");
         let folder = std::env::temp_dir().join(format!("sylvia-owner-campaign-index-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&folder);
+        // A folder left by an earlier run must go, or its files would look like this run's.
+        if let Err(error) = std::fs::remove_dir_all(&folder) {
+            assert_eq!(
+                error.kind(),
+                std::io::ErrorKind::NotFound,
+                "cannot clear the old work folder {}: {error}",
+                folder.display()
+            );
+        }
         std::fs::create_dir_all(&folder).unwrap();
         let database = folder.join("authority.sqlite3");
         let mut bytes = Vec::new();
@@ -805,7 +1008,15 @@ mod tests {
         // fault or held campaign work are proven by `sylvia-app/tests/lifecycle.rs` instead.
         let record = read_json("crates/sylvia-app/tests/vectors/lifecycle/lifecycle_runs.json");
         let folder = std::env::temp_dir().join(format!("sylvia-owner-lifecycle-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&folder);
+        // A folder left by an earlier run must go, or its files would look like this run's.
+        if let Err(error) = std::fs::remove_dir_all(&folder) {
+            assert_eq!(
+                error.kind(),
+                std::io::ErrorKind::NotFound,
+                "cannot clear the old work folder {}: {error}",
+                folder.display()
+            );
+        }
         std::fs::create_dir_all(&folder).unwrap();
         let database = folder.join("authority.sqlite3");
         let mut bytes = Vec::new();
@@ -964,7 +1175,15 @@ mod tests {
         // the database afterwards must be Python's.
         let record = read_json("crates/sylvia-app/tests/vectors/purge/purge_runs.json");
         let folder = std::env::temp_dir().join(format!("sylvia-owner-purge-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&folder);
+        // A folder left by an earlier run must go, or its files would look like this run's.
+        if let Err(error) = std::fs::remove_dir_all(&folder) {
+            assert_eq!(
+                error.kind(),
+                std::io::ErrorKind::NotFound,
+                "cannot clear the old work folder {}: {error}",
+                folder.display()
+            );
+        }
         std::fs::create_dir_all(&folder).unwrap();
         let database = folder.join("authority.sqlite3");
         gunzip_to("crates/sylvia-app/tests/vectors/purge/seed.sqlite3.gz", &database);
@@ -1086,7 +1305,15 @@ mod tests {
         // `longPathAware` manifest; the owner executables do, so their Win32 file calls take long
         // paths exactly when Windows enables them, as Python's do.
         let folder = std::env::temp_dir().join(format!("sgx-{}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&folder);
+        // A folder left by an earlier run must go, or its files would look like this run's.
+        if let Err(error) = std::fs::remove_dir_all(&folder) {
+            assert_eq!(
+                error.kind(),
+                std::io::ErrorKind::NotFound,
+                "cannot clear the old work folder {}: {error}",
+                folder.display()
+            );
+        }
         std::fs::create_dir_all(&folder).unwrap();
         let database = folder.join("authority.sqlite3");
         gunzip_to("crates/sylvia-store/tests/vectors/export_capture/story.sqlite3.gz", &database);
@@ -1197,7 +1424,15 @@ mod tests {
         for (name, base) in bases {
             // A short root, as in the export test.
             let folder = std::env::temp_dir().join(format!("sgr-{}-{name}", std::process::id()));
-            let _ = std::fs::remove_dir_all(&folder);
+            // A folder left by an earlier run must go, or its files would look like this run's.
+            if let Err(error) = std::fs::remove_dir_all(&folder) {
+                assert_eq!(
+                    error.kind(),
+                    std::io::ErrorKind::NotFound,
+                    "cannot clear the old work folder {}: {error}",
+                    folder.display()
+                );
+            }
             std::fs::create_dir_all(&folder).unwrap();
             let database = folder.join("authority.sqlite3");
             gunzip_to(base, &database);

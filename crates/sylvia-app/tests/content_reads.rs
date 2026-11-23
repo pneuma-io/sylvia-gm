@@ -57,7 +57,15 @@ async fn content_reads_match_python() {
             let folder = Path::new(env!("CARGO_TARGET_TMPDIR"))
                 .join("sylvia-app")
                 .join(format!("content-reads-{name}"));
-            let _ = std::fs::remove_dir_all(&folder);
+            // A folder left by an earlier run must go, or its files would look like this run's.
+            if let Err(error) = std::fs::remove_dir_all(&folder) {
+                assert_eq!(
+                    error.kind(),
+                    std::io::ErrorKind::NotFound,
+                    "cannot clear the old work folder {}: {error}",
+                    folder.display()
+                );
+            }
             std::fs::create_dir_all(&folder).unwrap();
             let database = folder.join("authority.sqlite3");
             std::fs::write(&database, base(name)).unwrap();

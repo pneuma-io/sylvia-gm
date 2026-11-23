@@ -133,7 +133,7 @@ pub const REGISTRY: &[Command] = &[
     pending("begin_campaign_construction", "campaigns", true, true),
     pending("complete_campaign_construction", "campaigns", false, true),
     pending("model_guidance", "providers", true, true),
-    pending("finalize_campaign_construction", "campaigns", true, true),
+    ported("finalize_campaign_construction", "campaigns", true, true),
     pending("start_dm_session", "sessions", true, true),
     pending("catalog", "campaigns", true, true),
     pending("execute_action", "actions", false, true),
