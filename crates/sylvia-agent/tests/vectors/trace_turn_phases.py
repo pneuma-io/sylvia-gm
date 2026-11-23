@@ -25,6 +25,7 @@ import copy
 import dataclasses
 import json
 import os
+import random
 import sys
 import uuid as uuid_module
 from pathlib import Path
@@ -254,15 +255,20 @@ def traced_init(self, owner, provider, **kwargs):  # type: ignore[no-untyped-def
 _provider_session.ProviderSessionAdapter.__init__ = traced_init
 
 
+#: `uuid4()` for the traced modules, from a fixed seed, so a regenerated vector file is
+#: byte-identical (the run's other identities come from the session file).
+UUID_RANDOM = random.Random(20261123)
+
+
 class Uuids:
-    """`uuid.uuid4()` for the phases, each value logged."""
+    """`uuid.uuid4()` for the phases: seeded version-4 values, each one logged."""
 
     def __getattr__(self, name: str) -> object:
         return getattr(uuid_module, name)
 
     @staticmethod
     def uuid4() -> uuid_module.UUID:
-        value = uuid_module.uuid4()
+        value = uuid_module.UUID(int=UUID_RANDOM.getrandbits(128), version=4)
         if ACTIVE["value"]:
             log({"event": "uuid", "hex": value.hex})
         return value
