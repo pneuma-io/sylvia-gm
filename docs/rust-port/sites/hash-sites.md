@@ -21,7 +21,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/builder_references.py:353` | `with_character_examples` | hashlib.sha256 | `"content_sha256": hashlib.sha256(canonical_json_bytes(draft)).hexdigest(),` | |
 | `application/bundled_packages.py:210` | `_srd_drafts` | hashlib.sha256 | `if item.byte_count != len(value) or item.sha256 != hashlib.sha256(value).hexdigest():` |  `sylvia-app` bundled_vectors |
 | `application/bundled_starter_characters.py:89` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(source.encode()).hexdigest(),` | |
-| `application/bundled_starter_characters.py:90` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(setting_character_schema or {})).hexdigest(),` | |
+| `application/bundled_starter_characters.py:90` | `bundled_starter_participants` | hashlib.sha256 | `hashlib.sha256(canonical_json_bytes(setting_character_schema or {})).hexdigest(),` |  `sylvia-app` starter_vectors |
 | `application/campaign_library_selection.py:319` | `resolve_campaign_plan_selection` | hashlib.sha256 | `install_id=f"plan-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` | |
 | `application/campaign_library_selection.py:422` | `materialize_template_party` | hashlib.sha256 | `participant_namespace=hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24],` | |
 | `application/campaign_library_selection.py:555` | `materialize_library_party` | hashlib.sha256 | `+ hashlib.sha256(f"{operation_id}\0{artifact_id}".encode()).hexdigest()[:24]` | |
