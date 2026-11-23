@@ -94,7 +94,8 @@ fn negative_number(text: &str) -> bool {
 #[derive(Clone)]
 enum Word {
     Option(usize, Option<String>, bool),
-    /// A prefix of more than one long option: an error when parsing reaches it.
+    /// A prefix of more than one long option: an error in the first pass (Linux) or when parsing
+    /// reaches it (Windows), as each platform's reference interpreter does.
     Ambiguous(String),
     Unknown,
     Argument,
@@ -148,7 +149,10 @@ fn classify(word: &str) -> Result<Word, Stop> {
 
 /// `parser.parse_args(words)`.
 pub fn parse(words: &[String]) -> Result<Arguments, Stop> {
-    // The first pass classifies every word; an ambiguous prefix is reported when it is reached.
+    // The first pass classifies every word. Each platform follows its reference interpreter
+    // (`docs/rust-port/README.md`): CPython 3.12.3 (Linux) reports an ambiguous prefix in this
+    // pass, before any option runs; 3.12.11 (Windows) reports it when parsing reaches the word,
+    // so an earlier `-h` still prints the help.
     let mut classes = Vec::with_capacity(words.len());
     let mut rest = false;
     for word in words {
@@ -158,7 +162,11 @@ pub fn parse(words: &[String]) -> Result<Arguments, Stop> {
             rest = true;
             classes.push(Word::Argument);
         } else {
-            classes.push(classify(word)?);
+            let class = classify(word)?;
+            if let (Word::Ambiguous(message), false) = (&class, cfg!(windows)) {
+                return Err(Stop::Error(message.clone()));
+            }
+            classes.push(class);
         }
     }
     let mut parsed = Arguments::default();
