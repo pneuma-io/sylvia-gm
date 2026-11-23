@@ -1,6 +1,6 @@
 # Lane 1 ledger: Formats and content
 
-Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 111 files, 32,577 lines.
+Python snapshot `0da1010feb5a520f917f5d69ff8553ddb174e9e7`. 141 files, 41,552 lines (thirty Builder files from lane 4, 24 Nov 2026).
 
 One row per Python file this lane retires. Status is `pending`, `in progress`,
 `ported` (Rust replacement merged and its comparison checks pass) or `retired`
@@ -9,6 +9,29 @@ file; a row moves to another lane only through the manager.
 
 | Python file | Lines | Rust target | Status | Notes |
 | --- | ---: | --- | --- | --- |
+| `src/sylvia_gm/agent/_builder_question_answers.py` | 127 | `sylvia-agent::builder::question_answers` | ported | `builder_question_details`, `builder_question_answer_content` (vectors `builder_foundation_vectors`) |
+| `src/sylvia_gm/agent/_builder_reference_copy_tool.py` | 98 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_builder_session.py` | 2,709 | `sylvia-agent::builder` | in progress | B1: `_provider_history`, `_coalesce_builder_responses` and `_builder_native_request` (`builder::history`); `_creation_subflow_purpose`, `_effective_tracked_skill` and `_builder_prompt` (`builder::prompt`, its texts read from the Python source by `generate_builder_texts.py`); `_tool_call_details`, `_durable_tool_result` and `_builder_tool_evidence` (`builder::evidence`) (vectors `builder_foundation_vectors`). The turns follow in B3, the tools in B4 to B7 |
+| `src/sylvia_gm/agent/_builder_source_tool.py` | 75 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_builder_title.py` | 64 | `sylvia-agent::builder::title` | ported | `opening_title`, `FirstReplyTitle`, `TITLE_INSTRUCTION` (exported) (vectors `builder_foundation_vectors`) |
+| `src/sylvia_gm/agent/_character_draft_tool.py` | 99 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_character_profile_tools.py` | 350 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_character_reuse_tool.py` | 106 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_content_definition_tool.py` | 140 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_history.py` | 62 | - | retired | No live caller; see "Retired files" below |
+| `src/sylvia_gm/agent/_import_repair_tools.py` | 73 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_library_source_copy_tool.py` | 156 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_library_source_tool.py` | 146 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_mode.py` | 13 | `sylvia-agent::builder::mode` | ported | `AgentMode`; the Rust runner refuses `DmSession` (vectors `builder_foundation_vectors`) |
+| `src/sylvia_gm/agent/_participant_file_tool.py` | 82 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_plan_draft_check_tool.py` | 50 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_ruleset_draft_check_tool.py` | 75 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_coverage.py` | 93 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_provider.py` | 153 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_runner.py` | 348 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_ruleset_test_tool.py` | 70 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/agent/_runner.py` | 2,549 | `sylvia-agent::builder::runner` | pending | Port without the `store` (`StateAPI`) and `reveal_guard` parameters and every `DM_SESSION` branch: no live caller in the 0.4.1 snapshot. The constructor refuses `DM_SESSION` before any of that code runs, and its two callers (`agent/_builder_session.py`) pass `BUILDER_FREEFORM`. If the Rust mode type can still hold `DM_SESSION`, construction refuses it with Python's `ValueError` text; if it cannot, this row will say the mode is not representable. |
+| `src/sylvia_gm/agent/_skills.py` | 59 | `sylvia-agent::builder::skills` | ported | `builder_skills`, `builder_skill_references`, `load_builder_skill`. The skills and their references are exported into `builder/builder_texts.json` by `builder/generate_builder_texts.py` (vectors `builder_foundation_vectors`) |
 | `src/sylvia_gm/application/__init__.py` | 1 | `sylvia-app::__init__` | pending | |
 | `src/sylvia_gm/application/_srd_lite_character_legacy.py` | 315 | `sylvia-app::srd_lite_character_compatibility` | ported | Data only: the compressed Lite 0.2 contract is exported as `sylvia-app/src/srd_lite_legacy_character_contract.json` by `generate_srd_lite_legacy_contract.py`; read by `srd_lite_character_compatibility` |
 | `src/sylvia_gm/application/_yaml_bounds.py` | 71 | `sylvia-domain::yaml_bounds` | ported | In `sylvia-domain`, not `sylvia-app`: lane 2's `package_runtime` and the Builder's Ruleset source both run it from a `construct_document` hook. `yaml_bounds_vectors` |
@@ -120,6 +143,13 @@ file; a row moves to another lane only through the manager.
 | `src/sylvia_gm/state/_store.py` | 290 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/state/_validators.py` | 316 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
 | `src/sylvia_gm/state/state_api.py` | 2,359 | - | retired | No live caller in the 0.4.1 snapshot; see "Retired files" below |
+| `src/sylvia_gm/tools/__init__.py` | 22 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/tools/_builder_handlers.py` | 504 | `sylvia-agent::builder` | pending | `tool_create_campaign_folder` is not ported: no live caller in the 0.4.1 snapshot (`create_campaign_folder` is never registered). Builder prompt text that names it stays byte-exact. |
+| `src/sylvia_gm/tools/_converter.py` | 65 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/tools/_dm_campaign_handlers.py` | 252 | - | retired | Serves only the runner's `DM_SESSION` branches; see "Retired files" below |
+| `src/sylvia_gm/tools/_registry.py` | 254 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/tools/_spec.py` | 126 | `sylvia-agent::builder` | pending | |
+| `src/sylvia_gm/tools/_toolsets.py` | 55 | `sylvia-agent::builder` | pending | |
 
 ## Retired files
 
@@ -139,3 +169,10 @@ and stays byte for byte. `campaign/rift.py` is live and is ported.
 21 Nov 2026): they reference only each other and `builder/__init__.py`'s re-export, and nothing in
 `src/`, `scripts/`, `tests/`, SylviaBench or Trigger Discipline uses `InterviewExtractor`,
 `InterviewManifest` or `ExtractionError`. The `builder/__init__.py` port drops the two re-exports.
+
+Retired with the Builder handover (lane 1, 24 Nov 2026): `agent/_history.py` has no live caller.
+The Builder's two `AgentRunner` constructions in `agent/_builder_session.py` pass
+`history_path=None` with an explicit `initial_history`, so `load_history` and `save_history` never
+touch a file, and nothing else in `src/` or `scripts/` calls them (`session/_history.py` only
+re-exports them). `tools/_dm_campaign_handlers.py` serves only the runner's `DM_SESSION` branches,
+which the Rust runner does not port (see the `agent/_runner.py` row); lane 4 agreed this one.

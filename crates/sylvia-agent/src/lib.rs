@@ -20,6 +20,7 @@
 
 pub mod activity;
 pub mod argument_contracts;
+pub mod builder;
 pub mod campaign_memory;
 pub mod inference_identity;
 pub mod native_continuation;
