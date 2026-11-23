@@ -9,6 +9,7 @@
 
 pub mod builder;
 pub mod campaigns;
+pub mod packages;
 pub mod providers;
 mod table;
 

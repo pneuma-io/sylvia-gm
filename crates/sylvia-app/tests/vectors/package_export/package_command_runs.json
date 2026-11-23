@@ -1,0 +1,194 @@
+{
+ "python": "3.12.11",
+ "runs": [
+  {
+   "op": "export_package_candidate",
+   "params": {
+    "candidate_id": "candidate-install-1"
+   },
+   "outcome": {
+    "error": "OwnerProtocolError",
+    "code": null,
+    "message": "export_id must be a nonempty string"
+   },
+   "tree": []
+  },
+  {
+   "op": "export_package_candidate",
+   "params": {
+    "export_id": "-bad",
+    "candidate_id": "candidate-install-1"
+   },
+   "outcome": {
+    "error": "OwnerProtocolError",
+    "code": null,
+    "message": "export_id is not a safe artifact identity"
+   },
+   "tree": []
+  },
+  {
+   "op": "export_package_candidate",
+   "params": {
+    "export_id": "first"
+   },
+   "outcome": {
+    "error": "OwnerProtocolError",
+    "code": null,
+    "message": "candidate_id must be a nonempty string"
+   },
+   "tree": [
+    [
+     "exports/first.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ]
+   ]
+  },
+  {
+   "op": "export_package_candidate",
+   "params": {
+    "export_id": "missing",
+    "candidate_id": "candidate-missing"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "candidate_unavailable",
+    "message": "Package candidate is unavailable"
+   },
+   "tree": [
+    [
+     "exports/first.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+     "exports/missing.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ]
+   ]
+  },
+  {
+   "op": "export_package_candidate",
+   "params": {
+    "export_id": "first",
+    "candidate_id": "candidate-install-1"
+   },
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-install-1",
+     "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+     "archive_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+     "byte_count": 25842
+    }
+   },
+   "tree": [
+    [
+     "exports/first.sylvia-gm-package",
+     "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b"
+    ],
+    [
+     "exports/missing.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ]
+   ]
+  },
+  {
+   "op": "export_package_candidate_file",
+   "params": {
+    "export_id": "third",
+    "candidate_id": "candidate-install-3"
+   },
+   "outcome": {
+    "ok": {
+     "export": {
+      "candidate_id": "candidate-install-3",
+      "closure_sha256": "3c1b153af197d3758fb389e538b10ac99f802c5eaafa272e965fc7aad0a57ffb",
+      "archive_sha256": "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec",
+      "byte_count": 1071
+     },
+     "artifact_path": "exports/third.sylvia-gm-package"
+    }
+   },
+   "tree": [
+    [
+     "exports/first.sylvia-gm-package",
+     "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b"
+    ],
+    [
+     "exports/missing.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+     "exports/third.sylvia-gm-package",
+     "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec"
+    ]
+   ]
+  },
+  {
+   "op": "export_package_candidate_file",
+   "params": {
+    "export_id": "first",
+    "candidate_id": "candidate-install-2"
+   },
+   "outcome": {
+    "ok": {
+     "export": {
+      "candidate_id": "candidate-install-2",
+      "closure_sha256": "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+      "archive_sha256": "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b",
+      "byte_count": 25842
+     },
+     "artifact_path": "exports/first.sylvia-gm-package"
+    }
+   },
+   "tree": [
+    [
+     "exports/first.sylvia-gm-package",
+     "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b"
+    ],
+    [
+     "exports/missing.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+     "exports/third.sylvia-gm-package",
+     "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec"
+    ]
+   ]
+  },
+  {
+   "op": "export_package_candidate_file",
+   "params": {
+    "export_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "candidate_id": "candidate-install-3"
+   },
+   "outcome": {
+    "ok": {
+     "export": {
+      "candidate_id": "candidate-install-3",
+      "closure_sha256": "3c1b153af197d3758fb389e538b10ac99f802c5eaafa272e965fc7aad0a57ffb",
+      "archive_sha256": "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec",
+      "byte_count": 1071
+     },
+     "artifact_path": "exports/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.sylvia-gm-package"
+    }
+   },
+   "tree": [
+    [
+     "exports/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.sylvia-gm-package",
+     "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec"
+    ],
+    [
+     "exports/first.sylvia-gm-package",
+     "c50d43a0c09abdf6745af7adb5dfa4246daf56282d93df0d20c3697e7e721d6b"
+    ],
+    [
+     "exports/missing.sylvia-gm-package",
+     "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    ],
+    [
+     "exports/third.sylvia-gm-package",
+     "5bc42c9bd33573df9672009fafd4b61ea190d5acb7aa637ca08b0d00fc40f8ec"
+    ]
+   ]
+  }
+ ]
+}
