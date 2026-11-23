@@ -8,8 +8,11 @@ use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
+use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::{content_reads, turn_reads};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_domain::authority::ActionCommand;
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
@@ -182,6 +185,26 @@ impl TurnOwner for OwnerReads {
                 None => Err(CodedError::rejected("Accepted Campaign Plan is unavailable")
                     .with_error_type("CommandRejected")),
             }
+        })
+    }
+
+    fn execute_action<'a>(
+        &'a self,
+        command: &'a ActionCommand,
+    ) -> BoxFuture<'a, Result<ActionExecution, AuthorityFailure>> {
+        Box::pin(async move {
+            let Some(owner_id) = self.owner_id() else {
+                return Err(CodedError::new(
+                    "internal_error",
+                    "The GM turn's owner reads were built without the owner's identity.",
+                )
+                .with_error_type("RuntimeError")
+                .into());
+            };
+            actions::execute_action(self.store(), owner_id, command).await.map_err(|error| match error {
+                ActionError::Domain(error) => AuthorityFailure::Domain(error),
+                ActionError::Store(error) => AuthorityFailure::Coded(store_error(error)),
+            })
         })
     }
 

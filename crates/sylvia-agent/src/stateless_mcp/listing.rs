@@ -9,7 +9,8 @@
 //! carries it ([`wire_input_schema`]). The server turns an `AuthorityError` into an
 //! `MCPError` (its message, the code in `data`), and the SDK's in-process client hands that to
 //! the caller inside two `ExceptionGroup`s (anyio's task groups): the caller sees the class
-//! `ExceptionGroup` and the message `unhandled errors in a TaskGroup (1 sub-exception)`. That is
+//! `ExceptionGroup` and the message `unhandled errors in a TaskGroup (1 sub-exception)`; an
+//! exception the handler does not catch reaches the caller the same way. That is
 //! no `AuthorityError`, so nothing turns it into a tool result, a Full Audit record or a coded
 //! reply: the owner answers its fixed `internal_error` text and local diagnostics records
 //! `error_code` `internal_error` with `error_type` `ExceptionGroup`. The Rust error is that
@@ -331,17 +332,20 @@ fn is_command_rejected(error: &CodedError) -> bool {
 /// `str()` of the exception group the in-process client raises around one `MCPError`.
 pub const LISTING_REFUSAL_MESSAGE: &str = "unhandled errors in a TaskGroup (1 sub-exception)";
 
-/// The server handler's `except AuthorityError: raise MCPError(...)`, as the client raises it:
-/// an internal fault (`sylvia_owner::dispatch::Failure::Internal`), not a refusal.
+/// An exception out of a server handler, as the in-process client raises it: the handler's
+/// `except AuthorityError: raise MCPError(...)`, or any other exception, which the SDK answers
+/// as an `MCPError` too (code -32603, its text). Either way the client raises the exception
+/// group, an internal fault (`sylvia_owner::dispatch::Failure::Internal`), not a refusal. A
+/// path not ported yet keeps its own error.
 pub fn listing_refusal(error: CodedError) -> CodedError {
-    if error.code == PORT_PENDING || !super::is_authority_error(&error) {
+    if error.code == PORT_PENDING {
         return error;
     }
     CodedError::new("internal_error", LISTING_REFUSAL_MESSAGE).with_error_type("ExceptionGroup")
 }
 
 /// `build_stateless_mcp_server(owner)`'s `list_tools` for one request, as the client converts it.
-async fn server_list_tools(
+pub(crate) async fn server_list_tools(
     owner: &dyn TurnOwner,
     campaign_id: &str,
     session_id: Option<&str>,
