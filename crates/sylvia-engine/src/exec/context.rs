@@ -50,12 +50,15 @@ pub struct Extras {
 }
 
 /// How a nested `call` runs: as the package runtime's `nested` executor (the bridge's combat
-/// state, the choice control, prepared parameters) or as a procedure's `_make_nested_executor`
-/// (a copy of the combat state, no choice control).
+/// state, the choice control, prepared parameters), as a procedure's `_make_nested_executor`
+/// (a copy of the combat state, no choice control), or as a player preflight's `nested`
+/// executor (`_player_preflight`: the parent's combat state itself, parameters as passed, no
+/// choice control or procedures).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NestedMode {
     Package,
     Procedure,
+    Preflight,
 }
 
 /// `ctx.procedure_executor`: a trigger's depth and the combat state its procedures run against.

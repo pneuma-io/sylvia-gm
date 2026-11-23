@@ -70,6 +70,8 @@ pub struct BundledSources {
     pub rift_party_template: PathBuf,
     /// `campaign-plans`, the bundled Campaign Plan collection (`bundled_plans_root()`).
     pub campaign_plans_root: PathBuf,
+    /// `sylvia_gm/campaign/srd-starters.json`, the twelve authored SRD starter characters.
+    pub srd_starters: PathBuf,
 }
 
 impl BundledSources {
@@ -89,6 +91,7 @@ impl BundledSources {
                 .join("campaign")
                 .join("the-rift-awakening.json"),
             campaign_plans_root: root.join("campaign-plans"),
+            srd_starters: root.join("src").join("sylvia_gm").join("campaign").join("srd-starters.json"),
         }
     }
 }
@@ -243,6 +246,8 @@ pub struct BundledPackages {
     content_catalog: OnceLock<Vec<JsonMap>>,
     /// `campaign/rift.py`'s `_template` `lru_cache`.
     pub(crate) rift_template: OnceLock<Json>,
+    /// `bundled_starter_characters`' caches.
+    pub(crate) starter_caches: crate::bundled_starter_characters::StarterCaches,
     /// `bundled_campaign_plans`' caches (Python's `lru_cache`s).
     pub(crate) plan_caches: crate::bundled_campaign_plans::PlanCaches,
 }
@@ -257,6 +262,7 @@ impl BundledPackages {
             authority: OnceLock::new(),
             content_catalog: OnceLock::new(),
             rift_template: OnceLock::new(),
+            starter_caches: Default::default(),
             plan_caches: Default::default(),
         }
     }
