@@ -45,10 +45,12 @@ fn main() {
     let code = runtime.block_on(sylvia_owner::run(BufReader::new(stdin()), stdout()));
     // Python's `atexit` hooks, last registered first: each ChatGPT account's connection closes
     // and a pending Claude sign-in is cancelled (both registered when first used), then the
-    // kept Claude Code processes close (registered at import), each removing its private files.
+    // kept Claude Code processes and ChatGPT threads close (registered at import): the processes
+    // remove their private files, and the threads close without collecting usage.
     sylvia_provider::config::chatgpt_settings::close_all();
     sylvia_provider::config::claude_settings::cancel_all();
     sylvia_provider::claude_kept::close_all();
+    sylvia_provider::chatgpt::close_all_kept_threads();
     // The stdin reader thread may still be blocked in a read; exit without waiting for it.
     std::process::exit(code);
 }
