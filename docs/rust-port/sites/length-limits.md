@@ -279,8 +279,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_session.py:1278` | `_validated_speaker_name` | len() against a limit | `or len(name) > _SPEAKER_NAME_MAX_LENGTH` | |
 | `agent/_provider_session.py:1748` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not gm_system_prompt.strip() or len(encoded_prompt) > _MAX_GM_SYSTEM_PROMPT_BYTES:` | |
 | `agent/_provider_session.py:1774` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not campaign_plan_text.strip() or len(encoded_plan) > _MAX_CAMPAIGN_PLAN_BYTES:` | |
-| `agent/_runner.py:677` | `AgentRunner._turn_impl` | len() against a limit | `input_preview = user_message[:50] + "..." if len(user_message) > 50 else user_message` | |
-| `agent/_runner.py:2063` | `AgentRunner._build_chapter_history_text` | len() against a limit | `if len(content) > 800:` | |
+| `agent/_runner.py:677` | `AgentRunner._turn_impl` | len() against a limit | `input_preview = user_message[:50] + "..." if len(user_message) > 50 else user_message` | retired (B2b: DM_SESSION or the non-streaming turn) |
+| `agent/_runner.py:2063` | `AgentRunner._build_chapter_history_text` | len() against a limit | `if len(content) > 800:` | retired (B2b: DM_SESSION or the non-streaming turn) |
 | `agent/_stateless_mcp.py:943` | `_campaign_file_updates` | len() against a limit | `if len(raw_items) > 64:` | |
 | `agent/_stateless_mcp.py:1005` | `_campaign_file_updates` | len() against a limit | `if len(updates) > 64:` | |
 | `agent/_tool_loader.py:258` | `_summary` | len() against a limit | `if len(description) <= SUMMARY_LIMIT:` | |
