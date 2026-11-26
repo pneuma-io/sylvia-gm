@@ -181,6 +181,8 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::campaigns::handle_restore_trashed_campaign(context, params).await
         }
         "builder_chat_index" => commands::builder::handle_builder_chat_index(context, params).await,
+        "create_builder_chat" => commands::builder::handle_create_builder_chat(context, params).await,
+        "resume_agent_session" => commands::sessions::handle_resume_agent_session(context, params).await,
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,

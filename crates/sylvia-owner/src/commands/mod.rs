@@ -11,6 +11,7 @@ pub mod builder;
 pub mod campaigns;
 pub mod packages;
 pub mod providers;
+pub mod sessions;
 mod table;
 
 pub use table::{find, Command, Status, REGISTRY, RUN_LOOP_METHODS};

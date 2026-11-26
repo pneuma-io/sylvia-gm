@@ -39,6 +39,64 @@ pub async fn handle_builder_chat_index(ctx: &DispatchContext, _params: &JsonMap)
     Ok(Json::Array(chats.iter().map(builder_chat_value).collect()))
 }
 
+/// `_started_builder_chat(ctx, chat, start, replayed=...)`: save a new chat's start settings
+/// and answer the chat as it now stands. A replay answers the saved chat unchanged.
+async fn started_builder_chat(
+    ctx: &DispatchContext,
+    chat: &BuilderChatRecord,
+    start: &crate::chat_start::ChatStart,
+    replayed: bool,
+) -> CodedResult<Json> {
+    let mut value = builder_chat_value(chat);
+    if replayed {
+        return Ok(value);
+    }
+    crate::chat_start::apply_chat_start(ctx, chat.session().fields().session_id.as_str(), start).await?;
+    // `dataclasses.replace(chat, session=replace(chat.session, reasoning_effort=...))`.
+    if let (Some(effort), Some(session)) = (&start.reasoning_effort, value.get_mut("session")) {
+        session["reasoning_effort"] = Json::String(effort.clone());
+    }
+    Ok(value)
+}
+
+/// `handle_create_builder_chat`: a new standalone Builder chat. Its session id comes from the
+/// operation id, so the same operation replays the same chat. Without both `provider_id` and
+/// `model_id` it uses Settings' default model; its start settings are resolved before the chat
+/// exists and saved only when this is not a replay.
+pub async fn handle_create_builder_chat(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let session_id =
+        format!("session-builder-{}", &sylvia_base::hash::sha256_hex(operation_id.as_bytes())[..24]);
+    let mut provider_id = super::campaigns::optional_text(params, "provider_id")?;
+    let mut model_id = super::campaigns::optional_text(params, "model_id")?;
+    if provider_id.is_none() || model_id.is_none() {
+        let path = super::providers::config_path(ctx);
+        let settings = super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_settings::provider_settings(sources, &path)
+        })?;
+        let settings =
+            sylvia_provider::config::reply_json(&settings).map_err(super::providers::config_error)?;
+        let Some(Json::Object(default)) = settings.get("default_model") else {
+            return Err(sylvia_base::CodedError::rejected(
+                "Configure a default model before creating a chat",
+            ));
+        };
+        provider_id = Some(required(default, "provider_id")?);
+        model_id = Some(required(default, "model_id")?);
+    }
+    let (provider_id, model_id) = (provider_id.unwrap_or_default(), model_id.unwrap_or_default());
+    let start = crate::chat_start::chat_start_for(ctx, "builder", &provider_id, &model_id, params).await?;
+    let replayed = crate::chat_start::session_exists(ctx, &session_id).await?;
+    let display_name =
+        super::campaigns::optional_text(params, "display_name")?.unwrap_or_else(|| "New chat".to_owned());
+    let chat = ctx
+        .store
+        .call(move |store| store.create_builder_chat(&session_id, &provider_id, &model_id, &display_name))
+        .await
+        .map_err(super::campaigns::store_error)?;
+    started_builder_chat(ctx, &chat, &start, replayed).await
+}
+
 /// `_required_text(params, key)` as a handler's error.
 fn required(params: &JsonMap, key: &str) -> CodedResult<String> {
     crate::dispatch::required_text(params, key).map_err(|failure| match failure {
@@ -135,8 +193,8 @@ mod tests {
     #[test]
     fn renamed_and_deleted_chats_reply_in_pythons_field_order() {
         // The records lane 3's Python run returned from a rename and a delete: the handlers'
-        // replies. The owner session `builder-chat-edit` covers the refusals; a rename and a
-        // delete of a real chat need `create_builder_chat` in the owner.
+        // replies. The owner session `builder-chat-edit` covers the refusals, and
+        // `builder-chat-create` a rename and a delete of real chats.
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("../../crates/sylvia-store/tests/vectors/sessions/session_runs.json");
         let runs: Json = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
