@@ -158,6 +158,7 @@ impl StoreHandle {
         content_sha256: &str,
         maximum_files: i64,
     ) -> StoreResult<Vec<String>> {
+        let _operation = self.operation()?;
         let (package_id, version, sha256) =
             (package_id.to_owned(), version.to_owned(), content_sha256.to_owned());
         self.call(move |store| store.package_file_paths(&package_id, &version, &sha256, maximum_files)).await
@@ -173,6 +174,7 @@ impl StoreHandle {
         portable_path: &str,
         maximum_bytes: i64,
     ) -> StoreResult<String> {
+        let _operation = self.operation()?;
         let (package_id, version, sha256, path) =
             (package_id.to_owned(), version.to_owned(), content_sha256.to_owned(), portable_path.to_owned());
         self.call(move |store| store.package_text_file(&package_id, &version, &sha256, &path, maximum_bytes))
@@ -186,6 +188,7 @@ impl StoreHandle {
         version: &str,
         content_sha256: &str,
     ) -> StoreResult<JsonMap> {
+        let _operation = self.operation()?;
         let (package_id, version, sha256) =
             (package_id.to_owned(), version.to_owned(), content_sha256.to_owned());
         self.call(move |store| store.package_record(&package_id, &version, &sha256)).await
@@ -198,6 +201,7 @@ impl StoreHandle {
         version: &str,
         content_sha256: &str,
     ) -> StoreResult<String> {
+        let _operation = self.operation()?;
         let (package_id, version, sha256) =
             (package_id.to_owned(), version.to_owned(), content_sha256.to_owned());
         self.call(move |store| store.package_label(&package_id, &version, &sha256)).await

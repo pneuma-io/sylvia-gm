@@ -17,6 +17,7 @@ use sylvia_store::{AuthorityStore, StoreError, StoreHandle, StoreResult};
 
 /// `AuthorityOwner.snapshot(campaign_id)`.
 pub async fn snapshot(store: &StoreHandle, campaign_id: &str) -> StoreResult<CampaignSnapshot> {
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store.call(move |store| store.snapshot(&campaign_id)).await
 }
@@ -44,6 +45,7 @@ pub async fn model_context_snapshot(
     store: &StoreHandle,
     campaign_id: &str,
 ) -> StoreResult<(CampaignDisplaySnapshot, Option<ModelDecisionBoundary>)> {
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store
         .call(move |store| {

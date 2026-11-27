@@ -24,6 +24,7 @@ fn key_error(key: &str) -> StoreError {
 
 /// `AuthorityOwner.current_package_lock(campaign_id)`.
 pub async fn current_package_lock(store: &StoreHandle, campaign_id: &str) -> StoreResult<PackageLockRecord> {
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store.call(move |store| store.current_package_lock(&campaign_id)).await
 }
@@ -37,6 +38,7 @@ pub async fn provider_continuation(
     provider_id: &str,
     model_id: &str,
 ) -> StoreResult<Option<Json>> {
+    let _operation = store.operation()?;
     let (session_id, response_id, provider_id, model_id) =
         (session_id.to_owned(), response_id.to_owned(), provider_id.to_owned(), model_id.to_owned());
     store
@@ -53,6 +55,7 @@ pub async fn actor_context(
     provider_id: &str,
     model_id: &str,
 ) -> StoreResult<Option<JsonMap>> {
+    let _operation = store.operation()?;
     let (session_id, context_id, provider_id, model_id) =
         (session_id.to_owned(), context_id.to_owned(), provider_id.to_owned(), model_id.to_owned());
     store.call(move |store| store.actor_context(&session_id, &context_id, &provider_id, &model_id)).await
@@ -64,6 +67,7 @@ pub async fn campaign_preparation_boundary(
     store: &StoreHandle,
     campaign_id: &str,
 ) -> StoreResult<Option<ModelDecisionBoundary>> {
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store.call(move |store| preparation_boundary_on(store, &campaign_id)).await
 }
@@ -92,6 +96,7 @@ pub async fn model_decision_boundary(
     store: &StoreHandle,
     campaign_id: &str,
 ) -> StoreResult<Option<ModelDecisionBoundary>> {
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store
         .call(move |store| {
@@ -264,6 +269,7 @@ pub(super) fn inventory_tool(
 /// available to one DM session. The two catalog checks refuse a transitioning campaign where
 /// Python's do, after the plan and secret reads.
 pub async fn campaign_narrative_options(store: &StoreHandle, session_id: &str) -> StoreResult<JsonMap> {
+    let _operation = store.operation()?;
     let id = session_id.to_owned();
     let basis = store.call(move |store| narrative_basis(store, &id)).await?;
     let mut operations: Vec<Json> =

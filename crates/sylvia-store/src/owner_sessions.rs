@@ -56,6 +56,7 @@ impl StoreHandle {
     /// `AuthorityOwner.session_context`: the session's context, with the latest Creation
     /// Subflow link enriched with its parent's interview transcript.
     pub async fn session_context(&self, session_id: &str) -> StoreResult<SessionContext> {
+        let _operation = self.operation()?;
         let context = self.raw_context(session_id).await?;
         if context.session.campaign_id().is_none() {
             return Ok(context);
@@ -158,6 +159,7 @@ impl StoreHandle {
         effort: Option<&str>,
         once: Option<&str>,
     ) -> StoreResult<SessionRecord> {
+        let _operation = self.operation()?;
         let _work = self.session_campaign_work(session_id).await?;
         let _session = self.lanes().sessions.acquire(session_id).await;
         let (session_id, effort, once) =
@@ -174,6 +176,7 @@ impl StoreHandle {
 pub struct HeldSession {
     pub context: SessionContext,
     _work: SessionWork,
+    _operation: crate::owner_lifecycle::OperationGuard,
 }
 
 impl StoreHandle {
@@ -193,6 +196,7 @@ impl StoreHandle {
     /// `AuthorityOwner.agent_session_work(session_id)`: a DM session's operation under its
     /// campaign's work, while the session is active and still its campaign's writer.
     pub async fn agent_session_work(&self, session_id: &str) -> StoreResult<HeldSession> {
+        let operation = self.operation()?;
         let initial = self.raw_context(session_id).await?;
         let Some(campaign_id) = initial.session.campaign_id().map(str::to_owned) else {
             return Err(rejected("DM sessions require campaign authority"));
@@ -210,12 +214,13 @@ impl StoreHandle {
         if writer != context.session.role() {
             return Err(rejected("Agent session no longer holds campaign writer authority"));
         }
-        Ok(HeldSession { context, _work: SessionWork::Campaign(work) })
+        Ok(HeldSession { context, _work: SessionWork::Campaign(work), _operation: operation })
     }
 
     /// `AuthorityOwner.builder_session_work(session_id)`: one active Builder session's operation,
     /// under a standalone chat's owner lane or its campaign's work.
     pub async fn builder_session_work(&self, session_id: &str) -> StoreResult<HeldSession> {
+        let operation = self.operation()?;
         let initial = self.raw_context(session_id).await?;
         let check = |context: &SessionContext| -> StoreResult<()> {
             if context.session.fields().status != SessionStatus::Active {
@@ -234,7 +239,7 @@ impl StoreHandle {
                     return Err(rejected("Builder chat campaign association changed"));
                 }
                 check(&context)?;
-                Ok(HeldSession { context, _work: SessionWork::BuilderChat(guard) })
+                Ok(HeldSession { context, _work: SessionWork::BuilderChat(guard), _operation: operation })
             }
             Some(campaign_id) => {
                 let work = self.campaign_work(&campaign_id).await?;
@@ -243,7 +248,7 @@ impl StoreHandle {
                     return Err(rejected("Agent session campaign identity changed"));
                 }
                 check(&context)?;
-                Ok(HeldSession { context, _work: SessionWork::Campaign(work) })
+                Ok(HeldSession { context, _work: SessionWork::Campaign(work), _operation: operation })
             }
         }
     }
@@ -258,6 +263,7 @@ impl StoreHandle {
         kind: SessionMessageKind,
         content: &JsonMap,
     ) -> StoreResult<SessionMessage> {
+        let _operation = self.operation()?;
         if !matches!(
             kind,
             SessionMessageKind::SafeThink | SessionMessageKind::Talk | SessionMessageKind::Steering
@@ -288,6 +294,7 @@ impl StoreHandle {
         session_id: &str,
         events: &[sylvia_domain::authority::CanonicalEvent],
     ) -> StoreResult<Vec<SessionMessage>> {
+        let _operation = self.operation()?;
         let _work = self.session_campaign_work(session_id).await?;
         let _session = self.lanes().sessions.acquire(session_id).await;
         let (session_id, events) = (session_id.to_owned(), events.to_vec());
@@ -307,6 +314,7 @@ impl StoreHandle {
                 "builder_chat_work_in_progress",
             ));
         };
+        let _operation = self.operation()?;
         let context = self.raw_context(session_id).await?;
         if context.session.campaign_id().is_some() {
             return Err(rejected("Archive the campaign to archive its Interview or Builder"));
@@ -339,6 +347,7 @@ impl StoreHandle {
         &self,
         record: &sylvia_domain::provider_records::ProviderPrivateRecord,
     ) -> StoreResult<()> {
+        let _operation = self.operation()?;
         let record = record.clone();
         self.call(move |store| store.append_private_provider_record(&record)).await
     }
@@ -350,6 +359,7 @@ impl StoreHandle {
         attempt_id: &str,
         completed: bool,
     ) -> StoreResult<()> {
+        let _operation = self.operation()?;
         let (session_id, attempt_id) = (session_id.to_owned(), attempt_id.to_owned());
         self.call(move |store| store.finish_private_provider_attempt(&session_id, &attempt_id, completed))
             .await

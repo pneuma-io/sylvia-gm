@@ -100,6 +100,7 @@ fn finite(now: f64, message: &str) -> Result<f64, ActionError> {
 
 /// `start_narration_attempt(...)`: begin the campaign's work and admit one live attempt.
 pub async fn start_narration_attempt(store: &StoreHandle, start: NarrationStart) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let work = super::guided::campaign_work(store, &start.campaign_id).await?;
     // A failure drops `work`, finishing it, as Python's `except BaseException` does.
     start_attempt(store, start, None, Some(work)).await
@@ -226,6 +227,7 @@ pub async fn emit_narration_token(
     token: &str,
     response_blocks: Option<&Json>,
 ) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -278,6 +280,7 @@ pub async fn flush_narration(
     campaign_id: &str,
     attempt_id: &str,
 ) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -301,6 +304,7 @@ pub async fn bind_narration_action(
     attempt_id: &str,
     action_id: &str,
 ) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -328,6 +332,17 @@ pub async fn bind_narration_action(
 /// resolve the interruption a Retry answers), end it and its work, and return its canonical
 /// events.
 pub async fn complete_narration_attempt(
+    store: &StoreHandle,
+    campaign_id: &str,
+    attempt_id: &str,
+) -> Result<Vec<CanonicalEvent>, ActionError> {
+    let _operation = store.operation()?;
+    complete_attempt(store, campaign_id, attempt_id).await
+}
+
+/// `_complete_narration_attempt(campaign_id, attempt_id)`: the completion for an operation that
+/// already holds the owner's operation guard (`manual_retry`).
+async fn complete_attempt(
     store: &StoreHandle,
     campaign_id: &str,
     attempt_id: &str,
@@ -411,6 +426,7 @@ pub async fn disconnect_narration(
     attempt_id: &str,
     now: f64,
 ) -> Result<f64, ActionError> {
+    let _operation = store.operation()?;
     let now = finite(now, "Disconnect time must be finite")?;
     let narration = store.narration();
     let Some(grace) = narration.disconnect_grace() else {
@@ -431,6 +447,7 @@ pub async fn reconnect_narration(
     now: f64,
     acknowledged_sequence: i64,
 ) -> Result<CanonicalReplay, ActionError> {
+    let _operation = store.operation()?;
     let now = finite(now, "Reconnect time must be finite")?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
@@ -452,7 +469,13 @@ pub async fn reconnect_narration(
             return Err(rejected("Narration reconnect deadline elapsed"));
         }
     }
-    Ok(super::player_reads::canonical_replay(store, narration, campaign_id, acknowledged_sequence).await?)
+    Ok(super::player_reads::canonical_replay_in_operation(
+        store,
+        narration,
+        campaign_id,
+        acknowledged_sequence,
+    )
+    .await?)
 }
 
 /// `narration_attempt_status(campaign_id, attempt_id)`: the attempt's transport lifecycle.
@@ -461,6 +484,7 @@ pub async fn narration_attempt_status(
     campaign_id: &str,
     attempt_id: &str,
 ) -> Result<String, ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let _region = narration.region().await;
     attempt(narration, &key(campaign_id, attempt_id), |attempt| {
@@ -500,6 +524,7 @@ pub async fn expire_narration(
     attempt_id: &str,
     now: f64,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -524,6 +549,7 @@ pub async fn interrupt_narration(
     campaign_id: &str,
     attempt_id: &str,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -547,7 +573,10 @@ async fn last_attempt_commit(
 
 /// `_expire_narration_locked(attempt)`: end the attempt and its work, save its interruption and
 /// cancel it once. The caller holds the region.
-async fn expire_locked(store: &StoreHandle, key: &Key) -> Result<NarrationInterruption, ActionError> {
+pub(super) async fn expire_locked(
+    store: &StoreHandle,
+    key: &Key,
+) -> Result<NarrationInterruption, ActionError> {
     let narration = store.narration();
     let fresh = new_interruption_id()?;
     let (work, campaign_id, attempt_id) = attempt(narration, key, |attempt| {
@@ -612,6 +641,7 @@ pub async fn redirect_narration(
     content: &JsonMap,
     interruption_id: &str,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let _work = store.session_campaign_work(session_id).await?;
     let id = session_id.to_owned();
     let context = store.call(move |store| store.session_context(&id)).await?;
@@ -740,6 +770,7 @@ pub async fn manual_retry<N: RetryNarration>(
     on_attempt_started: impl FnOnce() + Send,
     mut narrator: N,
 ) -> Result<ManualRetryResult, RetryFailure<N::Error>> {
+    let _operation = store.operation()?;
     let _work = super::guided::campaign_work(store, &request.campaign_id).await?;
     let ManualRetry { campaign_id, interruption_id, retry_id, cancel } = request;
     let reserved = {
@@ -796,9 +827,7 @@ pub async fn manual_retry<N: RetryNarration>(
             Some(owner) => RetryFailure::Owner(owner),
             None => RetryFailure::Narrator(error),
         }),
-        Ok(()) => {
-            complete_narration_attempt(store, &campaign_id, &retry_id).await.map_err(RetryFailure::Owner)
-        }
+        Ok(()) => complete_attempt(store, &campaign_id, &retry_id).await.map_err(RetryFailure::Owner),
     };
     match outcome {
         Ok(canonical) => Ok(ManualRetryResult { input, canonical, replayed: false }),
@@ -826,6 +855,7 @@ pub async fn campaign_ending_choice_text(
     message_id: &str,
     choice: &JsonMap,
 ) -> Result<String, ActionError> {
+    let _operation = store.operation()?;
     let _work = store.session_campaign_work(session_id).await?;
     let id = session_id.to_owned();
     let page = store.call(move |store| store.session_history_page(&id, None, 50)).await?;
@@ -922,6 +952,7 @@ pub async fn unresolved_session_interruption(
     store: &StoreHandle,
     context: &SessionContext,
 ) -> Result<Option<(NarrationInterruption, bool)>, ActionError> {
+    let _operation = store.operation()?;
     let Some(campaign_id) = context.session.campaign_id().map(str::to_owned) else { return Ok(None) };
     if context.session.role() != WriterRole::Dm {
         return Ok(None);
@@ -949,6 +980,7 @@ pub async fn retryable_interruption(
     campaign_id: &str,
     failed_attempt_id: &str,
 ) -> Result<Option<NarrationInterruption>, ActionError> {
+    let _operation = store.operation()?;
     if validate_authority_identity(campaign_id, "Campaign identity", false).is_err()
         || validate_authority_identity(failed_attempt_id, "Failed narration attempt identity", false).is_err()
     {
@@ -973,6 +1005,7 @@ pub async fn narration_interruption(
     campaign_id: &str,
     interruption_id: &str,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let (campaign, interruption) = (campaign_id.to_owned(), interruption_id.to_owned());
     Ok(store.call(move |store| store.interruption(&campaign, &interruption)).await?)
 }
@@ -984,6 +1017,7 @@ pub async fn saved_action_receipt(
     campaign_id: &str,
     action_id: &str,
 ) -> Result<sylvia_domain::authority::ActionReceipt, ActionError> {
+    let _operation = store.operation()?;
     let (campaign, action) = (campaign_id.to_owned(), action_id.to_owned());
     Ok(store.call(move |store| store.action_receipt(&campaign, &action)).await?)
 }
@@ -994,6 +1028,7 @@ pub async fn private_provider_index(
     store: &StoreHandle,
     session_id: &str,
 ) -> Result<Vec<JsonMap>, ActionError> {
+    let _operation = store.operation()?;
     let session = session_id.to_owned();
     Ok(store.call(move |store| store.private_provider_index(&session)).await?)
 }

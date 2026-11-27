@@ -22,6 +22,7 @@ pub struct StoreHandle {
     lanes: OwnerLanes,
     narration: std::sync::Arc<crate::narration::NarrationState>,
     tool_cache: std::sync::Arc<crate::tool_cache::ToolCache>,
+    lifecycle: std::sync::Arc<crate::owner_lifecycle::OwnerLifecycle>,
 }
 
 /// Joins the store thread; returned once by [`StoreHandle::spawn`].
@@ -68,6 +69,7 @@ impl StoreHandle {
                     lanes: OwnerLanes::default(),
                     narration: std::sync::Arc::default(),
                     tool_cache,
+                    lifecycle: std::sync::Arc::default(),
                 };
                 Ok((handle, StoreThread { thread: Some(thread) }))
             }
@@ -92,6 +94,11 @@ impl StoreHandle {
     /// ones the store thread's [`AuthorityStore::tool_cache`] holds.
     pub fn tool_cache(&self) -> &crate::tool_cache::ToolCache {
         &self.tool_cache
+    }
+
+    /// The owner's own lifecycle (`_lifecycle` and `_active_operations`), shared by every clone.
+    pub fn lifecycle(&self) -> &std::sync::Arc<crate::owner_lifecycle::OwnerLifecycle> {
+        &self.lifecycle
     }
 
     /// The owner's lane registries: `AuthorityOwner._lanes` and `SessionApplication._lanes`.
