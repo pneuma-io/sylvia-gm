@@ -7,6 +7,7 @@ pub mod direct_actions;
 pub mod guided;
 pub mod lifecycle;
 pub mod narration;
+pub mod narration_attempts;
 pub mod player_reads;
 pub mod portable;
 pub mod snapshots;

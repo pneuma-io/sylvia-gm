@@ -28,6 +28,7 @@ pub mod guided_advance;
 pub mod guided_finalize;
 pub mod guided_start;
 pub mod handle;
+pub mod interruptions;
 pub mod lanes;
 pub mod launch;
 pub mod lifecycle;
