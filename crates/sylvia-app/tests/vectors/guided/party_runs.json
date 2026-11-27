@@ -1082,5 +1082,832 @@
     "answer_message_id": "guided-answer-6f9d6ec5457b870655809eb9"
    }
   }
- ]
+ ],
+ "final_package_digests": {
+  "package_activations": "63dc5cd64766d956bc42563985e874037cb0660c0b234a3127a54aa1ee7f3a23",
+  "package_blob_chunks": "ae13a1aa714838a9340776d2d5241dd2f0465bd748df440c17ff5c55aec8526e",
+  "package_blobs": "0815f885aab32ebd02d9f6f8885e611ac7238fe27b01cdc6e739b59eeeae729c",
+  "package_candidate_memberships": "500dbdf1c5d82d149fde8a47ad9f5dbd11ec97fa42e2e4bc36b0301f3ba96262",
+  "package_candidates": "1c578033b87fa689dd9345a433bba921293d3612099ec7f2a20908710f8529c5",
+  "package_capabilities": "b6dfb3df08eebffbfaccd10b9b1260d8f5e6542245e81196f4683777c2b05551",
+  "package_dependencies": "e979142dae08d0b6ef91101b160fae577214b9232d5d908f6bec3a97d5a8a445",
+  "package_exact_dependencies": "bb55d2bed54ac0a08d6d208d1fb51bb8833023ab7bd2879d9a0d3566d5c4b205",
+  "package_manifest_files": "a28c4855b8d83e55779567fc9d3da9e82171df6303660c2fb4e8f7618ffd21a9",
+  "package_manifests": "65468661d5dcfda95ac24c1e79decad360a6e26d0159d7a1987c842bb7a69175",
+  "package_participant_artifacts": "92c982b4332af9ecc934938bf0ffa38556bba623126bade1d9bab991f2f624f7",
+  "package_prompt_fragments": "022c3bf9ef61473689cdeefdfd11b1b7ba7cf8630aff29f51be34a11b1b9424e",
+  "package_read_leases": "ce0db56e413dbb832900e49550e689e395ce2ee7ce5a7247fee351f84edb74c3",
+  "package_recovery_roots": "eb62bbc0ad76033aabb9e19f67a2925d20142215f359ef4394803da2987fa28d",
+  "package_staging": "edd77288c79dc401644c4b4b1774738c5537b69be9e13179cf160623a56e0144",
+  "package_staging_chunks": "a20a1e0bb2e2d565a79f6e2fd040953b0c88b341b755a3191bf56bd80eb8c29f",
+  "package_tools": "239c1f1411c9097a77a7695746a7f8283a0d0ccedb19420cbdc2e6e2a14c5feb",
+  "package_ui_surfaces": "b472ad93f0735813d14dd391ce7c5439a0ee013a95db383dfc3b8b85ca7d2260",
+  "packages": "56251db4ee23474e12cc316a48d61599ec06d0458737aa310795ea9f30d4fadc"
+ },
+ "final_tables": {
+  "agent_session_messages": [
+   [
+    "session-table",
+    1,
+    "guided-intro-0d4fc4a78d3706edccafb665",
+    "talk",
+    "{\"interview_step\":\"ruleset\",\"text\":\"Choose a Ruleset for this campaign, or choose No Ruleset for narrative-only play.\"}",
+    null
+   ],
+   [
+    "session-table",
+    2,
+    "guided-state-0d4fc4a78d3706edccafb665",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{},\"construction_revision\":0,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-intro-0d4fc4a78d3706edccafb665\",\"current_step\":\"ruleset\",\"kind\":\"campaign_interview_state\",\"phase\":\"draft\",\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    3,
+    "guided-answer-ede833aa7cfedbc61837be30",
+    "user",
+    "{\"interview_step\":\"ruleset\",\"interview_value\":{\"candidate_id\":\"candidate-install-riichi\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    4,
+    "guided-question-ede833aa7cfedbc61837be30",
+    "talk",
+    "{\"interview_step\":\"setting\",\"text\":\"Choose a compatible Campaign Setting.\"}",
+    null
+   ],
+   [
+    "session-table",
+    5,
+    "guided-state-ede833aa7cfedbc61837be30",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\"},\"construction_revision\":1,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-ede833aa7cfedbc61837be30\",\"current_step\":\"setting\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-ruleset\",\"navigation_frontier\":\"setting\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    6,
+    "guided-answer-20da8f4547148c6a0699f6bb",
+    "user",
+    "{\"interview_step\":\"setting\",\"interview_value\":{\"setting_id\":null},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    7,
+    "guided-question-20da8f4547148c6a0699f6bb",
+    "talk",
+    "{\"interview_step\":\"plan\",\"text\":\"Choose a compatible Campaign Plan.\"}",
+    null
+   ],
+   [
+    "session-table",
+    8,
+    "guided-state-20da8f4547148c6a0699f6bb",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\",\"setting\":\"guided-answer-20da8f4547148c6a0699f6bb\"},\"construction_revision\":2,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-20da8f4547148c6a0699f6bb\",\"current_step\":\"plan\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-setting\",\"navigation_frontier\":\"plan\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    9,
+    "guided-answer-a8cb83f5225e912a3f83d4f4",
+    "user",
+    "{\"interview_step\":\"plan\",\"interview_value\":{\"plan_id\":null},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    10,
+    "guided-question-a8cb83f5225e912a3f83d4f4",
+    "talk",
+    "{\"interview_step\":\"name\",\"text\":\"Review or edit the suggested campaign name.\"}",
+    null
+   ],
+   [
+    "session-table",
+    11,
+    "guided-state-a8cb83f5225e912a3f83d4f4",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"plan\":\"guided-answer-a8cb83f5225e912a3f83d4f4\",\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\",\"setting\":\"guided-answer-20da8f4547148c6a0699f6bb\"},\"construction_revision\":3,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-a8cb83f5225e912a3f83d4f4\",\"current_step\":\"name\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-plan\",\"navigation_frontier\":\"name\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    12,
+    "guided-answer-366be0bba5dbe5a63f9ac674",
+    "user",
+    "{\"interview_step\":\"name\",\"interview_value\":{\"display_name\":\"Table Night\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    13,
+    "guided-question-366be0bba5dbe5a63f9ac674",
+    "talk",
+    "{\"interview_step\":\"participants\",\"text\":\"Choose or create the participants required by this campaign.\"}",
+    null
+   ],
+   [
+    "session-table",
+    14,
+    "guided-state-366be0bba5dbe5a63f9ac674",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"name\":\"guided-answer-366be0bba5dbe5a63f9ac674\",\"plan\":\"guided-answer-a8cb83f5225e912a3f83d4f4\",\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\",\"setting\":\"guided-answer-20da8f4547148c6a0699f6bb\"},\"construction_revision\":4,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-366be0bba5dbe5a63f9ac674\",\"current_step\":\"participants\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-name\",\"navigation_frontier\":\"participants\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    15,
+    "guided-answer-7581e305eaa9a566454d3b0d",
+    "user",
+    "{\"interview_step\":\"participants\",\"interview_value\":{\"participants\":[]},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    16,
+    "guided-question-7581e305eaa9a566454d3b0d",
+    "talk",
+    "{\"interview_step\":\"boundaries_preferences\",\"text\":\"State any hard Boundaries and softer Preferences.\"}",
+    null
+   ],
+   [
+    "session-table",
+    17,
+    "guided-state-7581e305eaa9a566454d3b0d",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"name\":\"guided-answer-366be0bba5dbe5a63f9ac674\",\"participants\":\"guided-answer-7581e305eaa9a566454d3b0d\",\"plan\":\"guided-answer-a8cb83f5225e912a3f83d4f4\",\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\",\"setting\":\"guided-answer-20da8f4547148c6a0699f6bb\"},\"construction_revision\":5,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-7581e305eaa9a566454d3b0d\",\"current_step\":\"boundaries_preferences\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-participants\",\"navigation_frontier\":\"boundaries_preferences\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    18,
+    "guided-answer-1eb199a47da451057f102988",
+    "user",
+    "{\"interview_step\":\"boundaries_preferences\",\"interview_value\":{\"boundaries\":[]},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    19,
+    "guided-question-1eb199a47da451057f102988",
+    "talk",
+    "{\"interview_step\":\"specific_requests\",\"text\":\"Add any Specific Requests, or choose No additional requests.\"}",
+    null
+   ],
+   [
+    "session-table",
+    20,
+    "guided-state-1eb199a47da451057f102988",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"boundaries_preferences\":\"guided-answer-1eb199a47da451057f102988\",\"name\":\"guided-answer-366be0bba5dbe5a63f9ac674\",\"participants\":\"guided-answer-7581e305eaa9a566454d3b0d\",\"plan\":\"guided-answer-a8cb83f5225e912a3f83d4f4\",\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\",\"setting\":\"guided-answer-20da8f4547148c6a0699f6bb\"},\"construction_revision\":6,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-1eb199a47da451057f102988\",\"current_step\":\"specific_requests\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-boundaries\",\"navigation_frontier\":\"specific_requests\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    21,
+    "guided-answer-59e00b763ae7f15612227982",
+    "user",
+    "{\"interview_step\":\"specific_requests\",\"interview_value\":{\"requests\":[]},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-table",
+    22,
+    "guided-question-59e00b763ae7f15612227982",
+    "talk",
+    "{\"interview_step\":\"review\",\"text\":\"Review the spoiler-free campaign summary before choosing Ready to Begin.\"}",
+    null
+   ],
+   [
+    "session-table",
+    23,
+    "guided-state-59e00b763ae7f15612227982",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"boundaries_preferences\":\"guided-answer-1eb199a47da451057f102988\",\"name\":\"guided-answer-366be0bba5dbe5a63f9ac674\",\"participants\":\"guided-answer-7581e305eaa9a566454d3b0d\",\"plan\":\"guided-answer-a8cb83f5225e912a3f83d4f4\",\"ruleset\":\"guided-answer-ede833aa7cfedbc61837be30\",\"setting\":\"guided-answer-20da8f4547148c6a0699f6bb\",\"specific_requests\":\"guided-answer-59e00b763ae7f15612227982\"},\"construction_revision\":7,\"creation_operation_id\":\"table\",\"current_question_message_id\":\"guided-question-59e00b763ae7f15612227982\",\"current_step\":\"review\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"t-requests\",\"navigation_frontier\":\"review\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-table",
+    24,
+    "guided-ready-table",
+    "user",
+    "{\"interview_step\":\"ready\",\"interview_value\":{\"action\":\"ready_to_begin\"},\"text\":\"Ready to Begin\"}",
+    null
+   ],
+   [
+    "session-plain",
+    1,
+    "guided-intro-a116c9ed46d6207734a43317",
+    "talk",
+    "{\"interview_step\":\"ruleset\",\"text\":\"Choose a Ruleset for this campaign, or choose No Ruleset for narrative-only play.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    2,
+    "guided-state-a116c9ed46d6207734a43317",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{},\"construction_revision\":0,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-intro-a116c9ed46d6207734a43317\",\"current_step\":\"ruleset\",\"kind\":\"campaign_interview_state\",\"phase\":\"draft\",\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    3,
+    "guided-answer-82eeb7bb79738c2c6c70c0d7",
+    "user",
+    "{\"interview_step\":\"ruleset\",\"interview_value\":{\"candidate_id\":\"candidate-install-plain\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    4,
+    "guided-question-82eeb7bb79738c2c6c70c0d7",
+    "talk",
+    "{\"interview_step\":\"setting\",\"text\":\"Choose a compatible Campaign Setting.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    5,
+    "guided-state-82eeb7bb79738c2c6c70c0d7",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\"},\"construction_revision\":1,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-82eeb7bb79738c2c6c70c0d7\",\"current_step\":\"setting\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-ruleset\",\"navigation_frontier\":\"setting\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    6,
+    "guided-answer-ded4986576510bce229354ea",
+    "user",
+    "{\"interview_step\":\"setting\",\"interview_value\":{\"setting_id\":null},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    7,
+    "guided-question-ded4986576510bce229354ea",
+    "talk",
+    "{\"interview_step\":\"plan\",\"text\":\"Choose a compatible Campaign Plan.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    8,
+    "guided-state-ded4986576510bce229354ea",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\",\"setting\":\"guided-answer-ded4986576510bce229354ea\"},\"construction_revision\":2,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-ded4986576510bce229354ea\",\"current_step\":\"plan\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-setting\",\"navigation_frontier\":\"plan\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    9,
+    "guided-answer-1e5f2f709abf88a21a7edf04",
+    "user",
+    "{\"interview_step\":\"plan\",\"interview_value\":{\"plan_id\":null},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    10,
+    "guided-question-1e5f2f709abf88a21a7edf04",
+    "talk",
+    "{\"interview_step\":\"name\",\"text\":\"Review or edit the suggested campaign name.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    11,
+    "guided-state-1e5f2f709abf88a21a7edf04",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"plan\":\"guided-answer-1e5f2f709abf88a21a7edf04\",\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\",\"setting\":\"guided-answer-ded4986576510bce229354ea\"},\"construction_revision\":3,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-1e5f2f709abf88a21a7edf04\",\"current_step\":\"name\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-plan\",\"navigation_frontier\":\"name\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    12,
+    "guided-answer-749a534ece10469b760fe110",
+    "user",
+    "{\"interview_step\":\"name\",\"interview_value\":{\"display_name\":\"Table Night\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    13,
+    "guided-question-749a534ece10469b760fe110",
+    "talk",
+    "{\"interview_step\":\"participants\",\"text\":\"Choose or create the participants required by this campaign.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    14,
+    "guided-state-749a534ece10469b760fe110",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"name\":\"guided-answer-749a534ece10469b760fe110\",\"plan\":\"guided-answer-1e5f2f709abf88a21a7edf04\",\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\",\"setting\":\"guided-answer-ded4986576510bce229354ea\"},\"construction_revision\":4,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-749a534ece10469b760fe110\",\"current_step\":\"participants\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-name\",\"navigation_frontier\":\"participants\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    15,
+    "guided-answer-5f0a64bcd19975159ddd1672",
+    "user",
+    "{\"interview_step\":\"participants\",\"interview_value\":{\"participants\":[]},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    16,
+    "guided-question-5f0a64bcd19975159ddd1672",
+    "talk",
+    "{\"interview_step\":\"boundaries_preferences\",\"text\":\"State any hard Boundaries and softer Preferences.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    17,
+    "guided-state-5f0a64bcd19975159ddd1672",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"name\":\"guided-answer-749a534ece10469b760fe110\",\"participants\":\"guided-answer-5f0a64bcd19975159ddd1672\",\"plan\":\"guided-answer-1e5f2f709abf88a21a7edf04\",\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\",\"setting\":\"guided-answer-ded4986576510bce229354ea\"},\"construction_revision\":5,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-5f0a64bcd19975159ddd1672\",\"current_step\":\"boundaries_preferences\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-participants\",\"navigation_frontier\":\"boundaries_preferences\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    18,
+    "guided-answer-0919265be7a6405d5378aa4a",
+    "user",
+    "{\"interview_step\":\"boundaries_preferences\",\"interview_value\":{\"boundaries\":[]},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    19,
+    "guided-question-0919265be7a6405d5378aa4a",
+    "talk",
+    "{\"interview_step\":\"specific_requests\",\"text\":\"Add any Specific Requests, or choose No additional requests.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    20,
+    "guided-state-0919265be7a6405d5378aa4a",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"boundaries_preferences\":\"guided-answer-0919265be7a6405d5378aa4a\",\"name\":\"guided-answer-749a534ece10469b760fe110\",\"participants\":\"guided-answer-5f0a64bcd19975159ddd1672\",\"plan\":\"guided-answer-1e5f2f709abf88a21a7edf04\",\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\",\"setting\":\"guided-answer-ded4986576510bce229354ea\"},\"construction_revision\":6,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-0919265be7a6405d5378aa4a\",\"current_step\":\"specific_requests\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-boundaries\",\"navigation_frontier\":\"specific_requests\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    21,
+    "guided-answer-8954609ea34a976eb1f4b287",
+    "user",
+    "{\"interview_step\":\"specific_requests\",\"interview_value\":{\"requests\":[]},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-plain",
+    22,
+    "guided-question-8954609ea34a976eb1f4b287",
+    "talk",
+    "{\"interview_step\":\"review\",\"text\":\"Review the spoiler-free campaign summary before choosing Ready to Begin.\"}",
+    null
+   ],
+   [
+    "session-plain",
+    23,
+    "guided-state-8954609ea34a976eb1f4b287",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"boundaries_preferences\":\"guided-answer-0919265be7a6405d5378aa4a\",\"name\":\"guided-answer-749a534ece10469b760fe110\",\"participants\":\"guided-answer-5f0a64bcd19975159ddd1672\",\"plan\":\"guided-answer-1e5f2f709abf88a21a7edf04\",\"ruleset\":\"guided-answer-82eeb7bb79738c2c6c70c0d7\",\"setting\":\"guided-answer-ded4986576510bce229354ea\",\"specific_requests\":\"guided-answer-8954609ea34a976eb1f4b287\"},\"construction_revision\":7,\"creation_operation_id\":\"plain\",\"current_question_message_id\":\"guided-question-8954609ea34a976eb1f4b287\",\"current_step\":\"review\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"p-requests\",\"navigation_frontier\":\"review\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-plain",
+    24,
+    "guided-ready-plain",
+    "user",
+    "{\"interview_step\":\"ready\",\"interview_value\":{\"action\":\"ready_to_begin\"},\"text\":\"Ready to Begin\"}",
+    null
+   ],
+   [
+    "session-saved",
+    1,
+    "guided-intro-d81c55f49c5bb0d36bc11e39",
+    "talk",
+    "{\"interview_step\":\"ruleset\",\"text\":\"Choose a Ruleset for this campaign, or choose No Ruleset for narrative-only play.\"}",
+    null
+   ],
+   [
+    "session-saved",
+    2,
+    "guided-state-d81c55f49c5bb0d36bc11e39",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{},\"construction_revision\":0,\"creation_operation_id\":\"saved\",\"current_question_message_id\":\"guided-intro-d81c55f49c5bb0d36bc11e39\",\"current_step\":\"ruleset\",\"kind\":\"campaign_interview_state\",\"phase\":\"draft\",\"version\":1}",
+    null
+   ],
+   [
+    "session-saved",
+    3,
+    "guided-answer-714c5165ab7d34f17bf0e154",
+    "user",
+    "{\"interview_step\":\"ruleset\",\"interview_value\":{\"candidate_id\":\"sylvia.srd-lite.bg3\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-saved",
+    4,
+    "guided-question-714c5165ab7d34f17bf0e154",
+    "talk",
+    "{\"interview_step\":\"setting\",\"text\":\"Choose a compatible Campaign Setting.\"}",
+    null
+   ],
+   [
+    "session-saved",
+    5,
+    "guided-state-714c5165ab7d34f17bf0e154",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"ruleset\":\"guided-answer-714c5165ab7d34f17bf0e154\"},\"construction_revision\":1,\"creation_operation_id\":\"saved\",\"current_question_message_id\":\"guided-question-714c5165ab7d34f17bf0e154\",\"current_step\":\"setting\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"s-ruleset\",\"navigation_frontier\":\"setting\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-saved",
+    6,
+    "guided-answer-524e7f9da8a2f117a0938c9e",
+    "user",
+    "{\"interview_step\":\"setting\",\"interview_value\":{\"setting_id\":\"pneuma.severed-lands\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-saved",
+    7,
+    "guided-question-524e7f9da8a2f117a0938c9e",
+    "talk",
+    "{\"interview_step\":\"plan\",\"text\":\"Choose a compatible Campaign Plan.\"}",
+    null
+   ],
+   [
+    "session-saved",
+    8,
+    "guided-state-524e7f9da8a2f117a0938c9e",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"ruleset\":\"guided-answer-714c5165ab7d34f17bf0e154\",\"setting\":\"guided-answer-524e7f9da8a2f117a0938c9e\"},\"construction_revision\":2,\"creation_operation_id\":\"saved\",\"current_question_message_id\":\"guided-question-524e7f9da8a2f117a0938c9e\",\"current_step\":\"plan\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"s-setting\",\"navigation_frontier\":\"plan\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ],
+   [
+    "session-saved",
+    9,
+    "guided-answer-6f9d6ec5457b870655809eb9",
+    "user",
+    "{\"interview_step\":\"plan\",\"interview_value\":{\"plan_id\":\"campaign-plan-reusable-f1e609979b9b1daeace2d9b1-91c5fab1cbf0f5cc\"},\"text\":\"An answer\"}",
+    null
+   ],
+   [
+    "session-saved",
+    10,
+    "guided-question-6f9d6ec5457b870655809eb9",
+    "talk",
+    "{\"interview_step\":\"name\",\"text\":\"Review or edit the suggested campaign name.\"}",
+    null
+   ],
+   [
+    "session-saved",
+    11,
+    "guided-state-6f9d6ec5457b870655809eb9",
+    "evidence",
+    "{\"active_subflow\":null,\"answers\":{\"plan\":\"guided-answer-6f9d6ec5457b870655809eb9\",\"ruleset\":\"guided-answer-714c5165ab7d34f17bf0e154\",\"setting\":\"guided-answer-524e7f9da8a2f117a0938c9e\"},\"construction_revision\":3,\"creation_operation_id\":\"saved\",\"current_question_message_id\":\"guided-question-6f9d6ec5457b870655809eb9\",\"current_step\":\"name\",\"kind\":\"campaign_interview_state\",\"last_operation_id\":\"s-plan\",\"navigation_frontier\":\"name\",\"phase\":\"draft\",\"subflows\":[],\"version\":1}",
+    null
+   ]
+  ],
+  "agent_sessions": [
+   [
+    "session-table",
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder",
+    "standin",
+    "standin/standin-narrator",
+    "active",
+    null,
+    "BUILD CAMPAIGN PLAN",
+    "[]",
+    "4c35df729f6bd02a712b35e9922eba5cf1b40b1c1815dc4e45b1e733ddddd2d6",
+    null,
+    null
+   ],
+   [
+    "session-plain",
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "builder",
+    "standin",
+    "standin/standin-narrator",
+    "active",
+    null,
+    "BUILD CAMPAIGN PLAN",
+    "[]",
+    "ff27d38aa549054b67c0d1af0c28bc0f3b4d19ed50479a8ba0672f25770b2f7c",
+    null,
+    null
+   ],
+   [
+    "session-saved",
+    "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "builder",
+    "standin",
+    "standin/standin-narrator",
+    "active",
+    null,
+    "BUILD CAMPAIGN PLAN",
+    "[]",
+    "0cd5e75422f7c2767bc29fec2483057a6e4fc1d88f573a452085a91b29ba3935",
+    null,
+    null
+   ]
+  ],
+  "campaign_constructions": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "bind",
+    "turn-construction-table",
+    "lock-903daf76fa92bff12c9da84af21b4171dc0497ea",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "bind-plain",
+    "turn-construction-plain",
+    "lock-74f97b33a31c32076e5d40db0ff196a63adf45f2",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "campaign_lifecycle_state": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "builder",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "builder",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "builder",
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "campaign_lock_memberships": [
+   [
+    "lock-903daf76fa92bff12c9da84af21b4171dc0497ea",
+    0,
+    "pneuma.riichi-mahjong",
+    "0.1.1",
+    "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+    "primary"
+   ],
+   [
+    "lock-903daf76fa92bff12c9da84af21b4171dc0497ea",
+    1,
+    "pneuma.riichi-club",
+    "0.1.1",
+    "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+    "dependency"
+   ],
+   [
+    "lock-74f97b33a31c32076e5d40db0ff196a63adf45f2",
+    0,
+    "synthetic.guided-plain",
+    "1.0.0",
+    "46ed43e540cdca6875f9a77d5770ff7bda77e1fb0c75989f16827a262572c285",
+    "primary"
+   ]
+  ],
+  "campaign_locks": [
+   [
+    "lock-903daf76fa92bff12c9da84af21b4171dc0497ea",
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "c8c2d2e970fcc78bec27cdb4564248e3fef11af07bb8b5278b6c181acd6ed27b",
+    "available",
+    null,
+    0
+   ],
+   [
+    "lock-74f97b33a31c32076e5d40db0ff196a63adf45f2",
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "3bbbf926143c6248cb5cd6cb6d22c0a59df9f49f629bf9b92a17d56ad6c42aa6",
+    "available",
+    null,
+    0
+   ]
+  ],
+  "campaign_operations": [
+   [
+    "bind",
+    "confirm_new_campaign",
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "{\"builder_session\":{\"model_id\":\"standin/standin-narrator\",\"provider_id\":\"standin\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"session-table\"},\"display_name\":\"Table Night\",\"initial_state\":[{\"key\":\"table\",\"namespace\":\"pneuma.riichi-mahjong\",\"value\":{\"round\":1,\"wind\":\"east\"}}],\"operation_id\":\"bind\",\"operation_kind\":\"confirm_new_campaign\",\"package_candidate_id\":\"candidate-install-riichi\",\"package_lock\":[{\"capabilities\":[\"pneuma.riichi-mahjong.guidance\",\"pneuma.riichi-mahjong.play\"],\"dependencies\":[],\"load_order\":0,\"package_id\":\"pneuma.riichi-mahjong\",\"role\":\"primary\",\"sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"version\":\"0.1.1\"},{\"capabilities\":[],\"dependencies\":[{\"kind\":\"ruleset_snapshot\",\"namespace\":\"ruleset_snapshot\",\"package_id\":\"pneuma.riichi-mahjong\",\"sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"version\":\"0.1.1\"}],\"load_order\":1,\"package_id\":\"pneuma.riichi-club\",\"role\":\"dependency\",\"sha256\":\"3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415\",\"version\":\"0.1.1\"}],\"participants\":[{\"adaptation_id\":null,\"data\":{\"control\":\"player\",\"name\":\"Ann\"},\"kind\":\"player\",\"package_id\":\"pneuma.riichi-mahjong\",\"package_sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"package_version\":\"0.1.1\",\"participant_id\":\"player-ann\",\"schema_id\":\"pneuma.riichi-mahjong.player.v1\",\"schema_sha256\":\"3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1\",\"validation_status\":\"validated\"},{\"adaptation_id\":null,\"data\":{\"control\":\"player\",\"name\":\"Ben\"},\"kind\":\"player\",\"package_id\":\"pneuma.riichi-mahjong\",\"package_sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"package_version\":\"0.1.1\",\"participant_id\":\"player-ben\",\"schema_id\":\"pneuma.riichi-mahjong.player.v1\",\"schema_sha256\":\"3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1\",\"validation_status\":\"validated\"}],\"turn_id\":\"turn-construction-table\"}",
+    "15ffe42d0e40c9c61633409295d7f24d6190903bc157b92eeeab8c69b711a9d9",
+    "{\"campaign_id\":\"campaign-draft-0d4fc4a78d3706edccafb665\",\"resulting_revision\":0}",
+    "turn-construction-table",
+    "lock-903daf76fa92bff12c9da84af21b4171dc0497ea",
+    0,
+    0
+   ],
+   [
+    "bind-plain",
+    "confirm_new_campaign",
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "{\"builder_session\":{\"model_id\":\"standin/standin-narrator\",\"provider_id\":\"standin\",\"selected_skill\":\"BUILD CAMPAIGN PLAN\",\"session_id\":\"session-plain\"},\"display_name\":\"Table Night\",\"initial_state\":[{\"key\":\"weather\",\"namespace\":\"world\",\"value\":{\"rain\":true}}],\"operation_id\":\"bind-plain\",\"operation_kind\":\"confirm_new_campaign\",\"package_candidate_id\":\"candidate-install-plain\",\"package_lock\":[{\"capabilities\":[],\"dependencies\":[],\"load_order\":0,\"package_id\":\"synthetic.guided-plain\",\"role\":\"primary\",\"sha256\":\"46ed43e540cdca6875f9a77d5770ff7bda77e1fb0c75989f16827a262572c285\",\"version\":\"1.0.0\"}],\"turn_id\":\"turn-construction-plain\"}",
+    "feb5bc821d6652b1d4532738dabf1c1c99db2b99af0e13e01fb02d00e97c7845",
+    "{\"campaign_id\":\"campaign-draft-a116c9ed46d6207734a43317\",\"resulting_revision\":0}",
+    "turn-construction-plain",
+    "lock-74f97b33a31c32076e5d40db0ff196a63adf45f2",
+    0,
+    0
+   ]
+  ],
+  "campaign_package_memberships": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "pneuma.riichi-mahjong",
+    "0.1.1",
+    "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+    "primary",
+    0
+   ],
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "pneuma.riichi-club",
+    "0.1.1",
+    "3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415",
+    "dependency",
+    1
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "synthetic.guided-plain",
+    "1.0.0",
+    "46ed43e540cdca6875f9a77d5770ff7bda77e1fb0c75989f16827a262572c285",
+    "primary",
+    0
+   ]
+  ],
+  "campaign_revisions": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "campaign_state": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "pneuma.riichi-mahjong",
+    "table",
+    "{\"round\":1,\"wind\":\"east\"}"
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "world",
+    "weather",
+    "{\"rain\":true}"
+   ]
+  ],
+  "campaign_state_namespace_owners": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "pneuma.riichi-mahjong",
+    "pneuma.riichi-mahjong"
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "world",
+    "synthetic.guided-plain"
+   ]
+  ],
+  "campaigns": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "Table Night",
+    "active",
+    "builder",
+    0,
+    "[{\"id\":\"pneuma.riichi-mahjong\",\"load_order\":0,\"role\":\"primary\",\"sha256\":\"bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf\",\"version\":\"0.1.1\"},{\"id\":\"pneuma.riichi-club\",\"load_order\":1,\"role\":\"dependency\",\"sha256\":\"3ecfa8782f0f4f471403b4c95a323244542a59f1ba9f093478c33afabadf3415\",\"version\":\"0.1.1\"}]",
+    "lock-903daf76fa92bff12c9da84af21b4171dc0497ea"
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "Table Night",
+    "active",
+    "builder",
+    0,
+    "[{\"id\":\"synthetic.guided-plain\",\"load_order\":0,\"role\":\"primary\",\"sha256\":\"46ed43e540cdca6875f9a77d5770ff7bda77e1fb0c75989f16827a262572c285\",\"version\":\"1.0.0\"}]",
+    "lock-74f97b33a31c32076e5d40db0ff196a63adf45f2"
+   ],
+   [
+    "campaign-draft-d81c55f49c5bb0d36bc11e39",
+    "Table Night",
+    "active",
+    "builder",
+    0,
+    "unbound",
+    null
+   ]
+  ],
+  "participants": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "player-ann",
+    "player",
+    "pneuma.riichi-mahjong",
+    "0.1.1",
+    "{\"control\":\"player\",\"name\":\"Ann\"}",
+    "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+    "pneuma.riichi-mahjong.player.v1",
+    "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+    "validated",
+    null
+   ],
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "player-ben",
+    "player",
+    "pneuma.riichi-mahjong",
+    "0.1.1",
+    "{\"control\":\"player\",\"name\":\"Ben\"}",
+    "bb1b534b3fdd8e92544f872331468c340828a69e650e45a50198c1ae775a1dbf",
+    "pneuma.riichi-mahjong.player.v1",
+    "3910f188f38ef1d3bad32ccc0a5ce27a62cbfc330094e6b498d451b942718ef1",
+    "validated",
+    null
+   ]
+  ],
+  "turns": [
+   [
+    "campaign-draft-0d4fc4a78d3706edccafb665",
+    "turn-construction-table",
+    "open",
+    0
+   ],
+   [
+    "campaign-draft-a116c9ed46d6207734a43317",
+    "turn-construction-plain",
+    "open",
+    0
+   ]
+  ]
+ }
 }

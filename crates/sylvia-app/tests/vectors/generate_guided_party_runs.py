@@ -18,8 +18,14 @@ saved Plan's files are recorded in `party_runs.json`. Then:
 - a Draft on `plain` bound with initial state in a namespace no package prefixes, which its one
   package owns;
 - a Draft whose Interview picks the saved Plan (the plan step resolves its Interview content).
-It writes `guided/party_runs.json` and `guided/party_runs.sqlite3.gz` (the database afterwards);
-`tests/guided.rs` replays them. Identities are explicit and the owner's UUIDs are seeded, so a
+It writes `guided/party_runs.json`, which `tests/guided.rs` replays. The final database is not
+committed (the saved-Plan Interview installs the bundled Rift snapshot, about 45 MB of package
+rows that change with every SRD Lite release). Instead the record keeps, with
+`installed_base.py`:
+- `final_package_digests`: every package table's digest afterwards, which the Rust run, making
+  the same install, must match exactly;
+- `final_tables`: the full final rows of every other table the run changed, from which the test
+  rebuilds Python's database to compare with its own under the usual normalisation. Identities are explicit and the owner's UUIDs are seeded, so a
 re-run writes byte-identical files. Reference tooling only.
 """
 
@@ -56,10 +62,12 @@ from sylvia_gm.infrastructure import sqlite_authority as a  # noqa: E402
 from sylvia_gm.infrastructure.package_archive import admit_package_archive  # noqa: E402
 
 import generate_guided_ruleset_runs as ruleset_runs  # noqa: E402
+import installed_base  # noqa: E402
 
 OUT = HERE / "guided"
 SEED = OUT / "seed.sqlite3.gz"
-OUTPUTS = ("party_seed.sqlite3.gz", "party_runs.json", "party_runs.sqlite3.gz")
+OUTPUTS = ("party_seed.sqlite3.gz", "party_runs.json")
+RETIRED = ("party_runs.sqlite3.gz",)
 RIICHI = ROOT / "rulesets/riichi-mahjong/riichi-mahjong-0.1.1.sylvia-gm-package"
 READY = {"text": "Ready to Begin", "interview_step": "ready", "interview_value": {"action": "ready_to_begin"}}
 CANDIDATE = "candidate-install-riichi"
@@ -211,6 +219,11 @@ def run(owner: AuthorityOwner, op: dict[str, object], campaigns: dict[str, str])
     return {"ok": value}
 
 
+def is_package_table(table: str) -> bool:
+    """The package library's tables: compared by digest, not committed as rows."""
+    return table == "packages" or table.startswith("package_")
+
+
 def checkpoint(database: Path) -> bytes:
     connection = sqlite3.connect(database)
     connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
@@ -225,7 +238,7 @@ def saved_files(root: Path) -> dict[str, str]:
 
 def main() -> None:
     OUT.mkdir(exist_ok=True)
-    for name in OUTPUTS:
+    for name in OUTPUTS + RETIRED:
         (OUT / name).unlink(missing_ok=True)
     with tempfile.TemporaryDirectory(dir=HERE) as scratch:
         database = Path(scratch) / "authority.sqlite3"
@@ -236,14 +249,22 @@ def main() -> None:
                                           source_payload=thaw_json_value(rift.payload),
                                           source_markdown=rift.readable_markdown).artifact_id
         files = saved_files(Path(scratch))
-        (OUT / "party_seed.sqlite3.gz").write_bytes(gzip.compress(checkpoint(database), mtime=0))
+        seed_bytes = checkpoint(database)
+        (OUT / "party_seed.sqlite3.gz").write_bytes(gzip.compress(seed_bytes, mtime=0))
+        base = Path(scratch) / "base.sqlite3"
+        base.write_bytes(seed_bytes)
         ops = operations(identity, sibling)
         campaigns: dict[str, str] = {}
         with AuthorityOwner.open(database, "guided-party-runs") as owner:
             outcomes = [run(owner, op, campaigns) for op in ops]
-        (OUT / "party_runs.sqlite3.gz").write_bytes(gzip.compress(checkpoint(database), mtime=0))
+        installed_base.checkpoint(database)
+        changed = installed_base.changed_rows(base, database)
+        digests = installed_base.table_digests(database)
+    package_digests = {table: digest for table, digest in digests.items() if is_package_table(table)}
+    final_tables = {table: rows for table, rows in changed.items() if not is_package_table(table)}
     record = {"python": ".".join(sys.version.split()[0].split(".")[:2]), "sibling": sibling, "files": files,
-              "operations": ops, "outcomes": outcomes}
+              "operations": ops, "outcomes": outcomes, "final_package_digests": package_digests,
+              "final_tables": final_tables}
     (OUT / "party_runs.json").write_bytes((json.dumps(record, indent=1, ensure_ascii=True) + "\n").encode("utf-8"))
     for op, outcome in zip(ops, outcomes):
         print(op["op"][:20], op.get("operation_id"), ascii(outcome)[:150])

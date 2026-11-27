@@ -7,6 +7,8 @@
 //! `advance_guided_campaign_draft`. Each outcome must be Python's, and the database afterwards
 //! must match Python's. Steps that need an Interview Contribution are refused as not yet ported.
 
+mod installed_base;
+
 use flate2::read::GzDecoder;
 use serde_json::json;
 use std::io::Read;
@@ -536,11 +538,37 @@ async fn guided_party_matches_python() {
     }
     drop(handle);
     tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
-    let rules = sylvia_compare::diff::Rules::defaults();
+    // The package tables (the saved-Plan Interview installs the bundled Rift snapshot) must end
+    // exactly as Python's, by digest.
+    let is_package = |table: &str| table == "packages" || table.starts_with("package_");
+    let digests = installed_base::table_digests(&database);
+    let ours: std::collections::BTreeMap<&String, &String> =
+        digests.iter().filter(|(table, _)| is_package(table)).collect();
+    let want: std::collections::BTreeMap<&String, &str> = record["final_package_digests"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(table, digest)| (table, digest.as_str().unwrap()))
+        .collect();
+    let differing: Vec<&String> = want
+        .iter()
+        .filter(|(table, digest)| ours.get(*table).map(|d| d.as_str()) != Some(**digest))
+        .map(|(table, _)| *table)
+        .collect();
+    assert!(
+        ours.len() == want.len() && differing.is_empty(),
+        "package tables differ from Python's: {differing:?}"
+    );
+    // Every other table: Python's database rebuilt from the base and the rows its run changed,
+    // compared under the usual normalisation.
     let python = folder.join("python.sqlite3");
-    std::fs::write(&python, gunzip("party_runs")).unwrap();
+    std::fs::write(&python, gunzip("party_seed")).unwrap();
+    installed_base::write_rows(&python, record["final_tables"].as_object().unwrap());
+    let rules = sylvia_compare::diff::Rules::defaults();
     let dump = |path: &Path| {
-        sylvia_compare::diff::normalise(&sylvia_compare::dbdump::dump(path).unwrap(), &rules).unwrap()
+        let mut dumped = sylvia_compare::dbdump::dump(path).unwrap();
+        dumped["tables"].as_object_mut().unwrap().retain(|table, _| !is_package(table));
+        sylvia_compare::diff::normalise(&dumped, &rules).unwrap()
     };
     let differences = sylvia_compare::diff::compare(&dump(&python), &dump(&database), 20);
     assert!(differences.is_empty(), "database differs from Python's: {differences:#?}");
