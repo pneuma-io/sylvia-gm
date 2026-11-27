@@ -13,6 +13,7 @@ pub mod mode;
 pub mod prompt;
 pub mod question_answers;
 pub mod ruleset_tests;
+pub mod ruleset_tools;
 pub mod runner;
 pub mod skills;
 pub mod title;
@@ -67,4 +68,25 @@ pub(crate) fn frozen_in(value: &Json, names: &[&str]) -> sylvia_base::CodedResul
         return Err(type_error(format!("unhashable type: '{}'", frozen_type_name(value))));
     }
     Ok(names.iter().any(|name| sylvia_domain::pyops::py_eq(value, &Json::from(*name))))
+}
+
+/// Whether Python's `type(error).__name__` is an `AuthorityError`: the class whose refusals
+/// carry a `code` and that the Builder tools catch (`except AuthorityError`).
+pub(crate) fn is_authority_error(class: &str) -> bool {
+    matches!(
+        class,
+        "AuthorityError"
+            | "SchemaIdentityError"
+            | "OwnerConflict"
+            | "WrongOwner"
+            | "WrongWriter"
+            | "StaleRevision"
+            | "IdempotencyConflict"
+            | "CommandRejected"
+            | "MechanicsRejected"
+            | "RulesetPreconditionRejected"
+            | "PortableRecoveryFailure"
+            | "_BackupFailure"
+            | "_ExportFailure"
+    )
 }

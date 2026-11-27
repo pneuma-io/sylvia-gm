@@ -1,0 +1,467 @@
+{
+ "python": "3.12",
+ "check_ruleset_draft": [
+  {
+   "name": "arguments",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {
+    "anything": 1
+   },
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_tool_parameters_invalid",
+    "message": "check_ruleset_draft takes no arguments."
+   }
+  },
+  {
+   "name": "empty_workspace",
+   "files": {},
+   "params": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_payload_invalid",
+    "message": "Builder ruleset payload is unavailable",
+    "validation_errors": []
+   }
+  },
+  {
+   "name": "valid",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "result": {
+    "success": true,
+    "status": "valid_draft",
+    "closure_sha256": "c4dd19c92130fce60b50912c23650f8ba7093830b66a42eec916f8dc32ceb76a",
+    "checked": [
+     "source",
+     "package",
+     "references",
+     "runtime"
+    ],
+    "published": false,
+    "message": "The draft passes package and runtime admission. It remains in the workspace. This check does not test gameplay sequences."
+   }
+  },
+  {
+   "name": "valid_without_tests",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\n"
+   },
+   "params": {},
+   "result": {
+    "success": true,
+    "status": "valid_draft",
+    "closure_sha256": "51b2a226843a2f9d1552c83d2db71efcb041bd77713e70280253cd53ad3d52ae",
+    "checked": [
+     "source",
+     "package",
+     "references",
+     "runtime"
+    ],
+    "published": false,
+    "message": "The draft passes package and runtime admission. It remains in the workspace. This check does not test gameplay sequences."
+   }
+  },
+  {
+   "name": "source_not_yaml",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "kind: [unclosed"
+   },
+   "params": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_ruleset_source_invalid",
+    "message": "Builder Ruleset source is invalid",
+    "validation_errors": [
+     {
+      "code": "ruleset_source_yaml_invalid",
+      "phase": "source",
+      "message": "Ruleset source must use bounded UTF-8 YAML with unique text fields and finite JSON values.",
+      "file": "ruleset-source.yaml",
+      "path": "$"
+     }
+    ]
+   }
+  },
+  {
+   "name": "source_not_a_mapping",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "- 1\n- 2\n"
+   },
+   "params": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_ruleset_source_invalid",
+    "message": "Builder Ruleset source is invalid",
+    "validation_errors": [
+     {
+      "code": "ruleset_source_expected_object",
+      "phase": "source",
+      "message": "Expected a YAML object.",
+      "file": "ruleset-source.yaml",
+      "path": "$"
+     }
+    ]
+   }
+  },
+  {
+   "name": "invalid_tests",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  scenarios:\n  - id: bad\n"
+   },
+   "params": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_ruleset_source_invalid",
+    "message": "Builder Ruleset source is invalid",
+    "validation_errors": [
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].description",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].covers",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].initial_state",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].participants",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].rolls",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].steps",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.format",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     }
+    ]
+   }
+  },
+  {
+   "name": "undeclared_field",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\ntools: []\n"
+   },
+   "params": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_ruleset_source_invalid",
+    "message": "Builder Ruleset source is invalid",
+    "validation_errors": [
+     {
+      "code": "ruleset_source_undeclared_field",
+      "phase": "source",
+      "message": "Field 'tools' is undeclared.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tools",
+      "package_id": "example.coin-rules",
+      "guidance": "Remove the undeclared field."
+     }
+    ]
+   }
+  }
+ ],
+ "test_ruleset_draft": [
+  {
+   "name": "arguments",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {
+    "x": null
+   },
+   "worker": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_tool_parameters_invalid",
+    "message": "test_ruleset_draft takes no arguments."
+   }
+  },
+  {
+   "name": "empty_workspace",
+   "files": {},
+   "params": {},
+   "worker": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_payload_invalid",
+    "message": "Builder ruleset payload is unavailable",
+    "validation_errors": []
+   }
+  },
+  {
+   "name": "invalid_tests",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  scenarios:\n  - id: bad\n"
+   },
+   "params": {},
+   "worker": {},
+   "result": {
+    "success": false,
+    "status": "rejected",
+    "code": "builder_ruleset_source_invalid",
+    "message": "Builder Ruleset source is invalid",
+    "validation_errors": [
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].description",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].covers",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].initial_state",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].participants",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].rolls",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.scenarios[0].steps",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "ruleset-source.yaml",
+      "path": "$.tests.format",
+      "guidance": "Read the ruleset_source content definition and correct this field."
+     }
+    ]
+   }
+  },
+  {
+   "name": "passed",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "worker": {
+    "payload": "{\"status\": \"passed\", \"closure_sha256\": \"c\", \"scenarios\": [{\"id\": \"coin-heads\", \"status\": \"passed\"}], \"coverage\": {}}"
+   },
+   "result": {
+    "status": "passed",
+    "closure_sha256": "c",
+    "scenarios": [
+     {
+      "id": "coin-heads",
+      "status": "passed"
+     }
+    ],
+    "coverage": {},
+    "success": true,
+    "published": false,
+    "summary": {
+     "passed": 1,
+     "total": 1,
+     "failed": 0
+    },
+    "message": "Saved scenarios ran through the campaign loop in disposable state. Inspect failures and coverage before declaring the Ruleset ready. The draft remains editable; no library or campaign was changed."
+   }
+  },
+  {
+   "name": "mixed_keeps_message_place",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "worker": {
+    "payload": "{\"status\": \"failed\", \"message\": \"worker text\", \"scenarios\": [{\"id\": \"a\", \"status\": \"passed\"}, {\"id\": \"b\", \"status\": \"failed\"}, {\"id\": \"c\", \"status\": \"error\"}]}"
+   },
+   "result": {
+    "status": "failed",
+    "message": "Saved scenarios ran through the campaign loop in disposable state. Inspect failures and coverage before declaring the Ruleset ready. The draft remains editable; no library or campaign was changed.",
+    "scenarios": [
+     {
+      "id": "a",
+      "status": "passed"
+     },
+     {
+      "id": "b",
+      "status": "failed"
+     },
+     {
+      "id": "c",
+      "status": "error"
+     }
+    ],
+    "success": false,
+    "published": false,
+    "summary": {
+     "passed": 1,
+     "total": 3,
+     "failed": 2
+    }
+   }
+  },
+  {
+   "name": "no_scenarios",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "worker": {
+    "payload": "{\"status\": \"missing_tests\"}"
+   },
+   "result": {
+    "status": "missing_tests",
+    "success": false,
+    "published": false,
+    "summary": {
+     "passed": 0,
+     "total": 0,
+     "failed": 0
+    },
+    "message": "Saved scenarios ran through the campaign loop in disposable state. Inspect failures and coverage before declaring the Ruleset ready. The draft remains editable; no library or campaign was changed."
+   }
+  },
+  {
+   "name": "worker_failed",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "worker": {
+    "payload": "{\"status\": \"passed\", \"closure_sha256\": \"c\", \"scenarios\": [{\"id\": \"coin-heads\", \"status\": \"passed\"}], \"coverage\": {}}",
+    "exit": 1
+   },
+   "result": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Saved scenarios ran through the campaign loop in disposable state. Inspect failures and coverage before declaring the Ruleset ready. The draft remains editable; no library or campaign was changed.",
+    "success": false,
+    "published": false,
+    "summary": {
+     "passed": 0,
+     "total": 0,
+     "failed": 0
+    }
+   }
+  },
+  {
+   "name": "exact_archive",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "worker": {
+    "echo": true
+   },
+   "result": {
+    "status": "passed",
+    "archive_sha256": "729172d1bf0b63d8d43c1d200fb0e117ef0875c91e57f3a824f88e489e8a741a",
+    "success": true,
+    "published": false,
+    "summary": {
+     "passed": 0,
+     "total": 0,
+     "failed": 0
+    },
+    "message": "Saved scenarios ran through the campaign loop in disposable state. Inspect failures and coverage before declaring the Ruleset ready. The draft remains editable; no library or campaign was changed."
+   }
+  },
+  {
+   "name": "cancelled",
+   "files": {
+    "ruleset-draft/ruleset-source.yaml": "format: 1\nid: example.coin-rules\nversion: 1.0.0\nlabel: Coin Rules\npublisher: Example author\nmechanic_families:\n  flip:\n    parameters: []\n    pre_conditions: []\n    effects:\n    - dice:\n        expression: 1d2\n      store_as: _result\n    narrative: {}\npublic_actions:\n- name: flip_coin\n  family: flip\n  description: Flip a coin.\n  configure: {}\n  capability: example.coin-rules.flip\n  state_predicates: []\n  turn_statuses:\n  - open\n  writers:\n  - dm\n  reference_availability: included\n  gameplay_resolution: engine_family\n  deterministic_part: null\n  gm_part: null\nprivate_mechanics: []\ndefinitions: {}\nparticipant_artifacts: []\noperating_guide: null\ntests:\n  format: 1\n  scenarios:\n  - id: coin-heads\n    description: A controlled coin flip commits its result.\n    covers:\n    - flip_coin\n    initial_state: []\n    participants: []\n    rolls:\n    - sides: 2\n      value: 2\n    steps:\n    - kind: gm_turn\n      message: Flip the coin.\n      replies:\n      - kind: tool\n        tool: flip_coin\n        arguments: {}\n      - kind: narration\n        text: The coin lands heads.\n      expect:\n      - subject: receipt\n        path:\n        - status\n        equals: committed\n      - subject: receipt\n        path:\n        - result\n        - context\n        - _result\n        - total\n        equals: 2\n"
+   },
+   "params": {},
+   "worker": {
+    "hang": true,
+    "cancel": true
+   },
+   "result": {
+    "status": "cancelled",
+    "scenarios": [],
+    "message": "Saved scenarios ran through the campaign loop in disposable state. Inspect failures and coverage before declaring the Ruleset ready. The draft remains editable; no library or campaign was changed.",
+    "success": false,
+    "published": false,
+    "summary": {
+     "passed": 0,
+     "total": 0,
+     "failed": 0
+    }
+   }
+  }
+ ]
+}
