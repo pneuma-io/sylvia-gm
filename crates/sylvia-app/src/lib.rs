@@ -11,6 +11,7 @@
 //! - [`path_guardrail`]: Builder file paths kept inside one allowed root.
 //! - [`plan_state_admission`]: a Plan's package-owned starting state checked against its Ruleset.
 //! - [`package_materialization`]: drafts completed, archived with `zipfile`'s exact bytes, and pre-admitted.
+//! - [`ruleset_testing`]: saved Ruleset tests run in a bounded worker process.
 //! - [`setting_character_requirements`]: Setting-owned Character File information.
 //! - [`srd_lite_character_compatibility`]: the retained SRD Lite 0.2 character contract.
 //! - [`workspace_files`]: Builder file writes that refuse a stale version.
@@ -31,6 +32,7 @@ pub mod builder_tools;
 pub mod bundled_campaign_plans;
 pub mod bundled_packages;
 pub mod bundled_starter_characters;
+pub mod campaign_inventory;
 pub mod campaign_library_selection;
 pub mod campaign_plan_materializer;
 pub mod campaign_plan_sources;
@@ -45,6 +47,7 @@ pub mod interview_content;
 pub mod knowledge_search;
 pub mod launch_compatibility;
 pub mod library_sources;
+pub mod map_segment_preview;
 pub mod network_graph;
 pub mod package_library;
 pub mod package_materialization;
@@ -53,11 +56,13 @@ pub mod package_mechanic;
 pub mod package_record_edits;
 pub mod package_runtime;
 pub mod path_guardrail;
+pub mod piece_table;
 pub mod plan_network_admission;
 pub mod plan_snapshot;
 pub mod plan_spatial_admission;
 pub mod plan_state_admission;
 pub mod player_actions;
+pub mod reference_text;
 pub mod result_card_admission;
 pub mod result_cards;
 pub mod reusable_library_deletion;
@@ -65,6 +70,7 @@ pub mod reusable_participants;
 pub mod reusable_plans;
 pub mod ruleless_play;
 pub mod ruleset_source;
+pub mod ruleset_testing;
 pub mod setting_character_requirements;
 pub mod spatial_preview;
 pub mod srd_lite_character_compatibility;

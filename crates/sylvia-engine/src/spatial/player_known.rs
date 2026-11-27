@@ -25,7 +25,7 @@ const DISPLAY_FIELDS: [&str; 11] = [
 const MAX_LABEL_BYTES: usize = 256;
 
 /// `except (TypeError, ValueError)` around a spatial admission: whether Python catches it.
-fn caught(error: &SpatialError) -> bool {
+pub fn caught(error: &SpatialError) -> bool {
     match error {
         SpatialError::Validation(_) => true,
         SpatialError::Uncaught { error_type, .. } => matches!(*error_type, "TypeError" | "ValueError"),
@@ -40,7 +40,7 @@ fn trimmed_text(text: &str, limit: usize) -> bool {
 
 /// `_public_display(metadata, scene=..., visible_anchors=...)`: the closed public presentation
 /// record, or `None` (hidden). A zone's display geometry is admitted against `scene`.
-fn public_display(
+pub fn public_display(
     metadata: &Json,
     scene: Option<&AdmittedSpatialScene>,
     visible_anchors: Option<&HashSet<String>>,
@@ -104,7 +104,7 @@ fn public_display(
 }
 
 /// `_visible_anchor_ids(scene)`: active entities with a public display.
-fn visible_anchor_ids(scene: &JsonMap) -> Result<HashSet<String>, SpatialError> {
+pub fn visible_anchor_ids(scene: &JsonMap) -> Result<HashSet<String>, SpatialError> {
     let mut anchors = HashSet::new();
     for item in scene["entities"].as_array().expect("admitted entities") {
         if item["active"] == Json::Bool(true) && public_display(&item["metadata"], None, None)?.is_some() {

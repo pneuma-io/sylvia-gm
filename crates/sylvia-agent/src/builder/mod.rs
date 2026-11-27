@@ -12,8 +12,12 @@ pub mod history;
 pub mod mode;
 pub mod prompt;
 pub mod question_answers;
+pub mod ruleset_tests;
+pub mod runner;
 pub mod skills;
 pub mod title;
+pub mod tools;
+pub mod turn;
 
 use std::sync::OnceLock;
 use sylvia_base::{pyjson, CodedError, Json};

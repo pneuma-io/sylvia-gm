@@ -987,7 +987,7 @@ pub(crate) fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::pat
 
 /// `_optional_text(payload, key)`: absent or `null` is `None`; anything else must be a
 /// nonempty string.
-fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
+pub(crate) fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
     match params.get(key) {
         None | Some(Json::Null) => Ok(None),
         Some(_) => required(params, key).map(Some),
@@ -1310,6 +1310,7 @@ mod tests {
             store,
             providers: None,
             session_loop: None,
+            campaign_loop: None,
             bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                 sylvia_app::bundled_packages::BundledSources::from_repository_root(
                     &crate::util::source_root(),
@@ -1487,6 +1488,7 @@ mod tests {
             store,
             providers: None,
             session_loop: None,
+            campaign_loop: None,
             bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                 sylvia_app::bundled_packages::BundledSources::from_repository_root(
                     &crate::util::source_root(),
@@ -1600,6 +1602,7 @@ mod tests {
             store,
             providers: None,
             session_loop: None,
+            campaign_loop: None,
             bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                 sylvia_app::bundled_packages::BundledSources::from_repository_root(
                     &crate::util::source_root(),
@@ -1736,6 +1739,7 @@ mod tests {
                 store,
                 providers: None,
                 session_loop: None,
+                campaign_loop: None,
                 bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                     sylvia_app::bundled_packages::BundledSources::from_repository_root(
                         &crate::util::source_root(),

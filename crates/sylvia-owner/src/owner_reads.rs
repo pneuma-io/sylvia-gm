@@ -26,11 +26,24 @@ fn coded(error: StoreError) -> CodedError {
 #[derive(Debug, Clone)]
 pub struct OwnerReads {
     store: StoreHandle,
+    /// This owner's own identity (`self._owner_id`), which `execute_action` checks a command's
+    /// owner against; `None` for reads that never execute.
+    owner_id: Option<String>,
 }
 
 impl OwnerReads {
     pub fn new(store: StoreHandle) -> Self {
-        Self { store }
+        Self { store, owner_id: None }
+    }
+
+    /// The reads of the owner `owner_id`, which may also execute its mechanics (the GM turn's).
+    pub fn for_owner(store: StoreHandle, owner_id: impl Into<String>) -> Self {
+        Self { store, owner_id: Some(owner_id.into()) }
+    }
+
+    /// This owner's own identity, when the reads were built with it.
+    pub(crate) fn owner_id(&self) -> Option<&str> {
+        self.owner_id.as_deref()
     }
 
     /// The store handle the reads go to (for the GM turn's `TurnOwner` delegation).

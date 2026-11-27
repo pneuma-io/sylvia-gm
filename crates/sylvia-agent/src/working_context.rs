@@ -529,6 +529,18 @@ impl WorkingContextProvider {
         self.records.lock().unwrap_or_else(std::sync::PoisonError::into_inner).clone()
     }
 
+    /// Messages the caller appended to the latest request's list after sending it. Python's
+    /// `_source` is the caller's list object itself, so `read_session_history`'s `current`
+    /// source sees what is appended to it afterwards: the Builder runner appends its tool-call
+    /// message and each tool result (lane 1's B3a calls this as it does). The GM's request list
+    /// is built for each round and never appended to.
+    pub fn extend_source(&self, messages: &[JsonMap]) {
+        self.source
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
+            .extend(messages.iter().cloned());
+    }
+
     /// `history_retrieval_enabled = enabled`.
     pub fn set_history_retrieval_enabled(&self, enabled: bool) {
         self.history_retrieval_enabled.store(enabled, Ordering::SeqCst);

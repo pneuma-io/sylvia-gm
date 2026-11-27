@@ -4,8 +4,8 @@
 //!
 //! A mechanic commits, fails, is refused by its Ruleset, or asks for a choice, which
 //! [`resolve_mechanics_choice`] answers (lane 4's T3, steps 1 and 2); its state and participant
-//! mutations are checked and committed (step 3). Not ported yet, so refused as
-//! `rust_port_pending`: a player action's origin and the Campaign File batches (step 4).
+//! mutations are checked and committed (step 3); a Campaign File update's continuity commands
+//! and a player action's origin commit with it (step 4: `campaign_file` and `direct_actions`).
 //!
 //! Errors keep Python's classes for lane 4's MCP surface: what `_execute_action` and lane 2's
 //! mechanic raise come back as [`ActionError::Domain`], unchanged (a `MechanicsRejected` keeps its
@@ -24,7 +24,7 @@ use sylvia_store::mechanics_choices::awaiting_receipt;
 use sylvia_store::{AuthorityStore, StoreError, StoreHandle};
 
 /// The owner's answer to `rust_port_pending`.
-const PORT_PENDING: &str = "rust_port_pending";
+pub(super) const PORT_PENDING: &str = "rust_port_pending";
 
 /// What `execute_action` answers: `ActionReceipt | AwaitingChoiceReceipt`.
 #[derive(Debug, Clone, PartialEq)]
@@ -219,6 +219,29 @@ pub async fn execute_action(
     command: &ActionCommand,
 ) -> Result<ActionExecution, ActionError> {
     let _work = super::guided::campaign_work(store, &command.campaign_id).await?;
+    execute_action_in_work(store, owner_id, command, &ExecuteOptions::default()).await
+}
+
+/// `_execute_action`'s keyword arguments, which only the owner's own operations pass.
+#[derive(Debug, Clone, Default)]
+pub(crate) struct ExecuteOptions {
+    /// `campaign_file_commands`: the Campaign File notes a character update commits with it.
+    pub(crate) campaign_file_commands: Vec<sylvia_domain::authority::CampaignContinuityCommand>,
+    /// `campaign_file_update`: the action is a Campaign File update's bookkeeping.
+    pub(crate) campaign_file_update: bool,
+    /// `player_action_origin`: the player control this action came from, kept with a choice it
+    /// reserves and committed as the outcome's origin marker (`retain_player_action_origin`).
+    pub(crate) player_action_origin: Option<JsonMap>,
+}
+
+/// `AuthorityOwner._execute_action(command, ...)`, for a caller already holding the campaign's
+/// work (`execute_action`, `update_campaign_file`).
+pub(crate) async fn execute_action_in_work(
+    store: &StoreHandle,
+    owner_id: &str,
+    command: &ActionCommand,
+    options: &ExecuteOptions,
+) -> Result<ActionExecution, ActionError> {
     // The identities, as `validate_authority_identity` checks them.
     let identities = [
         (&command.campaign_id, "Campaign identity"),
@@ -333,7 +356,9 @@ pub async fn execute_action(
                         &actor,
                         &boundary.actor_id.clone().map_or(Json::Null, Json::from),
                     );
-            if !normal_event {
+            // A Campaign File review that changes nothing is not play.
+            let unchanged_review = options.campaign_file_update && options.campaign_file_commands.is_empty();
+            if !normal_event && !unchanged_review {
                 return Err(command_rejected(
                     "Complete the queued starting character choices before play.",
                     "campaign_preparation_pending",
@@ -346,10 +371,19 @@ pub async fn execute_action(
     let decided = {
         let (command, hash, package, basis, parameters) =
             (owned.clone(), hash.clone(), package.clone(), basis, parameters);
-        let handle = store.clone();
+        let (handle, origin) = (store.clone(), options.player_action_origin.clone());
         store
             .call(move |store| {
-                Ok(execute_on(store, handle.narration(), &command, &hash, &package, &basis, parameters))
+                Ok(execute_on(
+                    store,
+                    handle.narration(),
+                    &command,
+                    &hash,
+                    &package,
+                    &basis,
+                    parameters,
+                    origin.as_ref(),
+                ))
             })
             .await?
     };
@@ -359,8 +393,18 @@ pub async fn execute_action(
         Err(ExecuteFailure::Domain(error)) => return Err(error.into()),
         Err(ExecuteFailure::Store(error)) => return Err(error.into()),
     };
+    let mut commit = commit;
+    commit.campaign_file_commands.clone_from(&options.campaign_file_commands);
     let receipt = store.call(move |store| store.commit_action(&commit)).await?;
     Ok(ActionExecution::Receipt(receipt))
+}
+
+/// The work a resolution holds: a player action's direct work, or ordinary campaign work.
+enum Work {
+    #[allow(dead_code)] // Held for its drop.
+    Direct(sylvia_store::work::DirectActionGuard),
+    #[allow(dead_code)] // Held for its drop.
+    Campaign(sylvia_store::work::CampaignWorkGuard),
 }
 
 /// What running the mechanic decided: a choice to await, or the commit to make.
@@ -424,6 +468,7 @@ fn admitted_tool(
 
 /// `_admitted_tool`, the parameter checks, the mechanic and its outcome checks, on the store
 /// thread, with the tool's pending projection held for the run.
+#[allow(clippy::too_many_arguments)]
 fn execute_on(
     store: &AuthorityStore,
     narration: &sylvia_store::narration::NarrationState,
@@ -432,6 +477,7 @@ fn execute_on(
     package: &PackageLockEntry,
     basis: &sylvia_store::action_execution::ActionBasis,
     parameters: JsonMap,
+    player_action_origin: Option<&JsonMap>,
 ) -> Result<Decided, ExecuteFailure> {
     let tool = admitted_tool(store, command, package, basis)?;
     sylvia_domain::schema_admission::validate_parameters(&parameters, &tool.input_schema)?;
@@ -493,7 +539,7 @@ fn execute_on(
                 parameters: &parameters,
                 initiating_session_id: command.initiating_session_id.as_deref(),
                 choice,
-                player_action_origin: None,
+                player_action_origin,
             })?;
         return Ok(Decided::Awaiting(awaiting_receipt(&pending)));
     }
@@ -510,9 +556,11 @@ fn execute_on(
         package_sha256: package.sha256().to_owned(),
         tool_name: command.tool_name.clone(),
         parameters,
-        outcome,
+        // `retain_player_action_origin(outcome, player_action_origin)`, the safe failure too.
+        outcome: crate::player_actions::retain_player_action_origin(outcome, player_action_origin),
         status,
         choice_resolution: None,
+        campaign_file_commands: Vec::new(),
     })))
 }
 
@@ -571,8 +619,8 @@ fn run_mechanic(
 /// `AuthorityOwner.resolve_mechanics_choice(command)`: one answer to the campaign's pending
 /// mechanics choice. The action resumes with the answer; it either asks its next choice (saved
 /// with the answer) or commits with every answer it took. A choice a player action is waiting on
-/// runs under Python's direct-action work, which comes with the player-action family, so it
-/// answers `rust_port_pending`.
+/// runs under the direct-action work (`_direct_action_work`), refused while other campaign work
+/// runs, and commits with the player action's origin.
 pub async fn resolve_mechanics_choice(
     store: &StoreHandle,
     owner_id: &str,
@@ -580,12 +628,20 @@ pub async fn resolve_mechanics_choice(
 ) -> Result<ActionExecution, ActionError> {
     let campaign_id = command.campaign_id.clone();
     let pending = store.call(move |store| store.pending_mechanics_action(&campaign_id)).await?;
-    if pending.as_ref().is_some_and(|pending| pending.player_action_origin.is_some()) {
-        return Err(ActionError::Store(StoreError::NotPorted(
-            "a player action's mechanics choice (direct-action work, T3 step 4)",
-        )));
-    }
-    let _work = super::guided::campaign_work(store, &command.campaign_id).await?;
+    let _work = if pending.as_ref().is_some_and(|pending| pending.player_action_origin.is_some()) {
+        let owned = command.campaign_id.clone();
+        let direct = store
+            .lanes()
+            .work
+            .begin_direct_action(&command.campaign_id, || {
+                let campaign_id = owned.clone();
+                async move { store.call(move |store| store.campaign_lifecycle(&campaign_id)).await }
+            })
+            .await?;
+        Work::Direct(direct)
+    } else {
+        Work::Campaign(super::guided::campaign_work(store, &command.campaign_id).await?)
+    };
     let invalid =
         || command_rejected("Mechanics choice authority identity is invalid", "invalid_authority_identity");
     if !(0..64).contains(&command.choice_sequence) {
@@ -783,13 +839,12 @@ fn resolve_on(
         };
         return Ok(Decided::Awaiting(store.advance_mechanics_choice(pending, &answer, next)?));
     }
-    let mut outcome = outcome;
-    if let Some(origin) = preparation_origin(store, pending, command)? {
-        let mut marker = JsonMap::new();
-        marker.insert("kind".into(), sylvia_domain::player_actions::PLAYER_ACTION_ORIGIN.into());
-        marker.insert("origin".into(), Json::Object(origin));
-        outcome.consequences.push(marker);
-    }
+    // `origin = pending.player_action_origin`, or the preparation click's.
+    let origin = match &pending.player_action_origin {
+        Some(origin) => Some(origin.clone()),
+        None => preparation_origin(store, pending, command)?,
+    };
+    let outcome = crate::player_actions::retain_player_action_origin(outcome, origin.as_ref());
     Ok(Decided::Commit(Box::new(sylvia_store::actions::CommitAction {
         campaign_id: pending.campaign_id.clone(),
         action_id: pending.action_id.clone(),
@@ -810,6 +865,7 @@ fn resolve_on(
             resolution,
             session_id: command.session_id.clone(),
         }),
+        campaign_file_commands: Vec::new(),
     })))
 }
 

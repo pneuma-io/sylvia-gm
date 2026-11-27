@@ -184,9 +184,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_session.py:894` | `_normalize_state_references.key` | re.sub; plain | `return re.sub(r"[\s_-]+", "_", re.sub(r"['’]", "", value.casefold())).strip("_")` || `sylvia-agent` tool_batch_vectors |
 | `agent/_provider_session.py:1290` | `_speaker_names_overlap.contains` | re.search; pattern built at run time, check by hand | `return re.search(rf"(?<!\w){re.escape(inner)}(?!\w)", outer) is not None` || `sylvia-agent` tool_batch_vectors |
 | `agent/_provider_session.py:2369` | `ProviderSessionAdapter._relevant_character_files_message` | re.search; pattern built at run time, check by hand | `if re.search( rf"(?<!\w){re.escape(alias)}(?!\w)", current_player_text, flags=re.IGNORECASE, )` | |
-| `agent/_ruleset_test_runner.py:50` | `_failure_message` | re.fullmatch; plain | `if isinstance(code, str) and re.fullmatch(r"[a-z][a-z0-9_]{0,79}", code):` | |
-| `agent/_runner.py:2015` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"^'''(?:json)?\s*", "", clean)` | |
-| `agent/_runner.py:2016` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"\s*'''$", "", clean)` | |
+| `agent/_ruleset_test_runner.py:50` | `_failure_message` | re.fullmatch; plain | `if isinstance(code, str) and re.fullmatch(r"[a-z][a-z0-9_]{0,79}", code):` | `sylvia-agent` ruleset_test_vectors (failure_message: by hand, ASCII only) |
+| `agent/_runner.py:2015` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"^'''(?:json)?\s*", "", clean)` | retired (B2b: DM_SESSION or the non-streaming turn) |
+| `agent/_runner.py:2016` | `AgentRunner._compress_chapter` | re.sub; plain | `clean = re.sub(r"\s*'''$", "", clean)` | retired (B2b: DM_SESSION or the non-streaming turn) |
 | `agent/_stateless_mcp.py:1341` | `_safe_error` | re.findall; pattern built at run time, check by hand | `for match in re.findall(pattern, str(error))` | `sylvia-agent` tool_batch_vectors |
 | `agent/_tool_loader.py:79` | `<module>` | re.compile; plain | `_ALIAS = re.compile(r"^tool_[0-9a-f]{12}_(.+)$")` | |
 | `agent/_working_context.py:579` | `WorkingContextProvider.read_history` | re.compile; pattern built at run time, check by hand | `match = re.compile(re.escape(query), re.IGNORECASE).search(text, offset)` | `sylvia-agent` working_context_vectors (Python's `_sre` case tables: `sylvia_base::pyre::ignorecase_search`) |
@@ -212,7 +212,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `session/_divergence.py:123` | `DivergenceDetector.analyze` | re.search; pattern built at run time, check by hand | `if re.search(pattern, response_lower):` | |
 | `session/_narrative_scanner.py:88` | `NarrativeScanner._compile_rules._c` | re.compile; pattern built at run time, check by hand | `return re.compile(pattern, flags)` | |
 | `session/_narrative_scanner.py:210` | `NarrativeScanner.scan` | re.compile; pattern built at run time, check by hand | `re.compile(tag, re.IGNORECASE \| re.DOTALL))` | |
-| `tools/_builder_handlers.py:274` | `tool_search_files` | re.compile; pattern built at run time, check by hand | `regex = re.compile(pattern)` | |
+| `tools/_builder_handlers.py:274` | `tool_search_files` | re.compile; pattern built at run time, check by hand | `regex = re.compile(pattern)` | `sylvia-agent` builder_tool_vectors; differences row (untranslatable patterns) |
 
 ## Lane 5: Owner, clients and release
 

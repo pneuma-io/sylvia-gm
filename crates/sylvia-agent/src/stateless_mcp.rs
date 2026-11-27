@@ -1,10 +1,14 @@
 //! `agent/_stateless_mcp.py`: the package-bound tool a model provider may be shown.
 //!
 //! [`ModelMechanicsTool`], the action-sequence queue's tools ([`action_sequence_model_tools`])
-//! a rejected call's correction contract ([`safe_error`]) and the queue tools' dispatch
-//! ([`call_action_sequence_tool`]) so far. `StatelessMcpMechanics`'
-//! turn calls come with the tool batch (T3b); the projection a provider is shown is
+//! a rejected call's correction contract ([`safe_error`]), the queue tools' dispatch
+//! ([`call_action_sequence_tool`]) and the tool listing ([`listing`]) so far. The mechanics
+//! calls and the Campaign File commit come with T3m; the projection a provider is shown is
 //! [`crate::provider_session::tools`].
+
+pub mod campaign_file;
+pub mod execute;
+pub mod listing;
 
 use crate::provider_session::reads::TurnOwner;
 use regex::Regex;

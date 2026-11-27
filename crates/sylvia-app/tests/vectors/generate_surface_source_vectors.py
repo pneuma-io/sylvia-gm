@@ -10,7 +10,9 @@ retired with the Python source.
 Each case is a surface source, a state and participants. A participant is an object with
 whichever of `kind`, `participant_id` and `data` the case gives (a missing one reads as `None`
 through `getattr`); kinds and identities are text or absent, as real participants' are. The
-record is the resolved value or the exception's class and message.
+state is frozen (`owned_payload`), as the owner's campaign state is. The record is the resolved
+value and `state_paths`, the key paths of its outermost frozen containers (which came from
+`state` sources; `resolve_surface_source_with_state_paths`), or the exception's class and message.
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from sylvia_gm.application.tactical_grid import resolve_surface_source
+from sylvia_gm.domain.authority import FrozenJsonDict, FrozenJsonList, owned_payload, thaw_json_value
 
 HERE = Path(__file__).resolve().parent
 OUTPUT = HERE / "surface_source_vectors.json"
@@ -49,12 +52,24 @@ def participant(entry: dict) -> SimpleNamespace:
     return SimpleNamespace(**entry)
 
 
+def frozen_paths(value: object, path: tuple = ()) -> list[list[str]]:
+    """The key paths of the outermost frozen containers in `value`."""
+    if isinstance(value, (FrozenJsonDict, FrozenJsonList)):
+        return [list(path)]
+    if isinstance(value, dict):
+        return [found for key, item in value.items() for found in frozen_paths(item, (*path, key))]
+    if isinstance(value, list):
+        assert not any(frozen_paths(item) for item in value), "a frozen container inside a plain list"
+    return []
+
+
 def run(source: object, participants: list) -> dict:
     try:
-        value = resolve_surface_source(source, state=STATE, participants=[participant(p) for p in participants])
+        value = resolve_surface_source(source, state=owned_payload(STATE),
+                                       participants=[participant(p) for p in participants])
     except Exception as error:  # noqa: BLE001 - every exception Python lets through
         return {"error": [type(error).__name__, str(error)]}
-    return {"result": value}
+    return {"result": thaw_json_value(value), "state_paths": frozen_paths(value)}
 
 
 def state(namespace, key):
@@ -87,6 +102,23 @@ TARGETED = [
     {"kind": "object", "fields": []}, {"kind": "object"}, {"kind": "object", "fields": {}},
     {"kind": "object", "fields": {"bad": {"kind": "literal", "value": 3}}},
     {"kind": "keyed_values", "entries": [{"key": state("pkg", "map.scene"), "value": {"kind": "literal", "value": [1]}}]},
+]
+# Where the answer holds frozen state: nested objects, keyed values and a key a later entry replaces.
+TARGETED += [
+    {"kind": "object", "fields": {
+        "a": state("pkg", "map"), "b": {"kind": "literal", "value": {"x": [1]}},
+        "c": {"kind": "object", "fields": {"d": state("pkg", "map.deep"), "e": state("pkg", "map.grid"),
+                                           "f": state("pkg", "flag"), "g": {"kind": "participants", "kinds": ["pc"]}}},
+        "h": {"kind": "keyed_values", "entries": [{"key": state("pkg", "map.scene"), "value": state("pkg", "list")}]}}},
+    {"kind": "keyed_values", "entries": [{"key": state("pkg", "map.scene"), "value": state("pkg", "map")},
+                                         {"key": state("pkg", "map.scene"), "value": {"kind": "literal", "value": {"z": 1}}}]},
+    {"kind": "keyed_values", "entries": [{"key": state("pkg", "map.scene"), "value": {"kind": "literal", "value": [2]}},
+                                         {"key": state("pkg", "map.scene"), "value": state("pkg", "map.deep.a")}]},
+    {"kind": "keyed_values", "entries": [{"key": state("pkg", "map.scene"), "value": state("pkg", "map")},
+                                         {"key": state("pkg", "map.scene"), "value": state("pkg", "none")}]},
+    {"kind": "object", "fields": {"scene": state("pkg", "map.scene"), "space": {"kind": "object", "fields": {
+        "declaration": {"kind": "literal", "value": {"widths": [1, 2]}}, "actors": state("pkg", "map.deep")}}}},
+    {"kind": "object", "fields": {"empty": state("pkg", "."), "deep": state("pkg", "map.deep.a.c")}},
 ]
 # Text keys after stripping Python's whitespace.
 for text in (" ", "\t\n", "　", " ", "\x1c", "​", " a "):

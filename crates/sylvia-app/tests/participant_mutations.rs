@@ -160,7 +160,7 @@ async fn participant_mutations_commit_as_pythons_owner_commits_them() {
     )
     .unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 25);
+    assert_eq!(runs.len(), 30);
     let owner_id = record["owner_id"].as_str().unwrap().to_owned();
     let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join("participant-mutations");
     if let Err(error) = std::fs::remove_dir_all(&folder) {

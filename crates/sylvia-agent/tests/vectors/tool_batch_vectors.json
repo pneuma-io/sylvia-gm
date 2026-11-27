@@ -4848,5 +4848,1339 @@
     "expected": false
    }
   ]
+ },
+ "narration": {
+  "facts": [
+   {
+    "name": "a skill check",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     {
+      "ability": "wisdom",
+      "skill": "perception",
+      "tool": "thieves_tools",
+      "target_number": 12,
+      "actor": "pc-1"
+     },
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "thieves_tools",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed",
+      "ability": "wisdom",
+      "skill": "perception",
+      "target_number": 12,
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "no parameters",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed",
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "a result that is not an object",
+    "arguments": [
+     "d20_test",
+     "done",
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     {
+      "ability": "wisdom",
+      "skill": "perception",
+      "tool": "thieves_tools",
+      "target_number": 12,
+      "actor": "pc-1"
+     },
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      }
+     }
+    }
+   },
+   {
+    "name": "a context that is not an object",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": [
+       1
+      ]
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     {
+      "ability": "wisdom",
+      "skill": "perception",
+      "tool": "thieves_tools",
+      "target_number": 12,
+      "actor": "pc-1"
+     },
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed"
+     }
+    }
+   },
+   {
+    "name": "no status",
+    "arguments": [
+     "d20_test",
+     {
+      "context": {}
+     },
+     {},
+     {},
+     {
+      "ability": "wisdom",
+      "skill": "perception",
+      "tool": "thieves_tools",
+      "target_number": 12,
+      "actor": "pc-1"
+     },
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "thieves_tools",
+      "current_entities": {},
+      "status": null,
+      "ability": "wisdom",
+      "skill": "perception",
+      "target_number": 12
+     }
+    }
+   },
+   {
+    "name": "an attack on a named target",
+    "arguments": [
+     "attack",
+     {
+      "status": "committed",
+      "context": {
+       "_target_id": "npc-1",
+       "_attack_roll": 15,
+       "_damage_roll": [
+        3,
+        1
+       ],
+       "_critical_hit": false
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "pc-1",
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": "npc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "npc-1"
+     },
+     {
+      "npc-1": "the smith",
+      "pc-1": ""
+     }
+    ],
+    "expected": {
+     "ok": {
+      "tool": "attack",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "current_actor_id": "pc-1",
+      "initiative_order": [
+       {
+        "actor_id": "pc-1",
+        "total": 18
+       },
+       {
+        "actor_id": "npc-1",
+        "name": "the smith",
+        "total": true
+       }
+      ],
+      "status": "committed",
+      "attack_roll": 15,
+      "critical_hit": false,
+      "damage_roll": [
+       3,
+       1
+      ],
+      "target_name": "the smith",
+      "target_id": "npc-1",
+      "target_hit_points_before": 7,
+      "target_hit_points_after": 3,
+      "hit_point_change": -4
+     }
+    }
+   },
+   {
+    "name": "an attack without display names",
+    "arguments": [
+     "attack",
+     {
+      "status": "committed",
+      "context": {
+       "_target_id": "npc-1",
+       "_attack_roll": 15,
+       "_damage_roll": [
+        3,
+        1
+       ],
+       "_critical_hit": false
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "pc-1",
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": "npc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "npc-1"
+     },
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "attack",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "current_actor_id": "pc-1",
+      "current_actor_name": "Tavin",
+      "initiative_order": [
+       {
+        "actor_id": "pc-1",
+        "total": 18
+       },
+       {
+        "actor_id": "npc-1",
+        "total": true
+       }
+      ],
+      "status": "committed",
+      "attack_roll": 15,
+      "critical_hit": false,
+      "damage_roll": [
+       3,
+       1
+      ],
+      "target_name": "Brakka",
+      "target_id": "npc-1",
+      "target_hit_points_before": 7,
+      "target_hit_points_after": 3,
+      "hit_point_change": -4
+     }
+    }
+   },
+   {
+    "name": "a boolean hit point total",
+    "arguments": [
+     "attack",
+     {
+      "status": "committed",
+      "context": {
+       "_target_id": "npc-2"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "attack",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed",
+      "target_id": "npc-2",
+      "target_hit_points_before": 4,
+      "target_hit_points_after": true,
+      "hit_point_change": -3
+     }
+    }
+   },
+   {
+    "name": "a target not in the previous state",
+    "arguments": [
+     "attack",
+     {
+      "status": "committed",
+      "context": {
+       "_target_id": "pc-1"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "attack",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed",
+      "target_name": "Tavin"
+     }
+    }
+   },
+   {
+    "name": "a target given only in the context",
+    "arguments": [
+     "attack",
+     {
+      "status": "committed",
+      "context": {
+       "target": {
+        "hp": 5
+       }
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "attack",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed"
+     }
+    }
+   },
+   {
+    "name": "float hit points",
+    "arguments": [
+     "attack",
+     {
+      "status": "committed",
+      "context": {
+       "_target_id": "npc-1"
+      }
+     },
+     {
+      "npc-1": {
+       "hp": 3.0
+      }
+     },
+     {
+      "npc-1": {
+       "hp": 7
+      }
+     },
+     null,
+     null,
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "attack",
+      "current_entities": {
+       "npc-1": {
+        "hp": 3.0
+       }
+      },
+      "status": "committed"
+     }
+    }
+   },
+   {
+    "name": "an empty combat",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {},
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "status": "committed",
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "one initiative actor twice",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "pc-1",
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": "pc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "pc-1"
+     },
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "current_actor_id": "pc-1",
+      "current_actor_name": "Tavin",
+      "initiative_order": [
+       {
+        "actor_id": "pc-1",
+        "total": true
+       },
+       {
+        "actor_id": "pc-1",
+        "total": true
+       }
+      ],
+      "status": "committed",
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "an order missing an actor",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "pc-1",
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": "npc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": ""
+     },
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "current_actor_id": "pc-1",
+      "current_actor_name": "Tavin",
+      "status": "committed",
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "a current actor that is not text",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": 7,
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": "npc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "npc-1"
+     },
+     null
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "initiative_order": [
+       {
+        "actor_id": "pc-1",
+        "total": 18
+       },
+       {
+        "actor_id": "npc-1",
+        "total": true
+       }
+      ],
+      "status": "committed",
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "a current actor named only in state",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "npc-1",
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": "npc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "npc-1"
+     },
+     {}
+    ],
+    "expected": {
+     "ok": {
+      "tool": "d20_test",
+      "current_entities": {
+       "npc-1": {
+        "name": "Brakka",
+        "hp": 3
+       },
+       "pc-1": {
+        "name": "Tavin",
+        "hp": 9
+       },
+       "npc-2": {
+        "hp": true
+       }
+      },
+      "current_actor_id": "npc-1",
+      "current_actor_name": "Brakka",
+      "initiative_order": [
+       {
+        "actor_id": "pc-1",
+        "total": 18
+       },
+       {
+        "actor_id": "npc-1",
+        "total": true
+       }
+      ],
+      "status": "committed",
+      "test_kind": "skill",
+      "ability_modifier": 2,
+      "d20_test": 14,
+      "adjusted_total": 17,
+      "outcome": "success",
+      "weapon": "longsword"
+     }
+    }
+   },
+   {
+    "name": "an unhashable initiative actor",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "pc-1",
+      "initiative_first_actor": "pc-1",
+      "initiative_second_actor": {
+       "id": 1
+      },
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "npc-1"
+     },
+     null
+    ],
+    "expected": {
+     "raised": {
+      "class": "TypeError",
+      "message": "unhashable type: 'dict'",
+      "code": null
+     }
+    }
+   },
+   {
+    "name": "an unhashable first actor",
+    "arguments": [
+     "d20_test",
+     {
+      "status": "committed",
+      "context": {
+       "_test_kind": "skill",
+       "_d20_test": 14,
+       "_adjusted_total": 17,
+       "_outcome": "success",
+       "_ability_modifier": 2,
+       "_unlisted": "kept out",
+       "_weapon": "longsword"
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 3
+      },
+      "pc-1": {
+       "name": "Tavin",
+       "hp": 9
+      },
+      "npc-2": {
+       "hp": true
+      }
+     },
+     {
+      "npc-1": {
+       "name": "Brakka",
+       "hp": 7
+      },
+      "npc-2": {
+       "hp": 4
+      }
+     },
+     null,
+     {
+      "current_actor": "pc-1",
+      "initiative_first_actor": [
+       1
+      ],
+      "initiative_second_actor": "npc-1",
+      "initiative_first_total": 18,
+      "initiative_second_total": true,
+      "order_first": "pc-1",
+      "order_second": "npc-1"
+     },
+     null
+    ],
+    "expected": {
+     "raised": {
+      "class": "TypeError",
+      "message": "unhashable type: 'list'",
+      "code": null
+     }
+    }
+   }
+  ],
+  "public": [
+   {
+    "name": "no action",
+    "arguments": [
+     null,
+     {
+      "context": {
+       "roll": 4
+      },
+      "private": true
+     }
+    ],
+    "expected": {
+     "ok": {
+      "context": {
+       "roll": 4
+      },
+      "private": true
+     }
+    }
+   },
+   {
+    "name": "an ordinary action",
+    "arguments": [
+     "action-1",
+     {
+      "context": {
+       "roll": 4
+      },
+      "private": true
+     }
+    ],
+    "expected": {
+     "ok": {
+      "context": {
+       "roll": 4
+      },
+      "private": true
+     }
+    }
+   },
+   {
+    "name": "a participant action",
+    "arguments": [
+     "actor-action-1",
+     {
+      "context": {
+       "roll": 4
+      },
+      "private": true
+     }
+    ],
+    "expected": {
+     "ok": {
+      "context": {
+       "roll": 4
+      }
+     }
+    }
+   },
+   {
+    "name": "a participant action without context",
+    "arguments": [
+     "actor-action-2",
+     {
+      "private": true
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Isolated participant action has no published public result",
+      "code": "command_rejected"
+     }
+    }
+   },
+   {
+    "name": "a participant action with a list context",
+    "arguments": [
+     "actor-action-3",
+     {
+      "context": [
+       1
+      ]
+     }
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Isolated participant action has no published public result",
+      "code": "command_rejected"
+     }
+    }
+   },
+   {
+    "name": "a participant action with a text result",
+    "arguments": [
+     "actor-action-4",
+     "done"
+    ],
+    "expected": {
+     "raised": {
+      "class": "CommandRejected",
+      "message": "Isolated participant action has no published public result",
+      "code": "command_rejected"
+     }
+    }
+   }
+  ]
  }
 }

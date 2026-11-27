@@ -25,6 +25,10 @@ fn main() {
                 let written = output.write_all(line.as_bytes()).and_then(|()| output.flush());
                 std::process::exit(if written.is_ok() { 0 } else { 120 });
             }
+            // `python -m sylvia_gm.config.claude_settings`: the headless Claude Code set-up.
+            Some("claude-settings") => {
+                std::process::exit(sylvia_owner::claude_settings_cli::main(&arguments[2..]));
+            }
             // The speech worker takes the model folder; the runtime is the owner's own build.
             Some("--dictation-worker") => {
                 std::process::exit(dictation_worker(&arguments[2..]));

@@ -28,6 +28,7 @@ pub mod guided_advance;
 pub mod guided_finalize;
 pub mod guided_start;
 pub mod handle;
+pub mod interruptions;
 pub mod lanes;
 pub mod launch;
 pub mod lifecycle;
@@ -64,6 +65,7 @@ pub mod work;
 pub use error::{StoreError, StoreResult};
 pub use handle::{StoreHandle, StoreThread};
 pub use lanes::{LaneGuard, LaneHold, LaneRegistry, OwnerLanes};
+pub use owner_sessions::SessionWork;
 pub use store::AuthorityStore;
 pub use stored_construction::OperationResult;
 

@@ -267,7 +267,26 @@ pub fn current_lock_record(connection: &Connection, campaign_id: &str) -> StoreR
 
 /// `sqlite_session._load_value` / `_load_payload`: canonical session JSON, an object.
 pub(crate) fn session_payload(text: &str) -> StoreResult<JsonMap> {
-    let parsed = sylvia_base::pyjson::loads(text).map_err(crate::error::json_error)?;
+    // `owned_json_value(json.loads(value))`: plain `json.loads` (a repeated member keeps the last,
+    // which the canonical check then refuses), and `NaN`, `Infinity` or a number that overflows
+    // to infinity fail `owned_json_value`'s `TypeError`.
+    use sylvia_base::pyjson::{loads_hooked, HookFailure, HookPolicy};
+    let parsed = match loads_hooked(text, HookPolicy::default()) {
+        Ok(hooked) if hooked.non_finite => {
+            return Err(sylvia_domain::DomainError::type_error("Value is not JSON-compatible").into())
+        }
+        Ok(hooked) => hooked.value,
+        Err(HookFailure::Decode(error)) => {
+            return Err(StoreError::Coded(
+                sylvia_base::CodedError::rejected(error.to_string()).with_error_type("JSONDecodeError"),
+            ))
+        }
+        Err(HookFailure::Unsupported(error)) => return Err(crate::error::json_error(error)),
+        // Both hooks are off, so neither refusal can come back.
+        Err(HookFailure::Duplicate(_) | HookFailure::Constant(_)) => {
+            return Err(StoreError::Other("session JSON hooks refused a value they do not check".into()))
+        }
+    };
     if crate::actions::dump(&parsed) != text {
         return Err(crate::error::value_error("Stored session JSON is not canonical"));
     }

@@ -1338,3 +1338,40 @@ impl AuthorityStore {
             .collect()
     }
 }
+
+impl AuthorityStore {
+    /// `append_canonical_references(session_id, events)`: each canonical event placed in the
+    /// session as its `canonical_reference` message (`canonical-<sequence>`), in one transaction.
+    pub fn append_canonical_references(
+        &self,
+        session_id: &str,
+        events: &[sylvia_domain::authority::CanonicalEvent],
+    ) -> StoreResult<Vec<SessionMessage>> {
+        self.ensure_session_schema()?;
+        let connection = self.connect()?;
+        let appended = (|| -> StoreResult<Vec<SessionMessage>> {
+            connection.execute_batch("BEGIN IMMEDIATE")?;
+            let mut messages = Vec::with_capacity(events.len());
+            for event in events {
+                let mut content = JsonMap::new();
+                content.insert("event_type".into(), event.event_type.as_str().into());
+                content.insert("visibility".into(), event.visibility.as_str().into());
+                content.insert("safe_payload".into(), Json::Object(event.safe_payload.clone()));
+                messages.push(append_message(
+                    &connection,
+                    session_id,
+                    &format!("canonical-{}", event.sequence),
+                    SessionMessageKind::CanonicalReference,
+                    &owned_payload(&Json::Object(content))?,
+                    Some(event.sequence),
+                )?);
+            }
+            connection.execute_batch("COMMIT")?;
+            Ok(messages)
+        })();
+        if !connection.is_autocommit() {
+            let _ = connection.execute_batch("ROLLBACK");
+        }
+        appended
+    }
+}

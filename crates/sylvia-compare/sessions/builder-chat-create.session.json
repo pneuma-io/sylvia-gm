@@ -1,0 +1,219 @@
+{
+  "name": "builder-chat-create",
+  "description": "Standalone Builder chats created through the owner: the refusals before a default model exists (no or an empty operation id, no default, half a model, a model id that is not text), the stand-in model saved and made the default, a chat created from it and replayed under the same operation, chats with an explicit model, a display name and start settings (an accepted speed, a refused effort and speed, and a model the catalog does not list), a refused display name and one too long, the index, a rename, an inexact and an exact delete, a deleted chat's operation run again; resume_agent_session's refusals (no id, an unknown session, an active chat; stopping one waits for the session loop); then shut down.",
+  "standin": true,
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "create_builder_chat",
+      "params": {}
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": ""
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-a"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-a",
+        "provider_id": "standin"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-a",
+        "provider_id": 5,
+        "model_id": "standin/standin-narrator"
+      }
+    },
+    {
+      "method": "builder_chat_index"
+    },
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "provider_settings"
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-a"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "set_default_model",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-a"
+      },
+      "save": {
+        "chat_a": "/result/session/session_id"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-a",
+        "display_name": "Ignored on replay"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-b",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "display_name": "Setting notes",
+        "speed": "standard"
+      },
+      "save": {
+        "chat_b": "/result/session/session_id"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-c",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "reasoning_effort": "high"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-c",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "speed": "warp"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-c",
+        "provider_id": "${provider_id}",
+        "model_id": "absent/model"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-c",
+        "display_name": ""
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-d",
+        "display_name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    },
+    {
+      "method": "builder_chat_index"
+    },
+    {
+      "method": "rename_builder_chat",
+      "params": {
+        "session_id": "${chat_a}",
+        "display_name": "World notes"
+      }
+    },
+    {
+      "method": "delete_builder_chat",
+      "params": {
+        "session_id": "${chat_b}",
+        "confirmation": "delete ${chat_b}"
+      }
+    },
+    {
+      "method": "delete_builder_chat",
+      "params": {
+        "session_id": "${chat_b}",
+        "confirmation": "permanently delete ${chat_b}"
+      }
+    },
+    {
+      "method": "builder_chat_index"
+    },
+    {
+      "method": "create_builder_chat",
+      "params": {
+        "operation_id": "chat-b"
+      }
+    },
+    {
+      "method": "builder_chat_index"
+    },
+    {
+      "method": "resume_agent_session",
+      "params": {}
+    },
+    {
+      "method": "resume_agent_session",
+      "params": {
+        "session_id": "session-missing"
+      }
+    },
+    {
+      "method": "resume_agent_session",
+      "params": {
+        "session_id": "${chat_a}"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}

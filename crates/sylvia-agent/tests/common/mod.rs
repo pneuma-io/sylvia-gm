@@ -9,8 +9,15 @@ pub mod turn_state;
 use serde_json::Value as J;
 use std::sync::Mutex;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
+use sylvia_agent::stateless_mcp::listing::CatalogEntry;
+use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
+use sylvia_app::authority::actions::ActionExecution;
 use sylvia_base::{CodedResult, JsonMap};
+use sylvia_domain::authority::{
+    ActionCommand, ActionReceipt, ActionStatus, AwaitingChoiceReceipt, MechanicsChoiceOption,
+    MechanicsChoiceRequest,
+};
 use sylvia_domain::authority::{
     CampaignConstructionBasis, CampaignContinuityRecord, CampaignContinuityView, CampaignDisplaySnapshot,
     CampaignSnapshot, CampaignState, CanonicalEvent, CanonicalEventType, CanonicalReplay, EventVisibility,
@@ -18,7 +25,9 @@ use sylvia_domain::authority::{
     PackageDependency, PackageLock, PackageLockEntry, PackageRole, Participant, ParticipantFields,
     TurnStatus, WriterRole,
 };
+use sylvia_domain::error::{DomainError, MechanicsDetails, MechanicsValidationIssue};
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::session::SessionActivityBasis;
 use sylvia_domain::session::{
     SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
 };
@@ -584,5 +593,228 @@ impl TurnOwner for Recorded {
             serde_json::json!([session_id, message_id, kind.as_str(), content]),
         );
         ready(session_message(&result))
+    }
+    fn catalog<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        include_unexposed: bool,
+    ) -> BoxFuture<'a, CodedResult<Vec<CatalogEntry>>> {
+        // Python passes `include_unexposed` only for the fixed list.
+        let args = if include_unexposed {
+            serde_json::json!([campaign_id, true])
+        } else {
+            serde_json::json!([campaign_id])
+        };
+        let result = self.next_result("catalog", args);
+        Box::pin(
+            async move { result.map(|value| value.as_array().unwrap().iter().map(catalog_entry).collect()) },
+        )
+    }
+    fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        let result = self.next_result("accepted_campaign_plan", serde_json::json!([campaign_id]));
+        Box::pin(async move { result.map(|plan| map(&plan["content"])) })
+    }
+    fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
+        let result = self.next_result("campaign_narrative_options", serde_json::json!([session_id]));
+        Box::pin(async move { result.map(|value| map(&value)) })
+    }
+    fn execute_action<'a>(
+        &'a self,
+        command: &'a ActionCommand,
+    ) -> BoxFuture<'a, Result<ActionExecution, AuthorityFailure>> {
+        let raised = self.reads.lock().unwrap().first().and_then(|read| read.get("raised")).cloned();
+        let result = self.next("execute_action", serde_json::json!([action_command_json(command)]));
+        let outcome = match raised {
+            Some(raised) => Err(recorded_failure(&raised)),
+            None => Ok(recorded_execution(&result)),
+        };
+        Box::pin(async move { outcome })
+    }
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<SessionActivityBasis>> {
+        let result = self.next("session_activity_basis", serde_json::json!([session_id, attempt_id]));
+        let message = |value: &J| (!value.is_null()).then(|| session_message(value));
+        ready(SessionActivityBasis {
+            session: session_record(&result["session"]),
+            accepted: message(&result["accepted"]),
+            terminal: message(&result["terminal"]),
+            has_compaction: result["has_compaction"].as_bool().unwrap(),
+        })
+    }
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
+        ready(opt(&self.next("current_open_turn", serde_json::json!([campaign_id]))))
+    }
+    fn update_campaign_file<'a>(
+        &'a self,
+        session_id: &'a str,
+        update_id: &'a str,
+        updates: Vec<JsonMap>,
+        basis_message_ids: Vec<String>,
+        turn_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let args = serde_json::json!([session_id, update_id, updates, basis_message_ids, turn_id]);
+        let outcome = self.answer("update_campaign_file", args);
+        Box::pin(async move { outcome })
+    }
+    fn search_campaign_knowledge<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        query: &'a J,
+        sources: Option<&'a J>,
+        limit: &'a J,
+        offset: &'a J,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let args = serde_json::json!([campaign_id, query, sources, limit, offset]);
+        let outcome = self.answer("search_campaign_knowledge", args);
+        Box::pin(async move { outcome })
+    }
+    fn read_campaign_reference<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        source: &'a J,
+        path: &'a J,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let outcome = self.answer("read_campaign_reference", serde_json::json!([campaign_id, source, path]));
+        Box::pin(async move { outcome })
+    }
+}
+
+impl Recorded {
+    /// The next call's object result, or the refusal Python's call raised, rebuilt in its class.
+    pub fn answer(&self, name: &str, args: J) -> Result<JsonMap, AuthorityFailure> {
+        let raised = self.reads.lock().unwrap().first().and_then(|read| read.get("raised")).cloned();
+        let result = self.next(name, args);
+        match raised {
+            Some(raised) => Err(recorded_failure(&raised)),
+            None => Ok(map(&result)),
+        }
+    }
+}
+
+/// `plain(command)` for an `ActionCommand`.
+pub fn action_command_json(command: &ActionCommand) -> J {
+    serde_json::json!({
+        "__class__": "ActionCommand", "campaign_id": command.campaign_id, "action_id": command.action_id,
+        "idempotency_key": command.idempotency_key, "owner_id": command.owner_id,
+        "writer": command.writer.as_str(), "expected_revision": command.expected_revision,
+        "turn_id": command.turn_id, "package_id": command.package_id, "tool_name": command.tool_name,
+        "parameters": command.parameters, "initiating_session_id": command.initiating_session_id,
+    })
+}
+
+/// A recorded exception's class, as the port names it.
+fn class_name(name: &str) -> &'static str {
+    const KNOWN: [&str; 12] = [
+        "CommandRejected",
+        "MechanicsRejected",
+        "RulesetPreconditionRejected",
+        "StaleRevision",
+        "WrongOwner",
+        "WrongWriter",
+        "IdempotencyConflict",
+        "OwnerConflict",
+        "ValueError",
+        "TypeError",
+        "KeyError",
+        "RuntimeError",
+    ];
+    KNOWN.into_iter().find(|known| *known == name).unwrap_or_else(|| panic!("unknown class {name}"))
+}
+
+/// A recorded owner refusal (`refusal_fields`), rebuilt in its class.
+pub fn recorded_failure(raised: &J) -> AuthorityFailure {
+    let class = class_name(raised["class"].as_str().unwrap());
+    let message = raised["message"].as_str().unwrap().to_owned();
+    let texts = |value: &J| -> Vec<String> {
+        value
+            .as_array()
+            .map(|items| items.iter().map(|item| item.as_str().unwrap().to_owned()).collect())
+            .unwrap_or_default()
+    };
+    let mechanics = raised.get("validation_issues").and_then(J::as_array).map(|issues| {
+        Box::new(MechanicsDetails {
+            field_paths: texts(&raised["field_paths"]),
+            validation_issues: issues
+                .iter()
+                .map(|payload| MechanicsValidationIssue {
+                    path: payload["path"].as_str().unwrap().to_owned(),
+                    kind: payload["kind"].as_str().unwrap().to_owned(),
+                    expected_type: payload["expected_type"].as_str().map(str::to_owned),
+                    actual_type: payload["actual_type"].as_str().map(str::to_owned),
+                    parent_path: payload["parent_path"].as_str().map(str::to_owned),
+                    allowed_values: texts(&payload["allowed_values"]),
+                    minimum: payload["minimum"].as_number().cloned(),
+                    maximum: payload["maximum"].as_number().cloned(),
+                    actual_length: payload["actual_length"].as_i64(),
+                })
+                .collect(),
+            state_changed: raised["state_changed"].as_bool().unwrap_or(false),
+            refusal_reasons: texts(&raised["refusal_reasons"]),
+        })
+    });
+    AuthorityFailure::Domain(match class {
+        "ValueError" => DomainError::Value(message),
+        "TypeError" => DomainError::Type(message),
+        "KeyError" | "RuntimeError" => DomainError::uncaught(class, message),
+        _ => DomainError::Rejected {
+            error_type: class,
+            code: raised["code"].as_str().unwrap().to_owned(),
+            message,
+            diagnostics: Vec::new(),
+            mechanics,
+        },
+    })
+}
+
+/// One recorded receipt (`plain(receipt)`).
+pub fn recorded_execution(value: &J) -> ActionExecution {
+    let text = |value: &J, key: &str| value[key].as_str().unwrap().to_owned();
+    match value["__class__"].as_str().unwrap() {
+        "AwaitingChoiceReceipt" => ActionExecution::AwaitingChoice(AwaitingChoiceReceipt {
+            campaign_id: text(value, "campaign_id"),
+            action_id: text(value, "action_id"),
+            basis_revision: value["basis_revision"].as_i64().unwrap(),
+            turn_id: text(value, "turn_id"),
+            choice: MechanicsChoiceRequest {
+                choice_id: text(&value["choice"], "choice_id"),
+                prompt: text(&value["choice"], "prompt"),
+                options: value["choice"]["options"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|option| MechanicsChoiceOption {
+                        option_id: text(option, "option_id"),
+                        label: text(option, "label"),
+                    })
+                    .collect(),
+            },
+            choice_sequence: value["choice_sequence"].as_i64().unwrap(),
+        }),
+        "ActionReceipt" => ActionExecution::Receipt(ActionReceipt {
+            campaign_id: text(value, "campaign_id"),
+            action_id: text(value, "action_id"),
+            status: ActionStatus::parse(value["status"].as_str().unwrap()).unwrap(),
+            result: map(&value["result"]),
+            resulting_revision: value["resulting_revision"].as_i64().unwrap(),
+        }),
+        other => panic!("unknown receipt {other}"),
+    }
+}
+
+/// One recorded `CatalogTool`: the fields the listing reads.
+pub fn catalog_entry(value: &J) -> CatalogEntry {
+    let text = |key: &str| value[key].as_str().unwrap().to_owned();
+    CatalogEntry {
+        package_id: text("package_id"),
+        package_version: text("package_version"),
+        package_sha256: text("package_sha256"),
+        name: text("name"),
+        capability: text("capability"),
+        input_schema: map(&value["input_schema"]),
+        description: text("description"),
+        model_behavior: ModelToolBehavior::parse(value["model_behavior"].as_str().unwrap()).unwrap(),
     }
 }

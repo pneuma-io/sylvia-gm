@@ -325,7 +325,7 @@ fn materialize_tool(
 }
 
 /// `_active_dm_context(session_id)`: one active campaign-bound DM session.
-fn active_dm_context(store: &AuthorityStore, session_id: &str) -> StoreResult<SessionContext> {
+pub(super) fn active_dm_context(store: &AuthorityStore, session_id: &str) -> StoreResult<SessionContext> {
     let context = store.session_context(session_id)?;
     let session = &context.session;
     if session.role() != WriterRole::Dm
@@ -453,7 +453,7 @@ fn exact_setting_knowledge(
 
 /// `_campaign_setting_knowledge(campaign_id, plan)`: the Setting knowledge the plan binds, read
 /// from the locked package (or its dependency-only rebind).
-fn campaign_setting_knowledge(
+pub(super) fn campaign_setting_knowledge(
     store: &AuthorityStore,
     campaign_id: &str,
     plan: &JsonMap,

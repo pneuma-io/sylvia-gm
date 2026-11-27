@@ -279,8 +279,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_session.py:1278` | `_validated_speaker_name` | len() against a limit | `or len(name) > _SPEAKER_NAME_MAX_LENGTH` | |
 | `agent/_provider_session.py:1748` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not gm_system_prompt.strip() or len(encoded_prompt) > _MAX_GM_SYSTEM_PROMPT_BYTES:` | |
 | `agent/_provider_session.py:1774` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not campaign_plan_text.strip() or len(encoded_plan) > _MAX_CAMPAIGN_PLAN_BYTES:` | |
-| `agent/_runner.py:677` | `AgentRunner._turn_impl` | len() against a limit | `input_preview = user_message[:50] + "..." if len(user_message) > 50 else user_message` | |
-| `agent/_runner.py:2063` | `AgentRunner._build_chapter_history_text` | len() against a limit | `if len(content) > 800:` | |
+| `agent/_runner.py:677` | `AgentRunner._turn_impl` | len() against a limit | `input_preview = user_message[:50] + "..." if len(user_message) > 50 else user_message` | retired (B2b: DM_SESSION or the non-streaming turn) |
+| `agent/_runner.py:2063` | `AgentRunner._build_chapter_history_text` | len() against a limit | `if len(content) > 800:` | retired (B2b: DM_SESSION or the non-streaming turn) |
 | `agent/_stateless_mcp.py:943` | `_campaign_file_updates` | len() against a limit | `if len(raw_items) > 64:` | |
 | `agent/_stateless_mcp.py:1005` | `_campaign_file_updates` | len() against a limit | `if len(updates) > 64:` | |
 | `agent/_tool_loader.py:258` | `_summary` | len() against a limit | `if len(description) <= SUMMARY_LIMIT:` | |
@@ -331,10 +331,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `session/_prompt_assembler.py:661` | `PromptAssembler._build_npc_block` | len() against a limit | `if len(candidate_line) > 120:` | |
 | `session/_prompt_assembler.py:767` | `PromptAssembler.build_history_with_indices` | len() against a limit | `if len(content) > 500:` | |
 | `session/_reveal_guard.py:110` | `RevealGuard.build_do_not_reveal_section` | len() against a limit | `if len(result) > 2000:` | |
-| `tools/_builder_handlers.py:125` | `tool_read_file` | len() against a limit | `if len(content) > 100_000:` | |
-| `tools/_builder_handlers.py:307` | `tool_search_files` | len() against a limit | `"content_complete": len(line) <= 200,` | |
-| `tools/_builder_handlers.py:310` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | |
-| `tools/_builder_handlers.py:312` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | |
+| `tools/_builder_handlers.py:125` | `tool_read_file` | len() against a limit | `if len(content) > 100_000:` | `sylvia-agent` builder_tool_vectors |
+| `tools/_builder_handlers.py:307` | `tool_search_files` | len() against a limit | `"content_complete": len(line) <= 200,` | `sylvia-agent` builder_tool_vectors |
+| `tools/_builder_handlers.py:310` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | `sylvia-agent` builder_tool_vectors |
+| `tools/_builder_handlers.py:312` | `tool_search_files` | len() against a limit | `if len(results) >= 100:` | `sylvia-agent` builder_tool_vectors |
 
 ## Lane 5: Owner, clients and release
 

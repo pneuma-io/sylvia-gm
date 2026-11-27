@@ -1421,3 +1421,52 @@ impl AuthorityStore {
         exact_participant_declarations(&self.connect()?, (package_id, version, content_sha256))
     }
 }
+
+/// `sqlite_packages.surfaces_for_lock(connection, package_lock)`: every locked package's prompt
+/// fragments and UI surfaces, in lock order.
+pub fn surfaces_for_lock(
+    connection: &Connection,
+    package_lock: &PackageLock,
+) -> StoreResult<(
+    Vec<sylvia_domain::package_library::SurfaceDeclaration>,
+    Vec<sylvia_domain::package_library::SurfaceDeclaration>,
+)> {
+    let (mut prompts, mut ui) = (Vec::new(), Vec::new());
+    for entry in package_lock.entries() {
+        let row: Option<Value> = connection
+            .query_row(
+                "SELECT canonical_json FROM package_manifests \
+                 WHERE package_id = ? AND version = ? AND content_sha256 = ?",
+                [entry.package_id(), entry.version(), entry.sha256()],
+                |row| row.get(0),
+            )
+            .optional()?;
+        let Some(canonical) = row else {
+            return Err(schema_identity("Current package surface manifest is unavailable"));
+        };
+        // `_manifest_from_json`: `manifest_from_record(_parse(canonical_json))`.
+        let manifest = sylvia_domain::package_library::manifest_from_record(
+            &crate::campaigns::parse_canonical(&py_str(&canonical))?,
+            None,
+        )?;
+        prompts.extend(manifest.prompt_fragments);
+        ui.extend(manifest.ui_surfaces);
+    }
+    Ok((prompts, ui))
+}
+
+impl AuthorityStore {
+    /// `package_surfaces_for_current_lock(campaign_id)`: the current lock's surfaces.
+    #[allow(clippy::type_complexity)]
+    pub fn package_surfaces_for_current_lock(
+        &self,
+        campaign_id: &str,
+    ) -> StoreResult<(
+        Vec<sylvia_domain::package_library::SurfaceDeclaration>,
+        Vec<sylvia_domain::package_library::SurfaceDeclaration>,
+    )> {
+        let connection = self.connect()?;
+        let lock = crate::campaigns::current_lock_record(&connection, campaign_id)?;
+        surfaces_for_lock(&connection, &lock.package_lock)
+    }
+}

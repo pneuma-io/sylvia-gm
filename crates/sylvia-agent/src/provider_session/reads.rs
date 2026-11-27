@@ -173,4 +173,70 @@ pub trait TurnOwner: OpeningReads {
         kind: SessionMessageKind,
         content: &'a JsonMap,
     ) -> BoxFuture<'a, CodedResult<SessionMessage>>;
+
+    /// `catalog(campaign_id)`, or `catalog(campaign_id, include_unexposed=True)`: the
+    /// campaign's admitted tools, as the MCP listing reads them.
+    fn catalog<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        include_unexposed: bool,
+    ) -> BoxFuture<'a, CodedResult<Vec<crate::stateless_mcp::listing::CatalogEntry>>>;
+
+    /// `accepted_campaign_plan(campaign_id).content`: refused with `CommandRejected("Accepted
+    /// Campaign Plan is unavailable")` when there is none.
+    fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `campaign_narrative_options(session_id)`: the Campaign File note types one DM session
+    /// may write, and their choices.
+    fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
+
+    /// `execute_action(command)`: one mechanic executed by the owner, refused in Python's class.
+    fn execute_action<'a>(
+        &'a self,
+        command: &'a sylvia_domain::authority::ActionCommand,
+    ) -> BoxFuture<
+        'a,
+        Result<sylvia_app::authority::actions::ActionExecution, crate::stateless_mcp::AuthorityFailure>,
+    >;
+
+    /// `session_activity_basis(session_id, attempt_id=None)`: the saved attempt facts the
+    /// activity indicator reads, without the conversation.
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<sylvia_domain::session::SessionActivityBasis>>;
+
+    /// `current_open_turn(campaign_id)`: the campaign's open TURN, if any.
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>>;
+
+    /// `update_campaign_file(session_id=..., update_id=..., updates=..., basis_message_ids=...,
+    /// turn_id=...)`: one validated Campaign File batch committed, refused in Python's class.
+    fn update_campaign_file<'a>(
+        &'a self,
+        session_id: &'a str,
+        update_id: &'a str,
+        updates: Vec<JsonMap>,
+        basis_message_ids: Vec<String>,
+        turn_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
+
+    /// `search_campaign_knowledge(campaign_id, query=..., sources=..., limit=..., offset=...)`:
+    /// the arguments as the MCP request gave them (the owner checks their types itself).
+    fn search_campaign_knowledge<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        query: &'a Json,
+        sources: Option<&'a Json>,
+        limit: &'a Json,
+        offset: &'a Json,
+    ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
+
+    /// `read_campaign_reference(campaign_id, source=..., path=...)`.
+    fn read_campaign_reference<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        source: &'a Json,
+        path: &'a Json,
+    ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
 }

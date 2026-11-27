@@ -30,17 +30,21 @@ use crate::provider_session::context::{
     is_command_rejected, persisted_selected_party_roles, ProviderSessionAdapter,
 };
 use crate::provider_session::control_texts::preparation_keeps_intent_pending;
-use crate::provider_session::narration_facts::action_sequence_narration_facts;
+use crate::provider_session::narration_facts::{action_sequence_narration_facts, mechanics_narration_facts};
 use crate::provider_session::request::contains_serialized_tool_call;
 use crate::provider_session::tagged::{Tagged, LEDGER_ENTRY_KEY};
 use crate::provider_session::tools::{resolve_provider_tool_alias, PREPARATION_INTENT_ARGUMENT};
-use crate::provider_turn::decisions::{buffered_narration_can_be_replaced, tool_call_needs_fresh_catalog};
+use crate::provider_turn::decisions::{
+    buffered_narration_can_be_replaced, committed_tool_resolves_player_boundary,
+    tool_call_needs_fresh_catalog,
+};
+use crate::provider_turn::round::current_combat_state;
 use crate::session_loop::{ProviderActionFeedback, ProviderEvent, SessionProviderInput};
 use crate::stateless_mcp::{call_action_sequence_tool, safe_error, AuthorityFailure};
 use serde_json::{json, Value as Json};
 use std::sync::OnceLock;
 use sylvia_base::{pystr, CodedError, CodedResult, JsonMap};
-use sylvia_domain::authority::{ActionCommand, ModelToolBehavior};
+use sylvia_domain::authority::{ActionCommand, CanonicalEventType, ModelToolBehavior};
 
 fn texts() -> &'static Json {
     static TEXTS: OnceLock<Json> = OnceLock::new();
@@ -731,5 +735,228 @@ fn push_stop(state: &mut ProviderTurnState, key: &str) -> CodedResult<()> {
         .current_application_controls
         .get_mut()?
         .push(object(vec![("role", json!("system")), ("content", json!(content))]));
+    Ok(())
+}
+
+/// `mapping[key]` on a turn local without it: Python's `KeyError`, an internal fault.
+fn entry<'a, T>(map: &'a indexmap::IndexMap<String, T>, key: &str) -> CodedResult<&'a T> {
+    map.get(key).ok_or_else(|| {
+        CodedError::new("internal_error", pystr::repr_json(&Json::from(key))).with_error_type("KeyError")
+    })
+}
+
+/// `json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)`.
+fn canonical_text(value: &Json) -> String {
+    sylvia_base::pyjson::dumps(value, sylvia_base::pyjson::Dump::CANONICAL)
+}
+
+/// One `{"role": "tool", ...}` result message of the round.
+fn tool_message(assembly: &ToolCallAssembly, content: &Json) -> Tagged {
+    Tagged::plain(object(vec![
+        ("role", json!("tool")),
+        ("tool_call_id", json!(assembly.call_id)),
+        ("name", json!(assembly.name)),
+        ("content", json!(canonical_text(content))),
+    ]))
+}
+
+/// `reconcile_tool_batch(...)`: the round's results back into the exchange, in call order. A
+/// failed optional reference read is marked correctable; each mechanic's canonical result is
+/// read back from the owner (its terminal event and tool result), with its narration facts and
+/// what it settles about the player's intent; the results are emitted as one evidence message.
+pub async fn reconcile_tool_batch(
+    adapter: &ProviderSessionAdapter,
+    state: &mut ProviderTurnState,
+    input: &SessionProviderInput,
+    turn_id: &str,
+    events: &mut dyn TurnEvents,
+) -> TurnResult<()> {
+    let reference_failure_instruction =
+        texts()["reference_failure_instruction"].as_str().expect("the exported reference instruction");
+    let ordered = state.locals.ordered.get()?.clone();
+    let mut optional_reference_failures: indexmap::IndexSet<String> = indexmap::IndexSet::new();
+    for assembly in &ordered {
+        state.locals.assembly.set(assembly.clone());
+        if !state.locals.local_tool_failures.get()?.contains(&assembly.call_id) {
+            continue;
+        }
+        let reference = resolve_provider_tool_alias(&assembly.name, state.locals.aliases.get()?)
+            .is_some_and(|(_, tool)| tool.category == "reference");
+        if !reference {
+            continue;
+        }
+        optional_reference_failures.insert(assembly.call_id.clone());
+        let results = state.locals.local_tool_results.get_mut()?;
+        entry(results, &assembly.call_id)?;
+        let result = results.get_mut(&assembly.call_id).expect("checked above");
+        result.insert("correction_optional".into(), Json::Bool(true));
+        result.insert("instruction".into(), json!(reference_failure_instruction));
+    }
+    let failures = state.locals.local_tool_failures.get()?.clone();
+    state.locals.required_tool_failures.set(
+        failures.iter().filter(|call_id| !optional_reference_failures.contains(*call_id)).cloned().collect(),
+    );
+    state.progress.round_failed.set(!failures.is_empty());
+    let sequence_facts = state.locals.sequence_narration_facts.get()?.clone();
+    let mut round_has_any_commit = !sequence_facts.is_empty();
+    let mut round_leaves_player_intent_pending = false;
+    let mut round_resolves_player_intent = false;
+    let mut round_narration_facts: Vec<JsonMap> = sequence_facts;
+    let tool_messages_start = state.locals.exchange_messages_mut()?.len();
+    for assembly in &ordered {
+        state.locals.assembly.set(assembly.clone());
+        let local_result = state.locals.local_tool_results.get()?.get(&assembly.call_id).cloned();
+        if let Some(local_result) = local_result {
+            if state.locals.local_tool_failures.get()?.contains(&assembly.call_id) {
+                state.progress.round_failed.set(true);
+            }
+            state.locals.exchange_messages_mut()?.push(tool_message(assembly, &Json::Object(local_result)));
+            continue;
+        }
+        let campaign_id = state.locals.campaign_id.value()?;
+        let snapshot = adapter.turn_owner()?.snapshot(&campaign_id).await?;
+        state.locals.snapshot.set(snapshot);
+        let action_id = entry(state.locals.mechanics_action_ids.get()?, &assembly.call_id)?.clone();
+        let snapshot = state.locals.snapshot.get()?;
+        let latest = |kinds: &[CanonicalEventType]| {
+            snapshot
+                .events
+                .iter()
+                .rev()
+                .find(|event| {
+                    event.action_id.as_deref() == Some(action_id.as_str())
+                        && kinds.contains(&event.event_type)
+                })
+                .cloned()
+        };
+        let terminal_event = latest(&[CanonicalEventType::ActionCommitted, CanonicalEventType::ActionFailed]);
+        let tool_result_event = latest(&[CanonicalEventType::ToolResult]);
+        let (Some(terminal_event), Some(tool_result_event)) = (terminal_event, tool_result_event) else {
+            return Err(CodedError::new(
+                "canonical_mechanic_result_unavailable",
+                "Canonical mechanic result is unavailable",
+            )
+            .with_error_type("CommandRejected")
+            .into());
+        };
+        let revision = snapshot.state.revision;
+        let snapshot_state = snapshot.state.state.clone();
+        let committed = terminal_event.event_type == CanonicalEventType::ActionCommitted;
+        if committed {
+            round_has_any_commit = true;
+            let behavior = *entry(state.locals.mechanics_tool_behaviors.get()?, &assembly.call_id)?;
+            state.locals.behavior.set(behavior);
+            if behavior == ModelToolBehavior::LeavesPlayerIntentPending {
+                let scope = state.locals.mechanics_preparation_scopes.get()?.get(&assembly.call_id).cloned();
+                round_leaves_player_intent_pending = preparation_keeps_intent_pending(
+                    scope.as_ref(),
+                    *state.obligations.player_intent_pending.get()?,
+                )?;
+            } else if committed_tool_resolves_player_boundary(state)? {
+                round_resolves_player_intent = true;
+            }
+        } else {
+            state.progress.round_failed.set(true);
+            state.locals.required_tool_failures.get_mut()?.insert(assembly.call_id.clone());
+        }
+        let result_payload =
+            tool_result_event.safe_payload.get("result").cloned().unwrap_or_else(|| json!({}));
+        // Narration facts use the full receipt; model history needs the outcome and card.
+        let model_result = match (&result_payload, committed) {
+            (Json::Object(result), true) => Json::Object(
+                result
+                    .iter()
+                    .filter(|(key, _)| key.as_str() != "context")
+                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .collect(),
+            ),
+            _ => result_payload.clone(),
+        };
+        adapter.turn_owner()?.record_admin_full_audit(object(vec![
+            ("kind", json!("gm_mechanic_receipt")),
+            ("action_id", json!(tool_result_event.action_id)),
+            ("campaign_id", json!(campaign_id)),
+            ("session_id", json!(input.session.session_id())),
+            ("turn_id", json!(turn_id)),
+            ("result", result_payload.clone()),
+        ]))?;
+        let parameters = entry(state.locals.mechanics_parameters.get()?, &assembly.call_id)?.clone();
+        let current_entities = current_referenced_entities(&parameters, &snapshot_state);
+        let round_result = object(vec![
+            ("status", json!(terminal_event.event_type.as_str())),
+            ("action_id", json!(tool_result_event.action_id)),
+            ("campaign_revision", json!(revision)),
+            ("safe_payload", Json::Object(terminal_event.safe_payload.clone())),
+            ("result", model_result),
+            ("current_entities", Json::Object(current_entities.clone())),
+        ]);
+        if committed {
+            let tool_name = entry(state.locals.mechanics_tool_names.get()?, &assembly.call_id)?.clone();
+            let transition = tool_name == "end_combat_encounter"
+                || state.locals.required_transitions.get()?.iter().any(|tool| tool.name == tool_name);
+            if transition {
+                state.obligations.engine_transition_review_pending.set(false);
+            }
+            let previous = entry(state.locals.mechanics_pre_entities.get()?, &assembly.call_id)?.clone();
+            let combat = current_combat_state(&snapshot_state);
+            round_narration_facts.push(mechanics_narration_facts(
+                &tool_name,
+                &result_payload,
+                &current_entities,
+                &previous,
+                Some(&parameters),
+                Some(&combat),
+                Some(state.locals.entity_display_names.get()?),
+            )?);
+        }
+        state.locals.exchange_messages_mut()?.push(tool_message(assembly, &Json::Object(round_result)));
+    }
+    let tool_messages: Vec<Json> = state.locals.exchange_messages_mut()?[tool_messages_start..]
+        .iter()
+        .map(|message| Json::Object(message.message.clone()))
+        .collect();
+    if !tool_messages.is_empty() {
+        let inference_id = state.locals.inference_id.value()?;
+        let mut payload = object(vec![("kind", json!("provider_tool_results"))]);
+        for (key, value) in state.locals.context_fields.get()? {
+            payload.insert(key.clone(), value.clone());
+        }
+        payload.insert("turn_id".into(), json!(turn_id));
+        payload.insert("inference_id".into(), json!(inference_id));
+        payload.insert(
+            "basis_message_id".into(),
+            state.locals.basis_message_id.value()?.map_or(Json::Null, Json::String),
+        );
+        payload.insert("results".into(), Json::Array(tool_messages));
+        // Model results omit engine context; a resumed turn restores these exact facts. This
+        // field is evidence only and never sent as history.
+        if !round_narration_facts.is_empty() {
+            payload.insert(
+                "narration_facts".into(),
+                Json::Array(round_narration_facts.iter().cloned().map(Json::Object).collect()),
+            );
+        }
+        events
+            .emit(ProviderEvent::Evidence { message_id: format!("{inference_id}-tool-results"), payload })
+            .await?;
+    }
+    input.control.progress.update("working", None)?;
+    if round_has_any_commit {
+        state.progress.any_commit_in_exchange.set(true);
+        if round_leaves_player_intent_pending {
+            state.obligations.player_intent_pending.set(true);
+        }
+        if round_resolves_player_intent {
+            state.obligations.player_intent_pending.set(false);
+        }
+        if input.session.role() == sylvia_domain::authority::WriterRole::Dm {
+            state.progress.campaign_file_disposition_in_exchange.set(false);
+        }
+        state.locals.buffered_narration.set(None);
+        state.locals.buffered_response_blocks.set(None);
+        state.locals.buffered_raw_response_blocks.set(None);
+        state.obligations.buffered_narration_needs_disposition.set(false);
+        state.locals.pending_narration_facts.get_mut()?.extend(round_narration_facts);
+    }
     Ok(())
 }

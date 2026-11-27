@@ -2711,6 +2711,7 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 name = "sylvia-agent"
 version = "0.4.1"
 dependencies = [
+ "fancy-regex",
  "futures-util",
  "getrandom 0.2.17",
  "hex",
@@ -2721,7 +2722,9 @@ dependencies = [
  "sylvia-app",
  "sylvia-base",
  "sylvia-domain",
+ "sylvia-engine",
  "sylvia-provider",
+ "sylvia-store",
  "thiserror 2.0.21",
  "tokio",
 ]

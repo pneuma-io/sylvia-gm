@@ -29,8 +29,24 @@ state vary: the provider input when there is one, any other positional argument 
 keyword arguments (`turn_id`, a refusal's `error`) are passed through as given.
 
 Each call is then run again on copies of its state and input with the variants
-`VARIANTS[phase]` names: some turn locals set, and some owner reads answered with given values
+`VARIANTS[phase]` names (and other phases on copies of its state, `CROSS_VARIANTS[phase]`): some turn locals set, and some owner reads answered with given values
 (logged as ordinary calls), so the Rust tests reach branches a recorded turn does not.
+
+The pseudo-phase `list_tools` traces `StatelessMcpMechanics._list_tools` instead (T3m-1):
+`listing_start` (its arguments), every owner call the listing makes, and `listing_end` (the
+tools, or what it raised). The first listing with a session is run again with the variants
+`listing_variants` gives: owner answers overridden (an override may be a refusal, raised), a
+different session or the fixed list.
+
+The pseudo-phase `execute_action` traces `StatelessMcpMechanics.execute_action` (T3m-2) the same
+way: `execution_start` (the command), every owner call and `uuid4` draw, and `execution_end`
+(the receipt, or what it raised). The first call is run again with `execution_variants`; an
+override may also be `Answers`, one answer per successive call.
+
+The pseudo-phase `campaign_file` traces `StatelessMcpMechanics.commit_campaign_file`,
+`search_knowledge` and `read_reference` (T3m-3): `campaign_file_start` (the method and its
+arguments), every owner call, and `campaign_file_end`. The first real commit is followed by
+`campaign_file_variants`.
 Reference tooling only; retired with the Python source.
 """
 
@@ -195,6 +211,31 @@ def dump_input(provider_input: object) -> dict[str, object]:
     })  # type: ignore[return-value]
 
 
+class Answers:
+    """Overridden answers for successive calls of one owner method, in order."""
+
+    def __init__(self, *answers: object) -> None:
+        self.answers = list(answers)
+
+    def next(self) -> object:
+        return self.answers.pop(0)
+
+
+def refusal_fields(error: BaseException) -> dict[str, object]:
+    """A raised error as the Rust tests rebuild it: class, message, code and, for a
+    `MechanicsRejected`, its correction fields."""
+    found: dict[str, object] = {"class": type(error).__name__, "message": str(error),
+                                "code": getattr(error, "code", None)}
+    if hasattr(error, "validation_issues"):
+        found.update({
+            "field_paths": list(error.field_paths),  # type: ignore[attr-defined]
+            "validation_issues": [issue.as_payload()
+                                  for issue in error.validation_issues],  # type: ignore[attr-defined]
+            "state_changed": error.state_changed,  # type: ignore[attr-defined]
+            "refusal_reasons": list(error.refusal_reasons)})  # type: ignore[attr-defined]
+    return found
+
+
 class Traced:
     """The adapter's owner: every call is logged while a phase runs; overrides answer first."""
 
@@ -207,6 +248,15 @@ class Traced:
             answer = OVERRIDES[name]
 
             def overridden(*args: object, **kwargs: object) -> object:
+                answer = OVERRIDES[name]
+                if isinstance(answer, Answers):
+                    answer = answer.next()
+                if isinstance(answer, BaseException):
+                    # An override may also be a refusal, raised as the owner would raise it.
+                    log({"event": "call", "name": name, "args": plain(list(args)),
+                         "kwargs": plain(kwargs), "override": True,
+                         "raised": refusal_fields(answer)})
+                    raise answer
                 log({"event": "call", "name": name, "args": plain(list(args)),
                      "kwargs": plain(kwargs), "result": plain(answer), "override": True})
                 return answer
@@ -219,9 +269,10 @@ class Traced:
             try:
                 result = value(*args, **kwargs)
             except BaseException as error:
+                # The code and a `MechanicsRejected`'s fields too: a refusal the server turns
+                # into a correction contract is rebuilt in its class.
                 log({"event": "call", "name": name, "args": plain(list(args)),
-                     "kwargs": plain(kwargs),
-                     "raised": {"class": type(error).__name__, "message": str(error)}})
+                     "kwargs": plain(kwargs), "raised": refusal_fields(error)})
                 raise
             log({"event": "call", "name": name, "args": plain(list(args)),
                  "kwargs": plain(kwargs), "result": plain(result)})
@@ -413,6 +464,34 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
                                      "text": "Who goes?"})}},
         {"name": "no blocks", "set": {"selected_raw_blocks": None, "ooc_ack_required": True}},
     ],
+    "reconcile_tool_batch": [
+        {"name": "failed reference reads and a failed call", "results": [
+            {"name": "read_campaign_reference", "failed": True,
+             "result": {"status": "rejected", "code": "reference_unavailable"}},
+            {"name": "search_campaign_knowledge", "failed": True,
+             "result": {"status": "rejected", "code": "knowledge_search_invalid"}},
+            {"name": None, "failed": True, "result": {"status": "rejected", "code": "x"}}]},
+        {"name": "a reference read that succeeded", "results": [
+            {"name": "read_campaign_reference", "failed": False, "result": {"status": "ok"}}]},
+        {"name": "an executed sequence only", "results": [],
+         "set": {"sequence_narration_facts": [
+             {"tool": "execute_action_sequence", "sequence_id": "s-1", "committed_actions": []}]},
+         "obligations": {"buffered_narration_needs_disposition": True},
+         "progress": {"campaign_file_disposition_in_exchange": True}},
+        {"name": "leaves the intent pending", "mechanic": {"behavior": "leaves_player_intent_pending"}},
+        {"name": "leaves pending, awaiting the player's choice",
+         "mechanic": {"behavior": "leaves_player_intent_pending", "scope": "await_player_choice"},
+         "obligations": {"player_intent_pending": False}},
+        {"name": "an invalid preparation scope",
+         "mechanic": {"behavior": "leaves_player_intent_pending", "scope": "rewrite_history"}},
+        {"name": "resolves the intent", "mechanic": {"behavior": "resolves_player_intent"},
+         "obligations": {"player_intent_pending": True},
+         "decisions": {"player_boundary_narration": True}},
+        {"name": "ends combat", "mechanic": {"tool_name": "end_combat_encounter"},
+         "obligations": {"engine_transition_review_pending": True}},
+        {"name": "the action failed", "event": "fail"},
+        {"name": "the result is unavailable", "event": "drop_result"},
+    ],
     "execute_tool_batch": [
         {"name": "an unknown tool", "calls": [{"name": "no_such_tool", "arguments": "{}"}]},
         {"name": "invalid JSON", "calls": [{"name": None, "arguments": '{"state_change": '}]},
@@ -506,6 +585,8 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
                 name=call["name"] if call["name"] is not None else real.name,
                 arguments=arguments))
         state.ordered = calls
+    if "results" in variant or "mechanic" in variant:
+        reconcile_variant(state, variant)
     supplier = getattr(provider_input, "catalog_supplier", None)
     if variant.get("catalog_tools") and supplier is not None:
         provider_input = dataclasses.replace(
@@ -526,9 +607,52 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
         if variant.get("lock"):
             changes["package_lock"] = lock_with_entry(real.package_lock)
         OVERRIDES["snapshot"] = dataclasses.replace(real, **changes)
+    if "event" in variant:
+        OVERRIDES["snapshot"] = changed_events(owner.snapshot(state.campaign_id), state, variant["event"])
     traced_call(function, self, state, (provider_input, *args[1:]) if args else args, kwargs,
                 variant["name"])
     OVERRIDES.clear()
+
+
+def reconcile_variant(state: ProviderTurnState, variant: dict[str, object]) -> None:
+    """`reconcile_tool_batch`'s variants: calls answered with given local results (`results`:
+    each a name, or `None` for the real call's, its result and whether it failed), and the
+    real mechanic's recorded behavior, preparation scope or tool name (`mechanic`)."""
+    real = state.ordered[0]
+    if "results" in variant:
+        calls = []
+        for index, entry in enumerate(variant["results"]):  # type: ignore[union-attr]
+            call_id = f"{real.call_id}-results-{index}"
+            calls.append(_provider_turn_phases._ToolCallAssembly(  # noqa: SLF001
+                call_id=call_id, name=entry["name"] if entry["name"] is not None else real.name,
+                arguments="{}"))
+            state.local_tool_results[call_id] = dict(entry["result"])
+            if entry["failed"]:
+                state.local_tool_failures.add(call_id)
+        state.ordered = calls
+    mechanic = variant.get("mechanic", {})
+    if "behavior" in mechanic:  # type: ignore[operator]
+        state.mechanics_tool_behaviors[real.call_id] = ModelToolBehavior(mechanic["behavior"])  # type: ignore[index]
+    if "scope" in mechanic:  # type: ignore[operator]
+        state.mechanics_preparation_scopes[real.call_id] = mechanic["scope"]  # type: ignore[index]
+    if "tool_name" in mechanic:  # type: ignore[operator]
+        state.mechanics_tool_names[real.call_id] = mechanic["tool_name"]  # type: ignore[index]
+
+
+def changed_events(snapshot: object, state: ProviderTurnState, change: object) -> object:
+    """The snapshot with the real mechanic's terminal event failed (`fail`) or its tool result
+    removed (`drop_result`)."""
+    from sylvia_gm.domain.authority import CanonicalEventType
+    action_id = state.mechanics_action_ids.get(state.ordered[0].call_id)
+    events = []
+    for event in snapshot.events:  # type: ignore[attr-defined]
+        if event.action_id == action_id:
+            if change == "fail" and event.event_type is CanonicalEventType.ACTION_COMMITTED:
+                event = dataclasses.replace(event, event_type=CanonicalEventType.ACTION_FAILED)
+            if change == "drop_result" and event.event_type is CanonicalEventType.TOOL_RESULT:
+                continue
+        events.append(event)
+    return dataclasses.replace(snapshot, events=tuple(events))
 
 
 def lock_with_entry(lock: object) -> object:
@@ -667,8 +791,63 @@ def traced_relay(function, self, state, args, kwargs):  # type: ignore[no-untype
     log({"event": "phase_end", "state": dump_state(state)})
 
 
+#: Each traced phase's own function, before `wrap` replaced it.
+ORIGINAL: dict[str, object] = {}
+
+#: Other phases run on a copy of a traced phase's state, for phases a recorded turn rarely
+#: reaches (T4's narration phases, from the final narration's state). Each is a phase name and
+#: a variant as `VARIANTS` gives them.
+NARRATED = "The gate creaks open on the cold yard."
+
+CROSS_VARIANTS: dict[str, list[tuple[str, dict[str, object]]]] = {
+    # A stand-in turn narrates through the Campaign File, so the prose-only phases run on the
+    # state a round's reconciliation starts from, with the round's prose set.
+    "reconcile_tool_batch": [
+        ("record_empty_completion", {"name": "no finish reason",
+                                     "set": {"narration": "", "round_finish_reason": None}}),
+        ("record_empty_completion", {"name": "an empty finish reason",
+                                     "set": {"narration": "", "round_finish_reason": ""}}),
+        ("record_empty_completion", {"name": "a finish reason",
+                                     "set": {"narration": "", "round_finish_reason": "length"}}),
+        ("retry_repeated_response", {"name": "a repeated response", "set": {"narration": NARRATED}}),
+        ("retry_repeated_response", {"name": "a repeated non-ASCII response",
+                                     "set": {"narration": "Ça va — l’œuvre est là. 🌒"}}),
+        ("retry_missing_tool_call", {"name": "a missing tool call", "set": {"narration": NARRATED}}),
+        ("retry_private_deliberation", {"name": "private deliberation",
+                                        "set": {"narration": "I should roll first."}}),
+        ("record_final_narration", {"name": "the final narration", "set": {"narration": NARRATED}}),
+        ("record_held_narration", {"name": "held narration with native data", "set": {
+            "narration": NARRATED, "assistant_reasoning": ["Thinking."],
+            "native_chat_metadata": {"thought": "x"}}}),
+        ("retry_missing_campaign_file_update", {"name": "a rejected Campaign File call", "set": {
+            "narration": NARRATED, "buffered_narration": None, "buffered_raw_response_blocks": None}}),
+        ("retry_missing_campaign_file_update", {"name": "a held response", "set": {
+            "narration": NARRATED, "buffered_narration": "Held.", "buffered_raw_response_blocks": None}}),
+        ("retry_missing_campaign_file_update", {"name": "held response blocks", "set": {
+            "narration": NARRATED, "buffered_narration": None,
+            "buffered_raw_response_blocks": [{"kind": "narration", "text": "Held."}]}}),
+        ("preserve_boundary_narration", {"name": "a GM decision still active",
+                                         "set": {"narration": NARRATED}}),
+        ("preserve_player_intent_narration", {"name": "the player's action still pending",
+                                              "set": {"narration": NARRATED}}),
+        ("retain_campaign_file_narration", {"name": "held for the Campaign File",
+                                            "set": {"narration": NARRATED}}),
+    ],
+}
+
+
+def run_cross_variants(name, self, before, args, kwargs):  # type: ignore[no-untyped-def]
+    for other, variant in CROSS_VARIANTS.get(name, []):
+        # Only for a phase this run traces, so the anchor's own vectors stay as they were.
+        if other not in PHASES:
+            continue
+        function = ORIGINAL.get(other) or getattr(_provider_turn_phases, other)
+        run_variant(function, self, before, args, kwargs, variant)
+
+
 def wrap(name: str) -> None:
     function = getattr(_provider_turn_phases, name)
+    ORIGINAL[name] = function
 
     if inspect.isgeneratorfunction(function):
         def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
@@ -676,20 +855,474 @@ def wrap(name: str) -> None:
             yield from traced_relay(function, self, state, args, kwargs)
             for variant in VARIANTS.get(name, []):
                 run_variant(function, self, before, args, kwargs, variant)
+            run_cross_variants(name, self, before, args, kwargs)
     else:
         def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
             before = copy_state(state)
             result = traced_call(function, self, state, args, kwargs, None)
             for variant in VARIANTS.get(name, []):
                 run_variant(function, self, before, args, kwargs, variant)
+            run_cross_variants(name, self, before, args, kwargs)
             return result
 
     traced.__name__ = name
     setattr(_provider_turn_phases, name, traced)
 
 
+#: The pseudo-phase that traces `StatelessMcpMechanics._list_tools` (T3m-1).
+LISTING = "list_tools"
+
+
+@dataclasses.dataclass(frozen=True)
+class PlanStub:
+    """An accepted Campaign Plan for a listing variant: the listing reads only its content."""
+
+    content: dict[str, object]
+
+
+def catalog_tool(name: str, schema: dict[str, object], description: str = "",
+                 behavior: str = "optional") -> object:
+    from sylvia_gm.application.authority import CatalogTool
+    return CatalogTool(package_id="sylvia.test", package_version="1.0.0", package_sha256="0" * 64,
+                       name=name, capability=f"test.{name}", input_schema=schema,
+                       execute=lambda *_: None, description=description,
+                       model_behavior=ModelToolBehavior(behavior))
+
+
+def probe_tools() -> list[object]:
+    """Catalog tools for `_model_input_schema`'s and the exposure's edges."""
+    spell = {"type": "string", "enum": ["fire_bolt", "magic_missile", "shield", "mm_alias", "wish"],
+             "x-sylvia-gm-castable-spells": True,
+             "x-sylvia-gm-spell-scope": ["magic_missile", "fire_bolt", "shield", "wish"],
+             "x-sylvia-gm-value-aliases": {"mm_alias": "magic_missile"}}
+    return [
+        catalog_tool("probe_schema", {
+            "title": None,
+            "x-sylvia-gm-exposure": {"any_of": [{"weird": 1}]},
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "type": "object",
+            "properties": {
+                "target": {"type": "string", "enum": ["old"], "x-sylvia-gm-reference": "participant"},
+                "who": {"type": "string", "x-sylvia-gm-reference": "participant"},
+                "derived_actor": {"type": "string", "x-sylvia-gm-derived": {"kind": "actor"}},
+                "null_derived": {"type": "string", "x-sylvia-gm-derived": None},
+                "secret": {"type": "string", "x-sylvia-gm-model-hidden": True},
+                "loosely_hidden": {"type": "string", "x-sylvia-gm-model-hidden": 1},
+                "need": {"type": "integer", "x-sylvia-gm-model-required": True},
+                "spell": spell,
+                "plain_enum": {"type": "string", "enum": ["a"], "x-sylvia-gm-spell-scope": ["a"]},
+            },
+            "required": ["secret", "target", "zzz", 1, "derived_actor"],
+            "additionalProperties": False,
+        }, behavior="required_ruleset_decision"),
+        catalog_tool("probe_unasked_spell", {
+            "type": "object", "properties": {},
+            "x-sylvia-gm-exposure": {"any_of": [{"spells": ["wish"]}]},
+        }, description="Shown only when a wish is in play."),
+        catalog_tool("probe_state_spell", {
+            "type": "object", "properties": {},
+            "x-sylvia-gm-exposure": {"any_of": [{"spells": ["probe_lasting_effect"]}]},
+        }),
+        catalog_tool("probe_entity_field", {
+            "type": "object", "properties": {"x": {"type": "string"}}, "required": "x",
+            "x-sylvia-gm-exposure": {"any_of": [{"entity_field": "probe.level", "op": "gte1"},
+                                                {"entity_field": "probe.flag", "op": "true"}]},
+        }),
+        catalog_tool("probe_absent_field", {
+            "type": "object", "properties": {}, "required": {"x": 1},
+            "x-sylvia-gm-exposure": {"any_of": [{"entity_field": "probe.missing", "op": "not_null"}]},
+        }),
+        catalog_tool("probe_no_spells", {
+            "type": "object",
+            "properties": {"spell": {"type": "string", "enum": ["wish"],
+                                     "x-sylvia-gm-castable-spells": True}},
+        }),
+    ]
+
+
+def listing_snapshot(owner: object, campaign_id: str) -> tuple[object, object]:
+    """The model context with castable spells: a spellbook, prepared spells and probe entities."""
+    snapshot, boundary_ = owner.model_context_snapshot(campaign_id)  # type: ignore[attr-defined]
+    participants = tuple(
+        dataclasses.replace(participant, data={**participant.data,
+                                                "wizard_spellbook": ["magic_missile", 7, "shield"]})
+        if index == 0 else participant
+        for index, participant in enumerate(snapshot.participants))
+    state = {**snapshot.state,
+             "sylvia.probe.entities": {"e1": {"prepared_spells": ["fire_bolt", None]}, "e2": "x",
+                                       "e3": {"prepared_spells": "shield"}},
+             "sylvia.other.entities": ["not", "a", "map"]}
+    return dataclasses.replace(snapshot, participants=participants, state=state), boundary_
+
+
+def listing_variants(owner: object, campaign_id: str) -> list[dict[str, object]]:
+    from sylvia_gm.domain.errors import CommandRejected
+    real = owner.catalog(campaign_id)  # type: ignore[attr-defined]
+    probes = (*real, *probe_tools())
+    state = owner.snapshot(campaign_id)  # type: ignore[attr-defined]
+    lasting = dataclasses.replace(state, state={
+        **state.state, "sylvia.probe.effects": {"effect": {"source": "probe_lasting_effect"}},
+        "sylvia.probe.entities": {"e1": {"probe": {"level": 2}}, "e2": {"probe": {"flag": True}},
+                                  "e3": {"probe": {"level": True}}}})
+    options = {"campaign_revision": 3, "character_update_schema": {
+        "type": "object", "properties": {"hp": {"type": "integer"}}, "required": ["hp"]},
+        "operations": ["record_memory", "record_entity", "update_scene", "update_plan_progress",
+                       "reveal_secret", "update_character", "update_inventory"],
+        "scene_act_ids": ["act-1", "act-2"], "plan_item_ids": ["objective:a", "act:1"],
+        "eligible_secret_ids": ["secret-1"]}
+    rejected = CommandRejected("Accepted Campaign Plan is unavailable")
+    return [
+        {"name": "probe_tools", "answer": {"catalog": probes,
+                                           "model_context_snapshot": listing_snapshot(owner, campaign_id)}},
+        {"name": "probe_exposure", "answer": {"catalog": probes, "snapshot": lasting}},
+        {"name": "no_session_no_plan", "session_id": None,
+         "answer": {"accepted_campaign_plan": rejected}},
+        {"name": "readable_plan", "session_id": None,
+         "answer": {"accepted_campaign_plan": PlanStub({"campaign_plan_markdown": "# Plan"})}},
+        {"name": "structured_plan", "session_id": None,
+         "answer": {"accepted_campaign_plan": PlanStub({"campaign_plan": {}})}},
+        {"name": "every_note", "answer": {"campaign_narrative_options": options}},
+        {"name": "no_notes", "answer": {"campaign_narrative_options": {**options, "operations": []}}},
+        {"name": "invalid_notes",
+         "answer": {"campaign_narrative_options": {**options, "scene_act_ids": "act-1"}}},
+        {"name": "catalog_refused",
+         "answer": {"catalog": CommandRejected("Campaign is transitioning", code="probe_code")}},
+        {"name": "invalid_properties",
+         "answer": {"catalog": (catalog_tool("bad", {"type": "object", "properties": []}),)}},
+        {"name": "invalid_property",
+         "answer": {"catalog": (catalog_tool("bad", {"type": "object", "properties": {"a": 1}}),)}},
+        {"name": "invalid_derivation", "answer": {"catalog": (catalog_tool("bad", {
+            "type": "object", "properties": {"a": {"x-sylvia-gm-derived": "actor"}}}),)}},
+        {"name": "fixed", "fixed": True},
+    ]
+
+
+LISTING_DONE = {"value": False}
+
+
+def described(error: BaseException) -> dict[str, object]:
+    """What a listing raised: its class and message, an `MCPError`'s data code, and for an
+    exception group the exceptions it holds."""
+    data = getattr(error, "data", None)
+    found: dict[str, object] = {
+        "class": type(error).__name__, "message": str(error),
+        "code": data.get("code") if isinstance(data, dict) else getattr(error, "code", None)}
+    if isinstance(error, BaseExceptionGroup):
+        found["exceptions"] = [described(inner) for inner in error.exceptions]
+    return found
+
+
+def wrap_listing() -> None:
+    from sylvia_gm.agent import _stateless_mcp
+
+    original = _stateless_mcp.StatelessMcpMechanics._list_tools  # noqa: SLF001
+
+    async def run(self, campaign_id, variant, **kwargs):  # type: ignore[no-untyped-def]
+        log({"event": "listing_start", "variant": variant, "campaign_id": campaign_id, **kwargs})
+        ACTIVE["value"] = True
+        try:
+            tools = await original(self, campaign_id, **kwargs)
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "listing_end", "raised": described(error)})
+            if variant is None:
+                raise
+            return None
+        finally:
+            ACTIVE["value"] = False
+        log({"event": "listing_end", "tools": plain(tools)})
+        return tools
+
+    async def traced(self, campaign_id, *, purpose, discovery_id, session_id, fixed=False):  # type: ignore[no-untyped-def]
+        owner = self._owner  # noqa: SLF001
+        self._owner = Traced(owner)  # noqa: SLF001
+        try:
+            kwargs = {"purpose": purpose, "discovery_id": discovery_id, "session_id": session_id,
+                      "fixed": fixed}
+            tools = await run(self, campaign_id, None, **kwargs)
+            if session_id is not None and not fixed and not LISTING_DONE["value"]:
+                LISTING_DONE["value"] = True
+                try:
+                    variants = listing_variants(owner, campaign_id)
+                except BaseException:
+                    import traceback
+                    log({"event": "listing_error", "traceback": traceback.format_exc()})
+                    raise
+                for variant in variants:
+                    OVERRIDES.clear()
+                    OVERRIDES.update(variant.get("answer", {}))  # type: ignore[arg-type]
+                    changed = {**kwargs, "discovery_id": f"{discovery_id}-{variant['name']}",
+                               **{key: variant[key] for key in ("session_id", "fixed")
+                                  if key in variant}}
+                    await run(self, campaign_id, variant["name"], **changed)
+                    OVERRIDES.clear()
+            return tools
+        finally:
+            self._owner = owner  # noqa: SLF001
+
+    _stateless_mcp.StatelessMcpMechanics._list_tools = traced  # noqa: SLF001
+
+
+#: The pseudo-phase that traces `StatelessMcpMechanics.execute_action` (T3m-2).
+EXECUTION = "execute_action"
+EXECUTION_DONE = {"value": False}
+
+
+def castable_catalog(owner: object, campaign_id: str, tool_name: str) -> tuple[object, ...]:
+    """The catalog with `tool_name` given a castable `spell` choice."""
+    found = []
+    for tool in owner.catalog(campaign_id):  # type: ignore[attr-defined]
+        if tool.name == tool_name:
+            schema = copy.deepcopy(dict(tool.input_schema))
+            schema["properties"] = {**schema["properties"], "spell": {
+                "type": "string", "enum": ["fire_bolt", "magic_missile", "wish"],
+                "x-sylvia-gm-castable-spells": True}}
+            tool = dataclasses.replace(tool, input_schema=schema)
+        found.append(tool)
+    return tuple(found)
+
+
+def execution_variants(owner: object, command: object) -> list[dict[str, object]]:
+    from sylvia_gm.domain.authority import (
+        AwaitingChoiceReceipt, MechanicsChoiceOption, MechanicsChoiceRequest)
+    from sylvia_gm.domain.errors import (
+        CommandRejected, IdempotencyConflict, MechanicsRejected, MechanicsValidationIssue,
+        RulesetPreconditionRejected, StaleRevision, WrongOwner, WrongWriter)
+    campaign_id = command.campaign_id  # type: ignore[attr-defined]
+    tool_name = command.tool_name  # type: ignore[attr-defined]
+    catalog = owner.catalog(campaign_id)  # type: ignore[attr-defined]
+    without = tuple(tool for tool in catalog if tool.name != tool_name)
+    issue = MechanicsValidationIssue(path="skill", kind="invalid_type", expected_type="string",
+                                     actual_type="integer")
+    enum_issue = MechanicsValidationIssue(path="ability", kind="invalid_enum_value",
+                                          allowed_values=("strength", "dexterity"))
+    spell_issue = MechanicsValidationIssue(path="spell", kind="invalid_enum_value",
+                                           allowed_values=("fire_bolt", "magic_missile", "wish"))
+    choice = AwaitingChoiceReceipt(
+        campaign_id=campaign_id, action_id=command.action_id,  # type: ignore[attr-defined]
+        basis_revision=7, turn_id=command.turn_id,  # type: ignore[attr-defined]
+        choice=MechanicsChoiceRequest(choice_id="choice-1", prompt="Which way?", options=(
+            MechanicsChoiceOption(option_id="left", label="Left"),
+            MechanicsChoiceOption(option_id="right", label="Right"))),
+        choice_sequence=2)
+    return [
+        {"name": "awaiting_choice", "answer": {"execute_action": choice}},
+        {"name": "stale_revision", "answer": {"execute_action": StaleRevision("stale")}},
+        {"name": "wrong_owner", "answer": {"execute_action": WrongOwner("owner")}},
+        {"name": "wrong_writer", "answer": {"execute_action": WrongWriter("writer")}},
+        {"name": "idempotency_conflict",
+         "answer": {"execute_action": IdempotencyConflict("conflict")}},
+        {"name": "command_rejected",
+         "answer": {"execute_action": CommandRejected("Probe refusal", code="probe_refused")}},
+        {"name": "plain_rejected", "answer": {"execute_action": CommandRejected("Probe refusal")}},
+        {"name": "mechanics_rejected", "answer": {"execute_action": MechanicsRejected(
+            "Probe mechanics refusal", code="probe_mechanics", field_paths=("skill",),
+            validation_issues=(issue,), state_changed=True,
+            refusal_reasons=("Reason one.", "Reason two."))}},
+        {"name": "enum_not_castable", "answer": {"execute_action": MechanicsRejected(
+            "Ability is not allowed", code="probe_enum", field_paths=("ability",),
+            validation_issues=(enum_issue,))}},
+        {"name": "castable_refusal", "answer": {
+            "catalog": castable_catalog(owner, campaign_id, tool_name),
+            "model_context_snapshot": listing_snapshot(owner, campaign_id),
+            "execute_action": MechanicsRejected(
+                "Spell is not allowed", code="probe_spell", field_paths=("spell",),
+                validation_issues=(spell_issue, issue), state_changed=False,
+                refusal_reasons=("Kept out.",))}},
+        {"name": "precondition", "answer": {"execute_action": RulesetPreconditionRejected(
+            "The target is out of reach.", reasons=("Missing input 'target_distance'",))}},
+        {"name": "value_error", "answer": {"execute_action": ValueError("probe value")}},
+        {"name": "key_error", "answer": {"execute_action": KeyError("probe")}},
+        {"name": "revalidation_unavailable", "answer": {"catalog": without}},
+        {"name": "no_longer_available", "answer": {"catalog": Answers(catalog, catalog, without)}},
+    ]
+
+
+def wrap_execution() -> None:
+    from sylvia_gm.agent import _stateless_mcp
+
+    _stateless_mcp.uuid = Uuids()  # type: ignore[attr-defined]
+    original = _stateless_mcp.StatelessMcpMechanics.execute_action
+
+    def run(self, command, variant):  # type: ignore[no-untyped-def]
+        log({"event": "execution_start", "variant": variant, "command": plain(command)})
+        ACTIVE["value"] = True
+        try:
+            receipt = original(self, command)
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "execution_end",
+                 "raised": {**refusal_fields(error), **described(error)}})
+            if variant is None:
+                raise
+            return None
+        finally:
+            ACTIVE["value"] = False
+        log({"event": "execution_end", "receipt": plain(receipt)})
+        return receipt
+
+    def traced(self, command):  # type: ignore[no-untyped-def]
+        owner = self._owner  # noqa: SLF001
+        self._owner = Traced(owner)  # noqa: SLF001
+        try:
+            receipt = run(self, command, None)
+            if not EXECUTION_DONE["value"]:
+                EXECUTION_DONE["value"] = True
+                for variant in execution_variants(owner, command):
+                    OVERRIDES.clear()
+                    OVERRIDES.update(variant["answer"])  # type: ignore[arg-type]
+                    run(self, command, variant["name"])
+                    OVERRIDES.clear()
+            return receipt
+        finally:
+            self._owner = owner  # noqa: SLF001
+
+    _stateless_mcp.StatelessMcpMechanics.execute_action = traced
+
+
+#: The pseudo-phase that traces the Campaign File commit and the reference reads (T3m-3).
+CAMPAIGN_FILE = "campaign_file"
+CAMPAIGN_FILE_DONE = {"value": False}
+
+
+def campaign_file_variants(owner: object, campaign_id: str, session_id: str,
+                           real: dict[str, object]) -> list[dict[str, object]]:
+    """Calls of `commit_campaign_file`, `search_knowledge` and `read_reference` beside the
+    first real commit: each validation branch, the owner's refusals and the turn lookup."""
+    from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected, MechanicsValidationIssue
+    fact = {"fact_id": "fact-1", "category": "discovery", "text": "The ledger is hidden.",
+            "visibility": "gm_private", "known_by": []}
+    changed = {"state_change": "changed", "state_change_summary": "One discovery."}
+    unchanged = {"state_change": "unchanged", "state_change_summary": "Nothing durable changed."}
+    options = owner.campaign_narrative_options(session_id)  # type: ignore[attr-defined]
+    every_note = {**options, "character_update_schema": {
+        "type": "object", "properties": {"hp": {"type": "integer"}, "note": {"type": "string",
+                                                                          "maxLength": 5}},
+        "required": ["hp"], "additionalProperties": False},
+        "operations": ["record_memory", "record_entity", "update_scene", "update_plan_progress",
+                       "reveal_secret", "update_character", "update_inventory"],
+        "scene_act_ids": ["act-1"], "plan_item_ids": ["act:1"], "eligible_secret_ids": ["secret-1"]}
+    updated = {"status": "campaign_file_updated", "update_id": "update", "campaign_revision": 9,
+               "state_changed": True}
+    refusal = MechanicsRejected(
+        "Character update is invalid", code="character_update_invalid", field_paths=("hp",),
+        validation_issues=(MechanicsValidationIssue(path="hp", kind="wrong_type",
+                                                    expected_type="integer", actual_type="string"),),
+        state_changed=False)
+    commit = {"method": "commit_campaign_file", "campaign_id": campaign_id, "session_id": session_id,
+              "basis_message_id": real["basis_message_id"], "turn_id": real["turn_id"]}
+    search = {"method": "search_knowledge", "campaign_id": campaign_id, "session_id": session_id}
+    read = {"method": "read_reference", "campaign_id": campaign_id, "session_id": session_id}
+    return [
+        {**commit, "name": "nothing changed", "parameters": unchanged},
+        {**commit, "name": "no assessment", "parameters": {}},
+        # 600 characters, 1200 UTF-8 bytes: within the 1000-character bound.
+        {**commit, "name": "a long non-ASCII summary", "parameters": {
+            **unchanged, "state_change_summary": "é" * 600}},
+        {**commit, "name": "a non-ASCII summary over the bound", "parameters": {
+            **unchanged, "state_change_summary": "é" * 1001}},
+        {**commit, "name": "foreign and mistyped collections", "parameters": {
+            **changed, "bogus": 1, "facts": "not a list", "entities": [], "zz_other": None}},
+        {**commit, "name": "too many items", "parameters": {**changed, "facts": [fact] * 65}},
+        {**commit, "name": "item shapes", "parameters": {**changed, "facts": [
+            1, {"fact_id": 5, "category": "oops", "text": "", "visibility": "player_known",
+                "known_by": [1, "a"], "extra": True},
+            {**fact, "text": "x" * 2001, "subjects": "one"}]}},
+        {**commit, "name": "changed without changes", "parameters": changed},
+        {**commit, "name": "unchanged with a change", "parameters": {**unchanged, "facts": [fact]}},
+        {**commit, "name": "a committed change", "parameters": {**changed, "facts": [fact]},
+         "answer": {"update_campaign_file": updated}},
+        {**commit, "name": "the owner refuses", "parameters": {**changed, "facts": [fact]},
+         "answer": {"update_campaign_file": refusal}},
+        {**commit, "name": "the owner fails", "parameters": {**changed, "facts": [fact]},
+         "answer": {"update_campaign_file": KeyError("probe")}},
+        {**commit, "name": "every note type", "parameters": {**changed,
+            "scenes": [{"summary": "At the gate.", "act_id": "act-2"}],
+            "character_updates": [{"hp": "9"}, {"hp": 9, "note": "too long"}, {"hp": 9}],
+            "plan_progress": [{"plan_item_id": "act:1", "progress_status": "engaged",
+                               "progress_summary": "Met the smith."}]},
+         "answer": {"campaign_narrative_options": every_note, "update_campaign_file": updated}},
+        {**commit, "name": "invalid options", "parameters": {**changed, "scenes": [
+            {"summary": "At the gate."}]},
+         "answer": {"campaign_narrative_options": {**options, "scene_act_ids": "act-1"}}},
+        {**commit, "name": "the open turn", "turn_id": None, "parameters": unchanged},
+        {**commit, "name": "no open turn", "turn_id": None, "parameters": unchanged,
+         "answer": {"current_open_turn": None}},
+        {**search, "name": "a search", "query": "ledger", "sources": ["campaign_state"],
+         "limit": 3, "offset": 0},
+        {**search, "name": "a search of every source", "query": "smith", "sources": None,
+         "limit": 5, "offset": 1},
+        {**search, "name": "a refused search", "query": "ledger", "sources": None, "limit": 5,
+         "offset": 0, "answer": {"search_campaign_knowledge": CommandRejected(
+             "Knowledge search limit is invalid", code="campaign_knowledge_limit_invalid")}},
+        {**search, "name": "a failed search", "query": "ledger", "sources": None, "limit": 5,
+         "offset": 0, "answer": {"search_campaign_knowledge": KeyError("probe")}},
+        {**read, "name": "a read of current state", "source": "campaign_state", "path": "current"},
+        {**read, "name": "a read of a missing path", "source": "campaign_plan", "path": "nowhere"},
+        {**read, "name": "a refused read", "source": "campaign_state", "path": "current",
+         "answer": {"read_campaign_reference": CommandRejected("Reference path is unavailable",
+                                                               code="campaign_reference_unavailable")}},
+    ]
+
+
+def wrap_campaign_file() -> None:
+    from sylvia_gm.agent import _stateless_mcp
+
+    methods = {name: getattr(_stateless_mcp.StatelessMcpMechanics, name)
+               for name in ("commit_campaign_file", "search_knowledge", "read_reference")}
+
+    def run(self, method, variant, campaign_id, **kwargs):  # type: ignore[no-untyped-def]
+        log({"event": "campaign_file_start", "variant": variant, "method": method,
+             "campaign_id": campaign_id, **plain(kwargs)})
+        ACTIVE["value"] = True
+        try:
+            result = methods[method](self, campaign_id, **kwargs)
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "campaign_file_end",
+                 "raised": {**refusal_fields(error), **described(error)}})
+            if variant is None:
+                raise
+            return None
+        finally:
+            ACTIVE["value"] = False
+        log({"event": "campaign_file_end", "result": plain(result)})
+        return result
+
+    def traced_method(method):  # type: ignore[no-untyped-def]
+        def traced(self, campaign_id, **kwargs):  # type: ignore[no-untyped-def]
+            owner = self._owner  # noqa: SLF001
+            self._owner = Traced(owner)  # noqa: SLF001
+            try:
+                result = run(self, method, None, campaign_id, **kwargs)
+                if method == "commit_campaign_file" and not CAMPAIGN_FILE_DONE["value"]:
+                    CAMPAIGN_FILE_DONE["value"] = True
+                    for variant in campaign_file_variants(owner, campaign_id,
+                                                          kwargs["session_id"], kwargs):
+                        arguments = {key: value for key, value in variant.items()
+                                     if key not in {"name", "method", "campaign_id", "answer"}}
+                        OVERRIDES.clear()
+                        OVERRIDES.update(variant.get("answer", {}))  # type: ignore[arg-type]
+                        run(self, variant["method"], variant["name"], campaign_id, **arguments)
+                        OVERRIDES.clear()
+                return result
+            finally:
+                self._owner = owner  # noqa: SLF001
+        return traced
+
+    for method in methods:
+        setattr(_stateless_mcp.StatelessMcpMechanics, method, traced_method(method))
+
+
 for phase in PHASES:
-    wrap(phase)
+    if phase == LISTING:
+        wrap_listing()
+    elif phase == EXECUTION:
+        wrap_execution()
+    elif phase == CAMPAIGN_FILE:
+        wrap_campaign_file()
+    else:
+        wrap(phase)
 
 _ = SimpleNamespace  # keep the import for future variants
 
