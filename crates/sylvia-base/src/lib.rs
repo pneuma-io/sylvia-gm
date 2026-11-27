@@ -13,6 +13,8 @@
 //! - [`pyurl`]: `urllib.parse`'s `urlsplit`, `urlunsplit` and strict `unquote`, CPython 3.12.
 //! - [`pyyaml`]: YAML loaded and dumped exactly as PyYAML 6.0.3 does (`SafeLoader`,
 //!   `CSafeLoader`, `safe_dump`).
+//! - [`testing`]: test helpers for every crate's tests, such as [`testing::assert_same_json`],
+//!   which checks JSON values and their key order (`assert_eq!` on `Value`s ignores order).
 //! - [`winreg`]: `winreg.QueryValueEx` as CPython 3.12 reads the current user's registry
 //!   (read-only; the rule 9 module for the registry).
 
@@ -24,6 +26,7 @@ pub mod pyre;
 pub mod pystr;
 pub mod pyurl;
 pub mod pyyaml;
+pub mod testing;
 pub mod winreg;
 
 pub use error::{CodedError, CodedResult};
