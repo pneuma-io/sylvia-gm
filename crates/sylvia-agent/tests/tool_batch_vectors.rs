@@ -294,3 +294,51 @@ fn arguments_match_python() {
         assert_eq!(J::Bool(overlap), case["expected"], "{case}");
     }
 }
+
+/// A narration helper's outcome as the generator writes it: `{"ok": ...}` or `{"raised": ...}`.
+fn helper_outcome(result: sylvia_base::CodedResult<J>) -> J {
+    match result {
+        Ok(value) => serde_json::json!({"ok": value}),
+        Err(error) => {
+            let class = error.error_type.unwrap_or("CommandRejected");
+            let code = if class == "TypeError" { J::Null } else { J::from(error.code) };
+            serde_json::json!({"raised": {"class": class, "message": error.message, "code": code}})
+        }
+    }
+}
+
+#[test]
+fn narration_helpers_match_python() {
+    use sylvia_agent::provider_session::narration_facts::{mechanics_narration_facts, public_action_result};
+    let vectors = vectors();
+    let cases = &vectors["narration"];
+    let facts = cases["facts"].as_array().expect("facts cases");
+    assert_eq!(facts.len(), 18);
+    for case in facts {
+        let name = case["name"].as_str().unwrap();
+        let arguments = case["arguments"].as_array().unwrap();
+        let names: Option<indexmap::IndexMap<String, String>> = arguments[6].as_object().map(|names| {
+            names.iter().map(|(key, value)| (key.clone(), value.as_str().unwrap().to_owned())).collect()
+        });
+        let outcome = mechanics_narration_facts(
+            arguments[0].as_str().unwrap(),
+            &arguments[1],
+            arguments[2].as_object().unwrap(),
+            arguments[3].as_object().unwrap(),
+            arguments[4].as_object(),
+            arguments[5].as_object(),
+            names.as_ref(),
+        )
+        .map(J::Object);
+        // Byte for byte: the facts' key order is what the GM's narration reads.
+        assert_eq!(ordered(&helper_outcome(outcome)), ordered(&case["expected"]), "{name}");
+    }
+    let public = cases["public"].as_array().expect("public cases");
+    assert_eq!(public.len(), 6);
+    for case in public {
+        let name = case["name"].as_str().unwrap();
+        let arguments = case["arguments"].as_array().unwrap();
+        let outcome = public_action_result(arguments[0].as_str(), &arguments[1]);
+        assert_eq!(ordered(&helper_outcome(outcome)), ordered(&case["expected"]), "{name}");
+    }
+}
