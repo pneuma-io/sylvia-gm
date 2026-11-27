@@ -126,6 +126,13 @@ fn unique_keys_flatten(constructor: &mut Constructor, node: NodeId) -> Result<()
     constructor.base_flatten_mapping(node)
 }
 
+/// `yaml.load(runtime_bytes.decode("utf-8"), Loader=_BoundedRuntimeLoader)`: the raw runtime
+/// document as the execution loader builds it, the graph checked first, for readers that need
+/// the authored tables rather than [`RuntimeTables`] (`AuthorityOwner.inspect_package_candidate`).
+pub fn load_bounded_runtime_yaml(runtime_bytes: &[u8]) -> Result<Data, PackageRuntimeFailure> {
+    load_yaml(runtime_bytes, false)
+}
+
 /// `yaml.load(text, Loader=_UniqueRuntimeLoader)` with `_load_runtime`'s exception handling.
 /// `yaml.load(text, Loader=_UniqueRuntimeLoader if authoring else _BoundedRuntimeLoader)`: both
 /// check the node graph first; only the authoring loader refuses duplicate keys.

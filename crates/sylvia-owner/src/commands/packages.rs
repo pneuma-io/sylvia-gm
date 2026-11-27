@@ -1,6 +1,4 @@
-//! `interfaces/commands/packages.py`: the package commands. `handle_export_package_candidate`,
-//! `handle_install_package` and `handle_install_package_file` are ported; inspecting candidates
-//! comes with its owner operations.
+//! `interfaces/commands/packages.py`: the package commands.
 
 use super::campaigns::{required, required_artifact_id, resolve_strict, store_error};
 use crate::dispatch::DispatchContext;
@@ -9,6 +7,44 @@ use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 /// An exception Python's handler does not catch: the owner's internal-error reply, with its class.
 fn os_error(error: &std::io::Error) -> CodedError {
     CodedError::new("internal_error", error.to_string()).with_error_type("OSError")
+}
+
+/// `handle_package_candidates`: every installed candidate, newest first
+/// (`AuthorityOwner.package_candidates`).
+pub async fn handle_package_candidates(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let candidates = ctx.store.call(|store| store.package_candidates()).await.map_err(store_error)?;
+    Ok(Json::Array(candidates.iter().map(candidate_value).collect()))
+}
+
+/// `handle_inspect_package_candidate`: one candidate's static package facts.
+pub async fn handle_inspect_package_candidate(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let candidate_id = required(params, "candidate_id")?;
+    sylvia_app::authority::package_candidates::inspect_package_candidate(&ctx.store, &candidate_id)
+        .await
+        .map(Json::Object)
+        .map_err(store_error)
+}
+
+/// `handle_package_candidate_text`: one admitted text file of a candidate's package. The three
+/// texts are read in order before the owner is asked.
+pub async fn handle_package_candidate_text(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let candidate_id = required(params, "candidate_id")?;
+    let package_id = required(params, "package_id")?;
+    let path = required(params, "path")?;
+    sylvia_app::authority::package_candidates::package_candidate_text(&ctx.store, &candidate_id, &package_id, &path)
+        .await
+        .map(Json::Object)
+        .map_err(store_error)
+}
+
+/// `handle_compare_package_candidates`: two candidates' closures compared by package.
+pub async fn handle_compare_package_candidates(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let left = required(params, "left_candidate_id")?;
+    let right = required(params, "right_candidate_id")?;
+    sylvia_app::authority::package_candidates::compare_package_candidates(&ctx.store, &left, &right)
+        .await
+        .map(Json::Object)
+        .map_err(store_error)
 }
 
 /// `handle_export_package_candidate`, for `export_package_candidate` and

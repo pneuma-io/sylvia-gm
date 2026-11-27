@@ -1125,6 +1125,18 @@ pub async fn handle_campaign_creation_catalog(ctx: &DispatchContext, params: &Js
     Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
 }
 
+/// `handle_snapshot` and `handle_display_snapshot`: the desktop's snapshot of a campaign
+/// (`AuthorityOwner.desktop_snapshot`), complete or, for `display_snapshot`, display-only.
+pub async fn handle_snapshot(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_app::authority::snapshots::{desktop_snapshot, DesktopSnapshot};
+    let campaign_id = required(params, "campaign_id")?;
+    let display_only = ctx.method == "display_snapshot";
+    match desktop_snapshot(&ctx.store, &campaign_id, display_only).await.map_err(store_error)? {
+        DesktopSnapshot::Full(snapshot) => crate::owner_json::snapshot_value(&snapshot),
+        DesktopSnapshot::Display(snapshot) => crate::owner_json::display_snapshot_value(&snapshot),
+    }
+}
+
 /// `handle_catalog`: the campaign's admitted tools (`AuthorityOwner.catalog(campaign_id)`), each
 /// as its package identity, name, capability and input schema.
 pub async fn handle_catalog(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {

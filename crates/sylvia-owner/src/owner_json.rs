@@ -283,3 +283,153 @@ pub fn session_run_value(result: &sylvia_agent::session_loop::SessionRunResult) 
     value.insert("interruption".into(), result.interruption.as_ref().map_or(Json::Null, interruption_value));
     Ok(Json::Object(value))
 }
+
+fn optional_text(value: &Option<String>) -> Json {
+    value.clone().map_or(Json::Null, Json::String)
+}
+
+/// `_json_value(Participant)`: the dataclass fields in declaration order.
+fn participant_value(participant: &sylvia_domain::authority::Participant) -> CodedResult<Json> {
+    let fields = participant.fields();
+    let mut value = JsonMap::new();
+    value.insert("participant_id".into(), fields.participant_id.clone().into());
+    value.insert("kind".into(), fields.kind.clone().into());
+    value.insert("package_id".into(), fields.package_id.clone().into());
+    value.insert("package_version".into(), fields.package_version.clone().into());
+    value.insert("data".into(), mapping_value(&fields.data)?);
+    value.insert("package_sha256".into(), optional_text(&fields.package_sha256));
+    value.insert("schema_id".into(), optional_text(&fields.schema_id));
+    value.insert("schema_sha256".into(), optional_text(&fields.schema_sha256));
+    value.insert("validation_status".into(), participant.validation_status().as_str().into());
+    value.insert("adaptation_id".into(), optional_text(&fields.adaptation_id));
+    Ok(Json::Object(value))
+}
+
+/// `_json_value(ActionRecord)`.
+fn action_record_value(action: &sylvia_domain::authority::ActionRecord) -> CodedResult<Json> {
+    let mut value = JsonMap::new();
+    value.insert("action_id".into(), action.action_id.clone().into());
+    value.insert("turn_id".into(), action.turn_id.clone().into());
+    value.insert("status".into(), action.status.as_str().into());
+    value.insert("expected_revision".into(), action.expected_revision.into());
+    value.insert("resulting_revision".into(), action.resulting_revision.into());
+    value.insert("writer".into(), action.writer.as_str().into());
+    value.insert("package_id".into(), action.package_id.clone().into());
+    value.insert("package_version".into(), action.package_version.clone().into());
+    value.insert("package_sha256".into(), action.package_sha256.clone().into());
+    value.insert("tool_name".into(), action.tool_name.clone().into());
+    value.insert("parameters".into(), mapping_value(&action.parameters)?);
+    value.insert("result".into(), mapping_value(&action.result)?);
+    Ok(Json::Object(value))
+}
+
+fn mappings_value(items: &[JsonMap]) -> CodedResult<Json> {
+    Ok(Json::Array(items.iter().map(mapping_value).collect::<CodedResult<_>>()?))
+}
+
+/// `_json_value(CampaignContinuityView)`, with its records.
+fn continuity_value(view: &sylvia_domain::authority::CampaignContinuityView) -> CodedResult<Json> {
+    let mut records = Vec::with_capacity(view.records.len());
+    for record in &view.records {
+        let mut value = JsonMap::new();
+        value.insert("entry_id".into(), record.entry_id.clone().into());
+        value.insert("record_id".into(), record.record_id.clone().into());
+        value.insert("kind".into(), record.kind.clone().into());
+        value.insert("status".into(), record.status.clone().into());
+        value.insert("payload".into(), mapping_value(&record.payload)?);
+        value.insert(
+            "basis_message_ids".into(),
+            Json::Array(record.basis_message_ids.iter().cloned().map(Json::String).collect()),
+        );
+        value.insert("admitted_revision".into(), record.admitted_revision.into());
+        value.insert("operation_id".into(), optional_text(&record.operation_id));
+        records.push(Json::Object(value));
+    }
+    let mut value = JsonMap::new();
+    value.insert(
+        "current_scene".into(),
+        match &view.current_scene {
+            Some(scene) => mapping_value(scene)?,
+            None => Json::Null,
+        },
+    );
+    value.insert("facts".into(), mappings_value(&view.facts)?);
+    value.insert("reveals".into(), mapping_value(&view.reveals)?);
+    value.insert("plan_progress".into(), mappings_value(&view.plan_progress)?);
+    value.insert("records".into(), Json::Array(records));
+    Ok(Json::Object(value))
+}
+
+/// `CampaignState`'s fields, which both snapshots begin with.
+fn campaign_state_fields(state: &sylvia_domain::authority::CampaignState) -> CodedResult<JsonMap> {
+    let mut lock = JsonMap::new();
+    lock.insert("entries".into(), sylvia_store::guided_start::package_lock_payload(&state.package_lock));
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), state.campaign_id.clone().into());
+    value.insert("display_name".into(), state.display_name.clone().into());
+    value.insert("lifecycle".into(), state.lifecycle.as_str().into());
+    value.insert("writer".into(), state.writer.as_str().into());
+    value.insert("revision".into(), state.revision.into());
+    value.insert("package_lock".into(), Json::Object(lock));
+    value.insert("state".into(), mapping_value(&state.state)?);
+    value.insert(
+        "participants".into(),
+        Json::Array(state.participants.iter().map(participant_value).collect::<CodedResult<_>>()?),
+    );
+    Ok(value)
+}
+
+/// The actions and events both snapshots carry after the state.
+fn history_fields(
+    value: &mut JsonMap,
+    actions: &[sylvia_domain::authority::ActionRecord],
+    events: &[sylvia_domain::authority::CanonicalEvent],
+) -> CodedResult<()> {
+    value.insert("actions".into(), Json::Array(actions.iter().map(action_record_value).collect::<CodedResult<_>>()?));
+    value.insert("events".into(), Json::Array(events.iter().map(canonical_event_value).collect::<CodedResult<_>>()?));
+    Ok(())
+}
+
+/// `turns`, a `Mapping[str, TurnStatus]`, by value in insertion order.
+fn turns_value(turns: &[(String, sylvia_domain::authority::TurnStatus)]) -> Json {
+    Json::Object(turns.iter().map(|(turn_id, status)| (turn_id.clone(), status.as_str().into())).collect())
+}
+
+/// `_json_value(CampaignDisplaySnapshot)`.
+pub fn display_snapshot_value(snapshot: &sylvia_domain::authority::CampaignDisplaySnapshot) -> CodedResult<Json> {
+    let mut value = campaign_state_fields(&snapshot.state)?;
+    history_fields(&mut value, &snapshot.actions, &snapshot.events)?;
+    value.insert("turns".into(), turns_value(&snapshot.turns));
+    value.insert("continuity".into(), continuity_value(&snapshot.continuity)?);
+    Ok(Json::Object(value))
+}
+
+/// `_json_value(CampaignSnapshot)`: mutations and consequences come after the events.
+pub fn snapshot_value(snapshot: &sylvia_domain::authority::CampaignSnapshot) -> CodedResult<Json> {
+    let mut value = campaign_state_fields(&snapshot.state)?;
+    history_fields(&mut value, &snapshot.actions, &snapshot.events)?;
+    let mut mutations = Vec::with_capacity(snapshot.mutations.len());
+    for item in &snapshot.mutations {
+        let mut mutation = JsonMap::new();
+        mutation.insert("action_id".into(), item.action_id.clone().into());
+        mutation.insert("ordinal".into(), item.ordinal.into());
+        mutation.insert("namespace".into(), item.namespace.clone().into());
+        mutation.insert("key".into(), item.key.clone().into());
+        mutation.insert("before".into(), json_value(&item.before)?);
+        mutation.insert("after".into(), json_value(&item.after)?);
+        mutations.push(Json::Object(mutation));
+    }
+    value.insert("mutations".into(), Json::Array(mutations));
+    let mut consequences = Vec::with_capacity(snapshot.consequences.len());
+    for item in &snapshot.consequences {
+        let mut consequence = JsonMap::new();
+        consequence.insert("action_id".into(), item.action_id.clone().into());
+        consequence.insert("ordinal".into(), item.ordinal.into());
+        consequence.insert("payload".into(), mapping_value(&item.payload)?);
+        consequences.push(Json::Object(consequence));
+    }
+    value.insert("consequences".into(), Json::Array(consequences));
+    value.insert("turns".into(), turns_value(&snapshot.turns));
+    value.insert("continuity".into(), continuity_value(&snapshot.continuity)?);
+    Ok(Json::Object(value))
+}
