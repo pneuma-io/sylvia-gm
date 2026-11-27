@@ -62,6 +62,7 @@ pub mod plan_snapshot;
 pub mod plan_spatial_admission;
 pub mod plan_state_admission;
 pub mod player_actions;
+pub mod reference_text;
 pub mod result_card_admission;
 pub mod result_cards;
 pub mod reusable_library_deletion;

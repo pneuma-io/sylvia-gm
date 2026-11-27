@@ -203,7 +203,7 @@ pub(super) fn character_update_tool(
 
 /// `_character_update_options(campaign_id)`: the bookkeeping tool's exact package schema with
 /// the revision it must name.
-fn character_update_options(store: &AuthorityStore, campaign_id: &str) -> StoreResult<JsonMap> {
+pub(super) fn character_update_options(store: &AuthorityStore, campaign_id: &str) -> StoreResult<JsonMap> {
     let Some(tool) = character_update_tool(store, campaign_id)? else { return Ok(JsonMap::new()) };
     // `_character_update_options`: the exact package schema with the revision it must name.
     let object = |value: Option<&Json>, key: &str| match value {
