@@ -644,6 +644,54 @@ impl TurnOwner for Recorded {
             has_compaction: result["has_compaction"].as_bool().unwrap(),
         })
     }
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
+        ready(opt(&self.next("current_open_turn", serde_json::json!([campaign_id]))))
+    }
+    fn update_campaign_file<'a>(
+        &'a self,
+        session_id: &'a str,
+        update_id: &'a str,
+        updates: Vec<JsonMap>,
+        basis_message_ids: Vec<String>,
+        turn_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let args = serde_json::json!([session_id, update_id, updates, basis_message_ids, turn_id]);
+        let outcome = self.answer("update_campaign_file", args);
+        Box::pin(async move { outcome })
+    }
+    fn search_campaign_knowledge<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        query: &'a J,
+        sources: Option<&'a J>,
+        limit: &'a J,
+        offset: &'a J,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let args = serde_json::json!([campaign_id, query, sources, limit, offset]);
+        let outcome = self.answer("search_campaign_knowledge", args);
+        Box::pin(async move { outcome })
+    }
+    fn read_campaign_reference<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        source: &'a J,
+        path: &'a J,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let outcome = self.answer("read_campaign_reference", serde_json::json!([campaign_id, source, path]));
+        Box::pin(async move { outcome })
+    }
+}
+
+impl Recorded {
+    /// The next call's object result, or the refusal Python's call raised, rebuilt in its class.
+    pub fn answer(&self, name: &str, args: J) -> Result<JsonMap, AuthorityFailure> {
+        let raised = self.reads.lock().unwrap().first().and_then(|read| read.get("raised")).cloned();
+        let result = self.next(name, args);
+        match raised {
+            Some(raised) => Err(recorded_failure(&raised)),
+            None => Ok(map(&result)),
+        }
+    }
 }
 
 /// `plain(command)` for an `ActionCommand`.
