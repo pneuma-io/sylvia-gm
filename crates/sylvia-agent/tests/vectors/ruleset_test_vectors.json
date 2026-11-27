@@ -1,0 +1,4732 @@
+{
+ "python": "3.12",
+ "checked_outcomes": [
+  {
+   "name": "state_covers_committed",
+   "assertions": [
+    {
+     "subject": "state",
+     "path": [
+      "x"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "attack",
+     "context": {
+      "roll": 4
+     }
+    }
+   },
+   "tool_results": [
+    {
+     "tool": "move",
+     "result": {
+      "status": "action_committed"
+     }
+    },
+    {
+     "tool": "look",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [
+     "attack",
+     "move"
+    ],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "state_without_path",
+   "assertions": [
+    {
+     "subject": "state",
+     "path": [],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "attack",
+     "context": {
+      "roll": 4
+     }
+    }
+   },
+   "tool_results": [
+    {
+     "tool": "move",
+     "result": {
+      "status": "action_committed"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "receipt_context",
+   "assertions": [
+    {
+     "subject": "receipt",
+     "path": [
+      "result",
+      "context",
+      "roll"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "attack",
+     "context": {
+      "roll": 4
+     }
+    }
+   },
+   "tool_results": [],
+   "expected": {
+    "actions": [
+     "attack"
+    ],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "receipt_context_too_short",
+   "assertions": [
+    {
+     "subject": "receipt",
+     "path": [
+      "result",
+      "context"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "attack",
+     "context": {
+      "roll": 4
+     }
+    }
+   },
+   "tool_results": [],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "receipt_not_committed",
+   "assertions": [
+    {
+     "subject": "receipt",
+     "path": [
+      "result",
+      "context",
+      "roll"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "rejected",
+    "result": {
+     "tool": "attack"
+    }
+   },
+   "tool_results": [],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "control_path",
+   "assertions": [
+    {
+     "subject": "control",
+     "path": [
+      "owner"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "attack",
+     "context": {
+      "roll": 4
+     }
+    }
+   },
+   "tool_results": [],
+   "expected": {
+    "actions": [
+     "attack"
+    ],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "control_empty_receipt",
+   "assertions": [
+    {
+     "subject": "control",
+     "path": [
+      "owner"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {},
+   "tool_results": [],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "control_no_receipt",
+   "assertions": [
+    {
+     "subject": "control",
+     "path": [
+      "owner"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "receipt_without_tool",
+   "assertions": [
+    {
+     "subject": "control",
+     "path": [
+      "owner"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {}
+   },
+   "tool_results": [],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_committed",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      0,
+      "result",
+      "result",
+      "total"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "roll",
+     "result": {
+      "status": "action_committed"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [
+     "roll"
+    ],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_committed_short",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      0,
+      "result",
+      "result"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "roll",
+     "result": {
+      "status": "action_committed"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_rejected",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      1,
+      "result",
+      "status"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "roll",
+     "result": {
+      "status": "action_committed"
+     }
+    },
+    {
+     "tool": "cast",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [
+     "cast"
+    ],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_precondition",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      0,
+      "result",
+      "code"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "cast",
+     "result": {
+      "status": "action_failed",
+      "code": "ruleset_precondition_failed"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [
+     "cast"
+    ],
+    "preconditions": [
+     "cast"
+    ]
+   }
+  },
+  {
+   "name": "tool_result_wrong_key",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      0,
+      "result",
+      "message"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "cast",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_out_of_range",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      3,
+      "result",
+      "status"
+     ],
+     "equals": null
+    },
+    {
+     "subject": "tool_results",
+     "path": [
+      -1,
+      "result",
+      "status"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "cast",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_not_result",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      0,
+      "tool",
+      "status"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "cast",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_bool_index",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      true,
+      "result",
+      "status"
+     ],
+     "equals": null
+    },
+    {
+     "subject": "tool_results",
+     "path": [
+      0.0,
+      "result",
+      "status"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "cast",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "tool_result_huge_index",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      9223372036854775808,
+      "result",
+      "status"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "cast",
+     "result": {
+      "status": "rejected"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "receipt_and_tool_committed",
+   "assertions": [
+    {
+     "subject": "state",
+     "path": [
+      "hp"
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "heal"
+    }
+   },
+   "tool_results": [
+    {
+     "tool": "heal",
+     "result": {
+      "status": "action_committed"
+     }
+    },
+    {
+     "tool": "bless",
+     "result": {
+      "status": "action_committed"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [
+     "bless",
+     "heal"
+    ],
+    "rejections": [],
+    "preconditions": []
+   }
+  },
+  {
+   "name": "mixed",
+   "assertions": [
+    {
+     "subject": "tool_results",
+     "path": [
+      0,
+      "result",
+      "status"
+     ],
+     "equals": null
+    },
+    {
+     "subject": "state",
+     "path": [
+      "hp"
+     ],
+     "equals": null
+    },
+    {
+     "subject": "available_tools",
+     "path": [
+      0
+     ],
+     "equals": null
+    }
+   ],
+   "receipt": null,
+   "tool_results": [
+    {
+     "tool": "b",
+     "result": {
+      "status": "rejected",
+      "code": "ruleset_precondition_failed"
+     }
+    },
+    {
+     "tool": "a",
+     "result": {
+      "status": "action_committed"
+     }
+    }
+   ],
+   "expected": {
+    "actions": [
+     "a"
+    ],
+    "rejections": [
+     "b"
+    ],
+    "preconditions": [
+     "b"
+    ]
+   }
+  }
+ ],
+ "summarize_coverage": [
+  {
+   "name": "empty",
+   "required": [
+    "a"
+   ],
+   "results": [],
+   "scenarios": [],
+   "required_rejections": null,
+   "required_preconditions": null,
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "a"
+    ],
+    "checked_actions": [],
+    "checked_rejections": [],
+    "missing_actions": [
+     "a"
+    ],
+    "unproven_claims": [],
+    "missing_rejections": [],
+    "interaction_scenarios": [],
+    "missing_interaction": false,
+    "missing_preconditions": [],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "one_checked",
+   "required": [
+    "a",
+    "b"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a"
+        ],
+        "rejections": []
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "s1",
+     "covers": [
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": null,
+   "required_preconditions": null,
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "a",
+     "b"
+    ],
+    "checked_actions": [
+     "a"
+    ],
+    "checked_rejections": [],
+    "missing_actions": [
+     "b"
+    ],
+    "unproven_claims": [],
+    "missing_rejections": [],
+    "interaction_scenarios": [],
+    "missing_interaction": true,
+    "missing_preconditions": [],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "failed_scenario_counts_nothing",
+   "required": [
+    "a"
+   ],
+   "results": [
+    {
+     "status": "failed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a"
+        ],
+        "rejections": []
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "s1",
+     "covers": [
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": null,
+   "required_preconditions": null,
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "a"
+    ],
+    "checked_actions": [],
+    "checked_rejections": [],
+    "missing_actions": [
+     "a"
+    ],
+    "unproven_claims": [
+     "a"
+    ],
+    "missing_rejections": [],
+    "interaction_scenarios": [],
+    "missing_interaction": false,
+    "missing_preconditions": [],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "unproven_claim",
+   "required": [
+    "a",
+    "b"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a"
+        ],
+        "rejections": []
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "s1",
+     "covers": [
+      "a",
+      "b",
+      "c"
+     ]
+    }
+   ],
+   "required_rejections": [
+    "a"
+   ],
+   "required_preconditions": null,
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "a",
+     "b"
+    ],
+    "checked_actions": [
+     "a"
+    ],
+    "checked_rejections": [],
+    "missing_actions": [
+     "b"
+    ],
+    "unproven_claims": [
+     "b",
+     "c"
+    ],
+    "missing_rejections": [
+     "a"
+    ],
+    "interaction_scenarios": [],
+    "missing_interaction": true,
+    "missing_preconditions": [],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "interaction_and_rejections",
+   "required": [
+    "a",
+    "b",
+    "c"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a",
+         "b"
+        ],
+        "rejections": [
+         "c"
+        ],
+        "preconditions": [
+         "c",
+         "z"
+        ]
+       }
+      },
+      {
+       "coverage": {
+        "actions": [
+         "c"
+        ],
+        "rejections": []
+       }
+      }
+     ]
+    },
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "b"
+        ],
+        "rejections": [
+         "a"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "s1",
+     "covers": [
+      "a",
+      "b",
+      "c"
+     ]
+    },
+    {
+     "id": "s2",
+     "covers": [
+      "b",
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": [
+    "a",
+    "c",
+    "d"
+   ],
+   "required_preconditions": [
+    "c",
+    "e"
+   ],
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "a",
+     "b",
+     "c"
+    ],
+    "checked_actions": [
+     "a",
+     "b",
+     "c"
+    ],
+    "checked_rejections": [
+     "a",
+     "c"
+    ],
+    "missing_actions": [],
+    "unproven_claims": [],
+    "missing_rejections": [
+     "d"
+    ],
+    "interaction_scenarios": [
+     "s1"
+    ],
+    "missing_interaction": false,
+    "missing_preconditions": [
+     "e"
+    ],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "handoff",
+   "required": [
+    "a"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a"
+        ],
+        "rejections": [],
+        "handoff_phases": [
+         "held"
+        ]
+       }
+      },
+      {
+       "coverage": {
+        "actions": [],
+        "rejections": [],
+        "handoff_phases": [
+         "released",
+         "held"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a"
+        ],
+        "rejections": [],
+        "handoff_phases": [
+         "held"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "h1",
+     "covers": [
+      "a"
+     ]
+    },
+    {
+     "id": "h2",
+     "covers": [
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": null,
+   "required_preconditions": null,
+   "requires_handoff": true,
+   "expected": {
+    "required_actions": [
+     "a"
+    ],
+    "checked_actions": [
+     "a"
+    ],
+    "checked_rejections": [],
+    "missing_actions": [],
+    "unproven_claims": [],
+    "missing_rejections": [],
+    "interaction_scenarios": [],
+    "missing_interaction": false,
+    "missing_preconditions": [],
+    "handoff_scenarios": [
+     "h1"
+    ],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "handoff_missing",
+   "required": [
+    "a"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a"
+        ],
+        "rejections": [],
+        "handoff_phases": [
+         "released"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "h1",
+     "covers": [
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": [],
+   "required_preconditions": [],
+   "requires_handoff": true,
+   "expected": {
+    "required_actions": [
+     "a"
+    ],
+    "checked_actions": [
+     "a"
+    ],
+    "checked_rejections": [],
+    "missing_actions": [],
+    "unproven_claims": [],
+    "missing_rejections": [],
+    "interaction_scenarios": [],
+    "missing_interaction": false,
+    "missing_preconditions": [],
+    "handoff_scenarios": [],
+    "missing_handoff": true
+   }
+  },
+  {
+   "name": "undeclared_observed",
+   "required": [
+    "a",
+    "b"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "a",
+         "b"
+        ],
+        "rejections": [
+         "b"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "s1",
+     "covers": [
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": [
+    "b"
+   ],
+   "required_preconditions": [
+    "a"
+   ],
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "a",
+     "b"
+    ],
+    "checked_actions": [
+     "a"
+    ],
+    "checked_rejections": [],
+    "missing_actions": [
+     "b"
+    ],
+    "unproven_claims": [],
+    "missing_rejections": [
+     "b"
+    ],
+    "interaction_scenarios": [],
+    "missing_interaction": true,
+    "missing_preconditions": [
+     "a"
+    ],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  },
+  {
+   "name": "unicode_order",
+   "required": [
+    "Z",
+    "a",
+    "z",
+    "\u00e9"
+   ],
+   "results": [
+    {
+     "status": "passed",
+     "steps": [
+      {
+       "coverage": {
+        "actions": [
+         "\u00e9",
+         "Z"
+        ],
+        "rejections": []
+       }
+      }
+     ]
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "s1",
+     "covers": [
+      "\u00e9",
+      "Z",
+      "a"
+     ]
+    }
+   ],
+   "required_rejections": null,
+   "required_preconditions": null,
+   "requires_handoff": false,
+   "expected": {
+    "required_actions": [
+     "Z",
+     "a",
+     "z",
+     "\u00e9"
+    ],
+    "checked_actions": [
+     "Z",
+     "\u00e9"
+    ],
+    "checked_rejections": [],
+    "missing_actions": [
+     "a",
+     "z"
+    ],
+    "unproven_claims": [
+     "a"
+    ],
+    "missing_rejections": [],
+    "interaction_scenarios": [
+     "s1"
+    ],
+    "missing_interaction": false,
+    "missing_preconditions": [],
+    "handoff_scenarios": [],
+    "missing_handoff": false
+   }
+  }
+ ],
+ "assertions": {
+  "observations": {
+   "state": {
+    "hp": 3,
+    "ratio": 0.5,
+    "flag": true,
+    "items": [
+     1,
+     {
+      "k": "v"
+     }
+    ],
+    "none": null,
+    "one": 1,
+    "nested": {
+     "list": [
+      1,
+      true,
+      1.0
+     ]
+    }
+   },
+   "receipt": {
+    "status": "committed",
+    "result": {
+     "tool": "attack"
+    }
+   },
+   "tool_results": [
+    {
+     "tool": "roll",
+     "result": {
+      "status": "action_committed",
+      "result": {
+       "total": 7
+      }
+     }
+    }
+   ],
+   "control": null,
+   "available_tools": [
+    "attack",
+    "roll"
+   ]
+  },
+  "cases": [
+   {
+    "name": "exact",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "hp"
+      ],
+      "equals": 3
+     },
+     {
+      "subject": "state",
+      "path": [
+       "ratio"
+      ],
+      "equals": 0.5
+     }
+    ],
+    "failures": []
+   },
+   {
+    "name": "int_is_not_float",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "hp"
+      ],
+      "equals": 3.0
+     },
+     {
+      "subject": "state",
+      "path": [
+       "ratio"
+      ],
+      "equals": 0
+     }
+    ],
+    "failures": [
+     {
+      "subject": "state",
+      "path": [
+       "hp"
+      ],
+      "expected": 3.0,
+      "actual": 3,
+      "missing": false
+     },
+     {
+      "subject": "state",
+      "path": [
+       "ratio"
+      ],
+      "expected": 0,
+      "actual": 0.5,
+      "missing": false
+     }
+    ]
+   },
+   {
+    "name": "bool_is_not_int",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "flag"
+      ],
+      "equals": 1
+     },
+     {
+      "subject": "state",
+      "path": [
+       "one"
+      ],
+      "equals": true
+     }
+    ],
+    "failures": [
+     {
+      "subject": "state",
+      "path": [
+       "flag"
+      ],
+      "expected": 1,
+      "actual": true,
+      "missing": false
+     },
+     {
+      "subject": "state",
+      "path": [
+       "one"
+      ],
+      "expected": true,
+      "actual": 1,
+      "missing": false
+     }
+    ]
+   },
+   {
+    "name": "nested_python_equality",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "nested"
+      ],
+      "equals": {
+       "list": [
+        true,
+        1.0,
+        1
+       ]
+      }
+     },
+     {
+      "subject": "state",
+      "path": [
+       "items"
+      ],
+      "equals": [
+       1.0,
+       {
+        "k": "v"
+       }
+      ]
+     }
+    ],
+    "failures": []
+   },
+   {
+    "name": "missing_is_not_null",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "absent"
+      ],
+      "equals": null
+     },
+     {
+      "subject": "state",
+      "path": [
+       "none"
+      ],
+      "equals": null
+     }
+    ],
+    "failures": [
+     {
+      "subject": "state",
+      "path": [
+       "absent"
+      ],
+      "expected": null,
+      "actual": null,
+      "missing": true
+     }
+    ]
+   },
+   {
+    "name": "list_index",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       1,
+       "k"
+      ],
+      "equals": "v"
+     },
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       2
+      ],
+      "equals": 1
+     },
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       -1
+      ],
+      "equals": 1
+     },
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       true
+      ],
+      "equals": 1
+     }
+    ],
+    "failures": [
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       2
+      ],
+      "expected": 1,
+      "actual": null,
+      "missing": true
+     },
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       -1
+      ],
+      "expected": 1,
+      "actual": null,
+      "missing": true
+     },
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       true
+      ],
+      "expected": 1,
+      "actual": null,
+      "missing": true
+     }
+    ]
+   },
+   {
+    "name": "key_on_list_and_index_on_dict",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       "0"
+      ],
+      "equals": 1
+     },
+     {
+      "subject": "state",
+      "path": [
+       0
+      ],
+      "equals": 3
+     }
+    ],
+    "failures": [
+     {
+      "subject": "state",
+      "path": [
+       "items",
+       "0"
+      ],
+      "expected": 1,
+      "actual": null,
+      "missing": true
+     },
+     {
+      "subject": "state",
+      "path": [
+       0
+      ],
+      "expected": 3,
+      "actual": null,
+      "missing": true
+     }
+    ]
+   },
+   {
+    "name": "whole_subject",
+    "expected": [
+     {
+      "subject": "control",
+      "path": [],
+      "equals": null
+     },
+     {
+      "subject": "available_tools",
+      "path": [],
+      "equals": [
+       "attack",
+       "roll"
+      ]
+     },
+     {
+      "subject": "receipt",
+      "path": [
+       "result"
+      ],
+      "equals": {
+       "tool": "attack"
+      }
+     }
+    ],
+    "failures": []
+   },
+   {
+    "name": "tool_results",
+    "expected": [
+     {
+      "subject": "tool_results",
+      "path": [
+       0,
+       "result",
+       "result",
+       "total"
+      ],
+      "equals": 7
+     },
+     {
+      "subject": "tool_results",
+      "path": [
+       0,
+       "tool"
+      ],
+      "equals": "cast"
+     }
+    ],
+    "failures": [
+     {
+      "subject": "tool_results",
+      "path": [
+       0,
+       "tool"
+      ],
+      "expected": "cast",
+      "actual": "roll",
+      "missing": false
+     }
+    ]
+   },
+   {
+    "name": "through_scalar",
+    "expected": [
+     {
+      "subject": "state",
+      "path": [
+       "hp",
+       "x"
+      ],
+      "equals": 1
+     },
+     {
+      "subject": "control",
+      "path": [
+       "owner"
+      ],
+      "equals": "gm"
+     }
+    ],
+    "failures": [
+     {
+      "subject": "state",
+      "path": [
+       "hp",
+       "x"
+      ],
+      "expected": 1,
+      "actual": null,
+      "missing": true
+     },
+     {
+      "subject": "control",
+      "path": [
+       "owner"
+      ],
+      "expected": "gm",
+      "actual": null,
+      "missing": true
+     }
+    ]
+   }
+  ],
+  "unknown_subject": "KeyError"
+ },
+ "dice": [
+  {
+   "name": "exact",
+   "rolls": [
+    {
+     "sides": 20,
+     "value": 13
+    },
+    {
+     "sides": 6,
+     "value": 1
+    }
+   ],
+   "calls": [
+    [
+     1,
+     20
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "outcomes": [
+    {
+     "value": 13
+    },
+    {
+     "value": 1
+    }
+   ],
+   "failure": null,
+   "finished": null
+  },
+  {
+   "name": "table_draw",
+   "rolls": [
+    {
+     "sides": 4,
+     "value": 4
+    }
+   ],
+   "calls": [
+    [
+     0,
+     3
+    ]
+   ],
+   "outcomes": [
+    {
+     "value": 3
+    }
+   ],
+   "failure": null,
+   "finished": null
+  },
+  {
+   "name": "too_many",
+   "rolls": [
+    {
+     "sides": 6,
+     "value": 2
+    }
+   ],
+   "calls": [
+    [
+     1,
+     6
+    ],
+    [
+     1,
+     6
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "outcomes": [
+    {
+     "value": 2
+    },
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The game requested more rolls than the scenario supplies."
+    },
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The game requested more rolls than the scenario supplies."
+    }
+   ],
+   "failure": "The game requested more rolls than the scenario supplies.",
+   "finished": {
+    "raised": "ScenarioScriptError",
+    "message": "The game requested more rolls than the scenario supplies."
+   }
+  },
+  {
+   "name": "wrong_size",
+   "rolls": [
+    {
+     "sides": 8,
+     "value": 2
+    },
+    {
+     "sides": 6,
+     "value": 3
+    }
+   ],
+   "calls": [
+    [
+     1,
+     6
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   "outcomes": [
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The requested die size differs from the scripted roll."
+    },
+    {
+     "value": 3
+    }
+   ],
+   "failure": "The requested die size differs from the scripted roll.",
+   "finished": {
+    "raised": "ScenarioScriptError",
+    "message": "The requested die size differs from the scripted roll."
+   }
+  },
+  {
+   "name": "unused",
+   "rolls": [
+    {
+     "sides": 6,
+     "value": 2
+    },
+    {
+     "sides": 6,
+     "value": 5
+    }
+   ],
+   "calls": [
+    [
+     1,
+     6
+    ]
+   ],
+   "outcomes": [
+    {
+     "value": 2
+    }
+   ],
+   "failure": null,
+   "finished": {
+    "raised": "ScenarioScriptError",
+    "message": "The scenario finished with unused scripted rolls."
+   }
+  },
+  {
+   "name": "none",
+   "rolls": [],
+   "calls": [],
+   "outcomes": [],
+   "failure": null,
+   "finished": null
+  }
+ ],
+ "failure_message": {
+  "raised": [
+   {
+    "class": "CommandRejected",
+    "code": "command_rejected",
+    "message": "CommandRejected (command_rejected)"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "archive_invalid",
+    "message": "CommandRejected (archive_invalid)"
+   },
+   {
+    "class": "MechanicsRejected",
+    "code": "mechanics_rejected",
+    "message": "MechanicsRejected (mechanics_rejected)"
+   },
+   {
+    "class": "RulesetPreconditionRejected",
+    "code": "ruleset_precondition_failed",
+    "message": "RulesetPreconditionRejected (ruleset_precondition_failed)"
+   },
+   {
+    "class": "SchemaIdentityError",
+    "code": "schema_identity_mismatch",
+    "message": "SchemaIdentityError (schema_identity_mismatch)"
+   },
+   {
+    "class": "StaleRevision",
+    "code": "stale_revision",
+    "message": "StaleRevision (stale_revision)"
+   },
+   {
+    "class": "WrongOwner",
+    "code": "wrong_owner",
+    "message": "WrongOwner (wrong_owner)"
+   },
+   {
+    "class": "WrongWriter",
+    "code": "wrong_writer",
+    "message": "WrongWriter (wrong_writer)"
+   },
+   {
+    "class": "OwnerConflict",
+    "code": "owner_conflict",
+    "message": "OwnerConflict (owner_conflict)"
+   },
+   {
+    "class": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "IdempotencyConflict (idempotency_conflict)"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "Upper_case",
+    "message": "CommandRejected"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "9starts_with_digit",
+    "message": "CommandRejected"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "message": "CommandRejected (aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "message": "CommandRejected"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "has-dash",
+    "message": "CommandRejected"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "\u00e9",
+    "message": "CommandRejected"
+   },
+   {
+    "class": "CommandRejected",
+    "code": "",
+    "message": "CommandRejected"
+   },
+   {
+    "class": "ValueError",
+    "code": "ignored_code",
+    "message": "ValueError"
+   },
+   {
+    "class": "KeyError",
+    "code": "ignored_code",
+    "message": "KeyError"
+   },
+   {
+    "class": "RuntimeError",
+    "code": null,
+    "message": "RuntimeError"
+   },
+   {
+    "class": "TypeError",
+    "code": null,
+    "message": "TypeError"
+   },
+   {
+    "class": "StopIteration",
+    "code": null,
+    "message": "StopIteration"
+   }
+  ],
+  "script": {
+   "message": "The scripted operation is not uniquely available.",
+   "expected": "The scripted operation is not uniquely available."
+  }
+ },
+ "provider": [
+  {
+   "name": "tool_reply",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "roll",
+     "arguments": {
+      "dice": "1d20",
+      "note": "\u00e9"
+     },
+     "expect_request": {
+      "decision_owner": "gm",
+      "available_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    [
+     {
+      "content": "",
+      "tool_call_delta": {
+       "index": 0,
+       "id": "scenario-call-1",
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "arguments": "{\"dice\": \"1d20\", \"note\": \"\\u00e9\"}"
+       }
+      },
+      "finish_reason": "tool_calls"
+     }
+    ],
+    "finished"
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "cast",
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "before_discovery",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    }
+   ],
+   "owners": [
+    "none"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     {
+      "content": "The coin lands heads.",
+      "tool_call_delta": null,
+      "finish_reason": "stop"
+     }
+    ],
+    "finished"
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "none",
+     "available_tools": []
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "narration_without_disposition",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    }
+   ],
+   "owners": [
+    "none"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": null
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    [
+     {
+      "content": "The coin lands heads.",
+      "tool_call_delta": null,
+      "finish_reason": "stop"
+     }
+    ]
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "none",
+     "available_tools": []
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "narration_through_disposition",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    }
+   ],
+   "owners": [
+    "player"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "sylvia.narrative",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "update_campaign_file",
+     "capability": "narrative_state.update_campaign_file",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "update_campaign_file tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_a0ed2117acfa_update_campaign_file",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast",
+     "update_campaign_file"
+    ],
+    [
+     {
+      "content": "",
+      "tool_call_delta": {
+       "index": 0,
+       "id": "scenario-call-1",
+       "type": "function",
+       "function": {
+        "name": "tool_a0ed2117acfa_update_campaign_file",
+        "arguments": "{\"state_change\": \"unchanged\", \"state_change_summary\": \"The scenario adds no durable narrative facts.\", \"revised_player_facing_response\": [{\"kind\": \"narration\", \"text\": \"The coin lands heads.\"}]}"
+       }
+      },
+      "finish_reason": "tool_calls"
+     }
+    ]
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "player",
+     "available_tools": [
+      "cast",
+      "roll",
+      "update_campaign_file"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "ambiguous_disposition",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "sylvia.narrative",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "update_campaign_file",
+     "capability": "narrative_state.update_campaign_file",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "update_campaign_file tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "other.narrative",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "update_campaign_file",
+     "capability": "mechanics.update_campaign_file",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "update_campaign_file tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_a0ed2117acfa_update_campaign_file",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_d93644a3a154_update_campaign_file",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "update_campaign_file",
+     "update_campaign_file"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The narration disposition operation is ambiguous."
+    },
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The narration disposition operation is ambiguous."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll",
+      "update_campaign_file"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "The narration disposition operation is ambiguous."
+  },
+  {
+   "name": "not_uniquely_available",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "cast",
+     "arguments": {}
+    },
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    }
+   ],
+   "owners": [
+    "gm",
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The scripted operation is not uniquely available at this request."
+    },
+    [
+     {
+      "content": "The coin lands heads.",
+      "tool_call_delta": null,
+      "finish_reason": "stop"
+     }
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The scripted operation is not uniquely available at this request."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    },
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "cast",
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 2,
+   "failure": "The scripted operation is not uniquely available at this request."
+  },
+  {
+   "name": "owner_differs",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads.",
+     "expect_request": {
+      "decision_owner": "player"
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "Decision owner differs from the saved expectation."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "Decision owner differs from the saved expectation."
+  },
+  {
+   "name": "expected_unavailable",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads.",
+     "expect_request": {
+      "available_tools": [
+       "roll",
+       "cast"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "An expected operation is unavailable at this request."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "An expected operation is unavailable at this request."
+  },
+  {
+   "name": "withheld_available",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads.",
+     "expect_request": {
+      "unavailable_tools": [
+       "missing",
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "An operation expected to be withheld is available at this request."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "An operation expected to be withheld is available at this request."
+  },
+  {
+   "name": "script_ended",
+   "replies": [],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The game loop requested a reply after the saved script ended."
+    },
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The game loop requested a reply after the saved script ended."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 0,
+   "failure": "The game loop requested a reply after the saved script ended."
+  },
+  {
+   "name": "unused_replies",
+   "replies": [
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    },
+    {
+     "kind": "narration",
+     "text": "The coin lands heads."
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    },
+    {
+     "op": "finish"
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    [
+     {
+      "content": "The coin lands heads.",
+      "tool_call_delta": null,
+      "finish_reason": "stop"
+     }
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The game loop finished with unused scripted replies."
+    },
+    {
+     "raised": "ScenarioScriptError",
+     "message": "The game loop finished with unused scripted replies."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "The game loop finished with unused scripted replies."
+  },
+  {
+   "name": "record_none_callable",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "roll",
+     "arguments": {
+      "dice": "1d20",
+      "note": "\u00e9"
+     },
+     "expect_request": {
+      "decision_owner": "gm",
+      "available_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      },
+      {
+       "role": "user",
+       "content": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): no tool can be called at this step. Reply without a tool call; a tool call now is refused."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "An expected operation is unavailable at this request."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": []
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "An expected operation is unavailable at this request."
+  },
+  {
+   "name": "record_only",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "cast",
+     "arguments": {
+      "x": 1
+     },
+     "expect_request": {
+      "unavailable_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      },
+      {
+       "role": "user",
+       "content": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): at this step only these listed tools can be called: tool_6869d2d21616_cast. A call to any other tool is refused."
+      }
+     ],
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    [
+     {
+      "content": "",
+      "tool_call_delta": {
+       "index": 0,
+       "id": "scenario-call-1",
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "arguments": "{\"x\": 1}"
+       }
+      },
+      "finish_reason": "tool_calls"
+     }
+    ]
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "cast"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "record_except",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "roll",
+     "arguments": {
+      "dice": "1d20",
+      "note": "\u00e9"
+     },
+     "expect_request": {
+      "decision_owner": "gm",
+      "available_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_a0ed2117acfa_update_campaign_file",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ],
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      },
+      {
+       "role": "user",
+       "content": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): at this step every listed tool can be called except: tool_a0ed2117acfa_update_campaign_file. A call to one of those is refused."
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    [
+     {
+      "content": "",
+      "tool_call_delta": {
+       "index": 0,
+       "id": "scenario-call-1",
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "arguments": "{\"dice\": \"1d20\", \"note\": \"\\u00e9\"}"
+       }
+      },
+      "finish_reason": "tool_calls"
+     }
+    ]
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "cast",
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "record_every",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "roll",
+     "arguments": {
+      "dice": "1d20",
+      "note": "\u00e9"
+     },
+     "expect_request": {
+      "decision_owner": "gm",
+      "available_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ],
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      },
+      {
+       "role": "user",
+       "content": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): every tool listed in this request can be called at this step."
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    [
+     {
+      "content": "",
+      "tool_call_delta": {
+       "index": 0,
+       "id": "scenario-call-1",
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "arguments": "{\"dice\": \"1d20\", \"note\": \"\\u00e9\"}"
+       }
+      },
+      "finish_reason": "tool_calls"
+     }
+    ]
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "cast",
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "record_latest_applies",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "roll",
+     "arguments": {
+      "dice": "1d20",
+      "note": "\u00e9"
+     },
+     "expect_request": {
+      "decision_owner": "gm",
+      "available_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ],
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      },
+      {
+       "role": "user",
+       "content": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): at this step only these listed tools can be called: tool_ddd6f13103fb_roll. A call to any other tool is refused."
+      },
+      {
+       "role": "user",
+       "content": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): no tool can be called at this step. Reply without a tool call; a tool call now is refused."
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    {
+     "raised": "ScenarioScriptError",
+     "message": "An expected operation is unavailable at this request."
+    }
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": []
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": "An expected operation is unavailable at this request."
+  },
+  {
+   "name": "record_in_list_content",
+   "replies": [
+    {
+     "kind": "tool",
+     "tool": "roll",
+     "arguments": {
+      "dice": "1d20",
+      "note": "\u00e9"
+     },
+     "expect_request": {
+      "decision_owner": "gm",
+      "available_tools": [
+       "roll"
+      ]
+     }
+    }
+   ],
+   "owners": [
+    "gm"
+   ],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "stream",
+     "tools": [
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "tool_6869d2d21616_cast",
+        "description": "",
+        "parameters": {}
+       }
+      },
+      {
+       "type": "function",
+       "function": {
+        "name": "unknown_tool",
+        "description": "",
+        "parameters": {}
+       }
+      }
+     ],
+     "messages": [
+      {
+       "role": "user",
+       "content": [
+        {
+         "type": "text",
+         "text": "SYLVIA_GM_CALLABLE_TOOLS (application control, not player speech; the latest record with this label applies): at this step only these listed tools can be called: tool_ddd6f13103fb_roll. A call to any other tool is refused."
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    [
+     {
+      "content": "",
+      "tool_call_delta": {
+       "index": 0,
+       "id": "scenario-call-1",
+       "type": "function",
+       "function": {
+        "name": "tool_ddd6f13103fb_roll",
+        "arguments": "{\"dice\": \"1d20\", \"note\": \"\\u00e9\"}"
+       }
+      },
+      "finish_reason": "tool_calls"
+     }
+    ]
+   ],
+   "terminal": null,
+   "requests": [
+    {
+     "decision_owner": "gm",
+     "available_tools": [
+      "roll"
+     ]
+    }
+   ],
+   "tool_results": [],
+   "position": 1,
+   "failure": null
+  },
+  {
+   "name": "evidence",
+   "replies": [],
+   "owners": [],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    },
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "cast",
+     "capability": "mechanics.cast",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "cast tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "evidence",
+     "payload": {
+      "kind": "provider_tool_results",
+      "results": [
+       {
+        "name": "tool_ddd6f13103fb_roll",
+        "content": "{\"status\": \"action_committed\", \"action_id\": \"a1\"}"
+       },
+       {
+        "name": "unknown_tool",
+        "content": "[1, 2]"
+       }
+      ]
+     }
+    },
+    {
+     "op": "evidence",
+     "payload": {
+      "kind": "tool_calls",
+      "results": "ignored"
+     }
+    },
+    {
+     "op": "evidence",
+     "payload": {
+      "kind": "provider_tool_results",
+      "results": []
+     }
+    }
+   ],
+   "outputs": [
+    [
+     "roll",
+     "cast"
+    ],
+    "emitted",
+    "emitted",
+    "emitted"
+   ],
+   "terminal": null,
+   "requests": [],
+   "tool_results": [
+    {
+     "tool": "roll",
+     "result": {
+      "status": "action_committed",
+      "action_id": "a1"
+     }
+    },
+    {
+     "tool": "unknown_tool",
+     "result": [
+      1,
+      2
+     ]
+    }
+   ],
+   "position": 0,
+   "failure": null
+  },
+  {
+   "name": "evidence_invalid_json",
+   "replies": [],
+   "owners": [],
+   "catalog": [
+    {
+     "package_id": "example.rules",
+     "package_version": "1.0.0",
+     "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "name": "roll",
+     "capability": "mechanics.roll",
+     "input_schema": {
+      "type": "object"
+     },
+     "parameter_derivations": null,
+     "description": "roll tool",
+     "category": "mechanic",
+     "model_behavior": "optional"
+    }
+   ],
+   "ops": [
+    {
+     "op": "discover",
+     "id": "discovery-1"
+    },
+    {
+     "op": "evidence",
+     "payload": {
+      "kind": "provider_tool_results",
+      "results": [
+       {
+        "name": "tool_ddd6f13103fb_roll",
+        "content": "{"
+       }
+      ]
+     }
+    },
+    {
+     "op": "finish"
+    }
+   ],
+   "outputs": [
+    [
+     "roll"
+    ],
+    "emitted"
+   ],
+   "terminal": {
+    "raised": "JSONDecodeError",
+    "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
+   },
+   "requests": [],
+   "tool_results": [],
+   "position": 0,
+   "failure": null
+  },
+  {
+   "name": "generate",
+   "replies": [],
+   "owners": [],
+   "catalog": [],
+   "ops": [
+    {
+     "op": "generate",
+     "messages": [
+      {
+       "role": "system",
+       "content": "Play."
+      }
+     ]
+    }
+   ],
+   "outputs": [
+    {
+     "raised": "ScenarioScriptError",
+     "message": "Scenario execution requires the ordinary streaming adapter."
+    }
+   ],
+   "terminal": null,
+   "requests": [],
+   "tool_results": [],
+   "position": 0,
+   "failure": null
+  }
+ ],
+ "archives": {
+  "plain": "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",
+  "with_visitor": "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",
+  "not_an_archive": "bm90IGEgcGFja2FnZQ=="
+ },
+ "run_scenario": [
+  {
+   "name": "valid",
+   "archive": "plain",
+   "scenario": {
+    "id": "coin-heads",
+    "description": "A controlled coin flip commits its result.",
+    "covers": [
+     "flip_coin"
+    ],
+    "initial_state": [],
+    "participants": [],
+    "rolls": [
+     {
+      "sides": 2,
+      "value": 2
+     }
+    ],
+    "steps": [
+     {
+      "kind": "gm_turn",
+      "message": "Flip the coin.",
+      "replies": [
+       {
+        "kind": "tool",
+        "tool": "flip_coin",
+        "arguments": {}
+       },
+       {
+        "kind": "narration",
+        "text": "The coin lands heads."
+       }
+      ],
+      "expect": [
+       {
+        "subject": "receipt",
+        "path": [
+         "status"
+        ],
+        "equals": "committed"
+       },
+       {
+        "subject": "receipt",
+        "path": [
+         "result",
+         "context",
+         "_result",
+         "total"
+        ],
+        "equals": 2
+       }
+      ]
+     }
+    ]
+   },
+   "result": {
+    "id": "coin-heads",
+    "status": "passed",
+    "steps": [
+     {
+      "step": 0,
+      "status": "passed",
+      "failures": [],
+      "coverage": {
+       "actions": [
+        "flip_coin"
+       ],
+       "rejections": [],
+       "preconditions": [],
+       "handoff_phases": []
+      }
+     }
+    ]
+   },
+   "reached_campaign": true
+  },
+  {
+   "name": "undeclared_schema",
+   "archive": "plain",
+   "scenario": {
+    "id": "coin-heads",
+    "description": "A controlled coin flip commits its result.",
+    "covers": [
+     "flip_coin"
+    ],
+    "initial_state": [],
+    "participants": [
+     {
+      "id": "visitor",
+      "kind": "player_character",
+      "schema_id": "example.visitor",
+      "data": {
+       "name": "Visitor"
+      }
+     }
+    ],
+    "rolls": [
+     {
+      "sides": 2,
+      "value": 2
+     }
+    ],
+    "steps": [
+     {
+      "kind": "gm_turn",
+      "message": "Flip the coin.",
+      "replies": [
+       {
+        "kind": "tool",
+        "tool": "flip_coin",
+        "arguments": {}
+       },
+       {
+        "kind": "narration",
+        "text": "The coin lands heads."
+       }
+      ],
+      "expect": [
+       {
+        "subject": "receipt",
+        "path": [
+         "status"
+        ],
+        "equals": "committed"
+       },
+       {
+        "subject": "receipt",
+        "path": [
+         "result",
+         "context",
+         "_result",
+         "total"
+        ],
+        "equals": 2
+       }
+      ]
+     }
+    ]
+   },
+   "result": {
+    "id": "coin-heads",
+    "status": "failed",
+    "steps": [],
+    "failures": [
+     {
+      "message": "Participant schema is not declared by the tested Ruleset."
+     }
+    ]
+   },
+   "reached_campaign": false
+  },
+  {
+   "name": "declared_participant",
+   "archive": "with_visitor",
+   "scenario": {
+    "id": "coin-heads",
+    "description": "A controlled coin flip commits its result.",
+    "covers": [
+     "flip_coin"
+    ],
+    "initial_state": [],
+    "participants": [
+     {
+      "id": "visitor",
+      "kind": "player_character",
+      "schema_id": "example.visitor",
+      "data": {
+       "name": "Visitor"
+      }
+     }
+    ],
+    "rolls": [
+     {
+      "sides": 2,
+      "value": 2
+     }
+    ],
+    "steps": [
+     {
+      "kind": "gm_turn",
+      "message": "Flip the coin.",
+      "replies": [
+       {
+        "kind": "tool",
+        "tool": "flip_coin",
+        "arguments": {}
+       },
+       {
+        "kind": "narration",
+        "text": "The coin lands heads."
+       }
+      ],
+      "expect": [
+       {
+        "subject": "receipt",
+        "path": [
+         "status"
+        ],
+        "equals": "committed"
+       },
+       {
+        "subject": "receipt",
+        "path": [
+         "result",
+         "context",
+         "_result",
+         "total"
+        ],
+        "equals": 2
+       }
+      ]
+     }
+    ]
+   },
+   "result": {
+    "id": "coin-heads",
+    "status": "passed",
+    "steps": [
+     {
+      "step": 0,
+      "status": "passed",
+      "failures": [],
+      "coverage": {
+       "actions": [
+        "flip_coin"
+       ],
+       "rejections": [],
+       "preconditions": [],
+       "handoff_phases": []
+      }
+     }
+    ]
+   },
+   "reached_campaign": true
+  },
+  {
+   "name": "participant_bad_id",
+   "archive": "with_visitor",
+   "scenario": {
+    "id": "coin-heads",
+    "description": "A controlled coin flip commits its result.",
+    "covers": [
+     "flip_coin"
+    ],
+    "initial_state": [],
+    "participants": [
+     {
+      "id": "Bad Id!",
+      "kind": "player_character",
+      "schema_id": "example.visitor",
+      "data": {
+       "name": "Visitor"
+      }
+     }
+    ],
+    "rolls": [
+     {
+      "sides": 2,
+      "value": 2
+     }
+    ],
+    "steps": [
+     {
+      "kind": "gm_turn",
+      "message": "Flip the coin.",
+      "replies": [
+       {
+        "kind": "tool",
+        "tool": "flip_coin",
+        "arguments": {}
+       },
+       {
+        "kind": "narration",
+        "text": "The coin lands heads."
+       }
+      ],
+      "expect": [
+       {
+        "subject": "receipt",
+        "path": [
+         "status"
+        ],
+        "equals": "committed"
+       },
+       {
+        "subject": "receipt",
+        "path": [
+         "result",
+         "context",
+         "_result",
+         "total"
+        ],
+        "equals": 2
+       }
+      ]
+     }
+    ]
+   },
+   "result": {
+    "id": "coin-heads",
+    "status": "passed",
+    "steps": [
+     {
+      "step": 0,
+      "status": "passed",
+      "failures": [],
+      "coverage": {
+       "actions": [
+        "flip_coin"
+       ],
+       "rejections": [],
+       "preconditions": [],
+       "handoff_phases": []
+      }
+     }
+    ]
+   },
+   "reached_campaign": true
+  },
+  {
+   "name": "participant_data_not_object",
+   "archive": "with_visitor",
+   "scenario": {
+    "id": "coin-heads",
+    "description": "A controlled coin flip commits its result.",
+    "covers": [
+     "flip_coin"
+    ],
+    "initial_state": [],
+    "participants": [
+     {
+      "id": "visitor",
+      "kind": "player_character",
+      "schema_id": "example.visitor",
+      "data": [
+       1
+      ]
+     }
+    ],
+    "rolls": [
+     {
+      "sides": 2,
+      "value": 2
+     }
+    ],
+    "steps": [
+     {
+      "kind": "gm_turn",
+      "message": "Flip the coin.",
+      "replies": [
+       {
+        "kind": "tool",
+        "tool": "flip_coin",
+        "arguments": {}
+       },
+       {
+        "kind": "narration",
+        "text": "The coin lands heads."
+       }
+      ],
+      "expect": [
+       {
+        "subject": "receipt",
+        "path": [
+         "status"
+        ],
+        "equals": "committed"
+       },
+       {
+        "subject": "receipt",
+        "path": [
+         "result",
+         "context",
+         "_result",
+         "total"
+        ],
+        "equals": 2
+       }
+      ]
+     }
+    ]
+   },
+   "result": {
+    "id": "coin-heads",
+    "status": "failed",
+    "steps": [],
+    "failures": [
+     {
+      "message": "TypeError"
+     }
+    ]
+   },
+   "reached_campaign": false
+  },
+  {
+   "name": "not_an_archive",
+   "archive": "not_an_archive",
+   "scenario": {
+    "id": "coin-heads",
+    "description": "A controlled coin flip commits its result.",
+    "covers": [
+     "flip_coin"
+    ],
+    "initial_state": [],
+    "participants": [],
+    "rolls": [
+     {
+      "sides": 2,
+      "value": 2
+     }
+    ],
+    "steps": [
+     {
+      "kind": "gm_turn",
+      "message": "Flip the coin.",
+      "replies": [
+       {
+        "kind": "tool",
+        "tool": "flip_coin",
+        "arguments": {}
+       },
+       {
+        "kind": "narration",
+        "text": "The coin lands heads."
+       }
+      ],
+      "expect": [
+       {
+        "subject": "receipt",
+        "path": [
+         "status"
+        ],
+        "equals": "committed"
+       },
+       {
+        "subject": "receipt",
+        "path": [
+         "result",
+         "context",
+         "_result",
+         "total"
+        ],
+        "equals": 2
+       }
+      ]
+     }
+    ]
+   },
+   "result": {
+    "id": "coin-heads",
+    "status": "failed",
+    "steps": [],
+    "failures": [
+     {
+      "message": "CommandRejected (archive_invalid)"
+     }
+    ]
+   },
+   "reached_campaign": false
+  }
+ ],
+ "run_ruleset_tests": [
+  {
+   "name": "passed",
+   "payload": "{\"status\": \"passed\", \"scenarios\": [{\"id\": \"s\"}], \"coverage\": {}}",
+   "outcome": {
+    "status": "passed",
+    "scenarios": [
+     {
+      "id": "s"
+     }
+    ],
+    "coverage": {}
+   }
+  },
+  {
+   "name": "every_status",
+   "payload": "{\"status\": \"incomplete_coverage\", \"extra\": [1, 2.5, null]}",
+   "outcome": {
+    "status": "incomplete_coverage",
+    "extra": [
+     1,
+     2.5,
+     null
+    ]
+   }
+  },
+  {
+   "name": "exit_code",
+   "exit": 3,
+   "payload": "{\"status\": \"passed\"}",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker did not return results."
+   }
+  },
+  {
+   "name": "no_result",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker did not return results."
+   }
+  },
+  {
+   "name": "at_limit",
+   "payload_padded": [
+    "{\"status\": \"failed\"}",
+    4194304
+   ],
+   "outcome": {
+    "status": "failed"
+   }
+  },
+  {
+   "name": "over_limit",
+   "payload_padded": [
+    "{\"status\": \"failed\"}",
+    4194305
+   ],
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario results exceed the size limit."
+   }
+  },
+  {
+   "name": "not_utf8",
+   "payload_base64": "/3t9",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker returned invalid results."
+   }
+  },
+  {
+   "name": "not_json",
+   "payload": "{",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker returned invalid results."
+   }
+  },
+  {
+   "name": "not_object",
+   "payload": "[1]",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker returned invalid results."
+   }
+  },
+  {
+   "name": "unknown_status",
+   "payload": "{\"status\": \"unknown\"}",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker returned invalid results."
+   }
+  },
+  {
+   "name": "missing_status",
+   "payload": "{}",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker returned invalid results."
+   }
+  },
+  {
+   "name": "status_not_text",
+   "payload": "{\"status\": 1}",
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Scenario worker returned invalid results."
+   }
+  },
+  {
+   "name": "status_list",
+   "payload": "{\"status\": [\"passed\"]}",
+   "outcome": {
+    "raised": "TypeError",
+    "message": "unhashable type: 'list'"
+   }
+  },
+  {
+   "name": "status_object",
+   "payload": "{\"status\": {\"a\": 1}}",
+   "outcome": {
+    "raised": "TypeError",
+    "message": "unhashable type: 'dict'"
+   }
+  },
+  {
+   "name": "echo",
+   "echo": true,
+   "outcome": {
+    "status": "passed",
+    "archive_sha256": "2745a2f37cc8cc616016a4280cf2d4fcc4c5317050510d25a419742733eaec3d"
+   }
+  },
+  {
+   "name": "timed_out",
+   "hang": true,
+   "timeout": 0.5,
+   "outcome": {
+    "status": "timed_out",
+    "scenarios": [],
+    "message": "Scenario run did not finish."
+   }
+  },
+  {
+   "name": "cancelled",
+   "hang": true,
+   "cancel": true,
+   "outcome": {
+    "status": "cancelled",
+    "scenarios": [],
+    "message": "Scenario run did not finish."
+   }
+  },
+  {
+   "name": "timeout_not_positive",
+   "timeout": 0,
+   "outcome": {
+    "raised": "ValueError",
+    "message": "Scenario timeout must be positive"
+   }
+  },
+  {
+   "name": "archive_over_limit",
+   "archive_size": 134217729,
+   "outcome": {
+    "status": "error",
+    "scenarios": [],
+    "message": "Test package exceeds the size limit."
+   }
+  }
+ ]
+}
