@@ -15,7 +15,7 @@ use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ActionCommand;
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
-use sylvia_domain::session::{SessionMessage, SessionMessageKind};
+use sylvia_domain::session::{SessionActivityBasis, SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
 
 /// An `AuthorityOwner` method lane 3 has not ported yet.
@@ -211,6 +211,20 @@ impl TurnOwner for OwnerReads {
     fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
         Box::pin(async move {
             turn_reads::campaign_narrative_options(self.store(), session_id).await.map_err(store_error)
+        })
+    }
+
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<SessionActivityBasis>> {
+        Box::pin(async move {
+            let (session_id, attempt_id) = (session_id.to_owned(), attempt_id.map(str::to_owned));
+            self.store()
+                .call(move |store| store.session_activity_basis(&session_id, attempt_id.as_deref()))
+                .await
+                .map_err(store_error)
         })
     }
 }

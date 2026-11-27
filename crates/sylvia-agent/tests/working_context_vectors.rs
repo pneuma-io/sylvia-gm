@@ -130,6 +130,42 @@ fn group_keys_match_python() {
     same("groups", "pinned", &as_json(projected[..pinned.len()].to_vec()), &groups["pinned"]);
 }
 
+/// `extend_source`: a source appended to after the request reads back as Python's list object
+/// does, the same as a request whose list already held the appended messages.
+#[tokio::test]
+async fn extended_source_reads_as_the_appended_list() {
+    let sent = maps(&serde_json::json!([
+        {"role": "system", "content": "Rules"},
+        {"role": "user", "content": "Find the ledger"},
+    ]));
+    let appended = maps(&serde_json::json!([
+        {"role": "assistant", "content": null, "tool_calls": [
+            {"id": "call-1", "type": "function",
+             "function": {"name": "read_session_history", "arguments": "{}"}}]},
+        {"role": "tool", "tool_call_id": "call-1", "content": "{\"ok\":true}"},
+    ]));
+    let current = |wrapper: &WorkingContextProvider| {
+        wrapper.read_history(&map(&serde_json::json!({"source_id": "current"})))
+    };
+    let wrapper = |messages: &[JsonMap]| {
+        let messages = messages.to_vec();
+        async move {
+            let options = WorkingContextOptions::new(Arc::new(|_| Box::pin(async { Ok(()) })));
+            let wrapper = WorkingContextProvider::new(Arc::new(Scripted::new(None, &J::Null)), options);
+            wrapper.prepare(&messages, None, false, &JsonMap::new()).await.unwrap();
+            wrapper
+        }
+    };
+    let extended = wrapper(&sent).await;
+    let before = current(&extended);
+    for message in &appended {
+        extended.extend_source(std::slice::from_ref(message));
+    }
+    let whole = wrapper(&[sent.clone(), appended.clone()].concat()).await;
+    assert_eq!(current(&extended), current(&whole));
+    assert_ne!(current(&extended), before, "the appended messages are read");
+}
+
 /// A provider answering from the recorded script and recording what it is sent.
 struct Scripted {
     model: Option<ModelInfo>,

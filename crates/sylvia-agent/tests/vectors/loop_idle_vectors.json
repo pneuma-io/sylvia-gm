@@ -1,0 +1,754 @@
+{
+ "cases": [
+  {
+   "name": "dm_without_compaction",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "dm",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": null
+  },
+  {
+   "name": "builder_no_attempt",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": null,
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": null
+  },
+  {
+   "name": "builder_accepted_interrupted",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-7",
+    "status": "interrupted"
+   }
+  },
+  {
+   "name": "builder_start_interrupted",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "evidence",
+       "content": {
+        "kind": "builder_start",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-7",
+    "status": "interrupted"
+   }
+  },
+  {
+   "name": "builder_terminal",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": {
+       "session_id": "session-1",
+       "sequence": 4,
+       "message_id": "message-4",
+       "kind": "evidence",
+       "content": {
+        "kind": "agent_attempt_terminal",
+        "attempt_id": "attempt-7",
+        "status": "completed"
+       },
+       "canonical_sequence": null
+      },
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-7",
+    "status": "completed"
+   }
+  },
+  {
+   "name": "builder_terminal_status_kept",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": {
+       "session_id": "session-1",
+       "sequence": 4,
+       "message_id": "message-4",
+       "kind": "evidence",
+       "content": {
+        "kind": "agent_attempt_terminal",
+        "attempt_id": "attempt-7",
+        "status": {
+         "odd": [
+          1,
+          2
+         ]
+        }
+       },
+       "canonical_sequence": null
+      },
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-7",
+    "status": {
+     "odd": [
+      1,
+      2
+     ]
+    }
+   }
+  },
+  {
+   "name": "builder_given_attempt_unavailable",
+   "method": "builder_activity",
+   "attempt_id": "attempt-9",
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      "attempt-9"
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": null,
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-9",
+    "status": "unavailable"
+   }
+  },
+  {
+   "name": "builder_given_attempt_interrupted",
+   "method": "builder_activity",
+   "attempt_id": "attempt-7",
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      "attempt-7"
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-7",
+    "status": "interrupted"
+   }
+  },
+  {
+   "name": "builder_given_attempt_other_record",
+   "method": "builder_activity",
+   "attempt_id": "attempt-8",
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      "attempt-8"
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-8",
+    "status": "interrupted"
+   }
+  },
+  {
+   "name": "dm_with_compaction",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "dm",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": true
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "attempt-7",
+    "status": "interrupted"
+   }
+  },
+  {
+   "name": "dm_with_compaction_no_attempt",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "dm",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": null,
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": null,
+      "terminal": null,
+      "has_compaction": true
+     }
+    }
+   ],
+   "result": null
+  },
+  {
+   "name": "accepted_attempt_number",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go",
+        "attempt_id": 12
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "result": {
+    "attempt_id": "12",
+    "status": "interrupted"
+   }
+  },
+  {
+   "name": "accepted_without_attempt",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": null,
+      "has_compaction": false
+     }
+    }
+   ],
+   "raised": {
+    "class": "KeyError",
+    "message": "'attempt_id'",
+    "code": null
+   }
+  },
+  {
+   "name": "terminal_without_status",
+   "method": "builder_activity",
+   "attempt_id": null,
+   "calls": [
+    {
+     "event": "call",
+     "name": "session_activity_basis",
+     "args": [
+      "session-1",
+      null
+     ],
+     "kwargs": {},
+     "result": {
+      "session": {
+       "session_id": "session-1",
+       "campaign_id": "campaign-1",
+       "role": "builder",
+       "provider_id": "provider-1",
+       "model_id": "model-1",
+       "status": "active",
+       "parent_session_id": null,
+       "selected_skill": "BUILD CAMPAIGN PLAN",
+       "scope": [],
+       "reasoning_effort": null,
+       "reasoning_effort_once": null
+      },
+      "accepted": {
+       "session_id": "session-1",
+       "sequence": 3,
+       "message_id": "message-3",
+       "kind": "user",
+       "content": {
+        "text": "Go on",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "terminal": {
+       "session_id": "session-1",
+       "sequence": 4,
+       "message_id": "message-4",
+       "kind": "evidence",
+       "content": {
+        "kind": "agent_attempt_terminal",
+        "attempt_id": "attempt-7"
+       },
+       "canonical_sequence": null
+      },
+      "has_compaction": false
+     }
+    }
+   ],
+   "raised": {
+    "class": "KeyError",
+    "message": "'status'",
+    "code": null
+   }
+  },
+  {
+   "name": "activity_progress",
+   "method": "activity_progress",
+   "calls": [],
+   "result": null
+  },
+  {
+   "name": "context_status_hint",
+   "method": "context_status_hint",
+   "calls": [],
+   "result": null
+  },
+  {
+   "name": "provisional_session_projection",
+   "method": "provisional_session_projection",
+   "calls": [],
+   "result": []
+  },
+  {
+   "name": "assert_idle",
+   "method": "assert_idle",
+   "calls": [],
+   "result": null
+  },
+  {
+   "name": "steer",
+   "method": "steer",
+   "calls": [],
+   "raised": {
+    "class": "CommandRejected",
+    "message": "Agent session has no active provider work",
+    "code": "command_rejected"
+   }
+  },
+  {
+   "name": "stop",
+   "method": "stop",
+   "calls": [],
+   "raised": {
+    "class": "CommandRejected",
+    "message": "Agent session has no active provider work",
+    "code": "command_rejected"
+   }
+  },
+  {
+   "name": "expire",
+   "method": "expire",
+   "calls": [],
+   "raised": {
+    "class": "CommandRejected",
+    "message": "Agent session has no active provider work",
+    "code": "command_rejected"
+   }
+  },
+  {
+   "name": "disconnect",
+   "method": "disconnect",
+   "calls": [],
+   "raised": {
+    "class": "CommandRejected",
+    "message": "Agent session has no active provider work",
+    "code": "command_rejected"
+   }
+  },
+  {
+   "name": "reconnect",
+   "method": "reconnect",
+   "calls": [],
+   "raised": {
+    "class": "CommandRejected",
+    "message": "Agent session has no active provider work",
+    "code": "command_rejected"
+   }
+  }
+ ]
+}

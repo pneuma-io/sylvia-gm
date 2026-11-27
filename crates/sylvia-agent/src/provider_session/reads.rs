@@ -198,4 +198,12 @@ pub trait TurnOwner: OpeningReads {
         'a,
         Result<sylvia_app::authority::actions::ActionExecution, crate::stateless_mcp::AuthorityFailure>,
     >;
+
+    /// `session_activity_basis(session_id, attempt_id=None)`: the saved attempt facts the
+    /// activity indicator reads, without the conversation.
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<sylvia_domain::session::SessionActivityBasis>>;
 }

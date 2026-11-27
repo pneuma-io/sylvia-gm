@@ -27,6 +27,7 @@ use sylvia_domain::authority::{
 };
 use sylvia_domain::error::{DomainError, MechanicsDetails, MechanicsValidationIssue};
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::session::SessionActivityBasis;
 use sylvia_domain::session::{
     SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
 };
@@ -628,6 +629,20 @@ impl TurnOwner for Recorded {
             None => Ok(recorded_execution(&result)),
         };
         Box::pin(async move { outcome })
+    }
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<SessionActivityBasis>> {
+        let result = self.next("session_activity_basis", serde_json::json!([session_id, attempt_id]));
+        let message = |value: &J| (!value.is_null()).then(|| session_message(value));
+        ready(SessionActivityBasis {
+            session: session_record(&result["session"]),
+            accepted: message(&result["accepted"]),
+            terminal: message(&result["terminal"]),
+            has_compaction: result["has_compaction"].as_bool().unwrap(),
+        })
     }
 }
 
