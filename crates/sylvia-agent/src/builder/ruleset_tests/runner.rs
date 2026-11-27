@@ -13,6 +13,7 @@
 //! `ExceptionGroup` and `MCPError` failures come from the turn, so they come with it.
 
 use super::coverage::is_int;
+use crate::builder::is_authority_error;
 use std::path::Path;
 use std::sync::{Arc, Mutex, PoisonError};
 use sylvia_base::{CodedError, Json, JsonMap};
@@ -25,23 +26,6 @@ use sylvia_store::{AuthorityStore, StoreError};
 
 /// Where the port stops, as the scenario's failure.
 const PORT_PENDING: &str = "rust_port_pending";
-
-/// The `AuthorityError` classes, whose `code` `_failure_message` reports.
-const AUTHORITY_ERRORS: [&str; 13] = [
-    "AuthorityError",
-    "SchemaIdentityError",
-    "OwnerConflict",
-    "WrongOwner",
-    "WrongWriter",
-    "StaleRevision",
-    "IdempotencyConflict",
-    "CommandRejected",
-    "MechanicsRejected",
-    "RulesetPreconditionRejected",
-    "PortableRecoveryFailure",
-    "_BackupFailure",
-    "_ExportFailure",
-];
 
 /// What a scenario raised: `ScenarioScriptError(message)`, or any other exception by its
 /// class, with the code of an `AuthorityError`.
@@ -64,7 +48,7 @@ impl From<CodedError> for ScenarioError {
     /// A coded refusal: its Python class (`CommandRejected` when the port names none).
     fn from(error: CodedError) -> Self {
         let class = error.error_type.unwrap_or("CommandRejected");
-        let code = AUTHORITY_ERRORS.contains(&class).then_some(error.code);
+        let code = is_authority_error(class).then_some(error.code);
         Self::Raised { class: class.to_owned(), code }
     }
 }
@@ -72,8 +56,7 @@ impl From<CodedError> for ScenarioError {
 impl From<DomainError> for ScenarioError {
     fn from(error: DomainError) -> Self {
         let class = error.python_class();
-        let code =
-            AUTHORITY_ERRORS.contains(&class).then(|| error.code().unwrap_or("command_rejected").to_owned());
+        let code = is_authority_error(class).then(|| error.code().unwrap_or("command_rejected").to_owned());
         Self::Raised { class: class.to_owned(), code }
     }
 }

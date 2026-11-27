@@ -20,6 +20,7 @@ use super::history::{builder_native_request, provider_history};
 use super::mode::AgentMode;
 use super::prompt::{builder_prompt, creation_subflow_purpose, effective_tracked_skill};
 use super::rejected;
+use super::ruleset_tools::{ruleset_draft_check_tool, ruleset_test_tool, Cancelled};
 use super::runner::{AgentRunner, RunnerOptions, StreamEvent, StreamEventKind, TurnError};
 use super::skills::{builder_skill_references, load_builder_skill};
 use super::title::{title_instruction, FirstReplyTitle};
@@ -51,6 +52,12 @@ fn specs() -> &'static JsonMap {
 
 fn definition(name: &str) -> &'static Json {
     specs().get(name).unwrap_or_else(|| panic!("no exported definition for {name}"))
+}
+
+/// A Builder tool's exported definition (`builder_tool_specs.json`), for the modules that port
+/// its handler.
+pub(crate) fn exported_definition(name: &str) -> &'static Json {
+    definition(name)
 }
 
 /// A tool whose handler a later PR ports: its exact definition, and `rust_port_pending`.
@@ -123,6 +130,8 @@ pub struct BuilderTurnTools {
     /// Character declarations from the caller or the selected Plan (B5).
     pub character_declarations: bool,
     pub publish_ruleset_candidate: bool,
+    /// The worker `test_ruleset_draft` runs; this executable in its worker mode when `None`.
+    pub ruleset_test_worker: Option<sylvia_app::ruleset_testing::WorkerCommand>,
     pub publish_participant: bool,
     pub reuse_participant: bool,
     pub read_participant: bool,
@@ -180,8 +189,14 @@ fn plan_definition(name: &str) -> CodedResult<ToolSpec> {
     pending_tool(definition)
 }
 
-/// `stream_builder_turn`'s tool list, in Python's order, before the history tool.
-pub fn application_tools(context: &SessionContext, tools: &BuilderTurnTools) -> CodedResult<Vec<ToolSpec>> {
+/// `stream_builder_turn`'s tool list, in Python's order, before the history tool. The Ruleset
+/// draft tools work in `workspace`, and the test stops when `cancelled` says so.
+pub fn application_tools(
+    context: &SessionContext,
+    tools: &BuilderTurnTools,
+    workspace: &Path,
+    cancelled: Cancelled,
+) -> CodedResult<Vec<ToolSpec>> {
     let purpose = creation_subflow_purpose(context);
     let character = character_purpose(purpose.as_deref());
     let skill = effective_tracked_skill(context);
@@ -205,8 +220,8 @@ pub fn application_tools(context: &SessionContext, tools: &BuilderTurnTools) -> 
         specs.push(pending("complete_creation_subflow")?);
     }
     if matches!(skill.as_deref(), None | Some("BUILD RULESET")) && !character {
-        specs.push(pending("check_ruleset_draft")?);
-        specs.push(pending("test_ruleset_draft")?);
+        specs.push(ruleset_draft_check_tool(workspace)?);
+        specs.push(ruleset_test_tool(workspace, cancelled, tools.ruleset_test_worker.clone())?);
     }
     if tools.campaign_content_authority {
         specs.push(pending("discover_campaign_content")?);
@@ -551,7 +566,11 @@ pub async fn stream_builder_turn(
     }
     std::fs::create_dir_all(workspace)
         .map_err(|error| CodedError::rejected(error.to_string()).with_error_type("OSError"))?;
-    let mut tools = application_tools(context, &turn.tools)?;
+    let cancelled: Cancelled = {
+        let control = Arc::clone(control);
+        Arc::new(move || control.cancelled())
+    };
+    let mut tools = application_tools(context, &turn.tools, workspace, cancelled)?;
     let mut title = turn.request_title.then(FirstReplyTitle::new);
     let checkpoints = Arc::new(CheckpointBridge::new());
     let model = provider.model_info().cloned();
