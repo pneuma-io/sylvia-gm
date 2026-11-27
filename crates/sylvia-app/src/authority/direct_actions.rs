@@ -90,7 +90,7 @@ pub(crate) async fn player_action_in_owned_work(
     let origin = sylvia_domain::player_actions::player_control_origin(
         &request.source,
         request.expected_revision,
-        request.selection.as_object(),
+        &request.selection,
         request.session_id.as_deref(),
     )?;
     let owned = request.clone();
