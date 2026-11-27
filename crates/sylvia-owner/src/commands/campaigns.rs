@@ -987,7 +987,7 @@ pub(crate) fn resolve_strict(path: &std::path::Path) -> std::io::Result<std::pat
 
 /// `_optional_text(payload, key)`: absent or `null` is `None`; anything else must be a
 /// nonempty string.
-fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
+pub(crate) fn optional_text(params: &JsonMap, key: &str) -> CodedResult<Option<String>> {
     match params.get(key) {
         None | Some(Json::Null) => Ok(None),
         Some(_) => required(params, key).map(Some),
