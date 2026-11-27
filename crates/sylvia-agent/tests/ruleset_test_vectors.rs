@@ -29,6 +29,7 @@ use sylvia_agent::session_loop::{
     SessionProviderInput,
 };
 use sylvia_app::ruleset_testing::{run_ruleset_tests_with, WorkerCommand};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, JsonMap};
 use sylvia_engine::dice::RollSource;
 use sylvia_provider::types::PyValue;
@@ -77,7 +78,7 @@ fn checked_outcomes_match_python() {
         let receipt = case["receipt"].as_object();
         let actual =
             checked_outcomes(case["assertions"].as_array().unwrap(), receipt, &maps(&case["tool_results"]));
-        assert_eq!(J::Object(actual), case["expected"], "{}", case["name"]);
+        assert_same_json(&J::Object(actual), &case["expected"], format!("{}", case["name"]));
     }
 }
 
@@ -95,7 +96,7 @@ fn summarize_coverage_matches_python() {
             preconditions.as_ref(),
             case["requires_handoff"].as_bool().unwrap(),
         );
-        assert_eq!(J::Object(actual), case["expected"], "{}", case["name"]);
+        assert_same_json(&J::Object(actual), &case["expected"], format!("{}", case["name"]));
     }
 }
 
@@ -111,7 +112,7 @@ fn assertions_match_python() {
     let observations = map(&recorded["observations"]);
     for case in recorded["cases"].as_array().unwrap() {
         let failures = assertions(case["expected"].as_array().unwrap(), &observations).unwrap();
-        assert_eq!(J::Array(failures), case["failures"], "{}", case["name"]);
+        assert_same_json(&J::Array(failures), &case["failures"], format!("{}", case["name"]));
     }
     let unknown = assertions(&[json!({"subject": "unknown", "path": [], "equals": 1})], &observations);
     assert_eq!(unknown, Err(ScenarioError::raised(recorded["unknown_subject"].as_str().unwrap())));
@@ -297,17 +298,17 @@ async fn provider_matches_python() {
             }
             Err(other) => panic!("{name}: {other:?}"),
         };
-        assert_eq!(J::Array(outputs.lock().unwrap().clone()), case["outputs"], "{name}");
-        assert_eq!(terminal, case["terminal"], "{name}");
-        assert_eq!(
-            J::Array(provider.requests().into_iter().map(J::Object).collect()),
-            case["requests"],
-            "{name}"
+        assert_same_json(&J::Array(outputs.lock().unwrap().clone()), &case["outputs"], name);
+        assert_same_json(&terminal, &case["terminal"], name);
+        assert_same_json(
+            &J::Array(provider.requests().into_iter().map(J::Object).collect()),
+            &case["requests"],
+            format!("{name}"),
         );
-        assert_eq!(
-            J::Array(provider.tool_results().into_iter().map(J::Object).collect()),
-            case["tool_results"],
-            "{name}"
+        assert_same_json(
+            &J::Array(provider.tool_results().into_iter().map(J::Object).collect()),
+            &case["tool_results"],
+            format!("{name}"),
         );
         assert_eq!(provider.position() as u64, case["position"].as_u64().unwrap(), "{name}");
         assert_eq!(provider.failure().map(J::String).unwrap_or(J::Null), case["failure"], "{name}");
@@ -339,7 +340,7 @@ async fn run_scenario_matches_python_until_the_campaign() {
         } else {
             case["result"].clone()
         };
-        assert_eq!(J::Object(actual), expected, "{name}");
+        assert_same_json(&J::Object(actual), &expected, name);
     }
 }
 
@@ -438,7 +439,7 @@ fn run_ruleset_tests_matches_python() {
             Ok(result) => J::Object(result),
             Err(error) => json!({"raised": error.python_class(), "message": error.message()}),
         };
-        assert_eq!(outcome, case["outcome"], "{name}");
+        assert_same_json(&outcome, &case["outcome"], name);
     }
 }
 
