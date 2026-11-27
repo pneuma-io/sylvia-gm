@@ -225,7 +225,11 @@ fn builder_runner_matches_python() {
             let before = provider.requests.lock().unwrap().len();
             activity.lock().unwrap().clear();
             let (sender, mut receiver) = tokio::sync::mpsc::unbounded_channel();
-            let mut between = || steer.pop_front().flatten();
+            let mut between = || {
+                let next = steer.pop_front().flatten();
+                Box::pin(async move { next })
+                    as std::pin::Pin<Box<dyn std::future::Future<Output = Option<String>> + Send>>
+            };
             let turn_future = runner.turn_stream(
                 turn["text"].as_str().unwrap(),
                 &sender,

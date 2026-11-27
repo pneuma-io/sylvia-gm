@@ -21,7 +21,7 @@ use futures_util::StreamExt;
 use indexmap::IndexMap;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, MutexGuard};
 use sylvia_app::builder_prompts::{build_builder_system_prompt, AvailableOptions};
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{CodedError, Json, JsonMap};
@@ -302,7 +302,13 @@ pub struct RunnerOptions {
     pub builder_application_tools: Vec<ToolSpec>,
     pub allow_public_web: bool,
     pub activity_progress: Option<ActivityProgress>,
+    /// Told of every message the turn appends to its outgoing list after sending it. Python's
+    /// provider keeps that very list, so its view of the conversation grows with it.
+    pub outgoing: Option<OutgoingHook>,
 }
+
+/// See [`RunnerOptions::outgoing`].
+pub type OutgoingHook = Arc<dyn Fn(&JsonMap) + Send + Sync>;
 
 impl Default for RunnerOptions {
     fn default() -> Self {
@@ -320,23 +326,32 @@ impl Default for RunnerOptions {
             builder_application_tools: Vec::new(),
             allow_public_web: false,
             activity_progress: None,
+            outgoing: None,
         }
     }
 }
 
+/// `between_iterations()`: steering taken after a round of tools (the control's steering is
+/// awaited, so the callback returns a future).
+pub type BetweenIterations<'a> = &'a mut (dyn FnMut() -> std::pin::Pin<Box<dyn std::future::Future<Output = Option<String>> + Send + 'a>>
+             + Send);
+
 /// Where a turn's `provider-response-<hex>` identities come from (`uuid4().hex`).
-pub type ResponseIds = Box<dyn FnMut() -> String + Send>;
+pub type ResponseIds = Box<dyn FnMut() -> String + Send + Sync>;
 
 /// `AgentRunner` in a Builder mode.
 pub struct AgentRunner {
     mode: AgentMode,
     provider: Arc<dyn Provider>,
-    history: Vec<JsonMap>,
+    /// Shared so the turn's consumer can read it at each point the turn waits, as Python's
+    /// bridge reads `history_snapshot()` beside each batch of events.
+    history: SharedHistory,
     registry: ToolRegistry,
     system_prompt: String,
     application_data: String,
     pending_widget: Vec<(Json, Json)>,
     activity_progress: Option<ActivityProgress>,
+    outgoing: Option<OutgoingHook>,
     activity_retry: bool,
     busy: Arc<AtomicBool>,
     response_ids: ResponseIds,
@@ -344,6 +359,9 @@ pub struct AgentRunner {
     /// runner restores it (Python's `CancelledError` rollback).
     interrupted: Option<Vec<JsonMap>>,
 }
+
+/// The runner's history, readable while a turn holds the runner.
+pub type SharedHistory = Arc<Mutex<Vec<JsonMap>>>;
 
 /// `MAX_OUTPUT_LIMIT_CONTINUATIONS`.
 pub const MAX_OUTPUT_LIMIT_CONTINUATIONS: u32 = 3;
@@ -471,12 +489,13 @@ impl AgentRunner {
         Ok(Self {
             mode,
             provider,
-            history: initial_history,
+            history: Arc::new(Mutex::new(initial_history)),
             registry,
             system_prompt,
             application_data,
             pending_widget: Vec::new(),
             activity_progress: options.activity_progress,
+            outgoing: options.outgoing,
             activity_retry: false,
             busy: Arc::new(AtomicBool::new(false)),
             response_ids: Box::new(crate::working_context::uuid4_hex),
@@ -491,13 +510,23 @@ impl AgentRunner {
 
     /// `history_snapshot()`: an owned copy for canonical session persistence.
     pub fn history_snapshot(&self) -> Vec<JsonMap> {
-        self.interrupted.clone().unwrap_or_else(|| self.history.clone())
+        self.interrupted.clone().unwrap_or_else(|| self.lock().clone())
+    }
+
+    fn lock(&self) -> MutexGuard<'_, Vec<JsonMap>> {
+        self.history.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
+    }
+
+    /// The live history, for a consumer reading it while a turn runs (Python's
+    /// `history_snapshot()` beside each batch of events).
+    pub fn shared_history(&self) -> SharedHistory {
+        Arc::clone(&self.history)
     }
 
     /// A turn that never ended leaves the history as it was before that turn.
     fn recover(&mut self) {
         if let Some(snapshot) = self.interrupted.take() {
-            self.history = snapshot;
+            *self.lock() = snapshot;
         }
     }
 
@@ -519,6 +548,14 @@ impl AgentRunner {
     /// The registry, for the turn's tool list.
     pub fn registry(&self) -> &ToolRegistry {
         &self.registry
+    }
+
+    /// Append to the turn's outgoing messages, telling the outgoing hook.
+    fn outgoing(&self, messages: &mut Vec<JsonMap>, message: JsonMap) {
+        if let Some(hook) = &self.outgoing {
+            hook(&message);
+        }
+        messages.push(message);
     }
 
     fn progress(&self, phase: &str, tool: Option<&str>) {
@@ -567,7 +604,7 @@ impl AgentRunner {
             )),
         );
         messages.push(options);
-        for message in &self.history {
+        for message in self.lock().iter() {
             let mut clean = message.clone();
             clean.shift_remove("reasoning_content");
             messages.push(clean);
@@ -669,13 +706,14 @@ impl AgentRunner {
         real.insert("role".into(), Json::from("tool"));
         real.insert("tool_call_id".into(), tool_call_id.clone());
         real.insert("content".into(), Json::from(pyjson::dumps(&Json::Object(content), Dump::DEFAULT)));
-        let found = self.history.iter().rposition(|message| {
+        let mut history = self.lock();
+        let found = history.iter().rposition(|message| {
             message.get("role") == Some(&Json::from("tool"))
                 && message.get("tool_call_id").is_some_and(|id| py_eq(id, &tool_call_id))
         });
         match found {
-            Some(index) => self.history[index] = real,
-            None => self.history.push(real),
+            Some(index) => history[index] = real,
+            None => history.push(real),
         }
         Ok(())
     }
@@ -720,13 +758,14 @@ impl AgentRunner {
         &mut self,
         user_message: &str,
         events: &UnboundedSender<StreamEvent>,
-        between_iterations: Option<&mut (dyn FnMut() -> Option<String> + Send)>,
+        between_iterations: Option<BetweenIterations<'_>>,
         application_prompt: Option<&str>,
     ) -> Result<(), TurnError> {
         self.recover();
         self.busy.store(true, Ordering::SeqCst);
         let _busy = Busy(Arc::clone(&self.busy));
-        self.interrupted = Some(self.history.clone());
+        let snapshot = self.lock().clone();
+        self.interrupted = Some(snapshot);
         let result = self.turn_inner(user_message, events, between_iterations, application_prompt).await;
         self.interrupted = None;
         result
@@ -736,7 +775,7 @@ impl AgentRunner {
         &mut self,
         user_message: &str,
         events: &UnboundedSender<StreamEvent>,
-        mut between_iterations: Option<&mut (dyn FnMut() -> Option<String> + Send)>,
+        mut between_iterations: Option<BetweenIterations<'_>>,
         application_prompt: Option<&str>,
     ) -> Result<(), TurnError> {
         if application_prompt.is_some() && !user_message.is_empty() {
@@ -759,7 +798,7 @@ impl AgentRunner {
                 None => user_message.clone(),
             }),
         );
-        self.history.push(entry);
+        self.lock().push(entry);
         let mut messages = self.build_messages();
         let tools = self.build_tools();
         let send = |kind: StreamEventKind, data: String, meta: Option<JsonMap>| {
@@ -876,11 +915,11 @@ impl AgentRunner {
                     partial.insert("role".into(), Json::from("assistant"));
                     partial.insert("content".into(), Json::from(full_content.as_str()));
                     partial.insert("provider_response_id".into(), Json::from(response_id.as_str()));
-                    self.history.push(partial.clone());
-                    messages.push(partial);
+                    self.lock().push(partial.clone());
+                    self.outgoing(&mut messages, partial);
                 }
-                self.history.push(output_limit_notice());
-                messages.push(output_limit_notice());
+                self.lock().push(output_limit_notice());
+                self.outgoing(&mut messages, output_limit_notice());
                 self.activity_retry = true;
                 continue;
             }
@@ -904,7 +943,7 @@ impl AgentRunner {
                 reply.insert("role".into(), Json::from("assistant"));
                 reply.insert("content".into(), Json::from(full_content.as_str()));
                 reply.insert("provider_response_id".into(), Json::from(response_id.as_str()));
-                self.history.push(reply);
+                self.lock().push(reply);
                 let mut meta = JsonMap::new();
                 meta.insert("tool_calls_made".into(), serde_json::json!(tool_calls_made));
                 meta.insert("state_changed".into(), Json::Bool(!tool_calls_made.is_empty()));
@@ -933,8 +972,9 @@ impl AgentRunner {
                 outgoing.insert("reasoning_content".into(), Json::from(full_reasoning.as_str()));
             }
             let metadata = native_metadata.clone().map(Json::Object);
-            messages.push(attach_chat_metadata(&outgoing, metadata.as_ref(), false)?);
-            self.history.push(assistant);
+            let attached = attach_chat_metadata(&outgoing, metadata.as_ref(), false)?;
+            self.outgoing(&mut messages, attached);
+            self.lock().push(assistant);
             let mut round_results: Vec<Json> = Vec::new();
             for call in &accumulated {
                 let function = call["function"].as_object().expect("built above");
@@ -995,8 +1035,8 @@ impl AgentRunner {
                 tool_message.insert("role".into(), Json::from("tool"));
                 tool_message.insert("tool_call_id".into(), call_id.clone());
                 tool_message.insert("content".into(), Json::from(content));
-                self.history.push(tool_message.clone());
-                messages.push(tool_message);
+                self.lock().push(tool_message.clone());
+                self.outgoing(&mut messages, tool_message);
                 if name == "ask_question" {
                     if let Some(widget) = widget {
                         let mut meta = JsonMap::new();
@@ -1046,8 +1086,8 @@ impl AgentRunner {
                             );
                             skipped
                                 .insert("content".into(), Json::from(pyjson::dumps(&content, Dump::DEFAULT)));
-                            self.history.push(skipped.clone());
-                            messages.push(skipped);
+                            self.lock().push(skipped.clone());
+                            self.outgoing(&mut messages, skipped);
                         }
                     }
                     return Err(error);
@@ -1055,12 +1095,12 @@ impl AgentRunner {
             }
             guard.finish_round(&accumulated, &round_results)?;
             if let Some(steer) = between_iterations.as_deref_mut() {
-                if let Some(text) = steer().filter(|text| !text.is_empty()) {
+                if let Some(text) = steer().await.filter(|text| !text.is_empty()) {
                     let mut steering = JsonMap::new();
                     steering.insert("role".into(), Json::from("user"));
                     steering.insert("content".into(), Json::from(text));
-                    messages.push(steering.clone());
-                    self.history.push(steering);
+                    self.outgoing(&mut messages, steering.clone());
+                    self.lock().push(steering);
                 }
             }
         }
