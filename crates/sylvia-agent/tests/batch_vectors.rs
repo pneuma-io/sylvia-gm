@@ -1,4 +1,5 @@
-//! Compare one round's tool batch (T3b-1) with Python, on real turns.
+//! Compare one round's tool batch (T3b-1) and its reconciliation (T3b-2) with Python, on real
+//! turns.
 //!
 //! Regenerate with `tests/vectors/generate_batch_vectors.py`: `prepare_tool_batch` and
 //! `execute_tool_batch` traced in the `ruleless-turn` and `srd-mechanics-turn` turns. Rust is
@@ -13,8 +14,8 @@ use serde_json::{json, Value as J};
 use std::sync::{Arc, Mutex};
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
-use sylvia_agent::provider_turn::tool_batch::{execute_tool_batch, prepare_tool_batch};
-use sylvia_agent::provider_turn::{TurnEvents, TurnResult};
+use sylvia_agent::provider_turn::tool_batch::{execute_tool_batch, prepare_tool_batch, reconcile_tool_batch};
+use sylvia_agent::provider_turn::{TurnEvents, TurnFailure, TurnResult};
 use sylvia_agent::session_loop::{ProviderControl, ProviderEvent, SessionProviderInput};
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_base::{CodedError, JsonMap};
@@ -186,8 +187,18 @@ fn expand(value: &J, shared: &J) -> J {
 
 #[tokio::test]
 async fn tool_batches_match_python() {
-    let vectors: J =
-        serde_json::from_str(include_str!("vectors/batch_vectors.json")).expect("vector file is valid JSON");
+    replay(include_str!("vectors/batch_vectors.json")).await;
+}
+
+/// T3b-2: `reconcile_tool_batch`, traced in the same turns (`generate_reconcile_vectors.py`).
+#[tokio::test]
+async fn tool_reconciliations_match_python() {
+    replay(include_str!("vectors/reconcile_vectors.json")).await;
+}
+
+/// Replay every traced call of one vector file.
+async fn replay(text: &str) {
+    let vectors: J = serde_json::from_str(text).expect("vector file is valid JSON");
     let cases = expand(&vectors["cases"], &vectors["shared"]);
     let cases = cases.as_array().expect("cases");
     assert!(!cases.is_empty());
@@ -284,11 +295,19 @@ async fn tool_batches_match_python() {
             "prepare_tool_batch" => {
                 prepare_tool_batch(&adapter, &mut state, &provider_input, turn_id, &mut sink).await
             }
+            "reconcile_tool_batch" => {
+                reconcile_tool_batch(&adapter, &mut state, &provider_input, turn_id, &mut sink).await
+            }
             _ => execute_tool_batch(&adapter, &mut state, &provider_input, turn_id, &mut sink).await,
         };
         match (outcome, case.get("raised")) {
             (Ok(()), None) => {}
-            (Err(error), Some(raised)) => panic!("{name}: both raised; compare {error:?} with {raised}"),
+            // A phase's refusal is Python's: its class, code and message.
+            (Err(TurnFailure::Coded(error)), Some(raised)) => {
+                assert_eq!(J::from(error.error_type.unwrap_or("CommandRejected")), raised["class"], "{name}");
+                assert_eq!(J::from(error.code.as_str()), raised["code"], "{name}");
+                assert_eq!(J::from(error.message.as_str()), raised["message"], "{name}");
+            }
             (outcome, raised) => panic!("{name}: got {outcome:?}, Python raised {raised:?}"),
         }
         owner.check(&name);
