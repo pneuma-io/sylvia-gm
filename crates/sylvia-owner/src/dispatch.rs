@@ -148,6 +148,16 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     if method == "finalize_campaign_construction" {
         return commands::campaigns::handle_finalize_campaign_construction(context, params).await;
     }
+    // A submitted turn's provider errors keep Python's provider-error reply too.
+    if method == "submit_session_input" {
+        return commands::sessions::handle_submit_session_input(context, params).await;
+    }
+    if method == "start_dm_session" {
+        return commands::sessions::handle_start_dm_session(context, params).await;
+    }
+    if method == "manual_retry_session" {
+        return commands::sessions::handle_manual_retry_session(context, params).await;
+    }
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
@@ -192,6 +202,18 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "switch_session_speed" => commands::sessions::handle_switch_session_speed(context, params).await,
         "steer_session" => commands::sessions::handle_steer_session(context, params).await,
+        "switch_session_model" => commands::sessions::handle_switch_session_model(context, params).await,
+        "stop_agent_session" => commands::sessions::handle_stop_agent_session(context, params).await,
+        "interrupt_stream" => commands::sessions::handle_interrupt_stream(context, params).await,
+        "disconnect_stream" => commands::sessions::handle_disconnect_stream(context, params).await,
+        "stream_heartbeat" => commands::sessions::handle_stream_heartbeat(context, params).await,
+        "narration_attempt_status" => {
+            commands::sessions::handle_narration_attempt_status(context, params).await
+        }
+        "reconnect_stream" => commands::sessions::handle_reconnect_stream(context, params).await,
+        "session_context" | "session_history_page" => {
+            commands::sessions::handle_session_context(context, params).await
+        }
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,

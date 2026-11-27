@@ -63,7 +63,9 @@ fn reply(value: &Data) -> CodedResult<Json> {
 }
 
 /// `OwnerProtocolError("Provider settings reload is unavailable")` when there is no resolver.
-fn providers(ctx: &DispatchContext) -> CodedResult<&std::sync::Arc<dyn crate::services::ProviderResolver>> {
+pub(crate) fn providers(
+    ctx: &DispatchContext,
+) -> CodedResult<&std::sync::Arc<dyn crate::services::ProviderResolver>> {
     ctx.providers.as_ref().ok_or_else(|| {
         CodedError::rejected("Provider settings reload is unavailable").with_error_type("OwnerProtocolError")
     })

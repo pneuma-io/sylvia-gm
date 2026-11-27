@@ -205,13 +205,18 @@ fn expiry() {
     assert!(pool.keep(kept.clone(), 0).is_empty());
     assert_eq!(pool.len(), 1);
     // The reaper runs on its own thread; under load (other checks on the same machine) it can be
-    // scheduled late, so wait for it with a generous deadline instead of a fixed sleep.
+    // scheduled late, so wait for it with a generous deadline instead of a fixed sleep. As in
+    // Python's `KeptProcess.close`, the closed flag is set first and the callbacks run after it,
+    // on the reaper's thread, so wait for the callback too.
     let deadline = std::time::Instant::now() + Duration::from_secs(10);
-    while (!pool.is_empty() || !kept.is_closed()) && std::time::Instant::now() < deadline {
+    let reaped =
+        || pool.is_empty() && kept.is_closed() && closed.load(std::sync::atomic::Ordering::SeqCst) == 1;
+    while !reaped() && std::time::Instant::now() < deadline {
         std::thread::sleep(Duration::from_millis(20));
     }
     assert_eq!(pool.len(), 0, "the idle process was not reaped within 10 s");
     assert!(kept.is_closed());
+    assert_eq!(closed.load(std::sync::atomic::Ordering::SeqCst), 1, "its callback did not run within 10 s");
     kept.close();
     assert_eq!(closed.load(std::sync::atomic::Ordering::SeqCst), 1);
     // A process taken back before its time does not expire.
