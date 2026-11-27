@@ -192,6 +192,16 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "switch_session_speed" => commands::sessions::handle_switch_session_speed(context, params).await,
         "steer_session" => commands::sessions::handle_steer_session(context, params).await,
+        "interrupt_stream" => commands::sessions::handle_interrupt_stream(context, params).await,
+        "disconnect_stream" => commands::sessions::handle_disconnect_stream(context, params).await,
+        "stream_heartbeat" => commands::sessions::handle_stream_heartbeat(context, params).await,
+        "narration_attempt_status" => {
+            commands::sessions::handle_narration_attempt_status(context, params).await
+        }
+        "reconnect_stream" => commands::sessions::handle_reconnect_stream(context, params).await,
+        "session_context" | "session_history_page" => {
+            commands::sessions::handle_session_context(context, params).await
+        }
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,

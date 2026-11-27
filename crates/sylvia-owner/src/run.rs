@@ -176,6 +176,10 @@ const INTERNAL_ERROR_MESSAGE: &str = "Sylvia encountered an internal error, not 
 Previously saved work is kept. Try the action again; if it repeats, report this error with the action you were taking.";
 
 /// Exit code of a clean shutdown.
+/// `local_owner.DEFAULT_DISCONNECT_GRACE_SECONDS`: how long a dropped narration stream may
+/// reconnect before its attempt is interrupted.
+pub const DEFAULT_DISCONNECT_GRACE_SECONDS: f64 = 30.0;
+
 pub const EXIT_OK: i32 = 0;
 /// Exit code Python's `main` returns when startup fails.
 pub const EXIT_STARTUP_FAILED: i32 = 2;
@@ -1010,6 +1014,12 @@ fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
     }
     let providers: Arc<dyn crate::services::ProviderResolver> =
         Arc::new(crate::providers::OwnerProviders::new(&storage_root));
+    // `AuthorityOwner(..., disconnect_grace_seconds=...)`: the supervisor's narration
+    // disconnect grace (`DEFAULT_DISCONNECT_GRACE_SECONDS`), without which starting or
+    // disconnecting an attempt is refused.
+    if store.narration().set_disconnect_grace(crate::run::DEFAULT_DISCONNECT_GRACE_SECONDS).is_err() {
+        return Err(LaunchFailure::Other);
+    }
     // `CampaignSessionLoop(owner, ...)`: the GM turn's owner reads, which also execute its
     // mechanics. The lifecycle hooks are the supervisor's, ported with the narration stream.
     let campaign_loop = Arc::new(sylvia_agent::session_loop::campaign::CampaignSessionLoop::new(
