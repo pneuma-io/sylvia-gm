@@ -12,6 +12,7 @@ mod common;
 use common::turn_state;
 use common::{model, session_context, session_record, tool, Recorded};
 use serde_json::Value as J;
+use sylvia_base::testing::assert_same_json;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::campaign_memory::KnowledgeReference;
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
@@ -158,10 +159,10 @@ async fn round_preparation_matches_python() {
             .filter(|event| event["event"] == "audit_context")
             .map(|event| event["context"].clone())
             .collect();
-        assert_eq!(
-            J::Array(provider.contexts.lock().unwrap().clone()),
-            J::Array(audits),
-            "{name}: audit contexts"
+        assert_same_json(
+            &J::Array(provider.contexts.lock().unwrap().clone()),
+            &J::Array(audits),
+            format!("{name}: audit contexts"),
         );
     }
 }

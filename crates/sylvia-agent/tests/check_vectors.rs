@@ -9,6 +9,7 @@ mod common;
 
 use common::{session_context, session_record, turn_state, Recorded};
 use serde_json::Value as J;
+use sylvia_base::testing::assert_same_json;
 use std::sync::Arc;
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
@@ -89,10 +90,10 @@ async fn campaign_reading_helpers_match_python() {
         };
         match (outcome, case.get("raised")) {
             (Ok(returned), None) => {
-                assert_eq!(
-                    returned,
-                    case.get("returned").cloned().unwrap_or(J::Null),
-                    "{name}: what it returned"
+                assert_same_json(
+                    &returned,
+                    &case.get("returned").cloned().unwrap_or(J::Null),
+                    format!("{name}: what it returned"),
                 )
             }
             (Err(error), Some(raised)) => {

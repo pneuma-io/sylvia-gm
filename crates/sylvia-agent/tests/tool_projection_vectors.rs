@@ -7,6 +7,7 @@
 //! lists and alias resolution must all be Python's, key order included.
 
 use serde_json::{json, Value as J};
+use sylvia_base::testing::assert_same_json;
 use sylvia_agent::provider_session::tools::{
     model_tool_schema, package_tool_alias, provider_tools, resolve_provider_tool_alias, tool_description,
     ToolAliases,
@@ -140,6 +141,6 @@ fn alias_resolution_matches_python() {
         let requested = case["requested"].as_str().unwrap();
         let actual = resolve_provider_tool_alias(requested, &aliases)
             .map_or(J::Null, |(alias, found)| json!([alias, found.name]));
-        assert_eq!(actual, case["resolved"], "resolving {requested:?}");
+        assert_same_json(&actual, &case["resolved"], format!("resolving {requested:?}"));
     }
 }

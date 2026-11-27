@@ -3,6 +3,7 @@
 
 use super::{action_command_json, model, opt, session_context, session_record, tool};
 use serde_json::{json, Value as J};
+use sylvia_base::testing::assert_same_json;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::campaign_memory::KnowledgeReference;
 use sylvia_agent::provider_turn::{TurnEvents, TurnResult};
@@ -114,7 +115,7 @@ pub fn next_row(rows: &Mutex<Vec<J>>, name: &str, arguments: J) -> J {
     let mut rows = rows.lock().unwrap();
     assert!(!rows.is_empty(), "Rust called {name} more often than Python");
     let row = rows.remove(0);
-    assert_eq!(row["arguments"], arguments, "{name}'s arguments");
+    assert_same_json(&arguments, &row["arguments"], format!("{name}'s arguments"));
     row
 }
 

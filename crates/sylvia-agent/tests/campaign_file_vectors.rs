@@ -12,6 +12,7 @@ mod common;
 
 use common::Recorded;
 use serde_json::Value as J;
+use sylvia_base::testing::assert_same_json;
 use sylvia_agent::stateless_mcp::campaign_file::{commit_campaign_file, read_reference, search_knowledge};
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_domain::error::DomainError;
@@ -123,7 +124,7 @@ async fn campaign_file_calls_match_python() {
                         expected[key] = value.clone();
                     }
                 }
-                assert_eq!(error_json(&error), expected, "{name}");
+                assert_same_json(&error_json(&error), &expected, &name);
             }
             None => {
                 let found = result.unwrap_or_else(|error| panic!("{name}: {error:?}"));

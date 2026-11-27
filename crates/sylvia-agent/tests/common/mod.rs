@@ -8,6 +8,7 @@ pub mod replay;
 pub mod turn_state;
 
 use serde_json::Value as J;
+use sylvia_base::testing::json_difference;
 use std::sync::Mutex;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
@@ -355,7 +356,7 @@ impl Recorded {
         assert_eq!(read["name"].as_str(), Some(name), "Rust's next call differs from Python's");
         let mut recorded = read["args"].as_array().cloned().unwrap_or_default();
         recorded.extend(read["kwargs"].as_object().into_iter().flat_map(|kwargs| kwargs.values().cloned()));
-        if read["name"].as_str() != Some(name) || J::Array(recorded.clone()) != args {
+        if read["name"].as_str() != Some(name) || json_difference(&args, &J::Array(recorded.clone())).is_some() {
             self.failures.lock().unwrap().push(format!(
                 "call differs: Python {}({}), Rust {name}({args})",
                 read["name"],
@@ -430,10 +431,17 @@ impl OpeningReads for Recorded {
         acknowledged_sequence: i64,
     ) -> BoxFuture<'a, CodedResult<CanonicalReplay>> {
         let result = self.next("canonical_replay", serde_json::json!([campaign_id, acknowledged_sequence]));
-        empty_history(&result, "canonical");
-        empty_history(&result, "provisional");
+        // The GM turn reads only the canonical events; a recording with provisional projections
+        // would need them built too.
+        assert!(
+            result["provisional"].as_array().is_none_or(Vec::is_empty),
+            "a recorded replay has provisional projections the test owner does not build"
+        );
         ready(CanonicalReplay {
-            canonical: Vec::new(),
+            canonical: result["canonical"]
+                .as_array()
+                .map(|events| events.iter().map(canonical_event).collect())
+                .unwrap_or_default(),
             provisional: Vec::new(),
             high_water: result["high_water"].as_i64().unwrap(),
         })

@@ -57,6 +57,11 @@ inside it is wrapped.
 A variant may also change the provider input (`input`: messages appended to the history, kinds
 of message dropped from it, the basis, the recovery kind or the retry receipt), for the turn's
 setup phases (`prepare_turn_recovery`, `restore_saved_turn_progress`, `resume_exchange_results`).
+An appended message's text may name the campaign's first named participant (`{name}`, `{NAME}`
+in capitals, `{given}` for the first name); a variant whose campaign names no participant is
+skipped. The snapshot may be answered with two committed actions added after its events
+(`saved_actions`) or with that participant renamed and a renamed twin added, so two share
+its first name (`rename`).
 Reference tooling only; retired with the Python source.
 """
 
@@ -575,6 +580,14 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
         {"name": "a redirect from a boolean start", "input": {"basis": "added", "messages": [
             ("user", {"text": "Stop.", "redirect_interruption_id": "interruption-1",
                       "canonical_start_sequence": True})]}},
+        {"name": "a redirect from a boolean start, actions saved", "saved_actions": True,
+         "input": {"basis": "added", "messages": [
+             ("user", {"text": "Stop.", "redirect_interruption_id": "interruption-1",
+                       "canonical_start_sequence": True})]}},
+        {"name": "a redirect from the start, actions saved", "saved_actions": True,
+         "input": {"basis": "added", "messages": [
+             ("user", {"text": "Go left.", "redirect_interruption_id": "interruption-1",
+                       "canonical_start_sequence": 0})]}},
         {"name": "a redirect not interrupted", "input": {"basis": "added", "messages": [
             ("user", {"text": "Wait.", "redirect_interruption_id": ""})]}},
         {"name": "post-mechanics recovery without its receipt",
@@ -591,6 +604,16 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
             ("evidence", {"kind": "player_action_response", "action_id": "action-direct"})]}},
         {"name": "an opening", "input": {"drop": ["user", "talk"], "messages": [
             ("evidence", {"kind": "campaign_start"})]}},
+        {"name": "a started campaign after talk", "input": {"drop": ["user"], "messages": [
+            ("evidence", {"kind": "campaign_start"}), ("talk", {"text": "Welcome back."})]}},
+        {"name": "a player naming a character", "input": {"messages": [
+            ("user", {"text": "I turn to {NAME} and wait."})]}},
+        {"name": "a player using a first name", "input": {"messages": [
+            ("user", {"text": "Hey {given}, over here!"})]}},
+        {"name": "a name inside a word", "input": {"messages": [
+            ("user", {"text": "I greet x{given} and {given}s today."})]}},
+        {"name": "a first name two characters share", "rename": True, "input": {"messages": [
+            ("user", {"text": "Hey {given}, over here!"})]}},
         {"name": "saved round facts", "input": {"messages": [
             ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
                           "results": [], "narration_facts": [
@@ -681,6 +704,8 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
             "canonical_player_narration": [{"text": ""}, {"text": 3}]},
          "messages": ["assistant:The old reply.", "assistant-call:Calling."]},
         {"name": "a resumed Campaign File change", "messages": ["resumed-change"]},
+        {"name": "two player actions", "input": {"messages": [
+            ("user", {"text": "I open the door."}), ("user", {"text": "I step through."})]}},
     ],
     "resume_exchange_results": [
         {"name": "a held draft", "resumed": [{"role": "assistant", "content": "Draft."}]},
@@ -766,10 +791,33 @@ def basis_of(value: object, basis: object) -> object:
     return value
 
 
+def roster_names(owner: object, campaign_id: object) -> tuple[str, str] | None:
+    """The first named participant's name and first name, or `None` when none is named."""
+    for participant in owner.snapshot(campaign_id).participants:  # type: ignore[attr-defined]
+        name = participant.data.get("name")
+        if isinstance(name, str) and name.strip():
+            return name, name.strip().split()[0]
+    return None
+
+
+def named(value: object, names: tuple[str, str] | None) -> object:
+    """`{name}`, `{NAME}` and `{given}` in a message's text filled from the roster."""
+    if not isinstance(value, dict) or not isinstance(value.get("text"), str):
+        return value
+    text = value["text"]
+    if "{" not in text:
+        return value
+    if names is None:
+        raise LookupError("the campaign names no participant")
+    return {**value, "text": text.replace("{NAME}", names[0].upper()).replace(
+        "{name}", names[0]).replace("{given}", names[1])}
+
+
 def changed_input(provider_input: object, state: ProviderTurnState,
-                  change: dict[str, object]) -> object:
+                  change: dict[str, object], owner: object) -> object:
     """The provider input with a variant's `input` changes."""
     history = provider_input.history  # type: ignore[attr-defined]
+    names = roster_names(owner, provider_input.session.campaign_id)  # type: ignore[attr-defined]
     try:
         basis = state.basis_message_id
     except UnboundLocalError:
@@ -782,7 +830,7 @@ def changed_input(provider_input: object, state: ProviderTurnState,
         added.append(SessionMessage(
             session_id=provider_input.session.session_id,  # type: ignore[attr-defined]
             sequence=sequence + index + 1, message_id=f"message-variant-{index}",
-            kind=SessionMessageKind(kind), content=basis_of(content, basis)))
+            kind=SessionMessageKind(kind), content=named(basis_of(content, basis), names)))
     changes: dict[str, object] = {
         "history": dataclasses.replace(history, messages=(*messages, *added))}
     if "basis" in change:
@@ -820,8 +868,12 @@ def changed_messages(state: ProviderTurnState, specs: list[str]) -> None:
 def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[no-untyped-def]
     state = copy_state(state)
     provider_input = args[0] if args else None
+    owner = object.__getattribute__(self._owner, "_target")  # noqa: SLF001
     if "input" in variant:
-        provider_input = changed_input(provider_input, state, variant["input"])  # type: ignore[arg-type]
+        try:
+            provider_input = changed_input(provider_input, state, variant["input"], owner)  # type: ignore[arg-type]
+        except LookupError:
+            return
     if "messages" in variant:
         changed_messages(state, variant["messages"])  # type: ignore[arg-type]
     if "resumed" in variant:
@@ -865,7 +917,18 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
         provider_input = dataclasses.replace(provider_input, control=control)
     OVERRIDES.clear()
     OVERRIDES.update(variant.get("answer", {}))  # type: ignore[arg-type]
-    owner = object.__getattribute__(self._owner, "_target")  # noqa: SLF001
+    if variant.get("saved_actions") or variant.get("rename"):
+        campaign_id = provider_input.session.campaign_id  # type: ignore[union-attr]
+        real = owner.snapshot(campaign_id)
+        changes = {}
+        if variant.get("saved_actions"):
+            changes["events"] = (*real.events, *saved_actions(real))
+        if variant.get("rename"):
+            renamed = shared_first_names(real.participants)
+            if renamed is None:
+                return
+            changes["participants"] = renamed
+        OVERRIDES["snapshot"] = dataclasses.replace(real, **changes)
     if "combat" in variant or variant.get("lock"):
         real = owner.snapshot(state.campaign_id)
         changes: dict[str, object] = {}
@@ -904,6 +967,40 @@ def reconcile_variant(state: ProviderTurnState, variant: dict[str, object]) -> N
         state.mechanics_preparation_scopes[real.call_id] = mechanic["scope"]  # type: ignore[index]
     if "tool_name" in mechanic:  # type: ignore[operator]
         state.mechanics_tool_names[real.call_id] = mechanic["tool_name"]  # type: ignore[index]
+
+
+def saved_actions(snapshot: object) -> tuple[object, ...]:
+    """Two committed actions after the snapshot's events, each with its tool result."""
+    from sylvia_gm.domain.authority import CanonicalEvent, CanonicalEventType, EventVisibility
+    events = snapshot.events  # type: ignore[attr-defined]
+    top = max((event.sequence for event in events), default=0)
+    turn_id = events[-1].turn_id if events else "turn-variant"
+    added = []
+    for index, action_id in enumerate(("action-saved-1", "action-saved-2")):
+        sequence = top + 2 * index + 1
+        added.append(CanonicalEvent(sequence=sequence, event_type=CanonicalEventType.ACTION_COMMITTED,
+                                    turn_id=turn_id, action_id=action_id, safe_payload={}))
+        added.append(CanonicalEvent(sequence=sequence + 1, event_type=CanonicalEventType.TOOL_RESULT,
+                                    turn_id=turn_id, action_id=action_id,
+                                    safe_payload={"result": {"total": 9 + index, "note": "Ça"}},
+                                    visibility=EventVisibility.PLAYER_SAFE))
+    return tuple(added)
+
+
+def shared_first_names(participants: object) -> tuple[object, ...] | None:
+    """The first named participant renamed, and a twin of it (a new identity) added, so that
+    the two share a first name; `None` when no participant is named."""
+    first = next((participant for participant in participants  # type: ignore[attr-defined]
+                  if isinstance(participant.data.get("name"), str)
+                  and participant.data["name"].strip()), None)
+    if first is None:
+        return None
+    given = first.data["name"].strip().split()[0]
+    renamed = dataclasses.replace(first, data={**first.data, "name": f"{given} Vell"})
+    twin = dataclasses.replace(first, participant_id=f"{first.participant_id}-twin",
+                               data={**first.data, "name": f"{given} Stone"})
+    return tuple(renamed if participant is first else participant
+                 for participant in participants) + (twin,)  # type: ignore[attr-defined]
 
 
 def changed_events(snapshot: object, state: ProviderTurnState, change: object) -> object:
