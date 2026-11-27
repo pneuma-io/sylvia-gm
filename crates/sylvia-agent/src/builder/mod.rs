@@ -7,6 +7,9 @@
 //! evidence. The texts the model reads are exported from Python into `builder_texts.json` by
 //! `generate_builder_texts.py`, never retyped.
 
+pub mod character_profile_tools;
+pub mod character_tools;
+pub mod content_definition;
 pub mod evidence;
 pub mod history;
 pub mod mode;
@@ -89,4 +92,44 @@ pub(crate) fn is_authority_error(class: &str) -> bool {
             | "_BackupFailure"
             | "_ExportFailure"
     )
+}
+
+/// Which `except` clause of a Builder tool catches an error, by Python's class.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum PyFamily {
+    /// `CommandRejected` and its subclasses.
+    CommandRejected,
+    /// Another `AuthorityError`.
+    Authority,
+    /// `OSError` and its subclasses.
+    Os,
+    /// `UnicodeError` and its subclasses (all `ValueError`s).
+    Unicode,
+    /// Another `ValueError` (`json.JSONDecodeError`, `StaleWorkspaceFileError`,
+    /// `ContentShapeError`, `ParticipantValidationError`, ...).
+    Value,
+    /// `TypeError`.
+    Type,
+    /// Anything else (`KeyError`, `RuntimeError`, ...): no Builder tool catches it.
+    Other,
+}
+
+/// The family of `error`'s Python class.
+pub(crate) fn py_family(error: &sylvia_domain::DomainError) -> PyFamily {
+    let class = error.python_class();
+    match class {
+        "CommandRejected"
+        | "MechanicsRejected"
+        | "RulesetPreconditionRejected"
+        | "PortableRecoveryFailure"
+        | "_BackupFailure"
+        | "_ExportFailure" => PyFamily::CommandRejected,
+        _ if is_authority_error(class) => PyFamily::Authority,
+        "OSError" | "FileNotFoundError" | "FileExistsError" | "PermissionError" | "IsADirectoryError"
+        | "NotADirectoryError" => PyFamily::Os,
+        "UnicodeError" | "UnicodeDecodeError" | "UnicodeEncodeError" => PyFamily::Unicode,
+        "TypeError" => PyFamily::Type,
+        _ if error.is_value_error() || matches!(class, "ValueError" | "JSONDecodeError") => PyFamily::Value,
+        _ => PyFamily::Other,
+    }
 }
