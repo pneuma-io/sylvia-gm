@@ -1,15 +1,15 @@
 //! `ProviderSessionAdapter.for_turn(turn_id)` and `for_retry(model_id, provider_input=...,
 //! control=...)`: the session provider a DM turn runs and the narrator a manual retry runs.
 //!
-//! **A stub, with the session loop's** (`session_loop::campaign`, agreed with lanes 1 and 5):
-//! the shapes are final, and running either answers `rust_port_pending` until T5 (the turn's
-//! phases driven as a session provider) and T6 (the retry narrator) port them.
+//! - **`for_turn`** runs `_turn_events` (`provider_turn::turn`, T5a-1) with the loop's events.
+//! - **`for_retry`** is still a stub: running it answers `rust_port_pending` until T6.
 
 use super::context::ProviderSessionAdapter;
-use crate::provider_turn::TurnFailure;
+use crate::provider_turn::turn::turn_events;
+use crate::provider_turn::{TurnEvents, TurnFailure, TurnResult};
 use crate::session_loop::campaign::{NarrationStream, RetryNarrator};
 use crate::session_loop::{
-    ProviderControl, SessionEvents, SessionFailure, SessionProvider, SessionProviderError,
+    ProviderControl, ProviderEvent, SessionEvents, SessionFailure, SessionProvider, SessionProviderError,
     SessionProviderInput,
 };
 use std::sync::Arc;
@@ -27,19 +27,53 @@ fn pending(method: &str) -> CodedError {
 
 /// The provider `for_turn` gives.
 struct TurnProvider {
-    #[allow(dead_code)] // T5
     adapter: Arc<ProviderSessionAdapter>,
-    #[allow(dead_code)] // T5
     turn_id: String,
+}
+
+/// The loop's events, as the turn phases emit them. Python's loop raises its own exception and
+/// closes the generator; here the phase stops at the failed emit, and the loop is given back
+/// exactly the error its handler raised (an `AgentLoopError` and its reason included).
+struct LoopEvents<'a> {
+    events: &'a mut dyn SessionEvents,
+    raised: Option<SessionProviderError>,
+}
+
+impl TurnEvents for LoopEvents<'_> {
+    fn emit(&mut self, event: ProviderEvent) -> BoxFuture<'_, TurnResult<()>> {
+        Box::pin(async move {
+            let Err(error) = self.events.emit(event).await else { return Ok(()) };
+            let failure = match &error.error {
+                SessionFailure::Turn(failure) => failure.clone(),
+                SessionFailure::AgentLoop { reason, message } => {
+                    TurnFailure::Coded(CodedError::new(reason.as_str(), message.as_str()))
+                }
+            };
+            self.raised = Some(error);
+            Err(failure)
+        })
+    }
 }
 
 impl SessionProvider for TurnProvider {
     fn run<'a>(
         &'a self,
-        _input: SessionProviderInput,
-        _events: &'a mut dyn SessionEvents,
+        input: SessionProviderInput,
+        events: &'a mut dyn SessionEvents,
     ) -> BoxFuture<'a, Result<(), SessionProviderError>> {
-        Box::pin(async { Err(pending("ProviderSessionAdapter.for_turn").into()) })
+        Box::pin(async move {
+            // `for_turn` raises this when it is called; both callers run the provider at once.
+            if self.turn_id.is_empty() {
+                let error = CodedError::new("internal_error", "Provider session TURN identity must be nonempty")
+                    .with_error_type("ValueError");
+                return Err(error.into());
+            }
+            let mut events = LoopEvents { events, raised: None };
+            match turn_events(&self.adapter, &input, &self.turn_id, &mut events).await {
+                Ok(()) => Ok(()),
+                Err(failure) => Err(events.raised.take().unwrap_or_else(|| failure.into())),
+            }
+        })
     }
 }
 

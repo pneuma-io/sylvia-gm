@@ -14,6 +14,7 @@
 
 pub mod arguments;
 pub mod campaign_file;
+pub mod character_files;
 pub mod context;
 pub mod control_texts;
 pub mod messages;

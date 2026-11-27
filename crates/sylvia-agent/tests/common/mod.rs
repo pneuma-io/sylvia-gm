@@ -4,6 +4,7 @@
 
 #![allow(dead_code)]
 
+pub mod replay;
 pub mod turn_state;
 
 use serde_json::Value as J;
@@ -643,6 +644,16 @@ impl TurnOwner for Recorded {
             terminal: message(&result["terminal"]),
             has_compaction: result["has_compaction"].as_bool().unwrap(),
         })
+    }
+    fn actor_decision_request<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        turn_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<sylvia_app::actor_decisions::ActorDecisionRequest>>> {
+        let result = self.next("actor_decision_request", serde_json::json!([campaign_id, turn_id]));
+        // A recorded request is T6's (`run_required_actor_decision`); none is recorded yet.
+        assert!(result.is_null(), "a recorded actor decision request is not replayed before T6");
+        ready(None)
     }
     fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
         ready(opt(&self.next("current_open_turn", serde_json::json!([campaign_id]))))

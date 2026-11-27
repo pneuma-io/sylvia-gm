@@ -10,6 +10,7 @@ use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
+use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::{campaign_file, content_reads, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ActionCommand;
@@ -17,6 +18,7 @@ use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::{SessionActivityBasis, SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
+use sylvia_store::snapshots::DisplayQuery;
 
 /// An `AuthorityOwner` method lane 3 has not ported yet.
 fn pending(method: &str) -> CodedError {
@@ -273,6 +275,32 @@ impl TurnOwner for OwnerReads {
     ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
         // Lane 3's K1.
         Box::pin(async { Err(pending("read_campaign_reference").into()) })
+    }
+
+    fn actor_decision_request<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        _turn_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<ActorDecisionRequest>>> {
+        Box::pin(async move {
+            // `AuthorityOwner.actor_decision_request`'s opening: a package that declares no
+            // isolated participant has no actor decision. The rest (the turn checks and the
+            // projection) is T6's, with `run_required_actor_decision`.
+            let id = campaign_id.to_owned();
+            let isolated = self
+                .store()
+                .call(move |store| {
+                    let snapshot = store.display_snapshot(&id, &DisplayQuery::default())?;
+                    let declared = content_reads::decision_scope_declaration(store, &snapshot.state)?;
+                    Ok(declared.is_some_and(|declared| declared.contains_key("isolated_participant")))
+                })
+                .await
+                .map_err(store_error)?;
+            if isolated {
+                return Err(pending("actor_decision_request"));
+            }
+            Ok(None)
+        })
     }
 
     fn session_activity_basis<'a>(

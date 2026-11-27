@@ -8,7 +8,7 @@
 //! measures and later strips them.
 
 use super::context::{
-    canonical_player_narration, py_str, rejected, saved_action_sequence_results, ProviderSessionAdapter,
+    canonical_player_narration as canonical_player_narration_of, py_str, rejected, saved_action_sequence_results, ProviderSessionAdapter,
     SessionProviderInput,
 };
 use super::tagged::{Tagged, HOST_RECORD_KEY, LEDGER_KEY, STABLE_KEY};
@@ -111,6 +111,19 @@ impl ProviderSessionAdapter {
         &self,
         input: &SessionProviderInput,
         rank: &RankReferences,
+    ) -> CodedResult<Vec<Tagged>> {
+        self.messages_with(input, rank, None).await
+    }
+
+    /// `_messages(provider_input, ..., canonical_player_narration=...)`: with the campaign's
+    /// canonical narration already read (the turn reads it once), or `None` to read it here.
+    /// `campaign_has_mechanics` and `tools_available` change nothing (`_dm_system_prompt`
+    /// discards them), so they are not taken.
+    pub async fn messages_with(
+        &self,
+        input: &SessionProviderInput,
+        rank: &RankReferences,
+        canonical_player_narration: Option<Vec<JsonMap>>,
     ) -> CodedResult<Vec<Tagged>> {
         let reads = self.reads.as_ref();
         let mut selected: Vec<&SessionMessage> = input.history.messages.iter().collect();
@@ -273,9 +286,10 @@ impl ProviderSessionAdapter {
                 pyjson::dumps(&actions, Dump::DEFAULT.ascii(false))
             ))));
         }
-        let canonical_narration = match campaign_id {
-            Some(campaign_id) => canonical_player_narration(reads, campaign_id).await?,
-            None => Vec::new(),
+        let canonical_narration = match (canonical_player_narration, campaign_id) {
+            (Some(given), _) => given,
+            (None, Some(campaign_id)) => canonical_player_narration_of(reads, campaign_id).await?,
+            (None, None) => Vec::new(),
         };
         let guide = match campaign_id {
             Some(campaign_id) => reads.ruleset_gm_operating_guide(campaign_id).await?,
@@ -293,12 +307,16 @@ impl ProviderSessionAdapter {
                 .filter(|message| message.kind() == SessionMessageKind::User)
                 .map(SessionMessage::message_id),
         };
-        if dm && input.reference_reader.is_some() {
-            return Err(CodedError::new(
-                sylvia_provider::factory::PORT_PENDING,
-                "The Rust owner cannot select relevant Character Files yet.",
-            ));
-        }
+        // The current player's own words, when this request answers one.
+        let current_player_text = match (response_message, current_user_message_id, latest_selected_dialogue) {
+            (None, Some(_), Some(latest)) => latest.content().get("text").and_then(Json::as_str).unwrap_or(""),
+            _ => "",
+        };
+        let relevant_character_files = if dm && input.reference_reader.is_some() {
+            self.relevant_character_files_message(input, current_player_text).await?
+        } else {
+            None
+        };
         let first_player_action = response_message.is_none()
             && current_user_message_id.is_some()
             && !selected.iter().any(|message| {
@@ -310,6 +328,9 @@ impl ProviderSessionAdapter {
             let (explainers, fresh) =
                 self.campaign_context_messages(input, opening_request || first_player_action, rank).await?;
             messages.push(Tagged::plain(explainers));
+            if let Some(files) = relevant_character_files {
+                messages.push(Tagged::plain(files));
+            }
             fresh_context = Some(fresh);
         }
         let resume_basis_message_id: Option<&str> =
