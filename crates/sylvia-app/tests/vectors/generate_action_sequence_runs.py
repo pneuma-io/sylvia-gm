@@ -45,9 +45,12 @@ RECORDED_TESTS = [
     "tests/test_srd_creature_space_route_continuation.py", "tests/test_srd_lite_reaction_grants.py",
     "tests/test_gm_hotfix_upgrade.py", "tests/test_gm_memory_casting_hotfix.py",
     "tests/test_updater_move_observer.py", "tests/test_alpha_f6c_canonical_frontend.py",
+    # Scenarios of this generator's own, for the paths Python's tests reach only with Trigger
+    # Discipline or not at all: refusals, and an owner crash before or after a native commit.
+    "crates/sylvia-app/tests/vectors/action_sequence_scenarios.py",
 ]
 PRIVATE_MARKERS = ("trigger-discipline", "trigger_discipline", "trigger discipline", "siren", "queue-td")
-PER_ENTRY = 80
+PER_ENTRY = 200
 DOCUMENT_BYTES = 1024
 SEQUENCES = "sylvia_gm.application.action_sequences"
 
@@ -200,11 +203,29 @@ def pytest_runtest_setup(item):
 
 
 def recording() -> list | None:
+    """The running entry's trace, unless a recorded owner call is running: what that call does
+    inside the owner (even through sequence code) is the owner's own work, not a sequence call."""
+    if getattr(LOCAL, "inside_call", 0):
+        return None
     return getattr(LOCAL, "trace", None)
 
 
 def from_sequences(depth: int = 2) -> bool:
     return sys._getframe(depth).f_globals.get("__name__") == SEQUENCES
+
+
+# A scenario's injected owner fault: the `nth` recorded call named `name` (and matching `where`)
+# raises `RuntimeError`, before the real call or after it, as an owner crash would.
+FAULT: dict = {}
+
+
+def injected(name: str, args: tuple, kwargs: dict, when: str) -> bool:
+    if not FAULT or FAULT.get("name") != name or FAULT.get("when") != when:
+        return False
+    if "where" in FAULT and not FAULT["where"](args, kwargs):
+        return False
+    FAULT["seen"] = FAULT.get("seen", 0) + 1
+    return FAULT["seen"] == FAULT.get("nth", 1)
 
 
 def record_call(name: str, function, args: tuple, kwargs: dict):
@@ -213,11 +234,20 @@ def record_call(name: str, function, args: tuple, kwargs: dict):
         return function(*args, **kwargs)
     event = {"call": name, "args": arguments_of(name, args, kwargs)}
     trace.append(event)
+    if injected(name, args, kwargs, "before"):
+        event["raise"] = {"class": "RuntimeError", "message": "injected owner fault", "code": None}
+        raise RuntimeError("injected owner fault")
+    LOCAL.inside_call = getattr(LOCAL, "inside_call", 0) + 1
     try:
         value = function(*args, **kwargs)
+        if injected(name, args, kwargs, "after"):
+            event["raise"] = {"class": "RuntimeError", "message": "injected owner fault", "code": None}
+            raise RuntimeError("injected owner fault")
     except Exception as error:
         event["raise"] = error_record(error)
         raise
+    finally:
+        LOCAL.inside_call -= 1
     event["return"] = answer_of(name, value)
     return value
 
@@ -350,14 +380,15 @@ def pytest_configure(config):  # noqa: ARG001 - pytest hook
 
         def make(original=original, guard=guard):
             def guarded(self, *args):
-                return Guard(guard, original(self, *args), list(args), from_sequences(2))
+                return Guard(guard, original(self, *args), list(args), from_sequences(2) and recording() is not None)
             return guarded
 
         setattr(AuthorityOwner, attribute, make())
     original_lane = AuthorityOwner._lane
 
     def lane(self, campaign_id):
-        return Guard("lane", original_lane(self, campaign_id), [campaign_id], from_sequences(2))
+        return Guard("lane", original_lane(self, campaign_id), [campaign_id],
+                     from_sequences(2) and recording() is not None)
 
     AuthorityOwner._lane = lane
     original_init = AuthorityOwner.__init__
@@ -372,7 +403,7 @@ def pytest_configure(config):  # noqa: ARG001 - pytest hook
 
     def entry(name, function):
         def run(*args, **kwargs):
-            if recording() is not None:
+            if getattr(LOCAL, "trace", None) is not None:
                 return function(*args, **kwargs)
             LOCAL.trace = []
             arguments = {"positional": [plain(item) for item in args[1:]], "keywords": plain(kwargs)}
@@ -406,7 +437,7 @@ def pytest_configure(config):  # noqa: ARG001 - pytest hook
 
 
 def run_tests(with_plugin: bool, sink: Path | None, basetemp: Path) -> subprocess.CompletedProcess:
-    environment = {**os.environ, "PYTHONPATH": str(HERE)}
+    environment = {**os.environ, "PYTHONPATH": os.pathsep.join([str(HERE), str(ROOT)])}
     command = [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", f"--basetemp={basetemp}",
                "-rA", *RECORDED_TESTS]
     if with_plugin:
@@ -458,6 +489,59 @@ def record() -> tuple[list[dict], dict]:
     return runs, {"check": check, "skipped": skipped}
 
 
+# The message fields the sequence code reads (`_load`, `_bound_queues`, `_bind_execution_basis`
+# and `response_reservations`); a saved queue is kept whole.
+READ_FIELDS = ("kind", "sequence_id", "attempt_id", "basis_message_id", "narration_basis_message_id")
+SHARED_BYTES = 512
+
+
+def trim_context(context: dict) -> dict:
+    messages = []
+    for message in context["messages"]:
+        content = message["content"]
+        if content.get("kind") != "action_sequence":
+            content = {key: content[key] for key in READ_FIELDS if key in content}
+        messages.append({**message, "content": content})
+    return {**context, "messages": messages}
+
+
+def trim(run: dict) -> dict:
+    """Only what the sequence code reads of each answered session context."""
+    for event in run["trace"]:
+        answer = event.get("return")
+        if event.get("call") in ("active_dm_context", "session_context") and answer:
+            event["return"] = trim_context(answer)
+        elif event.get("call") == "campaign_session_contexts" and answer:
+            event["return"] = [trim_context(context) for context in answer]
+    return run
+
+
+def intern(value: object, shared: dict) -> object:
+    """Each object or list kept once in `shared`, at any depth, as `{"__shared__": key}` (over SHARED_BYTES)."""
+    if isinstance(value, dict):
+        value = {key: intern(item, shared) for key, item in value.items()}
+    elif isinstance(value, list):
+        value = [intern(item, shared) for item in value]
+    else:
+        return value
+    text = json.dumps(value, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
+    if len(text) <= SHARED_BYTES:
+        return value
+    key = hashlib.sha256(text.encode()).hexdigest()[:24]
+    shared[key] = value
+    return {"__shared__": key}
+
+
+def expand(value: object, shared: dict) -> object:
+    if isinstance(value, dict) and set(value) == {"__shared__"}:
+        return expand(shared[value["__shared__"]], shared)
+    if isinstance(value, dict):
+        return {key: expand(item, shared) for key, item in value.items()}
+    if isinstance(value, list):
+        return [expand(item, shared) for item in value]
+    return value
+
+
 def main() -> int:
     sys.path.insert(0, str(ROOT / "src"))
     if "--record" in sys.argv:
@@ -470,11 +554,21 @@ def main() -> int:
                 print("  ", line)
             return 1
     else:
-        runs = json.loads(OUTPUT.read_text(encoding="utf-8"))["runs"]
+        previous = json.loads(OUTPUT.read_text(encoding="utf-8"))
+        runs = [expand(run, previous.get("shared", {})) for run in previous["runs"]]
+    shared: dict = {}
+    kept = []
     for index, run in enumerate(runs):
+        run = trim(run)
         run["label"] = f"{run['entry']} {index}"
-    OUTPUT.write_bytes((json.dumps({"python": sys.version.split()[0], "runs": runs}, ensure_ascii=True,
-                                   allow_nan=False, separators=(",", ":")) + "\n").encode("ascii"))
+        kept.append(intern(run, shared))
+    text = json.dumps({"python": sys.version.split()[0], "shared": dict(sorted(shared.items())), "runs": kept},
+                      ensure_ascii=True, allow_nan=False, separators=(",", ":"))
+    assert " at 0x" not in text
+    lowered = text.lower()
+    found = [marker for marker in PRIVATE_MARKERS if marker in lowered]
+    assert not found, f"private markers in the vectors: {found}"
+    OUTPUT.write_bytes((text + "\n").encode("ascii"))
     counts: dict[str, int] = {}
     for run in runs:
         key = f"{run['entry']} {'ok' if 'ok' in run['outcome'] else run['outcome']['error']['class']}"

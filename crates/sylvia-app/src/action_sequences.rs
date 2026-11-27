@@ -295,7 +295,10 @@ pub enum PlayerActionAnswer {
 /// `bind_narration_action` takes the narration lock `_execute` already holds.
 pub trait SequenceOwner: Sync {
     /// `with owner._operation():`.
-    fn with_operation<'a, R, F, Fut>(&'a self, body: F) -> impl Future<Output = SequenceResult<R>> + Send + 'a
+    fn with_operation<'a, R, F, Fut>(
+        &'a self,
+        body: F,
+    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
     where
         R: Send + 'a,
         F: FnOnce() -> Fut + Send + 'a,
@@ -324,19 +327,26 @@ pub trait SequenceOwner: Sync {
         Fut: Future<Output = SequenceResult<R>> + Send + 'a;
 
     /// `with owner._narration_lock:`.
-    fn with_narration_lock<'a, R, F, Fut>(&'a self, body: F) -> impl Future<Output = SequenceResult<R>> + Send + 'a
+    fn with_narration_lock<'a, R, F, Fut>(
+        &'a self,
+        body: F,
+    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
     where
         R: Send + 'a,
         F: FnOnce() -> Fut + Send + 'a,
         Fut: Future<Output = SequenceResult<R>> + Send + 'a;
 
     /// `owner._active_dm_context(session_id)`.
-    fn active_dm_context<'a>(&'a self, session_id: &'a str)
-        -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a;
+    fn active_dm_context<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a;
 
     /// `owner._sessions.context(session_id)`.
-    fn session_context<'a>(&'a self, session_id: &'a str)
-        -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a;
+    fn session_context<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a;
 
     /// `owner._sessions.append_message(session_id=..., message_id=..., kind=..., content=...)`.
     fn append_session_message<'a>(
@@ -348,7 +358,10 @@ pub trait SequenceOwner: Sync {
     ) -> impl Future<Output = SequenceResult<()>> + Send + 'a;
 
     /// `owner._store.snapshot(campaign_id)`.
-    fn snapshot<'a>(&'a self, campaign_id: &'a str) -> impl Future<Output = SequenceResult<CampaignSnapshot>> + Send + 'a;
+    fn snapshot<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<CampaignSnapshot>> + Send + 'a;
 
     /// `owner._store.action_hit(campaign_id, action_id)`.
     fn action_hit<'a>(
@@ -358,15 +371,22 @@ pub trait SequenceOwner: Sync {
     ) -> impl Future<Output = SequenceResult<Option<IdempotencyHit>>> + Send + 'a;
 
     /// `owner._store.pending_mechanics_action(campaign_id) is not None`.
-    fn has_pending_mechanics_action<'a>(&'a self, campaign_id: &'a str)
-        -> impl Future<Output = SequenceResult<bool>> + Send + 'a;
+    fn has_pending_mechanics_action<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<bool>> + Send + 'a;
 
     /// `owner._store.current_open_turn(campaign_id)`.
-    fn current_open_turn<'a>(&'a self, campaign_id: &'a str)
-        -> impl Future<Output = SequenceResult<Option<String>>> + Send + 'a;
+    fn current_open_turn<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<Option<String>>> + Send + 'a;
 
     /// `owner._campaign_work_counts.get(campaign_id)`, `0` for `None`.
-    fn campaign_work_count<'a>(&'a self, campaign_id: &'a str) -> impl Future<Output = SequenceResult<usize>> + Send + 'a;
+    fn campaign_work_count<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<usize>> + Send + 'a;
 
     /// `owner._store.campaign_session_contexts(campaign_id)`.
     fn campaign_session_contexts<'a>(
@@ -423,7 +443,10 @@ pub trait SequenceOwner: Sync {
     ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a;
 
     /// `owner.campaign_panels(campaign_id)`.
-    fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> impl Future<Output = SequenceResult<JsonMap>> + Send + 'a;
+    fn campaign_panels<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<JsonMap>> + Send + 'a;
 
     /// `owner._player_action_in_owned_work(**envelope, preview_only=...)`.
     fn player_action_in_owned_work<'a>(
@@ -439,7 +462,10 @@ pub trait SequenceOwner: Sync {
     ) -> impl Future<Output = SequenceResult<()>> + Send + 'a;
 
     /// `owner._catalog(campaign_id)`.
-    fn catalog<'a>(&'a self, campaign_id: &'a str) -> impl Future<Output = SequenceResult<Vec<CatalogTool>>> + Send + 'a;
+    fn catalog<'a>(
+        &'a self,
+        campaign_id: &'a str,
+    ) -> impl Future<Output = SequenceResult<Vec<CatalogTool>>> + Send + 'a;
 
     /// The `attempt_id`s of `owner._attempts.values()` for this campaign that are not terminal and
     /// whose `turn_id` equals `turn_id` (`None` matches none), in `_attempts` order. Called only
@@ -502,7 +528,9 @@ fn is_authority_error(error: &ActionError) -> bool {
 fn error_text(error: &ActionError) -> String {
     match error {
         ActionError::Domain(error) => error.message().to_owned(),
-        ActionError::Store(error) => error.rejection().map_or_else(|| error.to_string(), |coded| coded.message),
+        ActionError::Store(error) => {
+            error.rejection().map_or_else(|| error.to_string(), |coded| coded.message)
+        }
     }
 }
 
@@ -533,7 +561,9 @@ fn field<'a>(map: &'a JsonMap, key: &str) -> SequenceResult<&'a Json> {
 /// A saved object field (a saved queue is the sequence code's own evidence; another JSON type
 /// is possible only by editing the database, and fails as a `TypeError`).
 fn object(value: &Json) -> SequenceResult<&JsonMap> {
-    value.as_object().ok_or_else(|| uncaught("TypeError", format!("'{}' object is not subscriptable", py_type_name(value))))
+    value.as_object().ok_or_else(|| {
+        uncaught("TypeError", format!("'{}' object is not subscriptable", py_type_name(value)))
+    })
 }
 
 fn text(value: &Json) -> SequenceResult<&str> {
@@ -544,7 +574,9 @@ fn text(value: &Json) -> SequenceResult<&str> {
 fn steps_of(queue: &JsonMap) -> SequenceResult<&Vec<Json>> {
     match field(queue, "steps")? {
         Json::Array(steps) => Ok(steps),
-        other => Err(uncaught("TypeError", format!("'{}' object is not a list of steps", py_type_name(other)))),
+        other => {
+            Err(uncaught("TypeError", format!("'{}' object is not a list of steps", py_type_name(other))))
+        }
     }
 }
 
@@ -554,9 +586,9 @@ fn step_at(queue: &JsonMap, index: usize) -> SequenceResult<&JsonMap> {
 
 fn step_mut(queue: &mut JsonMap, index: usize) -> SequenceResult<&mut JsonMap> {
     match queue.get_mut("steps") {
-        Some(Json::Array(steps)) => steps[index]
-            .as_object_mut()
-            .ok_or_else(|| uncaught("TypeError", "a saved step is not an object")),
+        Some(Json::Array(steps)) => {
+            steps[index].as_object_mut().ok_or_else(|| uncaught("TypeError", "a saved step is not an object"))
+        }
         _ => Err(uncaught("KeyError", "'steps'")),
     }
 }
@@ -712,7 +744,8 @@ fn commit_watermark(snapshot: &CampaignSnapshot, action_id: &str) -> i64 {
         .events
         .iter()
         .filter(|event| {
-            event.action_id.as_deref() == Some(action_id) && event.event_type == CanonicalEventType::ActionCommitted
+            event.action_id.as_deref() == Some(action_id)
+                && event.event_type == CanonicalEventType::ActionCommitted
         })
         .map(|event| event.sequence)
         .max()
@@ -727,7 +760,9 @@ async fn scope<O: SequenceOwner>(owner: &O, snapshot: &CampaignSnapshot) -> Sequ
         actors.push(text(field(object(actor)?, "id")?)?.to_owned());
     }
     actors.sort();
-    Ok(serde_json::json!({"available": value.get("available").cloned().unwrap_or(Json::Null), "actors": actors}))
+    Ok(
+        serde_json::json!({"available": value.get("available").cloned().unwrap_or(Json::Null), "actors": actors}),
+    )
 }
 
 /// `player_control_origin(envelope["source"], expected_revision=envelope["expected_revision"],
@@ -746,7 +781,9 @@ fn envelope_origin(envelope: &JsonMap, session_id: &Json) -> SequenceResult<Json
 async fn needs_recovery<O: SequenceOwner>(owner: &O, queue: &JsonMap) -> SequenceResult<bool> {
     for index in 0..steps_of(queue)?.len() {
         let step = step_at(queue, index)?;
-        if is(field(step, "status")?, STEP_COMMITTED) || !py_truthy(step.get("execution").unwrap_or(&Json::Null)) {
+        if is(field(step, "status")?, STEP_COMMITTED)
+            || !py_truthy(step.get("execution").unwrap_or(&Json::Null))
+        {
             continue;
         }
         let campaign_id = text(field(queue, "campaign_id")?)?;
@@ -816,10 +853,13 @@ async fn recover<O: SequenceOwner>(
     let campaign_id = text(field(queue, "campaign_id")?)?.to_owned();
     let mut changed = false;
     let snapshot = owner.snapshot(&campaign_id).await?;
-    let session_active = owner.session_context(session_id).await?.session.fields().status == SessionStatus::Active;
+    let session_active =
+        owner.session_context(session_id).await?.session.fields().status == SessionStatus::Active;
     for index in 0..steps_of(queue)?.len() {
         let step = step_at(queue, index)?;
-        if is(field(step, "status")?, STEP_COMMITTED) || !py_truthy(step.get("execution").unwrap_or(&Json::Null)) {
+        if is(field(step, "status")?, STEP_COMMITTED)
+            || !py_truthy(step.get("execution").unwrap_or(&Json::Null))
+        {
             continue;
         }
         let operation_id = text(field(step, "operation_id")?)?.to_owned();
@@ -827,7 +867,8 @@ async fn recover<O: SequenceOwner>(
         let step = step_at(queue, index)?;
         let origin = envelope_origin(object(field(step, "execution")?)?, field(queue, "session_id")?)?;
         let origins = player_action_origins(&snapshot);
-        let saved = origins.iter().find(|(action_id, _)| *action_id == operation_id).map(|(_, origin)| origin);
+        let saved =
+            origins.iter().find(|(action_id, _)| *action_id == operation_id).map(|(_, origin)| origin);
         if !player_action_request_matches(saved, &origin) {
             return Err(reject("Saved sequence action identity is inconsistent"));
         }
@@ -900,7 +941,9 @@ pub async fn compose_action_sequence<O: SequenceOwner>(
         _ => return Err(reject("An action sequence supports at most 32 declared steps")),
     };
     owner
-        .with_operation(|| owner.with_lane(&request.campaign_id, || compose_held(owner, request, steps, from_agent)))
+        .with_operation(|| {
+            owner.with_lane(&request.campaign_id, || compose_held(owner, request, steps, from_agent))
+        })
         .await
 }
 
@@ -928,7 +971,9 @@ async fn compose_held<O: SequenceOwner>(
     if let Some(old) = &old {
         if needs_recovery(owner, old).await? {
             action_sequence(owner, &request.session_id, Some(&request.sequence_id)).await?;
-            return Err(stale("Saved commitments were recovered; inspect the current sequence before editing"));
+            return Err(stale(
+                "Saved commitments were recovered; inspect the current sequence before editing",
+            ));
         }
     }
     let old_version = match &old {
@@ -1022,7 +1067,9 @@ async fn compose_held<O: SequenceOwner>(
             _ => None,
         };
         if let Some(previous) = previous {
-            if !py_eq(field(previous, "source")?, &source) || !py_eq(field(previous, "selection")?, &selection) {
+            if !py_eq(field(previous, "source")?, &source)
+                || !py_eq(field(previous, "selection")?, &selection)
+            {
                 return Err(reject("Committed steps cannot be edited"));
             }
             result.push(Json::Object(previous.clone()));
@@ -1041,12 +1088,14 @@ async fn compose_held<O: SequenceOwner>(
             Err(error) => return Err(error),
         };
         // A later intention can become legal after an earlier native commit.
-        let presentation =
-            match owner.player_action_preview(&control.tool, &control.parameters, &snapshot, &source, &selection).await {
-                Ok(presentation) => presentation,
-                Err(error) if is_authority_error(&error) => None,
-                Err(error) => return Err(error),
-            };
+        let presentation = match owner
+            .player_action_preview(&control.tool, &control.parameters, &snapshot, &source, &selection)
+            .await
+        {
+            Ok(presentation) => presentation,
+            Err(error) if is_authority_error(&error) => None,
+            Err(error) => return Err(error),
+        };
         let actor_id = match control.actor_parameter.as_deref().filter(|parameter| !parameter.is_empty()) {
             Some(parameter) => control.parameters.get(parameter).cloned().unwrap_or(Json::Null),
             None => Json::Null,
@@ -1063,7 +1112,8 @@ async fn compose_held<O: SequenceOwner>(
             .iter()
             .find(|(known, _)| py_eq(known, &actor_id))
             .map_or_else(|| actor_id.clone(), |(_, name)| name.clone());
-        let preview = presentation.and_then(|presentation| presentation.get("preview").cloned()).unwrap_or(Json::Null);
+        let preview =
+            presentation.and_then(|presentation| presentation.get("preview").cloned()).unwrap_or(Json::Null);
         let mut queued = JsonMap::new();
         set(&mut queued, "step_id", step_id);
         set(&mut queued, "source", source);
@@ -1129,7 +1179,9 @@ pub async fn execute_action_sequence<O: SequenceOwner>(
         return execute_held(owner, request).await;
     }
     owner
-        .with_operation(|| owner.with_direct_action_work(&request.campaign_id, || execute_held(owner, request)))
+        .with_operation(|| {
+            owner.with_direct_action_work(&request.campaign_id, || execute_held(owner, request))
+        })
         .await
 }
 
@@ -1171,7 +1223,11 @@ fn answer_action_id(answer: &PlayerActionAnswer) -> SequenceResult<&str> {
 }
 
 /// `_rebind_map(owner, snapshot, step)`: a queued map selection moved to the current revision.
-async fn rebind_map<O: SequenceOwner>(owner: &O, snapshot: &CampaignSnapshot, step: &JsonMap) -> SequenceResult<Json> {
+async fn rebind_map<O: SequenceOwner>(
+    owner: &O,
+    snapshot: &CampaignSnapshot,
+    step: &JsonMap,
+) -> SequenceResult<Json> {
     let mut selection = field(step, "selection")?.clone();
     if let Json::Object(map) = &mut selection {
         if map.contains_key("map_revision") && is(field(object(field(step, "source")?)?, "kind")?, "panel") {
@@ -1292,7 +1348,8 @@ async fn execute_in_lane<O: SequenceOwner>(owner: &O, request: &ExecuteRequest) 
         let receipt = match (&hit, &envelope) {
             // Recover an uncertain native commit before comparing its advanced revision.
             (Some(_), Some(envelope)) => {
-                let receipt = owner.player_action_in_owned_work(&envelope_request(object(envelope)?, false)?).await?;
+                let receipt =
+                    owner.player_action_in_owned_work(&envelope_request(object(envelope)?, false)?).await?;
                 let resulting = match &receipt {
                     PlayerActionAnswer::Receipt(receipt) => receipt.resulting_revision,
                     PlayerActionAnswer::AwaitingChoice(_) => {
@@ -1494,5 +1551,28 @@ pub async fn last_attempt_commit<O: SequenceOwner>(
             identities.extend(committed_from_markers(&queue, &markers).map_err(ActionError::Store)?);
         }
     }
-    Ok(snapshot.actions.iter().rev().find(|action| identities.contains(&action.action_id)).map(|action| action.action_id.clone()))
+    Ok(latest_committed(&snapshot, &identities))
+}
+
+/// `last_attempt_commit(owner, campaign_id, attempt_id)` on the store itself, which is all it
+/// reads (`owner._store`), for the owner's narration lifecycle (`_expire_narration_locked`).
+pub fn last_attempt_commit_in_store(
+    store: &AuthorityStore,
+    campaign_id: &str,
+    attempt_id: &str,
+) -> StoreResult<Option<String>> {
+    let snapshot = store.snapshot(campaign_id)?;
+    let mut identities: Vec<String> = Vec::new();
+    for context in store.campaign_session_contexts(campaign_id, &[])? {
+        for queue in bound_queues(&context, None, Some(attempt_id))? {
+            identities.extend(committed_ids(store, &queue)?);
+        }
+    }
+    Ok(latest_committed(&snapshot, &identities))
+}
+
+/// `next((a.action_id for a in reversed(snapshot.actions) if a.action_id in identities), None)`.
+fn latest_committed(snapshot: &CampaignSnapshot, identities: &[String]) -> Option<String> {
+    let found = snapshot.actions.iter().rev().find(|action| identities.contains(&action.action_id));
+    found.map(|action| action.action_id.clone())
 }

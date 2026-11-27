@@ -44,7 +44,8 @@ pub fn player_control_origin(
     };
     // `selection or {}`: Python's `None` is `Json::Null`; any falsy selection becomes `{}`, and a
     // truthy one (a list or text included) is kept as it is.
-    let selection = if crate::pyops::py_truthy(selection) { selection.clone() } else { Json::Object(JsonMap::new()) };
+    let selection =
+        if crate::pyops::py_truthy(selection) { selection.clone() } else { Json::Object(JsonMap::new()) };
     let mut origin = JsonMap::new();
     origin.insert("expected_revision".into(), json!(expected_revision));
     origin.insert("selection".into(), selection);
@@ -153,7 +154,8 @@ pub fn valid_player_action_consequence(payload: &JsonMap, expected_revision: i64
         }
         _ => return false,
     };
-    let Ok(mut expected) = player_control_origin(&source, expected_revision, &Json::Object(selection.clone()), session_id)
+    let Ok(mut expected) =
+        player_control_origin(&source, expected_revision, &Json::Object(selection.clone()), session_id)
     else {
         return false;
     };
