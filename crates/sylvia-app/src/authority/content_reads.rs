@@ -325,7 +325,7 @@ fn materialize_tool(
 }
 
 /// `_active_dm_context(session_id)`: one active campaign-bound DM session.
-fn active_dm_context(store: &AuthorityStore, session_id: &str) -> StoreResult<SessionContext> {
+pub(super) fn active_dm_context(store: &AuthorityStore, session_id: &str) -> StoreResult<SessionContext> {
     let context = store.session_context(session_id)?;
     let session = &context.session;
     if session.role() != WriterRole::Dm

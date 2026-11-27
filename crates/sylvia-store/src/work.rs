@@ -52,6 +52,22 @@ impl Drop for CampaignWorkGuard {
     }
 }
 
+/// One player action's direct work (`_direct_action_work`): when it drops, the campaign stops
+/// resolving a player action, then its campaign work finishes, in Python's order.
+#[derive(Debug)]
+pub struct DirectActionGuard {
+    _work: CampaignWorkGuard,
+    state: Arc<Mutex<State>>,
+    campaign_id: String,
+}
+
+impl Drop for DirectActionGuard {
+    fn drop(&mut self) {
+        // `_work` drops after this, finishing the campaign work.
+        self.state.lock().unwrap_or_else(PoisonError::into_inner).direct_actions.remove(&self.campaign_id);
+    }
+}
+
 /// One reserved campaign transition (`_reserve_campaign_transition`):
 /// `_release_campaign_transition` runs when it drops.
 #[derive(Debug)]
@@ -80,10 +96,19 @@ impl CampaignWork {
         F: FnOnce() -> Fut,
         Fut: std::future::Future<Output = StoreResult<LifecycleState>>,
     {
+        let _admission = self.admission.lock().await;
+        self.begin_admitted(campaign_id, lifecycle).await
+    }
+
+    /// `_begin_campaign_work`'s body, with the admission lock (`_work_condition`) already held.
+    async fn begin_admitted<F, Fut>(&self, campaign_id: &str, lifecycle: F) -> StoreResult<CampaignWorkGuard>
+    where
+        F: FnOnce() -> Fut,
+        Fut: std::future::Future<Output = StoreResult<LifecycleState>>,
+    {
         if validate_authority_identity(campaign_id, "Campaign identity", false).is_err() {
             return Err(rejected("Campaign authority identity is invalid", "invalid_authority_identity"));
         }
-        let _admission = self.admission.lock().await;
         {
             let state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
             if state.direct_actions.contains(campaign_id) {
@@ -102,6 +127,39 @@ impl CampaignWork {
         let mut state = self.state.lock().unwrap_or_else(PoisonError::into_inner);
         *state.counts.entry(campaign_id.to_owned()).or_insert(0) += 1;
         Ok(CampaignWorkGuard { state: Arc::clone(&self.state), campaign_id: campaign_id.to_owned() })
+    }
+
+    /// `_direct_action_work(campaign_id)`: a player click is admitted only while the campaign is
+    /// idle (no queueing behind GM work and no interrupting it), as campaign work that also marks
+    /// the campaign as resolving a player action, so new campaign work is refused until it ends.
+    pub async fn begin_direct_action<F, Fut>(
+        &self,
+        campaign_id: &str,
+        lifecycle: F,
+    ) -> StoreResult<DirectActionGuard>
+    where
+        F: FnOnce() -> Fut,
+        Fut: std::future::Future<Output = StoreResult<LifecycleState>>,
+    {
+        // Python holds `_work_condition` across the idle check and `_begin_campaign_work`.
+        let _admission = self.admission.lock().await;
+        if self.count(campaign_id) != 0 {
+            return Err(rejected(
+                "Player actions are unavailable while campaign work is running",
+                "campaign_work_in_progress",
+            ));
+        }
+        let work = self.begin_admitted(campaign_id, lifecycle).await?;
+        self.state
+            .lock()
+            .unwrap_or_else(PoisonError::into_inner)
+            .direct_actions
+            .insert(campaign_id.to_owned());
+        Ok(DirectActionGuard {
+            _work: work,
+            state: Arc::clone(&self.state),
+            campaign_id: campaign_id.to_owned(),
+        })
     }
 
     /// `_reserve_campaign_transition(campaign_id)`: refused while another transition is reserved

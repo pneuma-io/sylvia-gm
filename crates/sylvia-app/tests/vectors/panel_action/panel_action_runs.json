@@ -1,0 +1,1266 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "scenarios": [
+  {
+   "name": "plain",
+   "runs": [
+    {
+     "name": "a preview",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": true
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "label": "Move",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         4,
+         4
+        ],
+        "map_revision": 7
+       },
+       "actor": null,
+       "confirmation_required": false,
+       "confirmation": "c30910831817417eb3e7500e6c13cc5a4debdc6ac8d530db8f8f3efa06360a78",
+       "response": "on_request",
+       "preview": null
+      }
+     }
+    },
+    {
+     "name": "the move",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": []
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "its replay",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "status": "committed",
+       "result": {
+        "context": {},
+        "logs": [],
+        "narrative_directives": [],
+        "narrative_hooks": {},
+        "status": "committed",
+        "tool": "move_unit"
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "a conflicting replay",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        5,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "IdempotencyConflict",
+      "code": "idempotency_conflict",
+      "message": "Player action identity payload does not match"
+     }
+    },
+    {
+     "name": "an unknown surface",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "other-surface",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "nowhere",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_unavailable",
+      "message": "Panel action is unavailable"
+     }
+    },
+    {
+     "name": "an unknown action",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "other-action",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "fly"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_unavailable",
+      "message": "Panel action is unavailable"
+     }
+    },
+    {
+     "name": "a destination off the map",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "off-map",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        99,
+        99
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_invalid",
+      "message": "Panel action selection is invalid"
+     }
+    },
+    {
+     "name": "a destination that is not a point",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "not-a-point",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": "north",
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_invalid",
+      "message": "Panel action selection is invalid"
+     }
+    },
+    {
+     "name": "a stale revision",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "stale",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "StaleRevision",
+      "code": "stale_revision",
+      "message": "Panel action expected an obsolete campaign revision"
+     }
+    }
+   ]
+  },
+  {
+   "name": "confirmed",
+   "runs": [
+    {
+     "name": "the preview",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": true
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "label": "Move",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         4,
+         4
+        ],
+        "map_revision": 7
+       },
+       "actor": null,
+       "confirmation_required": true,
+       "confirmation": "ccc6e2a14db1127b752be4a41f2680d01d41da6ee27078c38cb18c18d68f30b5",
+       "response": "on_request",
+       "preview": null
+      }
+     }
+    },
+    {
+     "name": "the move without its token",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "action_confirmation_required",
+      "message": "Preview and confirm the current action first"
+     }
+    },
+    {
+     "name": "the confirmed move",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": "ccc6e2a14db1127b752be4a41f2680d01d41da6ee27078c38cb18c18d68f30b5",
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": []
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "its replay",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": "ccc6e2a14db1127b752be4a41f2680d01d41da6ee27078c38cb18c18d68f30b5",
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "status": "committed",
+       "result": {
+        "context": {},
+        "logs": [],
+        "narrative_directives": [],
+        "narrative_hooks": {},
+        "status": "committed",
+        "tool": "move_unit"
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "a later preview",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "later",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": true
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 1,
+       "label": "Move",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         4,
+         4
+        ],
+        "map_revision": 7
+       },
+       "actor": null,
+       "confirmation_required": true,
+       "confirmation": "ea3cbd81ef3b23d1b6e7902ce9fc6b49664583fb1b913ed93b346fd9241845dc",
+       "response": "on_request",
+       "preview": null
+      }
+     }
+    },
+    {
+     "name": "an old token at the later revision",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "later",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": "ccc6e2a14db1127b752be4a41f2680d01d41da6ee27078c38cb18c18d68f30b5",
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "action_confirmation_required",
+      "message": "Preview and confirm the current action first"
+     }
+    },
+    {
+     "name": "the later move confirmed",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "later",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": "ea3cbd81ef3b23d1b6e7902ce9fc6b49664583fb1b913ed93b346fd9241845dc",
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "later",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": []
+       },
+       "resulting_revision": 2
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "choice",
+   "runs": [
+    {
+     "name": "the move reserving its choice",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "AwaitingChoiceReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "basis_revision": 0,
+       "turn_id": "turn",
+       "choice": {
+        "__class__": "MechanicsChoiceRequest",
+        "choice_id": "route",
+        "prompt": "Choose a route",
+        "options": [
+         {
+          "__class__": "MechanicsChoiceOption",
+          "option_id": "north",
+          "label": "North"
+         },
+         {
+          "__class__": "MechanicsChoiceOption",
+          "option_id": "south",
+          "label": "South"
+         }
+        ]
+       },
+       "choice_sequence": 0
+      }
+     }
+    },
+    {
+     "name": "its replay",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "AwaitingChoiceReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "basis_revision": 0,
+       "turn_id": "turn",
+       "choice": {
+        "__class__": "MechanicsChoiceRequest",
+        "choice_id": "route",
+        "prompt": "Choose a route",
+        "options": [
+         {
+          "__class__": "MechanicsChoiceOption",
+          "option_id": "north",
+          "label": "North"
+         },
+         {
+          "__class__": "MechanicsChoiceOption",
+          "option_id": "south",
+          "label": "South"
+         }
+        ]
+       },
+       "choice_sequence": 0
+      }
+     }
+    },
+    {
+     "name": "a preview while it waits",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": true
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This player action is awaiting a choice"
+     }
+    }
+   ]
+  },
+  {
+   "name": "coordinate",
+   "runs": [
+    {
+     "name": "the coordinate move",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "coordinate-move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "aim_point": [
+        2.125,
+        1.375,
+        0.75
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "coordinate-move",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": []
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "its replay",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "coordinate-move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "aim_point": [
+        2.125,
+        1.375,
+        0.75
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "coordinate-move",
+       "status": "committed",
+       "result": {
+        "context": {},
+        "logs": [],
+        "narrative_directives": [],
+        "narrative_hooks": {},
+        "status": "committed",
+        "tool": "move_unit"
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "an aim point off the map",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "off-map",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "aim_point": [
+        99.0,
+        99.0,
+        0.0
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_invalid",
+      "message": "Panel action selection is invalid"
+     }
+    },
+    {
+     "name": "a stale map revision",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "stale-map",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "aim_point": [
+        2.125,
+        1.375,
+        0.75
+       ],
+       "map_revision": 6
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_invalid",
+      "message": "Panel action selection is invalid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "reference",
+   "runs": [
+    {
+     "name": "a preview naming the mechanical actor",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "refs-move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "aim_point": [
+        2.125,
+        1.375,
+        0.75
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": true
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "label": "Move",
+       "selection": {
+        "actor": "operator",
+        "aim_point": [
+         2.125,
+         1.375,
+         0.75
+        ],
+        "map_revision": 7
+       },
+       "actor": null,
+       "confirmation_required": false,
+       "confirmation": "f0daeacd08fa7e310fafd42d8b4451bc10c3836e998a8c57d080680742c7c1b3",
+       "response": "on_request",
+       "preview": null
+      }
+     }
+    },
+    {
+     "name": "the move bound to its mechanical actor",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "refs-move",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "aim_point": [
+        2.125,
+        1.375,
+        0.75
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "refs-move",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": []
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "a body without a reference",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": null,
+      "operation_id": "refs-ambusher",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "ambusher",
+       "aim_point": [
+        2.125,
+        1.375,
+        0.75
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "panel_action_invalid",
+      "message": "Panel action selection is invalid"
+     }
+    }
+   ]
+  },
+  {
+   "name": "party",
+   "runs": [
+    {
+     "name": "an uncontrolled companion",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "party-bravo",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "party",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "bravo"
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This actor is not currently controlled by the player"
+     }
+    },
+    {
+     "name": "a hidden member",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "party-hidden",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "party",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "hidden"
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "The selected party member is unavailable"
+     }
+    },
+    {
+     "name": "the map for an uncontrolled companion",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "map-bravo",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "bravo",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This actor is not currently controlled by the player"
+     }
+    },
+    {
+     "name": "a fixed action for an uncontrolled companion",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "fixed-bravo",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "party",
+       "action_id": "move-bravo"
+      },
+      "selection": null,
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This actor is not currently controlled by the player"
+     }
+    },
+    {
+     "name": "the party preview with its actor",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "party-operator",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "party",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator"
+      },
+      "confirmation": null,
+      "preview_only": true
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "label": "Move",
+       "selection": {
+        "actor": "operator"
+       },
+       "actor": {
+        "id": "operator",
+        "name": "Operator"
+       },
+       "confirmation_required": false,
+       "confirmation": "6f008ea0ccd9ba663f95893a3ac06a4b057d6ba5231b62ea6d1eaefec3274a73",
+       "response": "on_request",
+       "preview": null
+      }
+     }
+    },
+    {
+     "name": "the controlled member",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "party-operator",
+      "expected_revision": 0,
+      "source": {
+       "kind": "panel",
+       "surface_id": "party",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator"
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "party-operator",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": [],
+        "result_card": {
+         "version": 1,
+         "summary": [
+          {
+           "label": "Destination",
+           "value": [
+            4,
+            4
+           ],
+           "emphasis": false
+          }
+         ],
+         "details": [],
+         "title": "Movement",
+         "actions": [
+          {
+           "label": "Continue to the next position",
+           "tool": "move_unit",
+           "parameters": {
+            "actor": "operator",
+            "destination": [
+             5,
+             4
+            ],
+            "mode": "careful"
+           }
+          }
+         ]
+        }
+       },
+       "resulting_revision": 1
+      }
+     }
+    },
+    {
+     "name": "the map for the controlled member",
+     "request": {
+      "campaign_id": "campaign",
+      "session_id": "gm",
+      "operation_id": "map-operator",
+      "expected_revision": 1,
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "confirmation": null,
+      "preview_only": false
+     },
+     "outcome": {
+      "ok": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "map-operator",
+       "status": "committed",
+       "result": {
+        "status": "committed",
+        "tool": "move_unit",
+        "context": {},
+        "narrative_hooks": {},
+        "narrative_directives": [],
+        "logs": [],
+        "result_card": {
+         "version": 1,
+         "summary": [
+          {
+           "label": "Destination",
+           "value": [
+            4,
+            4
+           ],
+           "emphasis": false
+          }
+         ],
+         "details": [],
+         "title": "Movement",
+         "actions": [
+          {
+           "label": "Continue to the next position",
+           "tool": "move_unit",
+           "parameters": {
+            "actor": "operator",
+            "destination": [
+             5,
+             4
+            ],
+            "mode": "careful"
+           }
+          }
+         ]
+        }
+       },
+       "resulting_revision": 2
+      }
+     }
+    }
+   ]
+  }
+ ]
+}
