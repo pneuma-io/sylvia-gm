@@ -101,8 +101,11 @@ pub async fn update_campaign_file(
     match stage {
         Stage::Unchanged(answer) => Ok(answer),
         Stage::Character { command, commands, character_updates } => {
-            let options =
-                ExecuteOptions { campaign_file_commands: commands.clone(), campaign_file_update: true };
+            let options = ExecuteOptions {
+                campaign_file_commands: commands.clone(),
+                campaign_file_update: true,
+                player_action_origin: None,
+            };
             let receipt = match execute_action_in_work(store, owner_id, &command, &options).await {
                 Ok(receipt) => receipt,
                 // `except (OSError, sqlite3.Error)`.

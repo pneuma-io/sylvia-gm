@@ -3,6 +3,7 @@
 pub mod actions;
 pub mod campaign_file;
 pub mod content_reads;
+pub mod direct_actions;
 pub mod guided;
 pub mod lifecycle;
 pub mod narration;

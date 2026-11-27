@@ -1,0 +1,331 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "runs": [
+  {
+   "name": "the card's preview",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": true
+   },
+   "holding_session": null,
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "revision": 1,
+     "label": "Continue to the next position",
+     "selection": {},
+     "actor": null,
+     "confirmation_required": true,
+     "confirmation": "9617587f364d48e3e3d593ddbc969f67661d5613b5f02f3a5c3ee9e2ac1327d7",
+     "response": "automatic",
+     "preview": null
+    }
+   }
+  },
+  {
+   "name": "a click without confirming",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "action_confirmation_required",
+    "message": "Preview and confirm the current action first"
+   }
+  },
+  {
+   "name": "replacement parameters",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": {
+     "actor": "other"
+    },
+    "confirmation": null,
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Result-card actions do not accept replacement parameters"
+   }
+  },
+  {
+   "name": "a forged source",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0,
+     "parameters": {
+      "actor": "other"
+     }
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Player control source is invalid"
+   }
+  },
+  {
+   "name": "a click while the GM session holds campaign work",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": "9617587f364d48e3e3d593ddbc969f67661d5613b5f02f3a5c3ee9e2ac1327d7",
+    "preview_only": false
+   },
+   "holding_session": "gm",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_work_in_progress",
+    "message": "Player actions are unavailable while campaign work is running"
+   }
+  },
+  {
+   "name": "the confirmed click",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": "9617587f364d48e3e3d593ddbc969f67661d5613b5f02f3a5c3ee9e2ac1327d7",
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign",
+     "action_id": "card-move",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "move_unit",
+      "context": {},
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": [],
+      "result_card": {
+       "version": 1,
+       "summary": [
+        {
+         "label": "Destination",
+         "value": [
+          5,
+          4
+         ],
+         "emphasis": false
+        }
+       ],
+       "details": [],
+       "title": "Movement",
+       "actions": [
+        {
+         "label": "Continue to the next position",
+         "tool": "move_unit",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           5,
+           4
+          ],
+          "mode": "careful"
+         }
+        }
+       ]
+      }
+     },
+     "resulting_revision": 2
+    }
+   }
+  },
+  {
+   "name": "its replay",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": "9617587f364d48e3e3d593ddbc969f67661d5613b5f02f3a5c3ee9e2ac1327d7",
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign",
+     "action_id": "card-move",
+     "status": "committed",
+     "result": {
+      "context": {},
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "result_card": {
+       "actions": [
+        {
+         "label": "Continue to the next position",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           5,
+           4
+          ],
+          "mode": "careful"
+         },
+         "tool": "move_unit"
+        }
+       ],
+       "details": [],
+       "summary": [
+        {
+         "emphasis": false,
+         "label": "Destination",
+         "value": [
+          5,
+          4
+         ]
+        }
+       ],
+       "title": "Movement",
+       "version": 1
+      },
+      "status": "committed",
+      "tool": "move_unit"
+     },
+     "resulting_revision": 2
+    }
+   }
+  },
+  {
+   "name": "another source under the same operation",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "card-move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Player action identity payload does not match"
+   }
+  },
+  {
+   "name": "a preview once it resolved",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-move",
+    "expected_revision": 1,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 0
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": true
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "This player action has already resolved"
+   }
+  },
+  {
+   "name": "a button the card does not have",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-missing",
+    "expected_revision": 2,
+    "source": {
+     "kind": "result_card",
+     "action_id": "move",
+     "button_index": 3
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "The saved card action is unavailable"
+   }
+  }
+ ]
+}
