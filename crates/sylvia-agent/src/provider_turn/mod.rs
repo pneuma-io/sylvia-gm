@@ -12,6 +12,7 @@
 //! so the handling happens at the same point.
 
 pub mod decisions;
+pub mod narration;
 pub mod round;
 pub mod state;
 pub mod tool_batch;

@@ -29,7 +29,7 @@ state vary: the provider input when there is one, any other positional argument 
 keyword arguments (`turn_id`, a refusal's `error`) are passed through as given.
 
 Each call is then run again on copies of its state and input with the variants
-`VARIANTS[phase]` names: some turn locals set, and some owner reads answered with given values
+`VARIANTS[phase]` names (and other phases on copies of its state, `CROSS_VARIANTS[phase]`): some turn locals set, and some owner reads answered with given values
 (logged as ordinary calls), so the Rust tests reach branches a recorded turn does not.
 
 The pseudo-phase `list_tools` traces `StatelessMcpMechanics._list_tools` instead (T3m-1):
@@ -785,8 +785,63 @@ def traced_relay(function, self, state, args, kwargs):  # type: ignore[no-untype
     log({"event": "phase_end", "state": dump_state(state)})
 
 
+#: Each traced phase's own function, before `wrap` replaced it.
+ORIGINAL: dict[str, object] = {}
+
+#: Other phases run on a copy of a traced phase's state, for phases a recorded turn rarely
+#: reaches (T4's narration phases, from the final narration's state). Each is a phase name and
+#: a variant as `VARIANTS` gives them.
+NARRATED = "The gate creaks open on the cold yard."
+
+CROSS_VARIANTS: dict[str, list[tuple[str, dict[str, object]]]] = {
+    # A stand-in turn narrates through the Campaign File, so the prose-only phases run on the
+    # state a round's reconciliation starts from, with the round's prose set.
+    "reconcile_tool_batch": [
+        ("record_empty_completion", {"name": "no finish reason",
+                                     "set": {"narration": "", "round_finish_reason": None}}),
+        ("record_empty_completion", {"name": "an empty finish reason",
+                                     "set": {"narration": "", "round_finish_reason": ""}}),
+        ("record_empty_completion", {"name": "a finish reason",
+                                     "set": {"narration": "", "round_finish_reason": "length"}}),
+        ("retry_repeated_response", {"name": "a repeated response", "set": {"narration": NARRATED}}),
+        ("retry_repeated_response", {"name": "a repeated non-ASCII response",
+                                     "set": {"narration": "Ça va — l’œuvre est là. 🌒"}}),
+        ("retry_missing_tool_call", {"name": "a missing tool call", "set": {"narration": NARRATED}}),
+        ("retry_private_deliberation", {"name": "private deliberation",
+                                        "set": {"narration": "I should roll first."}}),
+        ("record_final_narration", {"name": "the final narration", "set": {"narration": NARRATED}}),
+        ("record_held_narration", {"name": "held narration with native data", "set": {
+            "narration": NARRATED, "assistant_reasoning": ["Thinking."],
+            "native_chat_metadata": {"thought": "x"}}}),
+        ("retry_missing_campaign_file_update", {"name": "a rejected Campaign File call", "set": {
+            "narration": NARRATED, "buffered_narration": None, "buffered_raw_response_blocks": None}}),
+        ("retry_missing_campaign_file_update", {"name": "a held response", "set": {
+            "narration": NARRATED, "buffered_narration": "Held.", "buffered_raw_response_blocks": None}}),
+        ("retry_missing_campaign_file_update", {"name": "held response blocks", "set": {
+            "narration": NARRATED, "buffered_narration": None,
+            "buffered_raw_response_blocks": [{"kind": "narration", "text": "Held."}]}}),
+        ("preserve_boundary_narration", {"name": "a GM decision still active",
+                                         "set": {"narration": NARRATED}}),
+        ("preserve_player_intent_narration", {"name": "the player's action still pending",
+                                              "set": {"narration": NARRATED}}),
+        ("retain_campaign_file_narration", {"name": "held for the Campaign File",
+                                            "set": {"narration": NARRATED}}),
+    ],
+}
+
+
+def run_cross_variants(name, self, before, args, kwargs):  # type: ignore[no-untyped-def]
+    for other, variant in CROSS_VARIANTS.get(name, []):
+        # Only for a phase this run traces, so the anchor's own vectors stay as they were.
+        if other not in PHASES:
+            continue
+        function = ORIGINAL.get(other) or getattr(_provider_turn_phases, other)
+        run_variant(function, self, before, args, kwargs, variant)
+
+
 def wrap(name: str) -> None:
     function = getattr(_provider_turn_phases, name)
+    ORIGINAL[name] = function
 
     if inspect.isgeneratorfunction(function):
         def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
@@ -794,12 +849,14 @@ def wrap(name: str) -> None:
             yield from traced_relay(function, self, state, args, kwargs)
             for variant in VARIANTS.get(name, []):
                 run_variant(function, self, before, args, kwargs, variant)
+            run_cross_variants(name, self, before, args, kwargs)
     else:
         def traced(self, state, *args, **kwargs):  # type: ignore[no-untyped-def]
             before = copy_state(state)
             result = traced_call(function, self, state, args, kwargs, None)
             for variant in VARIANTS.get(name, []):
                 run_variant(function, self, before, args, kwargs, variant)
+            run_cross_variants(name, self, before, args, kwargs)
             return result
 
     traced.__name__ = name
