@@ -13,7 +13,7 @@
 
 mod common;
 
-use common::replay::{self, install_catalogs, no_facts, Callbacks, Loop, Scripted};
+use common::replay::{self, install_catalogs, rank, Callbacks, Loop, Scripted};
 use common::{turn_state, Recorded};
 use serde_json::Value as J;
 use std::sync::{Arc, Mutex};
@@ -54,7 +54,7 @@ fn adapter(case: &J, owner: &Arc<Recorded>, provider: &Arc<Scripted>, ids: &Arc<
             &Environment::default(),
         )
         .expect("the recorded adapter inputs are valid")
-        .with_turn_owner(Arc::clone(owner) as Arc<dyn TurnOwner>, Arc::new(no_facts))
+        .with_turn_owner(Arc::clone(owner) as Arc<dyn TurnOwner>, Arc::new(rank))
         .with_record_warning(Arc::new(|_: &str| {}))
         .with_ids(Arc::new(move || {
             let mut ids = draw.lock().unwrap();
@@ -70,7 +70,9 @@ fn check_ending(name: &str, outcome: Result<(), TurnFailure>, raised: Option<&J>
         (Ok(()), None) => {}
         (Err(TurnFailure::Coded(error)), Some(raised)) => {
             assert_eq!(J::from(error.error_type.unwrap_or("CommandRejected")), raised["class"], "{name}: the class");
-            assert_eq!(J::from(error.code.as_str()), raised["code"], "{name}: the code");
+            // An uncaught exception has no `code`; the owner reports it as `internal_error`.
+            let code = raised["code"].as_str().unwrap_or("internal_error");
+            assert_eq!(error.code.as_str(), code, "{name}: the code");
             assert_eq!(J::from(error.message.as_str()), raised["message"], "{name}: the message");
         }
         (outcome, raised) => panic!("{name}: got {outcome:?}, Python raised {raised:?}"),

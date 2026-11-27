@@ -11,6 +11,7 @@ use super::context::{
     canonical_player_narration as canonical_player_narration_of, py_str, rejected, saved_action_sequence_results, ProviderSessionAdapter,
     SessionProviderInput,
 };
+use super::py_values::{push_unique, py_iter};
 use super::tagged::{Tagged, HOST_RECORD_KEY, LEDGER_KEY, STABLE_KEY};
 use super::texts::{
     campaign_opening_task_message, context_contract_update_message, dm_system_prompt,
@@ -245,18 +246,14 @@ impl ProviderSessionAdapter {
         }
         let saved_sequences = saved_action_sequence_results(input, reads).await?;
         if let (false, Some(campaign_id)) = (saved_sequences.is_empty(), campaign_id) {
+            // `dict.fromkeys(...)`: Python's equality, its iteration of a saved value, and its
+            // refusal of an unhashable key.
             let mut action_ids: Vec<Json> = Vec::new();
-            let push_unique = |ids: &mut Vec<Json>, value: Json| {
-                if !ids.contains(&value) {
-                    ids.push(value);
-                }
-            };
             let mut committed = Vec::new();
             for result in &saved_sequences {
-                if let Some(Json::Array(ids)) = result.get("committed_action_ids") {
-                    for id in ids {
-                        push_unique(&mut committed, id.clone());
-                    }
+                let Some(ids) = result.get("committed_action_ids") else { continue };
+                for id in py_iter(ids)? {
+                    push_unique(&mut committed, id)?;
                 }
             }
             if response_message.is_some() {
@@ -266,11 +263,11 @@ impl ProviderSessionAdapter {
                             CodedError::new("internal_error", "'action_id'").with_error_type("KeyError")
                         );
                     };
-                    push_unique(&mut action_ids, id.clone());
+                    push_unique(&mut action_ids, id.clone())?;
                 }
             }
             for id in committed {
-                push_unique(&mut action_ids, id);
+                push_unique(&mut action_ids, id)?;
             }
             let mut request = JsonMap::new();
             request.insert("player_action_ids".into(), Json::Array(action_ids));

@@ -35,6 +35,7 @@ use crate::provider_session::context::{
 use crate::provider_session::control_texts::preparation_keeps_intent_pending;
 use crate::provider_session::narration_facts::{action_sequence_narration_facts, public_action_result};
 use crate::provider_session::request::{contains_serialized_tool_call, release_provider_idle_soon};
+use crate::provider_session::py_values::{py_iter, require_hashable, require_hashable_frozen};
 use crate::provider_session::tagged::Tagged;
 use crate::provider_session::texts::{gm_system_contract_version, player_turn_text};
 use crate::provider_session::tools::{CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT, PREPARATION_INTENT_ARGUMENT};
@@ -118,41 +119,6 @@ fn saved_round_narration_facts(input: &SessionProviderInput, basis_message_id: O
         }
     }
     facts
-}
-
-/// An uncaught `TypeError`, as the owner reports it.
-fn type_error(message: String) -> CodedError {
-    CodedError::new("internal_error", message).with_error_type("TypeError")
-}
-
-/// Hashing `value` for a set or a set membership test: an object or a list is unhashable.
-fn require_hashable(value: &Json) -> CodedResult<()> {
-    match value {
-        Json::Object(_) | Json::Array(_) => Err(type_error(format!("unhashable type: '{}'", py_type_name(value)))),
-        _ => Ok(()),
-    }
-}
-
-/// [`require_hashable`] for a value read from a saved message's content, which Python keeps
-/// as frozen JSON (`FrozenJsonList`, `FrozenJsonDict`).
-fn require_hashable_frozen(value: &Json) -> CodedResult<()> {
-    let name = match value {
-        Json::Array(_) => "FrozenJsonList",
-        Json::Object(_) => "FrozenJsonDict",
-        _ => return Ok(()),
-    };
-    Err(type_error(format!("unhashable type: '{name}'")))
-}
-
-/// Iterating a saved value as Python does: a list's items, a text's characters, an object's
-/// keys; anything else is not iterable.
-fn py_iter(value: &Json) -> CodedResult<Vec<Json>> {
-    match value {
-        Json::Array(items) => Ok(items.clone()),
-        Json::String(text) => Ok(text.chars().map(|c| Json::from(c.to_string())).collect()),
-        Json::Object(map) => Ok(map.keys().map(|key| Json::from(key.as_str())).collect()),
-        other => Err(type_error(format!("'{}' object is not iterable", py_type_name(other)))),
-    }
 }
 
 /// `{action.get("action_id") for fact in facts for action in fact.get("committed_actions", ())}`.
@@ -313,17 +279,17 @@ pub async fn prepare_turn_recovery(
     state.locals.current_player_message.set(current);
     let sequence_results = saved_action_sequence_results(input, adapter.reads.as_ref()).await?;
     state.locals.saved_sequence_results.set(sequence_results.clone());
-    let mut pending_facts = saved_round_narration_facts(input, basis.as_deref());
-    let narrated = narrated_action_ids(&pending_facts)?;
+    // The live rounds' facts are assigned first: a saved queue's facts extend them.
+    state.locals.pending_narration_facts.set(saved_round_narration_facts(input, basis.as_deref()));
+    let narrated = narrated_action_ids(state.locals.pending_narration_facts.get()?)?;
     for result in &sequence_results {
         if already_narrated(result.get("committed_action_ids"), &narrated)? {
             continue;
         }
         if let Some(facts) = action_sequence_narration_facts(owner, &campaign_id, result).await? {
-            pending_facts.push(facts);
+            state.locals.pending_narration_facts.get_mut()?.push(facts);
         }
     }
-    state.locals.pending_narration_facts.set(pending_facts);
     state.obligations.provisional_tool_prose_pending.set(false);
     state.obligations.player_intent_pending.set(false);
     let committed = owner

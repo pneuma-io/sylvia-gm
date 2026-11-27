@@ -347,6 +347,21 @@ impl Provider for Scripted {
     }
 }
 
+/// Lane 3's `rank_references`, as the owner gives the request assembly (`sylvia-owner`'s
+/// preflight), for a recording whose campaign has knowledge facts.
+pub fn rank(query: &str, references: &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> {
+    let candidates: Vec<sylvia_app::knowledge_search::KnowledgeReference> = references
+        .iter()
+        .map(|reference| sylvia_app::knowledge_search::KnowledgeReference {
+            result: reference.result.clone(),
+            identity: reference.identity.clone(),
+            body: reference.body.clone(),
+        })
+        .collect();
+    sylvia_app::knowledge_search::rank_references(query, &candidates)
+        .map_err(|error| CodedError::new("internal_error", error.to_string()))
+}
+
 /// A rank function for a campaign without knowledge facts.
 pub fn no_facts(_query: &str, references: &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> {
     assert!(references.is_empty(), "the recorded campaign has no facts");
