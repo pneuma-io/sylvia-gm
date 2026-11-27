@@ -165,10 +165,6 @@
         "message_id": "canonical-5",
         "kind": "canonical_reference",
         "content": {
-         "activity": {
-          "label": "Dexterity",
-          "total": 15
-         },
          "event_type": "tool_result",
          "safe_payload": {
           "result": {
@@ -177,7 +173,11 @@
           },
           "status": "committed"
          },
-         "visibility": "player_safe"
+         "visibility": "player_safe",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         }
         },
         "canonical_sequence": 5
        },
@@ -218,42 +218,42 @@
       "latest_canonical_sequence": 5,
       "act_markers": [
        {
-        "act_number": 1,
-        "after_message_id": "canonical-1",
         "marker_id": "act-1-complete",
+        "after_message_id": "canonical-1",
+        "act_number": 1,
         "status": "complete"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-1",
         "marker_id": "act-2-begins",
+        "after_message_id": "canonical-1",
+        "act_number": 2,
         "status": "begins"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
         "marker_id": "act-2-complete",
+        "after_message_id": "canonical-2",
+        "act_number": 2,
         "status": "complete"
        }
       ],
       "campaign_ending": {
-       "act_number": 2,
-       "after_message_id": "canonical-2",
-       "choice": "epilogue",
        "ending_id": "end-quiet",
-       "has_after_story": false,
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
        "open_world": false,
-       "plan_title": "The Drowned Bell"
+       "has_after_story": false,
+       "choice": "epilogue"
       },
       "campaign_endings": [
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
-        "choice": "epilogue",
         "ending_id": "end-quiet",
-        "has_after_story": false,
+        "after_message_id": "canonical-2",
+        "act_number": 2,
+        "plan_title": "The Drowned Bell",
         "open_world": false,
-        "plan_title": "The Drowned Bell"
+        "has_after_story": false,
+        "choice": "epilogue"
        }
       ],
       "builder_question_messages": []
@@ -281,10 +281,6 @@
         "message_id": "canonical-5",
         "kind": "canonical_reference",
         "content": {
-         "activity": {
-          "label": "Dexterity",
-          "total": 15
-         },
          "event_type": "tool_result",
          "safe_payload": {
           "result": {
@@ -293,7 +289,11 @@
           },
           "status": "committed"
          },
-         "visibility": "player_safe"
+         "visibility": "player_safe",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         }
         },
         "canonical_sequence": 5
        },
@@ -334,42 +334,42 @@
       "latest_canonical_sequence": 5,
       "act_markers": [
        {
-        "act_number": 1,
-        "after_message_id": "canonical-1",
         "marker_id": "act-1-complete",
+        "after_message_id": "canonical-1",
+        "act_number": 1,
         "status": "complete"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-1",
         "marker_id": "act-2-begins",
+        "after_message_id": "canonical-1",
+        "act_number": 2,
         "status": "begins"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
         "marker_id": "act-2-complete",
+        "after_message_id": "canonical-2",
+        "act_number": 2,
         "status": "complete"
        }
       ],
       "campaign_ending": {
-       "act_number": 2,
-       "after_message_id": "canonical-2",
-       "choice": "epilogue",
        "ending_id": "end-quiet",
-       "has_after_story": false,
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
        "open_world": false,
-       "plan_title": "The Drowned Bell"
+       "has_after_story": false,
+       "choice": "epilogue"
       },
       "campaign_endings": [
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
-        "choice": "epilogue",
         "ending_id": "end-quiet",
-        "has_after_story": false,
+        "after_message_id": "canonical-2",
+        "act_number": 2,
+        "plan_title": "The Drowned Bell",
         "open_world": false,
-        "plan_title": "The Drowned Bell"
+        "has_after_story": false,
+        "choice": "epilogue"
        }
       ],
       "builder_question_messages": []
@@ -411,10 +411,6 @@
         "message_id": "canonical-5",
         "kind": "canonical_reference",
         "content": {
-         "activity": {
-          "label": "Dexterity",
-          "total": 15
-         },
          "event_type": "tool_result",
          "safe_payload": {
           "result": {
@@ -423,7 +419,11 @@
           },
           "status": "committed"
          },
-         "visibility": "player_safe"
+         "visibility": "player_safe",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         }
         },
         "canonical_sequence": 5
        }
@@ -435,42 +435,42 @@
       "latest_canonical_sequence": 5,
       "act_markers": [
        {
-        "act_number": 1,
-        "after_message_id": "canonical-1",
         "marker_id": "act-1-complete",
+        "after_message_id": "canonical-1",
+        "act_number": 1,
         "status": "complete"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-1",
         "marker_id": "act-2-begins",
+        "after_message_id": "canonical-1",
+        "act_number": 2,
         "status": "begins"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
         "marker_id": "act-2-complete",
+        "after_message_id": "canonical-2",
+        "act_number": 2,
         "status": "complete"
        }
       ],
       "campaign_ending": {
-       "act_number": 2,
-       "after_message_id": "canonical-2",
-       "choice": "epilogue",
        "ending_id": "end-quiet",
-       "has_after_story": false,
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
        "open_world": false,
-       "plan_title": "The Drowned Bell"
+       "has_after_story": false,
+       "choice": "epilogue"
       },
       "campaign_endings": [
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
-        "choice": "epilogue",
         "ending_id": "end-quiet",
-        "has_after_story": false,
+        "after_message_id": "canonical-2",
+        "act_number": 2,
+        "plan_title": "The Drowned Bell",
         "open_world": false,
-        "plan_title": "The Drowned Bell"
+        "has_after_story": false,
+        "choice": "epilogue"
        }
       ],
       "builder_question_messages": []
@@ -499,42 +499,42 @@
       "latest_canonical_sequence": 5,
       "act_markers": [
        {
-        "act_number": 1,
-        "after_message_id": "canonical-1",
         "marker_id": "act-1-complete",
+        "after_message_id": "canonical-1",
+        "act_number": 1,
         "status": "complete"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-1",
         "marker_id": "act-2-begins",
+        "after_message_id": "canonical-1",
+        "act_number": 2,
         "status": "begins"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
         "marker_id": "act-2-complete",
+        "after_message_id": "canonical-2",
+        "act_number": 2,
         "status": "complete"
        }
       ],
       "campaign_ending": {
-       "act_number": 2,
-       "after_message_id": "canonical-2",
-       "choice": "epilogue",
        "ending_id": "end-quiet",
-       "has_after_story": false,
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
        "open_world": false,
-       "plan_title": "The Drowned Bell"
+       "has_after_story": false,
+       "choice": "epilogue"
       },
       "campaign_endings": [
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
-        "choice": "epilogue",
         "ending_id": "end-quiet",
-        "has_after_story": false,
+        "after_message_id": "canonical-2",
+        "act_number": 2,
+        "plan_title": "The Drowned Bell",
         "open_world": false,
-        "plan_title": "The Drowned Bell"
+        "has_after_story": false,
+        "choice": "epilogue"
        }
       ],
       "builder_question_messages": []
@@ -610,10 +610,6 @@
         "message_id": "canonical-5",
         "kind": "canonical_reference",
         "content": {
-         "activity": {
-          "label": "Dexterity",
-          "total": 15
-         },
          "event_type": "tool_result",
          "safe_payload": {
           "result": {
@@ -622,7 +618,11 @@
           },
           "status": "committed"
          },
-         "visibility": "player_safe"
+         "visibility": "player_safe",
+         "activity": {
+          "label": "Dexterity",
+          "total": 15
+         }
         },
         "canonical_sequence": 5
        },
@@ -663,42 +663,42 @@
       "latest_canonical_sequence": 5,
       "act_markers": [
        {
-        "act_number": 1,
-        "after_message_id": "canonical-1",
         "marker_id": "act-1-complete",
+        "after_message_id": "canonical-1",
+        "act_number": 1,
         "status": "complete"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-1",
         "marker_id": "act-2-begins",
+        "after_message_id": "canonical-1",
+        "act_number": 2,
         "status": "begins"
        },
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
         "marker_id": "act-2-complete",
+        "after_message_id": "canonical-2",
+        "act_number": 2,
         "status": "complete"
        }
       ],
       "campaign_ending": {
-       "act_number": 2,
-       "after_message_id": "canonical-2",
-       "choice": "epilogue",
        "ending_id": "end-quiet",
-       "has_after_story": false,
+       "after_message_id": "canonical-2",
+       "act_number": 2,
+       "plan_title": "The Drowned Bell",
        "open_world": false,
-       "plan_title": "The Drowned Bell"
+       "has_after_story": false,
+       "choice": "epilogue"
       },
       "campaign_endings": [
        {
-        "act_number": 2,
-        "after_message_id": "canonical-2",
-        "choice": "epilogue",
         "ending_id": "end-quiet",
-        "has_after_story": false,
+        "after_message_id": "canonical-2",
+        "act_number": 2,
+        "plan_title": "The Drowned Bell",
         "open_world": false,
-        "plan_title": "The Drowned Bell"
+        "has_after_story": false,
+        "choice": "epilogue"
        }
       ],
       "builder_question_messages": []
@@ -2213,14 +2213,14 @@
     {
      "ok": [
       {
-       "authoritative": false,
+       "evidence_id": "evidence-1",
        "child_session_id": "child-1",
+       "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "safe_summary": "Rules drafted.",
        "claims": [
         "rules-ready"
        ],
-       "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-       "evidence_id": "evidence-1",
-       "safe_summary": "Rules drafted."
+       "authoritative": false
       },
       {
        "session_id": "child-1",
@@ -2242,14 +2242,14 @@
     {
      "ok": [
       {
-       "authoritative": false,
+       "evidence_id": "evidence-1",
        "child_session_id": "child-1",
+       "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+       "safe_summary": "Rules drafted.",
        "claims": [
         "rules-ready"
        ],
-       "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-       "evidence_id": "evidence-1",
-       "safe_summary": "Rules drafted."
+       "authoritative": false
       },
       {
        "session_id": "child-1",

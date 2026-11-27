@@ -401,16 +401,16 @@
       "current_scene": null,
       "facts": [
        {
-        "admitted_revision": 2,
         "record_id": "fact-a",
+        "text": "A storm is coming.",
         "record_kind": "fact",
-        "text": "A storm is coming."
+        "admitted_revision": 2
        },
        {
-        "admitted_revision": 3,
         "name": "Stern",
         "record_id": "npc-stern",
-        "record_kind": "entity"
+        "record_kind": "entity",
+        "admitted_revision": 3
        }
       ],
       "reveals": {

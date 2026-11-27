@@ -26,6 +26,7 @@ import json
 import shutil
 import sys
 import tempfile
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "src"))
@@ -49,6 +50,15 @@ from sylvia_gm.domain.session import SessionMessageKind  # noqa: E402
 from sylvia_gm.infrastructure import sqlite_authority as a  # noqa: E402
 
 OUT = Path(__file__).resolve().parent / "campaigns"
+
+
+def ordered(value: object) -> object:
+    """Plain JSON in Python's own key order; `_dump` would sort every mapping."""
+    if isinstance(value, Mapping):
+        return {str(key): ordered(item) for key, item in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [ordered(item) for item in value]
+    return value
 
 
 def build(database: Path) -> None:
@@ -203,7 +213,7 @@ def record_json(record: a.CampaignIndexRecord) -> dict[str, object]:
                 "resulting_campaign_revision": h.resulting_campaign_revision,
                 "chronology_ordinal": h.chronology_ordinal,
                 "completed_turn_id": h.completed_turn_id,
-                "model_guidance": json.loads(a._dump(model_guidance_payload(h.model_guidance))),
+                "model_guidance": ordered(model_guidance_payload(h.model_guidance)),
                 "payload_sha256": h.payload_sha256,
             }
             for h in record.handoffs
@@ -230,7 +240,7 @@ def entry_json(entry: object) -> dict[str, object]:
                     },
                     "model_guidance": None
                     if session.model_guidance is None
-                    else json.loads(a._dump(model_guidance_payload(session.model_guidance))),
+                    else ordered(model_guidance_payload(session.model_guidance)),
                 }
                 for session in value
             ]

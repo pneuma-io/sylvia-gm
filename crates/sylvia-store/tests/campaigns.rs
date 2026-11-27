@@ -7,6 +7,7 @@ use flate2::read::GzDecoder;
 use serde_json::json;
 use std::io::Read;
 use std::path::Path;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::Json;
 use sylvia_domain::model_capability::model_guidance_payload;
 use sylvia_store::campaigns::CampaignIndexRecord;
@@ -141,7 +142,7 @@ fn campaign_index_entries_match_the_python_owner() {
         let got_keys: Vec<&String> = got.as_object().unwrap().keys().collect();
         let want_keys: Vec<&String> = want.as_object().unwrap().keys().collect();
         assert_eq!(got_keys, want_keys, "field order");
-        assert_eq!(&got, want, "entry {}", want["campaign_id"]);
+        assert_same_json(&got, want, format!("entry {}", want["campaign_id"]));
     }
     assert!(store.campaign_index_entries().is_err(), "a closed owner refuses the read");
 }
@@ -162,6 +163,6 @@ fn campaign_index_matches_python() {
     let want = expected["campaign_index"].as_array().unwrap();
     assert_eq!(got.len(), want.len(), "campaign count");
     for (got, want) in got.iter().zip(want) {
-        assert_eq!(got, want, "campaign {}", want["campaign"]["campaign_id"]);
+        assert_same_json(got, want, format!("campaign {}", want["campaign"]["campaign_id"]));
     }
 }

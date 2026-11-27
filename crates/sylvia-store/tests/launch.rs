@@ -3,13 +3,14 @@
 
 mod common;
 
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::Json;
 use sylvia_store::launch::{self, LaunchHandshake};
 use sylvia_store::owner_lock::{authority_lock_identity, OwnerLock};
 
 fn assert_outcome(label: &str, got: Result<Json, sylvia_base::CodedError>, want: &Json) {
     match (got, want.get("error")) {
-        (Ok(value), None) => assert_eq!(&value, &want["ok"], "{label}"),
+        (Ok(value), None) => assert_same_json(&value, &want["ok"], label),
         (Err(error), Some(kind)) => {
             assert_eq!(error.error_type, kind.as_str(), "{label}: error type");
             assert_eq!(error.message, want["message"].as_str().unwrap(), "{label}: message");
