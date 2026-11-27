@@ -426,6 +426,34 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
                                      "text": "Who goes?"})}},
         {"name": "no blocks", "set": {"selected_raw_blocks": None, "ooc_ack_required": True}},
     ],
+    "reconcile_tool_batch": [
+        {"name": "failed reference reads and a failed call", "results": [
+            {"name": "read_campaign_reference", "failed": True,
+             "result": {"status": "rejected", "code": "reference_unavailable"}},
+            {"name": "search_campaign_knowledge", "failed": True,
+             "result": {"status": "rejected", "code": "knowledge_search_invalid"}},
+            {"name": None, "failed": True, "result": {"status": "rejected", "code": "x"}}]},
+        {"name": "a reference read that succeeded", "results": [
+            {"name": "read_campaign_reference", "failed": False, "result": {"status": "ok"}}]},
+        {"name": "an executed sequence only", "results": [],
+         "set": {"sequence_narration_facts": [
+             {"tool": "execute_action_sequence", "sequence_id": "s-1", "committed_actions": []}]},
+         "obligations": {"buffered_narration_needs_disposition": True},
+         "progress": {"campaign_file_disposition_in_exchange": True}},
+        {"name": "leaves the intent pending", "mechanic": {"behavior": "leaves_player_intent_pending"}},
+        {"name": "leaves pending, awaiting the player's choice",
+         "mechanic": {"behavior": "leaves_player_intent_pending", "scope": "await_player_choice"},
+         "obligations": {"player_intent_pending": False}},
+        {"name": "an invalid preparation scope",
+         "mechanic": {"behavior": "leaves_player_intent_pending", "scope": "rewrite_history"}},
+        {"name": "resolves the intent", "mechanic": {"behavior": "resolves_player_intent"},
+         "obligations": {"player_intent_pending": True},
+         "decisions": {"player_boundary_narration": True}},
+        {"name": "ends combat", "mechanic": {"tool_name": "end_combat_encounter"},
+         "obligations": {"engine_transition_review_pending": True}},
+        {"name": "the action failed", "event": "fail"},
+        {"name": "the result is unavailable", "event": "drop_result"},
+    ],
     "execute_tool_batch": [
         {"name": "an unknown tool", "calls": [{"name": "no_such_tool", "arguments": "{}"}]},
         {"name": "invalid JSON", "calls": [{"name": None, "arguments": '{"state_change": '}]},
@@ -519,6 +547,8 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
                 name=call["name"] if call["name"] is not None else real.name,
                 arguments=arguments))
         state.ordered = calls
+    if "results" in variant or "mechanic" in variant:
+        reconcile_variant(state, variant)
     supplier = getattr(provider_input, "catalog_supplier", None)
     if variant.get("catalog_tools") and supplier is not None:
         provider_input = dataclasses.replace(
@@ -539,9 +569,52 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
         if variant.get("lock"):
             changes["package_lock"] = lock_with_entry(real.package_lock)
         OVERRIDES["snapshot"] = dataclasses.replace(real, **changes)
+    if "event" in variant:
+        OVERRIDES["snapshot"] = changed_events(owner.snapshot(state.campaign_id), state, variant["event"])
     traced_call(function, self, state, (provider_input, *args[1:]) if args else args, kwargs,
                 variant["name"])
     OVERRIDES.clear()
+
+
+def reconcile_variant(state: ProviderTurnState, variant: dict[str, object]) -> None:
+    """`reconcile_tool_batch`'s variants: calls answered with given local results (`results`:
+    each a name, or `None` for the real call's, its result and whether it failed), and the
+    real mechanic's recorded behavior, preparation scope or tool name (`mechanic`)."""
+    real = state.ordered[0]
+    if "results" in variant:
+        calls = []
+        for index, entry in enumerate(variant["results"]):  # type: ignore[union-attr]
+            call_id = f"{real.call_id}-results-{index}"
+            calls.append(_provider_turn_phases._ToolCallAssembly(  # noqa: SLF001
+                call_id=call_id, name=entry["name"] if entry["name"] is not None else real.name,
+                arguments="{}"))
+            state.local_tool_results[call_id] = dict(entry["result"])
+            if entry["failed"]:
+                state.local_tool_failures.add(call_id)
+        state.ordered = calls
+    mechanic = variant.get("mechanic", {})
+    if "behavior" in mechanic:  # type: ignore[operator]
+        state.mechanics_tool_behaviors[real.call_id] = ModelToolBehavior(mechanic["behavior"])  # type: ignore[index]
+    if "scope" in mechanic:  # type: ignore[operator]
+        state.mechanics_preparation_scopes[real.call_id] = mechanic["scope"]  # type: ignore[index]
+    if "tool_name" in mechanic:  # type: ignore[operator]
+        state.mechanics_tool_names[real.call_id] = mechanic["tool_name"]  # type: ignore[index]
+
+
+def changed_events(snapshot: object, state: ProviderTurnState, change: object) -> object:
+    """The snapshot with the real mechanic's terminal event failed (`fail`) or its tool result
+    removed (`drop_result`)."""
+    from sylvia_gm.domain.authority import CanonicalEventType
+    action_id = state.mechanics_action_ids.get(state.ordered[0].call_id)
+    events = []
+    for event in snapshot.events:  # type: ignore[attr-defined]
+        if event.action_id == action_id:
+            if change == "fail" and event.event_type is CanonicalEventType.ACTION_COMMITTED:
+                event = dataclasses.replace(event, event_type=CanonicalEventType.ACTION_FAILED)
+            if change == "drop_result" and event.event_type is CanonicalEventType.TOOL_RESULT:
+                continue
+        events.append(event)
+    return dataclasses.replace(snapshot, events=tuple(events))
 
 
 def lock_with_entry(lock: object) -> object:

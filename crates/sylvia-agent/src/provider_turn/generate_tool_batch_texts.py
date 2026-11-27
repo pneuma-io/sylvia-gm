@@ -17,7 +17,9 @@ Every text is read back from the Python source with `ast`, never retyped:
   `state_reference_rejected` for the two whose code is the error's);
 - `sequence_stops`: `execute_action_sequence_call`'s two `SYLVIA_ACTION_SEQUENCE_STOP` controls,
   `stopped` (a sequence that paused, failed or went stale) then `undelivered` (no confirmed
-  reply), in source order.
+  reply), in source order;
+- `reference_failure_instruction`: the instruction `reconcile_tool_batch` gives a failed optional
+  Campaign File reference read.
 
 Reference tooling for the port; retired with the Python source.
 """
@@ -160,9 +162,15 @@ def safe_error_reasons() -> dict[str, str]:
     return reasons
 
 
+def reference_failure_instruction() -> str:
+    return const(assigned(function(AGENT / "_provider_turn_phases.py", "reconcile_tool_batch"),
+                          "reference_failure_instruction"))
+
+
 def main() -> None:
     texts = {"safe_error_reasons": safe_error_reasons(), "instructions": instructions(),
-             "batch_instructions": by_code("execute_tool_batch"), "sequence_stops": sequence_stops()}
+             "batch_instructions": by_code("execute_tool_batch"), "sequence_stops": sequence_stops(),
+             "reference_failure_instruction": reference_failure_instruction()}
     OUTPUT.write_bytes((json.dumps(texts, indent=1, ensure_ascii=False) + "\n").encode())
     print(f"wrote {OUTPUT.name}")
 

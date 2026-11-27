@@ -495,9 +495,81 @@ def argument_cases() -> dict[str, list[dict]]:
     return {"normalize": normalize, "derive": derive, "missing": missing, "overlap": overlap}
 
 
+# --- narration: one mechanic's narration facts and a participant action's public result ---
+
+def narration_cases() -> dict[str, list[dict]]:
+    from sylvia_gm.agent._provider_session import _mechanics_narration_facts, _public_action_result
+
+    entities = {"npc-1": {"name": "Brakka", "hp": 3}, "pc-1": {"name": "Tavin", "hp": 9},
+                "npc-2": {"hp": True}}
+    before = {"npc-1": {"name": "Brakka", "hp": 7}, "npc-2": {"hp": 4}}
+    check = {"status": "committed", "context": {
+        "_test_kind": "skill", "_d20_test": 14, "_adjusted_total": 17, "_outcome": "success",
+        "_ability_modifier": 2, "_unlisted": "kept out", "_weapon": "longsword"}}
+    attack = {"status": "committed", "context": {
+        "_target_id": "npc-1", "_attack_roll": 15, "_damage_roll": [3, 1], "_critical_hit": False}}
+    combat = {"current_actor": "pc-1", "initiative_first_actor": "pc-1",
+              "initiative_second_actor": "npc-1", "initiative_first_total": 18,
+              "initiative_second_total": True, "order_first": "pc-1", "order_second": "npc-1"}
+    names = {"npc-1": "the smith", "pc-1": ""}
+    parameters = {"ability": "wisdom", "skill": "perception", "tool": "thieves_tools",
+                  "target_number": 12, "actor": "pc-1"}
+    facts = [
+        ("a skill check", ["d20_test", check, entities, before, parameters, None, None]),
+        ("no parameters", ["d20_test", check, entities, before, None, None, None]),
+        ("a result that is not an object", ["d20_test", "done", entities, before, parameters, None, None]),
+        ("a context that is not an object",
+         ["d20_test", {"status": "committed", "context": [1]}, entities, before, parameters, None, None]),
+        ("no status", ["d20_test", {"context": {}}, {}, {}, parameters, None, None]),
+        ("an attack on a named target", ["attack", attack, entities, before, None, combat, names]),
+        ("an attack without display names", ["attack", attack, entities, before, None, combat, None]),
+        ("a boolean hit point total",
+         ["attack", {"status": "committed", "context": {"_target_id": "npc-2"}}, entities, before,
+          None, None, None]),
+        ("a target not in the previous state",
+         ["attack", {"status": "committed", "context": {"_target_id": "pc-1"}}, entities, before,
+          None, None, None]),
+        ("a target given only in the context",
+         ["attack", {"status": "committed", "context": {"target": {"hp": 5}}}, entities, before,
+          None, None, None]),
+        ("float hit points",
+         ["attack", {"status": "committed", "context": {"_target_id": "npc-1"}},
+          {"npc-1": {"hp": 3.0}}, {"npc-1": {"hp": 7}}, None, None, None]),
+        ("an empty combat", ["d20_test", check, entities, before, None, {}, None]),
+        ("one initiative actor twice", ["d20_test", check, entities, before, None, {
+            **combat, "initiative_second_actor": "pc-1", "order_second": "pc-1"}, None]),
+        ("an order missing an actor", ["d20_test", check, entities, before, None,
+                                        {**combat, "order_second": ""}, None]),
+        ("a current actor that is not text", ["d20_test", check, entities, before, None,
+                                              {**combat, "current_actor": 7}, None]),
+        ("a current actor named only in state", ["d20_test", check, entities, before, None,
+                                                 {**combat, "current_actor": "npc-1"}, {}]),
+        ("an unhashable initiative actor", ["d20_test", check, entities, before, None,
+                                            {**combat, "initiative_second_actor": {"id": 1}}, None]),
+        ("an unhashable first actor", ["d20_test", check, entities, before, None,
+                                       {**combat, "initiative_first_actor": [1]}, None]),
+    ]
+    public = [
+        ("no action", [None, {"context": {"roll": 4}, "private": True}]),
+        ("an ordinary action", ["action-1", {"context": {"roll": 4}, "private": True}]),
+        ("a participant action", ["actor-action-1", {"context": {"roll": 4}, "private": True}]),
+        ("a participant action without context", ["actor-action-2", {"private": True}]),
+        ("a participant action with a list context", ["actor-action-3", {"context": [1]}]),
+        ("a participant action with a text result", ["actor-action-4", "done"]),
+    ]
+    return {
+        "facts": [{"name": name, "arguments": arguments,
+                   "expected": outcome_of(_mechanics_narration_facts, *arguments)}
+                  for name, arguments in facts],
+        "public": [{"name": name, "arguments": arguments,
+                    "expected": outcome_of(_public_action_result, *arguments)}
+                   for name, arguments in public],
+    }
+
+
 def main() -> None:
     vectors = {"safe_error": safe_error_cases(), "helpers": helper_cases(),
-               "arguments": argument_cases()}
+               "arguments": argument_cases(), "narration": narration_cases()}
     out = Path(__file__).with_name("tool_batch_vectors.json")
     out.write_bytes((json.dumps(vectors, indent=1, ensure_ascii=False) + "\n").encode())
     print(f"wrote {out.name}: {sum(len(cases) for cases in vectors.values())} cases")
