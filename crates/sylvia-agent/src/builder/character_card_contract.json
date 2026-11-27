@@ -1,0 +1,121 @@
+{
+ "python": "3.12",
+ "contract": {
+  "success": true,
+  "supported": [
+   "flat V1 JSON/PNG chara",
+   "V2 2.0 JSON/PNG chara",
+   "V3 3.0 JSON/PNG ccv3"
+  ],
+  "unsupported": [
+   "CHARX/ZIP",
+   "foreign execution or macro/lore activation",
+   "asset fetching"
+  ],
+  "limits": {
+   "source_bytes": 16777216,
+   "json_bytes": 262144,
+   "nesting": 32,
+   "png_pixels": 16777216
+  },
+  "native_definition": "character_profile_v2",
+  "official_specifications": [
+   "https://github.com/malfoyslastname/character-card-spec-v2/blob/main/spec_v1.md",
+   "https://github.com/malfoyslastname/character-card-spec-v2/blob/main/spec_v2.md",
+   "https://github.com/kwaroran/character-card-spec-v3/blob/main/SPEC_V3.md"
+  ],
+  "external_definition": {
+   "envelopes": {
+    "v1": "Flat JSON object",
+    "v2": {
+     "spec": "chara_card_v2",
+     "spec_version": "2.0",
+     "data": "object"
+    },
+    "v3": {
+     "spec": "chara_card_v3",
+     "spec_version": "3.0",
+     "data": "object"
+    }
+   },
+   "required_v1_strings": [
+    "name",
+    "description",
+    "personality",
+    "scenario",
+    "first_mes",
+    "mes_example"
+   ],
+   "required_v2_additional_strings": [
+    "creator_notes",
+    "system_prompt",
+    "post_history_instructions",
+    "creator",
+    "character_version"
+   ],
+   "required_v2_arrays_of_strings": [
+    "alternate_greetings",
+    "tags"
+   ],
+   "required_v2_objects": [
+    "extensions"
+   ],
+   "required_v3_additional_arrays_of_strings": [
+    "group_only_greetings"
+   ],
+   "optional_book_fields": [
+    "name",
+    "description",
+    "scan_depth",
+    "token_budget",
+    "recursive_scanning",
+    "extensions",
+    "entries"
+   ],
+   "required_lore_fields": [
+    "keys",
+    "content",
+    "extensions",
+    "enabled",
+    "insertion_order"
+   ],
+   "required_v3_additional_lore_fields": [
+    "use_regex"
+   ],
+   "declared_lore_fields": [
+    "keys",
+    "secondary_keys",
+    "content",
+    "extensions",
+    "enabled",
+    "insertion_order",
+    "case_sensitive",
+    "name",
+    "priority",
+    "id",
+    "comment",
+    "selective",
+    "constant",
+    "position",
+    "use_regex"
+   ],
+   "optional_v3_fields": [
+    "assets",
+    "nickname",
+    "creator_notes_multilingual",
+    "source",
+    "creation_date",
+    "modification_date"
+   ],
+   "asset_required_strings": [
+    "type",
+    "uri",
+    "name",
+    "ext"
+   ],
+   "unknown_members": "Preserved only within bounded typed native JSON and retained original; never activated."
+  },
+  "mapping": "Description/personality -> biography; scenario -> portrayal; first_mes/alternatives -> greetings; mes_example -> dialogue example; book -> addressable lore; creator/tags/version/languages -> metadata. Unsupported settings/extensions are preserved_only.",
+  "requires": "Preview then import exact observed file version. Target adaptation and character validation remain mandatory."
+ }
+}

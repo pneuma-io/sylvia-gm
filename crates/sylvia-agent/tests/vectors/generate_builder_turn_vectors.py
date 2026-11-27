@@ -27,6 +27,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(Path(__file__).parent))
 
 from sylvia_gm.agent import _runner, _working_context  # noqa: E402
 from sylvia_gm.agent import _builder_session as session  # noqa: E402
@@ -42,6 +43,7 @@ from sylvia_gm.domain.session import (  # noqa: E402
 )
 from sylvia_gm.provider._base import ModelInfo, ProviderStreamChunk  # noqa: E402
 from sylvia_gm.provider._hooks import HookManager  # noqa: E402
+from generate_character_tool_vectors import as_declaration, companion_declaration, declaration_fields, plain  # noqa: E402
 
 OUTPUT = HERE / "builder_turn_vectors.json"
 NL = chr(10)
@@ -120,6 +122,24 @@ def scenarios():
     yield "plan_tools", {"session": STANDALONE, "messages": [], "user_text": "Plan", "tools": [
         "campaign_plan_authority", "check_campaign_plan", "publish_campaign_plan"]}, [
         [{"content": "Planning."}, STOP],
+    ]
+    hound = declaration_fields(companion_declaration())
+    world = {"type": "object", "additionalProperties": False, "required": ["home"],
+             "properties": {"home": {"type": "string", "minLength": 1}}}
+    draft = {"summary": "A loyal hound.", "authored_profile": "# Rex", "participant": {"name": "Rex", "loyal": True},
+             "entity_state": json.dumps({"bond": 2}), "setting_data": json.dumps({"home": "Kennel"})}
+    yield "companion_subflow", {"session": bound("BUILD CAMPAIGN SETTING"), "messages": [
+        ["evidence", "l-1", {"kind": "creation_subflow_link", "purpose": "companion"}]],
+        "user_text": "Make my companion", "declarations": [hound], "setting_character_schema": world,
+        "tools": ["publish_participant", "reuse_participant", "read_participant", "resolve_source_profile"]}, [
+        [call(0, "c1", "get_content_definition", json.dumps({"name": "character_creation"})),
+         call(1, "c2", "check_participant_draft", json.dumps(draft)), STOP],
+        [{"content": "Rex is ready."}, STOP],
+    ]
+    yield "plan_characters", {"session": STANDALONE, "messages": [], "user_text": "Plan the party",
+                              "plan_declarations": [hound], "tools": ["campaign_plan_authority"]}, [
+        [call(0, "p1", "check_participant_draft", json.dumps({**draft, "role": "companion"})), STOP],
+        [{"content": "Checked."}, STOP],
     ]
     yield "ask", {"session": STANDALONE, "messages": [], "user_text": "Ask me", "tools": []}, [
         [{"content": "Let me ask."}, call(0, "q1", "ask_question", json.dumps({"question": "Colour?", "options": ["Red"], "id": "c"})), STOP],
@@ -231,7 +251,20 @@ def run(name, spec, script):
         if "check_campaign_setting" in tools:
             kwargs["check_campaign_setting"] = stub
         if "campaign_plan_authority" in tools:
-            kwargs["campaign_plan_authority"] = lambda: None
+            plan = None
+            if spec.get("plan_declarations"):
+                plan = types.SimpleNamespace(
+                    character_declarations=tuple(as_declaration(item) for item in spec["plan_declarations"]),
+                    setting_character_schema=None)
+            kwargs["campaign_plan_authority"] = lambda: plan
+        if spec.get("declarations"):
+            declared = tuple(as_declaration(item) for item in spec["declarations"])
+            kwargs["participant_declarations"] = declared
+            kwargs["participant_schemas"] = {item.schema_id: item.schema for item in declared}
+            kwargs["setting_character_schema"] = spec.get("setting_character_schema")
+        for callback in ("publish_participant", "reuse_participant", "read_participant", "resolve_source_profile"):
+            if callback in tools:
+                kwargs[callback] = (lambda *_a, **_k: None) if callback == "resolve_source_profile" else stub
         if "check_campaign_plan" in tools:
             kwargs["check_campaign_plan"] = stub
         if "publish_campaign_plan" in tools:
@@ -260,8 +293,8 @@ def run(name, spec, script):
 def main() -> None:
     with tempfile.TemporaryDirectory() as scratch:
         profile_names = [spec.name for spec in character_profile_tools(Path(scratch), save=stub, read=stub)]
-    vectors = {"python": ".".join(sys.version.split()[0].split(".")[:2]), "profile_tool_names": profile_names,
-               "scenarios": [run(name, spec, script) for name, spec, script in scenarios()]}
+    vectors = plain({"python": ".".join(sys.version.split()[0].split(".")[:2]), "profile_tool_names": profile_names,
+                     "scenarios": [run(name, spec, script) for name, spec, script in scenarios()]})
     OUTPUT.write_text(json.dumps(vectors, ensure_ascii=True, separators=(",", ":")) + NL, encoding="utf-8",
                       newline=NL)
     print(OUTPUT.name, OUTPUT.stat().st_size, "bytes")
