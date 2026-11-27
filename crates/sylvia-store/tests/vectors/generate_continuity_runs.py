@@ -22,6 +22,7 @@ import shutil
 import sys
 import tempfile
 import uuid
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "src"))
@@ -143,8 +144,18 @@ class _Fault(Exception):
     """Stands in for a crash between the writes and the commit."""
 
 
+def ordered(value: object) -> object:
+    """Plain JSON in Python's own key order; `_dump` would sort every mapping."""
+    if isinstance(value, Mapping):
+        return {str(key): ordered(item) for key, item in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [ordered(item) for item in value]
+    return value
+
+
 def plain(value: object) -> object:
-    return json.loads(a._dump(value))
+    a._dump(value)  # canonical JSON still refuses what it refuses
+    return ordered(value)
 
 
 def receipt_json(receipt: object) -> dict[str, object]:

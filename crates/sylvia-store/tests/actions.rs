@@ -7,6 +7,7 @@ mod common;
 use flate2::read::GzDecoder;
 use std::io::Read;
 use std::path::Path;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{ActionReceipt, ActionStatus, MechanicOutcome, StateMutation, WriterRole};
 use sylvia_store::actions::{CommitAction, IdempotencyHit};
@@ -112,7 +113,7 @@ fn run(store: &mut AuthorityStore, op: &Json) -> StoreResult<Json> {
 
 fn check(label: &str, got: StoreResult<Json>, want: &Json) {
     match (got, want.get("error")) {
-        (Ok(value), None) => assert_eq!(value, want["ok"], "{label}"),
+        (Ok(value), None) => assert_same_json(&value, &want["ok"], label),
         (Err(StoreError::Coded(error)), Some(kind)) => {
             assert_eq!(error.error_type, kind.as_str(), "{label}: type");
             assert_eq!(Json::String(error.code.clone()), want["code"], "{label}: code");

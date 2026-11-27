@@ -27,6 +27,7 @@ import shutil
 import sys
 import tempfile
 import zipfile
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "src"))
@@ -221,6 +222,15 @@ class _Fault(Exception):
     """Stands in for a crash between the writes and the commit."""
 
 
+def ordered(value: object) -> object:
+    """A frozen payload as plain JSON, keeping every mapping's key order."""
+    if isinstance(value, Mapping):
+        return {str(key): ordered(item) for key, item in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [ordered(item) for item in value]
+    return value
+
+
 def receipt(value: object) -> object:
     if value is None or isinstance(value, (bool, str)):
         return value
@@ -230,7 +240,9 @@ def receipt(value: object) -> object:
         "campaign_id": value.campaign_id,  # type: ignore[attr-defined]
         "action_id": value.action_id,  # type: ignore[attr-defined]
         "status": value.status.value,  # type: ignore[attr-defined]
-        "result": json.loads(a._dump(value.result)),  # type: ignore[attr-defined]
+        # The receipt's own key order: a fresh commit keeps the outcome's, a replay the stored
+        # canonical text's.
+        "result": ordered(value.result),  # type: ignore[attr-defined]
         "resulting_revision": value.resulting_revision,  # type: ignore[attr-defined]
     }
 

@@ -18,6 +18,7 @@ use sylvia_app::authority::actions::ActionError;
 use sylvia_app::authority::narration_attempts::{
     self as narration, ManualRetry, NarrationStart, RetryFailure, RetryNarration, RetryStream,
 };
+use sylvia_base::testing::json_difference;
 use sylvia_base::Json;
 use sylvia_domain::authority::{CanonicalEvent, NarrationInterruption, ProseChannel, RetryNarrationInput};
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
@@ -367,8 +368,11 @@ async fn manual_retry_and_redirection_answer_and_store_as_pythons_owner() {
             &json!({"outcome": item["outcome"], "cancels": item["cancels"]}).to_string(),
             &python_ids,
         );
-        if got != want {
-            failures.push(format!("#{index} {}\n  Rust   {got}\n  Python {want}", item["step"]));
+        // `assert_same_json`'s comparison, on the normalized texts read back.
+        let parsed = |text: &str| serde_json::from_str::<Json>(text).unwrap();
+        if let Some(difference) = json_difference(&parsed(&got), &parsed(&want)) {
+            failures
+                .push(format!("#{index} {}: {difference}\n  Rust   {got}\n  Python {want}", item["step"]));
         }
     }
     drop(handle);

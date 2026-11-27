@@ -140,8 +140,8 @@
       "action_id": "action-1",
       "status": "committed",
       "result": {
-       "success": true,
-       "total": 15
+       "total": 15,
+       "success": true
       },
       "resulting_revision": 1
      }
@@ -349,8 +349,8 @@
       "action_id": "action-1",
       "status": "committed",
       "result": {
-       "success": true,
-       "total": 15
+       "total": 15,
+       "success": true
       },
       "resulting_revision": 1
      }
@@ -465,8 +465,8 @@
       "action_id": "action-1",
       "status": "committed",
       "result": {
-       "success": true,
-       "total": 15
+       "total": 15,
+       "success": true
       },
       "resulting_revision": 1
      }
@@ -717,8 +717,8 @@
       "action_id": "action-1",
       "status": "committed",
       "result": {
-       "success": true,
-       "total": 15
+       "total": 15,
+       "success": true
       },
       "resulting_revision": 1
      }
@@ -833,8 +833,8 @@
       "action_id": "action-1",
       "status": "committed",
       "result": {
-       "success": true,
-       "total": 15
+       "total": 15,
+       "success": true
       },
       "resulting_revision": 1
      }

@@ -8,6 +8,7 @@ use flate2::read::GzDecoder;
 use serde_json::json;
 use std::io::Read;
 use std::path::Path;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::WriterRole;
 use sylvia_domain::session::{
@@ -127,7 +128,7 @@ fn run(store: &AuthorityStore, root: &Path, op: &Json) -> StoreResult<Json> {
 
 fn check(label: &str, got: StoreResult<Json>, want: &Json) {
     match (got, want.get("error")) {
-        (Ok(value), None) => assert_eq!(value, want["ok"], "{label}"),
+        (Ok(value), None) => assert_same_json(&value, &want["ok"], label),
         (Err(error), Some(kind)) => {
             let Some(coded) = error.rejection() else {
                 panic!("{label}: Rust fault {error:?}, Python {want}")
