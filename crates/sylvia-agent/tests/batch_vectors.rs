@@ -1,5 +1,5 @@
-//! Compare one round's tool batch (T3b-1) and its reconciliation (T3b-2) with Python, on real
-//! turns.
+//! Compare one round's tool batch (T3b-1), its reconciliation (T3b-2) and the narration phases
+//! (T4) with Python, on real turns.
 //!
 //! Regenerate with `tests/vectors/generate_batch_vectors.py`: `prepare_tool_batch` and
 //! `execute_tool_batch` traced in the `ruleless-turn` and `srd-mechanics-turn` turns. Rust is
@@ -14,6 +14,7 @@ use serde_json::{json, Value as J};
 use std::sync::{Arc, Mutex};
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
+use sylvia_agent::provider_turn::narration;
 use sylvia_agent::provider_turn::tool_batch::{execute_tool_batch, prepare_tool_batch, reconcile_tool_batch};
 use sylvia_agent::provider_turn::{TurnEvents, TurnFailure, TurnResult};
 use sylvia_agent::session_loop::{ProviderControl, ProviderEvent, SessionProviderInput};
@@ -196,6 +197,12 @@ async fn tool_reconciliations_match_python() {
     replay(include_str!("vectors/reconcile_vectors.json")).await;
 }
 
+/// T4: the narration phases, traced in the same turns (`generate_narration_vectors.py`).
+#[tokio::test]
+async fn narration_phases_match_python() {
+    replay(include_str!("vectors/narration_vectors.json")).await;
+}
+
 /// Replay every traced call of one vector file.
 async fn replay(text: &str) {
     let vectors: J = serde_json::from_str(text).expect("vector file is valid JSON");
@@ -297,6 +304,36 @@ async fn replay(text: &str) {
             }
             "reconcile_tool_batch" => {
                 reconcile_tool_batch(&adapter, &mut state, &provider_input, turn_id, &mut sink).await
+            }
+            "record_empty_completion" => {
+                narration::record_empty_completion(&mut state, turn_id, &mut sink).await
+            }
+            "retry_repeated_response" => {
+                narration::retry_repeated_response(&mut state, turn_id, &mut sink).await
+            }
+            "retry_missing_tool_call" => {
+                narration::retry_missing_tool_call(&mut state, turn_id, &mut sink).await
+            }
+            "retry_private_deliberation" => {
+                narration::retry_private_deliberation(&mut state).map_err(TurnFailure::Coded)
+            }
+            "record_held_narration" => {
+                narration::record_held_narration(&mut state, &provider_input, &mut sink).await
+            }
+            "retry_missing_campaign_file_update" => {
+                narration::retry_missing_campaign_file_update(&mut state, turn_id, &mut sink).await
+            }
+            "preserve_boundary_narration" => {
+                narration::preserve_boundary_narration(&mut state, turn_id, &mut sink).await
+            }
+            "preserve_player_intent_narration" => {
+                narration::preserve_player_intent_narration(&mut state, turn_id, &mut sink).await
+            }
+            "retain_campaign_file_narration" => {
+                narration::retain_campaign_file_narration(&mut state, turn_id, &mut sink).await
+            }
+            "record_final_narration" => {
+                narration::record_final_narration(&mut state, &provider_input, &mut sink).await
             }
             _ => execute_tool_batch(&adapter, &mut state, &provider_input, turn_id, &mut sink).await,
         };
