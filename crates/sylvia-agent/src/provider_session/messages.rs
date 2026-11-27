@@ -8,8 +8,8 @@
 //! measures and later strips them.
 
 use super::context::{
-    canonical_player_narration as canonical_player_narration_of, py_str, rejected, saved_action_sequence_results, ProviderSessionAdapter,
-    SessionProviderInput,
+    canonical_player_narration as canonical_player_narration_of, py_str, rejected,
+    saved_action_sequence_results, ProviderSessionAdapter, SessionProviderInput,
 };
 use super::py_values::{push_unique, py_iter};
 use super::tagged::{Tagged, HOST_RECORD_KEY, LEDGER_KEY, STABLE_KEY};
@@ -305,8 +305,11 @@ impl ProviderSessionAdapter {
                 .map(SessionMessage::message_id),
         };
         // The current player's own words, when this request answers one.
-        let current_player_text = match (response_message, current_user_message_id, latest_selected_dialogue) {
-            (None, Some(_), Some(latest)) => latest.content().get("text").and_then(Json::as_str).unwrap_or(""),
+        let current_player_text = match (response_message, current_user_message_id, latest_selected_dialogue)
+        {
+            (None, Some(_), Some(latest)) => {
+                latest.content().get("text").and_then(Json::as_str).unwrap_or("")
+            }
             _ => "",
         };
         let relevant_character_files = if dm && input.reference_reader.is_some() {

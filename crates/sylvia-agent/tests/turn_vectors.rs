@@ -38,7 +38,12 @@ fn uuids(events: &[J]) -> Arc<Mutex<Vec<String>>> {
 }
 
 /// The adapter Python's turn ran with: its recorded arguments, owner, provider and identities.
-fn adapter(case: &J, owner: &Arc<Recorded>, provider: &Arc<Scripted>, ids: &Arc<Mutex<Vec<String>>>) -> Arc<ProviderSessionAdapter> {
+fn adapter(
+    case: &J,
+    owner: &Arc<Recorded>,
+    provider: &Arc<Scripted>,
+    ids: &Arc<Mutex<Vec<String>>>,
+) -> Arc<ProviderSessionAdapter> {
     let args = &case["adapter"];
     let draw = Arc::clone(ids);
     Arc::new(
@@ -69,7 +74,11 @@ fn check_ending(name: &str, outcome: Result<(), TurnFailure>, raised: Option<&J>
     match (outcome, raised) {
         (Ok(()), None) => {}
         (Err(TurnFailure::Coded(error)), Some(raised)) => {
-            assert_eq!(J::from(error.error_type.unwrap_or("CommandRejected")), raised["class"], "{name}: the class");
+            assert_eq!(
+                J::from(error.error_type.unwrap_or("CommandRejected")),
+                raised["class"],
+                "{name}: the class"
+            );
             // An uncaught exception has no `code`; the owner reports it as `internal_error`.
             let code = raised["code"].as_str().unwrap_or("internal_error");
             assert_eq!(error.code.as_str(), code, "{name}: the code");
@@ -98,7 +107,9 @@ async fn turn_setup_matches_python() {
         let mut state = turn_state::load(&case["before"]);
         let outcome = match phase {
             "prepare_turn_recovery" => prepare_turn_recovery(&adapter, &mut state, &input, &mut sink).await,
-            "restore_saved_turn_progress" => restore_saved_turn_progress(&mut state, &input).map_err(TurnFailure::Coded),
+            "restore_saved_turn_progress" => {
+                restore_saved_turn_progress(&mut state, &input).map_err(TurnFailure::Coded)
+            }
             "resume_exchange_results" => resume_exchange_results(&mut state).map_err(TurnFailure::Coded),
             other => panic!("{name}: no setup phase {other}"),
         };

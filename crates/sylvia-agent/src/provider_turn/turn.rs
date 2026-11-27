@@ -17,10 +17,12 @@
 
 use super::decisions::{
     actor_decision_can_be_requested, buffered_narration_is_settled, campaign_file_must_be_settled,
-    campaign_file_needs_narration, held_campaign_file_narration_is_needed, narration_needs_private_correction,
-    narration_repeats_previous_player_response, required_tool_call_is_missing, required_tool_correction_was_abandoned,
-    required_transition_can_run, round_needs_gm_decision, round_needs_player_intent_resolution,
-    settled_disposition_still_owes_ooc_acknowledgement, tool_round_can_release_narration, tool_round_needs_correction,
+    campaign_file_needs_narration, held_campaign_file_narration_is_needed,
+    narration_needs_private_correction, narration_repeats_previous_player_response,
+    required_tool_call_is_missing, required_tool_correction_was_abandoned, required_transition_can_run,
+    round_needs_gm_decision, round_needs_player_intent_resolution,
+    settled_disposition_still_owes_ooc_acknowledgement, tool_round_can_release_narration,
+    tool_round_needs_correction,
 };
 use super::narration;
 use super::round::{prepare_provider_round, prepare_round_catalog, stream_provider_round};
@@ -28,14 +30,16 @@ use super::state::ProviderTurnState;
 use super::tool_batch::{execute_tool_batch, prepare_tool_batch, reconcile_tool_batch};
 use super::tool_checks::retry_rejected_tool_call;
 use super::{TurnEvents, TurnFailure, TurnResult};
-use crate::provider_session::campaign_file::{campaign_file_arguments_establish_changes, validated_raw_response_blocks};
+use crate::provider_session::campaign_file::{
+    campaign_file_arguments_establish_changes, validated_raw_response_blocks,
+};
 use crate::provider_session::context::{
     canonical_player_narration, saved_action_sequence_results, ProviderSessionAdapter,
 };
 use crate::provider_session::control_texts::preparation_keeps_intent_pending;
 use crate::provider_session::narration_facts::{action_sequence_narration_facts, public_action_result};
-use crate::provider_session::request::{contains_serialized_tool_call, release_provider_idle_soon};
 use crate::provider_session::py_values::{py_iter, require_hashable, require_hashable_frozen};
+use crate::provider_session::request::{contains_serialized_tool_call, release_provider_idle_soon};
 use crate::provider_session::tagged::Tagged;
 use crate::provider_session::texts::{gm_system_contract_version, player_turn_text};
 use crate::provider_session::tools::{CAMPAIGN_FILE_REVISED_NARRATION_ARGUMENT, PREPARATION_INTENT_ARGUMENT};
@@ -54,7 +58,9 @@ use sylvia_provider::Provider;
 
 fn texts() -> &'static Json {
     static TEXTS: OnceLock<Json> = OnceLock::new();
-    TEXTS.get_or_init(|| serde_json::from_str(include_str!("turn_texts.json")).expect("exported texts are JSON"))
+    TEXTS.get_or_init(|| {
+        serde_json::from_str(include_str!("turn_texts.json")).expect("exported texts are JSON")
+    })
 }
 
 fn text(key: &str) -> &'static str {
@@ -90,8 +96,11 @@ fn pending(method: &str) -> TurnFailure {
 pub fn retry_empty_completion(state: &mut ProviderTurnState) -> CodedResult<()> {
     let used = *state.locals.empty_completion_corrections_used.get()? + 1;
     state.locals.empty_completion_corrections_used.set(used);
-    let required_output =
-        text(if *state.locals.provider_tool_call_required.get()? { "empty_required_tool" } else { "empty_response" });
+    let required_output = text(if *state.locals.provider_tool_call_required.get()? {
+        "empty_required_tool"
+    } else {
+        "empty_response"
+    });
     let content = text("empty_completion")
         .replace("{state.finish_reason}", &state.locals.finish_reason.value()?)
         .replace("{required_output}", required_output)
@@ -107,11 +116,15 @@ pub fn retry_empty_completion(state: &mut ProviderTurnState) -> CodedResult<()> 
 /// `_saved_round_narration_facts(provider_input, basis_message_id)`: the exact facts this saved
 /// GM input's live rounds committed, kept beside their tool results.
 fn saved_round_narration_facts(input: &SessionProviderInput, basis_message_id: Option<&str>) -> Vec<JsonMap> {
-    let Some(basis) = basis_message_id.filter(|_| input.session.role() == WriterRole::Dm) else { return Vec::new() };
+    let Some(basis) = basis_message_id.filter(|_| input.session.role() == WriterRole::Dm) else {
+        return Vec::new();
+    };
     let mut facts = Vec::new();
     for message in &input.history.messages {
         let content = message.content();
-        if !evidence_of(message, "provider_tool_results") || content.get("basis_message_id") != Some(&json!(basis)) {
+        if !evidence_of(message, "provider_tool_results")
+            || content.get("basis_message_id") != Some(&json!(basis))
+        {
             continue;
         }
         if let Some(Json::Array(saved)) = content.get("narration_facts") {
@@ -209,9 +222,9 @@ pub async fn prepare_turn_recovery(
     let post_mechanics = input.recovery_kind.as_deref() == Some("post_mechanics_narration");
     state.locals.post_mechanics_recovery.set(post_mechanics);
     let redirected = history.iter().find(|message| basis.as_deref() == Some(message.message_id()));
-    if let Some(redirected) = redirected
-        .filter(|message| message.content().get("redirect_interruption_id").is_some_and(sylvia_domain::pyops::py_truthy))
-    {
+    if let Some(redirected) = redirected.filter(|message| {
+        message.content().get("redirect_interruption_id").is_some_and(sylvia_domain::pyops::py_truthy)
+    }) {
         let start = redirected.content().get("canonical_start_sequence").cloned().unwrap_or(json!(0));
         // `isinstance(start_sequence, int)`: a boolean is one too.
         let start = match start {
@@ -230,7 +243,9 @@ pub async fn prepare_turn_recovery(
             .collect();
         let mut saved_results = Vec::new();
         for event in &saved_events {
-            if event.event_type != CanonicalEventType::ToolResult || !saved_action_ids.contains(&event.action_id) {
+            if event.event_type != CanonicalEventType::ToolResult
+                || !saved_action_ids.contains(&event.action_id)
+            {
                 continue;
             }
             let mut tool_result = event.safe_payload.clone();
@@ -261,10 +276,16 @@ pub async fn prepare_turn_recovery(
     }
     let opening_request = !direct_response
         && history.iter().any(|message| evidence_of(message, "campaign_start"))
-        && !history.iter().any(|message| matches!(message.kind(), SessionMessageKind::User | SessionMessageKind::Talk));
+        && !history
+            .iter()
+            .any(|message| matches!(message.kind(), SessionMessageKind::User | SessionMessageKind::Talk));
     state.locals.opening_request.set(opening_request);
     state.locals.participants.set(owner.snapshot(&campaign_id).await?.state.participants);
-    let footing = if opening_request { adapter.opening_footing_payload(input).await?.as_object().cloned() } else { None };
+    let footing = if opening_request {
+        adapter.opening_footing_payload(input).await?.as_object().cloned()
+    } else {
+        None
+    };
     state.locals.opening_footing.set(footing);
     let current = if direct_response {
         None
@@ -275,7 +296,10 @@ pub async fn prepare_turn_recovery(
         .locals
         .current_player_action
         .set(current.as_ref().map(|message| message.content().get("text").map_or_else(String::new, py_str)));
-    state.locals.current_user_wire_text.set(current.as_ref().map(|message| player_turn_text(message.content())));
+    state
+        .locals
+        .current_user_wire_text
+        .set(current.as_ref().map(|message| player_turn_text(message.content())));
     state.locals.current_player_message.set(current);
     let sequence_results = saved_action_sequence_results(input, adapter.reads.as_ref()).await?;
     state.locals.saved_sequence_results.set(sequence_results.clone());
@@ -327,7 +351,10 @@ fn is_campaign_file_tool(name: &str) -> bool {
 
 /// `restore_saved_turn_progress(...)`: committed actions' intent effects, the correction
 /// budgets and the resumed suffix of the exchange.
-pub fn restore_saved_turn_progress(state: &mut ProviderTurnState, input: &SessionProviderInput) -> CodedResult<()> {
+pub fn restore_saved_turn_progress(
+    state: &mut ProviderTurnState,
+    input: &SessionProviderInput,
+) -> CodedResult<()> {
     let invalid = |message: &str| rejected(message, "provider_tool_evidence_invalid");
     let basis = state.locals.basis_message_id.value()?;
     for message in &input.history.messages {
@@ -374,7 +401,11 @@ pub fn restore_saved_turn_progress(state: &mut ProviderTurnState, input: &Sessio
     state.locals.buffered_response_blocks.set(None);
     state.locals.buffered_raw_response_blocks.set(None);
     let ooc_ack_required = state.locals.current_player_message.get()?.as_ref().is_some_and(|message| {
-        message.content().get("ooc_text").and_then(Json::as_str).is_some_and(|ooc| !sylvia_base::pystr::strip(ooc).is_empty())
+        message
+            .content()
+            .get("ooc_text")
+            .and_then(Json::as_str)
+            .is_some_and(|ooc| !sylvia_base::pystr::strip(ooc).is_empty())
     });
     state.locals.ooc_ack_required.set(ooc_ack_required);
     let action_blank = state
@@ -383,7 +414,8 @@ pub fn restore_saved_turn_progress(state: &mut ProviderTurnState, input: &Sessio
         .get()?
         .as_deref()
         .is_none_or(|action| sylvia_base::pystr::strip(action).is_empty());
-    let participant_ooc_only = state.locals.context_owner.get()?.is_some() && ooc_ack_required && action_blank;
+    let participant_ooc_only =
+        state.locals.context_owner.get()?.is_some() && ooc_ack_required && action_blank;
     state.locals.participant_ooc_only.set(participant_ooc_only);
     state.obligations.buffered_narration_needs_disposition.set(false);
     let any_commit = *state.locals.post_mechanics_recovery.get()? || *state.locals.direct_response.get()?;
@@ -427,10 +459,17 @@ pub fn restore_saved_turn_progress(state: &mut ProviderTurnState, input: &Sessio
     };
     // `next(...)` with no match raises `StopIteration` inside the `_events` generator, which
     // Python turns into this `RuntimeError` (PEP 479).
-    let stop = || CodedError::new("internal_error", "generator raised StopIteration").with_error_type("RuntimeError");
+    let stop = || {
+        CodedError::new("internal_error", "generator raised StopIteration").with_error_type("RuntimeError")
+    };
     if *state.locals.opening_request.get()? {
-        task_index = messages.iter().position(|message| starts(message, "SYLVIA_GM_OPENING_TASK ")).ok_or_else(stop)?;
-        if task_index + 1 < messages.len() && messages[task_index + 1].message.get("role") == Some(&json!("user")) {
+        task_index = messages
+            .iter()
+            .position(|message| starts(message, "SYLVIA_GM_OPENING_TASK "))
+            .ok_or_else(stop)?;
+        if task_index + 1 < messages.len()
+            && messages[task_index + 1].message.get("role") == Some(&json!("user"))
+        {
             task_index += 1;
         }
     } else if *state.locals.direct_response.get()? {
@@ -453,16 +492,13 @@ pub fn restore_saved_turn_progress(state: &mut ProviderTurnState, input: &Sessio
         .locals
         .previous_player_action
         .set((player_actions.len() >= 2).then(|| player_actions[player_actions.len() - 2].clone()));
-    let mut previous = state
-        .locals
-        .canonical_player_narration
-        .get()?
-        .iter()
-        .rev()
-        .find_map(|record| record.get("text").and_then(Json::as_str).filter(|text| !text.is_empty()).map(str::to_owned));
+    let mut previous = state.locals.canonical_player_narration.get()?.iter().rev().find_map(|record| {
+        record.get("text").and_then(Json::as_str).filter(|text| !text.is_empty()).map(str::to_owned)
+    });
     if previous.is_none() {
         previous = prefix.iter().rev().find_map(|message| {
-            let content = message.message.get("content").and_then(Json::as_str).filter(|text| !text.is_empty())?;
+            let content =
+                message.message.get("content").and_then(Json::as_str).filter(|text| !text.is_empty())?;
             let calls = message.message.get("tool_calls").is_some_and(sylvia_domain::pyops::py_truthy);
             (message.message.get("role") == Some(&json!("assistant")) && !calls).then(|| content.to_owned())
         });
@@ -479,7 +515,9 @@ pub fn resume_exchange_results(state: &mut ProviderTurnState) -> CodedResult<()>
     let resumed = state.locals.resumed_messages.get()?.clone();
     for message in resumed.iter().map(|tagged| &tagged.message) {
         if message.get("role") == Some(&json!("assistant")) {
-            if let Some(Json::String(content)) = message.get("content").filter(|content| content != &&json!("")) {
+            if let Some(Json::String(content)) =
+                message.get("content").filter(|content| content != &&json!(""))
+            {
                 state.locals.buffered_narration.set(Some(content.clone()));
                 state.locals.buffered_response_blocks.set(None);
                 state.locals.buffered_raw_response_blocks.set(None);
@@ -488,7 +526,10 @@ pub fn resume_exchange_results(state: &mut ProviderTurnState) -> CodedResult<()>
             let raw_calls = message.get("tool_calls");
             if let Some(Json::Array(calls)) = raw_calls {
                 for call in calls {
-                    let Some(Json::Object(function)) = call.as_object().and_then(|call| call.get("function")) else { continue };
+                    let Some(Json::Object(function)) = call.as_object().and_then(|call| call.get("function"))
+                    else {
+                        continue;
+                    };
                     if !function.get("name").and_then(Json::as_str).is_some_and(is_campaign_file_tool) {
                         continue;
                     }
@@ -505,7 +546,8 @@ pub fn resume_exchange_results(state: &mut ProviderTurnState) -> CodedResult<()>
                             state.obligations.buffered_narration_needs_disposition.set(true);
                         }
                         Some(Json::String(text))
-                            if !sylvia_base::pystr::strip(text).is_empty() && !contains_serialized_tool_call(text) =>
+                            if !sylvia_base::pystr::strip(text).is_empty()
+                                && !contains_serialized_tool_call(text) =>
                         {
                             state.locals.buffered_narration.set(Some(text.clone()));
                             state.locals.buffered_response_blocks.set(None);
@@ -572,7 +614,10 @@ pub fn resume_exchange_results(state: &mut ProviderTurnState) -> CodedResult<()>
             state.obligations.campaign_file_narration_pending.set(false);
         }
         if status == Some("action_committed")
-            || !matches!(status, Some("rejected" | "action_failed" | "campaign_file_updated" | "campaign_file_unchanged"))
+            || !matches!(
+                status,
+                Some("rejected" | "action_failed" | "campaign_file_updated" | "campaign_file_unchanged")
+            )
         {
             state.locals.buffered_narration.set(None);
             state.locals.buffered_response_blocks.set(None);
@@ -583,7 +628,8 @@ pub fn resume_exchange_results(state: &mut ProviderTurnState) -> CodedResult<()>
     if settled_disposition_still_owes_ooc_acknowledgement(state)? {
         return Err(invalid("Persisted OOC turn response omits its acknowledgement"));
     }
-    let held = state.locals.buffered_narration.get()?.is_some() || state.locals.buffered_raw_response_blocks.get()?.is_some();
+    let held = state.locals.buffered_narration.get()?.is_some()
+        || state.locals.buffered_raw_response_blocks.get()?.is_some();
     let force = held && *state.obligations.buffered_narration_needs_disposition.get()?;
     state.obligations.force_campaign_file_update.set(force);
     Ok(())
@@ -657,7 +703,9 @@ async fn provider_events(
     state.obligations.engine_transition_review_pending.set(false);
     let mut stopped = false;
     for result in state.locals.saved_sequence_results.get()? {
-        if stopped_status(result.get("status"))? || result.get("provider_execution_stopped") == Some(&Json::Bool(true)) {
+        if stopped_status(result.get("status"))?
+            || result.get("provider_execution_stopped") == Some(&Json::Bool(true))
+        {
             stopped = true;
             break;
         }
@@ -688,11 +736,17 @@ async fn provider_events(
             }
             let narration = state.locals.narration.value()?;
             if contains_serialized_tool_call(&narration) {
-                return Err(rejected("Provider returned serialized tool syntax as narration", "provider_serialized_tool_call").into());
+                return Err(rejected(
+                    "Provider returned serialized tool syntax as narration",
+                    "provider_serialized_tool_call",
+                )
+                .into());
             }
             if narration.is_empty() {
                 narration::record_empty_completion(state, turn_id, events).await?;
-                if *state.locals.empty_completion_corrections_used.get()? < *state.locals.max_empty_completion_corrections.get()? {
+                if *state.locals.empty_completion_corrections_used.get()?
+                    < *state.locals.max_empty_completion_corrections.get()?
+                {
                     retry_empty_completion(state)?;
                     continue;
                 }
@@ -704,7 +758,9 @@ async fn provider_events(
             }
             state.locals.empty_completion_corrections_used.set(0);
             if narration_repeats_previous_player_response(state)? {
-                if *state.locals.repeated_response_corrections_used.get()? < *state.locals.max_repeated_response_corrections.get()? {
+                if *state.locals.repeated_response_corrections_used.get()?
+                    < *state.locals.max_repeated_response_corrections.get()?
+                {
                     narration::retry_repeated_response(state, turn_id, events).await?;
                     continue;
                 }
@@ -737,7 +793,11 @@ async fn provider_events(
                 let filtered = adapter.filter_private_deliberation(&state.locals.narration.value()?);
                 state.locals.narration.set(filtered.clone());
                 if filtered.is_empty() {
-                    return Err(rejected("Provider completed without player-visible narration", "provider_empty_completion").into());
+                    return Err(rejected(
+                        "Provider completed without player-visible narration",
+                        "provider_empty_completion",
+                    )
+                    .into());
                 }
             }
             if campaign_file_needs_narration(state)? {
@@ -750,10 +810,18 @@ async fn provider_events(
                     narration::retry_missing_campaign_file_update(state, turn_id, events).await?;
                     continue;
                 }
-                return Err(rejected("Provider completed without settling the Campaign File", "campaign_file_disposition_required").into());
+                return Err(rejected(
+                    "Provider completed without settling the Campaign File",
+                    "campaign_file_disposition_required",
+                )
+                .into());
             }
             if required_tool_correction_was_abandoned(state)? {
-                return Err(rejected("Provider abandoned a required tool-call correction", "provider_tool_correction_abandoned").into());
+                return Err(rejected(
+                    "Provider abandoned a required tool-call correction",
+                    "provider_tool_correction_abandoned",
+                )
+                .into());
             }
             if round_needs_gm_decision(state)? {
                 narration::preserve_boundary_narration(state, turn_id, events).await?;
@@ -791,7 +859,9 @@ async fn provider_events(
                 continue;
             }
             state.obligations.pending_failed_tool_call.set(true);
-            if *state.locals.rejected_tool_corrections_used.get()? < *state.locals.max_rejected_tool_corrections.get()? {
+            if *state.locals.rejected_tool_corrections_used.get()?
+                < *state.locals.max_rejected_tool_corrections.get()?
+            {
                 retry_rejected_tool_call(state)?;
                 continue;
             }
@@ -804,8 +874,12 @@ async fn provider_events(
                 .iter()
                 .find(|assembly| failures.contains(&assembly.call_id))
                 .and_then(|assembly| results.get(&assembly.call_id));
-            let code = failed.and_then(|result| result.get("code")).map_or_else(|| "mechanics_rejected".to_owned(), py_str);
-            return Err(rejected("The provider tool call remained invalid after bounded correction", &code).into());
+            let code = failed
+                .and_then(|result| result.get("code"))
+                .map_or_else(|| "mechanics_rejected".to_owned(), py_str);
+            return Err(
+                rejected("The provider tool call remained invalid after bounded correction", &code).into()
+            );
         }
         if tool_round_can_release_narration(state)? {
             let text = state.locals.buffered_narration.value()?.unwrap_or_default();

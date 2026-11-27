@@ -64,8 +64,9 @@ impl SessionProvider for TurnProvider {
         Box::pin(async move {
             // `for_turn` raises this when it is called; both callers run the provider at once.
             if self.turn_id.is_empty() {
-                let error = CodedError::new("internal_error", "Provider session TURN identity must be nonempty")
-                    .with_error_type("ValueError");
+                let error =
+                    CodedError::new("internal_error", "Provider session TURN identity must be nonempty")
+                        .with_error_type("ValueError");
                 return Err(error.into());
             }
             let mut events = LoopEvents { events, raised: None };

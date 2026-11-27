@@ -7,7 +7,6 @@ mod common;
 
 use common::{session_record, turn_state, Recorded};
 use serde_json::Value as J;
-use sylvia_base::testing::assert_same_json;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
@@ -19,6 +18,7 @@ use sylvia_agent::provider_turn::tool_checks::{
 };
 use sylvia_agent::session_loop::{ProviderControl, SessionProviderInput};
 use sylvia_agent::stateless_mcp::{safe_error, tool_result_text, AuthorityRefusal};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::CodedResult;
 use sylvia_domain::error::{MechanicsDetails, MechanicsValidationIssue};
 use sylvia_domain::session::SessionContext;
@@ -205,14 +205,20 @@ async fn helpers_match_python() {
             other => panic!("unknown helper {other}"),
         };
         match (outcome, case.get("raised")) {
-            (Ok(returned), None) => assert_same_json(&returned, &case["returned"], format!("{name}: what it returned")),
+            (Ok(returned), None) => {
+                assert_same_json(&returned, &case["returned"], format!("{name}: what it returned"))
+            }
             (Err(error), Some(raised)) => {
                 assert_eq!(J::from(error.message.as_str()), raised["message"], "{name}")
             }
             (outcome, raised) => panic!("{name}: got {outcome:?}, Python raised {raised:?}"),
         }
         owner.check(name);
-        assert_same_json(&J::from(warnings.lock().unwrap().clone()), &case["warnings"], format!("{name}: warnings"));
+        assert_same_json(
+            &J::from(warnings.lock().unwrap().clone()),
+            &case["warnings"],
+            format!("{name}: warnings"),
+        );
         turn_state::compare(name, &turn_state::dump(&state), &case["after"]);
     }
 }

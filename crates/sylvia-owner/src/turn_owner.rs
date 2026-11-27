@@ -9,8 +9,8 @@ use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
-use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::actor_decisions::ActorDecisionRequest;
+use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::{campaign_file, content_reads, knowledge, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ActionCommand;
@@ -254,7 +254,9 @@ impl TurnOwner for OwnerReads {
                 basis_message_ids,
                 turn_id: turn_id.map(str::to_owned),
             };
-            campaign_file::update_campaign_file(self.store(), owner_id, &update).await.map_err(authority_failure)
+            campaign_file::update_campaign_file(self.store(), owner_id, &update)
+                .await
+                .map_err(authority_failure)
         })
     }
 

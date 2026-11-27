@@ -8,7 +8,6 @@
 
 use indexmap::IndexMap;
 use serde_json::Value as J;
-use sylvia_base::testing::assert_same_json;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use sylvia_agent::activity::{operation_category, AttemptProgress, Clock};
@@ -19,6 +18,7 @@ use sylvia_agent::session_loop::{
     mechanics_rejection_feedback, ProviderControl, ProviderEvent, SessionProviderInput,
 };
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, JsonMap};
 use sylvia_domain::authority::{
     ModelDecisionActor, ModelDecisionBoundary, ModelDecisionOwner, ModelToolBehavior, WriterRole,
@@ -214,7 +214,11 @@ fn decisions_match_python() {
         let expected = case["results"].as_object().unwrap();
         assert_eq!(results.len(), expected.len(), "every Python predicate is checked");
         for (name, result) in results {
-            assert_same_json(&outcome(result), &expected[name], format!("case {index}, {name}, state {}", case["assigned"]));
+            assert_same_json(
+                &outcome(result),
+                &expected[name],
+                format!("case {index}, {name}, state {}", case["assigned"]),
+            );
         }
     }
 }

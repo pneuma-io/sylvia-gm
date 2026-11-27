@@ -14,7 +14,9 @@ pub(crate) fn type_error(message: String) -> CodedError {
 /// unhashable.
 pub(crate) fn require_hashable(value: &Json) -> Result<(), CodedError> {
     match value {
-        Json::Object(_) | Json::Array(_) => Err(type_error(format!("unhashable type: '{}'", py_type_name(value)))),
+        Json::Object(_) | Json::Array(_) => {
+            Err(type_error(format!("unhashable type: '{}'", py_type_name(value))))
+        }
         _ => Ok(()),
     }
 }

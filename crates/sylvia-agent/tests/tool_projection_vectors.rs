@@ -7,7 +7,6 @@
 //! lists and alias resolution must all be Python's, key order included.
 
 use serde_json::{json, Value as J};
-use sylvia_base::testing::assert_same_json;
 use sylvia_agent::provider_session::tools::{
     model_tool_schema, package_tool_alias, provider_tools, resolve_provider_tool_alias, tool_description,
     ToolAliases,
@@ -15,6 +14,7 @@ use sylvia_agent::provider_session::tools::{
 use sylvia_agent::stateless_mcp::{ModelMechanicsTool, ModelToolBehavior};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::pyjson::{self, Dump};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, CodedResult};
 
 fn vectors() -> J {

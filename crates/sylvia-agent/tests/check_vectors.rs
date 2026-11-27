@@ -9,7 +9,6 @@ mod common;
 
 use common::{session_context, session_record, turn_state, Recorded};
 use serde_json::Value as J;
-use sylvia_base::testing::assert_same_json;
 use std::sync::Arc;
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
@@ -18,6 +17,7 @@ use sylvia_agent::provider_turn::tool_checks::{
     settle_campaign_file_narration, validate_revision_speakers,
 };
 use sylvia_agent::session_loop::{ProviderControl, SessionProviderInput};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::CodedResult;
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::types::{ModelInfo, ProviderResponse};
@@ -89,13 +89,11 @@ async fn campaign_reading_helpers_match_python() {
             other => panic!("unknown helper {other}"),
         };
         match (outcome, case.get("raised")) {
-            (Ok(returned), None) => {
-                assert_same_json(
-                    &returned,
-                    &case.get("returned").cloned().unwrap_or(J::Null),
-                    format!("{name}: what it returned"),
-                )
-            }
+            (Ok(returned), None) => assert_same_json(
+                &returned,
+                &case.get("returned").cloned().unwrap_or(J::Null),
+                format!("{name}: what it returned"),
+            ),
             (Err(error), Some(raised)) => {
                 assert_eq!(J::from(error.message.as_str()), raised["message"], "{name}")
             }

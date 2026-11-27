@@ -3,12 +3,12 @@
 
 use super::{action_command_json, model, opt, session_context, session_record, tool};
 use serde_json::{json, Value as J};
-use sylvia_base::testing::assert_same_json;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::campaign_memory::KnowledgeReference;
 use sylvia_agent::provider_turn::{TurnEvents, TurnResult};
 use sylvia_agent::session_loop::{ProviderControl, ProviderEvent, SessionProviderInput};
 use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, CodedResult, JsonMap};
 use sylvia_domain::authority::{ActionReceipt, ActionStatus};
 use sylvia_domain::error::{DomainError, MechanicsDetails, MechanicsValidationIssue};
@@ -210,7 +210,9 @@ impl Callbacks {
                 Ok(row["result"].as_object().cloned().unwrap())
             })
         }));
-        Self { rows: [(writer, "narrative_writer"), (search, "knowledge_searcher"), (read, "reference_reader")] }
+        Self {
+            rows: [(writer, "narrative_writer"), (search, "knowledge_searcher"), (read, "reference_reader")],
+        }
     }
 
     /// Every recorded callback was made.
@@ -254,9 +256,14 @@ pub fn provider_input(input: &J) -> SessionProviderInput {
     if input["cancelled"].as_bool() == Some(true) {
         control.cancel().unwrap();
     }
-    let catalog = input["catalog"].as_array().map(|tools| tools.iter().map(tool).collect()).unwrap_or_default();
-    let mut provider_input =
-        SessionProviderInput::new(session_record(&input["session"]), session_context(&input["history"]), catalog, control);
+    let catalog =
+        input["catalog"].as_array().map(|tools| tools.iter().map(tool).collect()).unwrap_or_default();
+    let mut provider_input = SessionProviderInput::new(
+        session_record(&input["session"]),
+        session_context(&input["history"]),
+        catalog,
+        control,
+    );
     provider_input.basis_message_id = opt(&input["basis_message_id"]);
     provider_input.recovery_kind = opt(&input["recovery_kind"]);
     provider_input.retry_action_receipt =
@@ -271,7 +278,8 @@ fn chunk(value: &J) -> ProviderStreamChunk {
         content: text("content"),
         reasoning_content: text("reasoning_content"),
         tool_call_delta: (!value["tool_call_delta"].is_null()).then(|| value["tool_call_delta"].clone()),
-        finish_reason: (!value["finish_reason"].is_null()).then(|| PyValue::from_json(value["finish_reason"].clone())),
+        finish_reason: (!value["finish_reason"].is_null())
+            .then(|| PyValue::from_json(value["finish_reason"].clone())),
         anthropic_content: value["anthropic_content"].as_array().cloned(),
         chat_completion_metadata: value["chat_completion_metadata"].as_object().cloned(),
         provider_reported_reasoning_effort: opt("provider_reported_reasoning_effort"),

@@ -46,8 +46,11 @@ fn given_name(name: &str) -> CodedResult<&str> {
 }
 
 fn invalid() -> CodedError {
-    CodedError::new("participant_reference_invalid", "The exact Character File retrieval returned invalid data")
-        .with_error_type("CommandRejected")
+    CodedError::new(
+        "participant_reference_invalid",
+        "The exact Character File retrieval returned invalid data",
+    )
+    .with_error_type("CommandRejected")
 }
 
 impl ProviderSessionAdapter {
@@ -69,7 +72,8 @@ impl ProviderSessionAdapter {
         }
         let mut matched = Vec::new();
         for entry in &roster {
-            let participant_id = entry.get("participant_id").and_then(Json::as_str).filter(|id| !id.is_empty());
+            let participant_id =
+                entry.get("participant_id").and_then(Json::as_str).filter(|id| !id.is_empty());
             let name = entry.get("name").and_then(Json::as_str).filter(|name| !name.is_empty());
             let mut aliases: Vec<&str> = name.into_iter().collect();
             if let Some(name) = name {
@@ -80,8 +84,10 @@ impl ProviderSessionAdapter {
                     aliases.push(given);
                 }
             }
-            let directly_referenced = aliases.iter().copied().find(|alias| mentions(current_player_text, alias));
-            let (Some(participant_id), Some(_), Some(directly_referenced)) = (participant_id, name, directly_referenced)
+            let directly_referenced =
+                aliases.iter().copied().find(|alias| mentions(current_player_text, alias));
+            let (Some(participant_id), Some(_), Some(directly_referenced)) =
+                (participant_id, name, directly_referenced)
             else {
                 continue;
             };
@@ -109,8 +115,10 @@ impl ProviderSessionAdapter {
         if matched.is_empty() {
             return Ok(None);
         }
-        let facts = json!({"interpretation": gm_text("character_files_interpretation"), "references": matched});
-        let content = format!("{}{}", gm_text("character_files_prefix"), pyjson::dumps(&facts, Dump::CANONICAL));
+        let facts =
+            json!({"interpretation": gm_text("character_files_interpretation"), "references": matched});
+        let content =
+            format!("{}{}", gm_text("character_files_prefix"), pyjson::dumps(&facts, Dump::CANONICAL));
         let mut message = JsonMap::new();
         message.insert("role".into(), "system".into());
         message.insert("content".into(), content.into());

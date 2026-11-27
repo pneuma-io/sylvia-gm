@@ -12,10 +12,10 @@ mod common;
 
 use common::{recorded_execution, Recorded};
 use serde_json::Value as J;
-use sylvia_base::testing::assert_same_json;
 use std::sync::Mutex;
 use sylvia_agent::stateless_mcp::execute::execute_action;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_base::testing::assert_same_json;
 use sylvia_domain::authority::{ActionCommand, WriterRole};
 use sylvia_domain::error::DomainError;
 
