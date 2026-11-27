@@ -285,6 +285,64 @@ fn has_private_records(connection: &Connection) -> StoreResult<bool> {
 }
 
 impl AuthorityStore {
+    /// `append_private_provider_record(record)`: commit private ingress on its own, apart from
+    /// ordinary history and Full Audit capture, advancing the profile to schema 12 first.
+    pub fn append_private_provider_record(
+        &self,
+        record: &sylvia_domain::provider_records::ProviderPrivateRecord,
+    ) -> StoreResult<()> {
+        let connection = self.connect()?;
+        let result = (|| {
+            connection.execute_batch("BEGIN IMMEDIATE")?;
+            self.ensure_campaign_schema(&connection)?;
+            append_record(
+                &connection,
+                &PrivateRecord {
+                    session_id: &record.session_id,
+                    attempt_id: &record.attempt_id,
+                    response_id: &record.response_id,
+                    turn_id: &record.turn_id,
+                    basis_message_id: &record.basis_message_id,
+                    source_order: record.source_order,
+                    provider_id: &record.provider_id,
+                    model_id: &record.model_id,
+                    kind: &record.kind,
+                    payload: &record.payload,
+                },
+            )?;
+            connection.execute_batch("COMMIT")?;
+            Ok(())
+        })();
+        if !connection.is_autocommit() {
+            let _ = connection.execute_batch("ROLLBACK");
+        }
+        result
+    }
+
+    /// `finish_private_provider_attempt(session_id, attempt_id, completed=...)`: the attempt's
+    /// partial records made terminal; nothing before schema 11.
+    pub fn finish_private_provider_attempt(
+        &self,
+        session_id: &str,
+        attempt_id: &str,
+        completed: bool,
+    ) -> StoreResult<()> {
+        let connection = self.connect()?;
+        if !has_private_records(&connection)? {
+            return Ok(());
+        }
+        let result = (|| {
+            connection.execute_batch("BEGIN IMMEDIATE")?;
+            finish_attempt(&connection, session_id, attempt_id, completed)?;
+            connection.execute_batch("COMMIT")?;
+            Ok(())
+        })();
+        if !connection.is_autocommit() {
+            let _ = connection.execute_batch("ROLLBACK");
+        }
+        result
+    }
+
     /// `provider_continuation(session_id, response_id, provider_id=..., model_id=...)`.
     pub fn provider_continuation(
         &self,

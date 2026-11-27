@@ -1,5 +1,5 @@
-//! TURN reads and writes, the application half: `AuthorityOwner.current_open_turn` and
-//! `AuthorityOwner.open_turn`. The store halves are `sylvia_store::actions`.
+//! TURN reads and writes, the application half: `AuthorityOwner.current_open_turn`,
+//! `AuthorityOwner.open_turn` and `AuthorityOwner.complete_turn`. The store halves are `sylvia_store::actions`.
 
 use sylvia_domain::authority::validate_authority_identity;
 use sylvia_store::{StoreHandle, StoreResult};
@@ -29,4 +29,12 @@ pub async fn open_turn(store: &StoreHandle, campaign_id: &str, turn_id: &str) ->
     }
     let (campaign_id, turn_id) = (campaign_id.to_owned(), turn_id.to_owned());
     store.call(move |store| store.open_turn(&campaign_id, &turn_id)).await
+}
+
+/// `AuthorityOwner.complete_turn(campaign_id, turn_id)`: the campaign's work, then the store's
+/// `complete_turn`.
+pub async fn complete_turn(store: &StoreHandle, campaign_id: &str, turn_id: &str) -> StoreResult<()> {
+    let _work = super::guided::campaign_work(store, campaign_id).await?;
+    let (campaign_id, turn_id) = (campaign_id.to_owned(), turn_id.to_owned());
+    store.call(move |store| store.complete_turn(&campaign_id, &turn_id)).await
 }
