@@ -219,6 +219,26 @@ pub async fn execute_action(
     command: &ActionCommand,
 ) -> Result<ActionExecution, ActionError> {
     let _work = super::guided::campaign_work(store, &command.campaign_id).await?;
+    execute_action_in_work(store, owner_id, command, &ExecuteOptions::default()).await
+}
+
+/// `_execute_action`'s keyword arguments, which only the owner's own operations pass.
+#[derive(Debug, Clone, Default)]
+pub(crate) struct ExecuteOptions {
+    /// `campaign_file_commands`: the Campaign File notes a character update commits with it.
+    pub(crate) campaign_file_commands: Vec<sylvia_domain::authority::CampaignContinuityCommand>,
+    /// `campaign_file_update`: the action is a Campaign File update's bookkeeping.
+    pub(crate) campaign_file_update: bool,
+}
+
+/// `AuthorityOwner._execute_action(command, ...)`, for a caller already holding the campaign's
+/// work (`execute_action`, `update_campaign_file`).
+pub(crate) async fn execute_action_in_work(
+    store: &StoreHandle,
+    owner_id: &str,
+    command: &ActionCommand,
+    options: &ExecuteOptions,
+) -> Result<ActionExecution, ActionError> {
     // The identities, as `validate_authority_identity` checks them.
     let identities = [
         (&command.campaign_id, "Campaign identity"),
@@ -333,7 +353,9 @@ pub async fn execute_action(
                         &actor,
                         &boundary.actor_id.clone().map_or(Json::Null, Json::from),
                     );
-            if !normal_event {
+            // A Campaign File review that changes nothing is not play.
+            let unchanged_review = options.campaign_file_update && options.campaign_file_commands.is_empty();
+            if !normal_event && !unchanged_review {
                 return Err(command_rejected(
                     "Complete the queued starting character choices before play.",
                     "campaign_preparation_pending",
@@ -359,6 +381,8 @@ pub async fn execute_action(
         Err(ExecuteFailure::Domain(error)) => return Err(error.into()),
         Err(ExecuteFailure::Store(error)) => return Err(error.into()),
     };
+    let mut commit = commit;
+    commit.campaign_file_commands.clone_from(&options.campaign_file_commands);
     let receipt = store.call(move |store| store.commit_action(&commit)).await?;
     Ok(ActionExecution::Receipt(receipt))
 }
@@ -513,6 +537,7 @@ fn execute_on(
         outcome,
         status,
         choice_resolution: None,
+        campaign_file_commands: Vec::new(),
     })))
 }
 
@@ -810,6 +835,7 @@ fn resolve_on(
             resolution,
             session_id: command.session_id.clone(),
         }),
+        campaign_file_commands: Vec::new(),
     })))
 }
 

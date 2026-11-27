@@ -8,11 +8,14 @@ use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
+use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::{content_reads, turn_reads};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_domain::authority::ActionCommand;
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
-use sylvia_domain::session::{SessionMessage, SessionMessageKind};
+use sylvia_domain::session::{SessionActivityBasis, SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
 
 /// An `AuthorityOwner` method lane 3 has not ported yet.
@@ -185,9 +188,43 @@ impl TurnOwner for OwnerReads {
         })
     }
 
+    fn execute_action<'a>(
+        &'a self,
+        command: &'a ActionCommand,
+    ) -> BoxFuture<'a, Result<ActionExecution, AuthorityFailure>> {
+        Box::pin(async move {
+            let Some(owner_id) = self.owner_id() else {
+                return Err(CodedError::new(
+                    "internal_error",
+                    "The GM turn's owner reads were built without the owner's identity.",
+                )
+                .with_error_type("RuntimeError")
+                .into());
+            };
+            actions::execute_action(self.store(), owner_id, command).await.map_err(|error| match error {
+                ActionError::Domain(error) => AuthorityFailure::Domain(error),
+                ActionError::Store(error) => AuthorityFailure::Coded(store_error(error)),
+            })
+        })
+    }
+
     fn campaign_narrative_options<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
         Box::pin(async move {
             turn_reads::campaign_narrative_options(self.store(), session_id).await.map_err(store_error)
+        })
+    }
+
+    fn session_activity_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: Option<&'a str>,
+    ) -> BoxFuture<'a, CodedResult<SessionActivityBasis>> {
+        Box::pin(async move {
+            let (session_id, attempt_id) = (session_id.to_owned(), attempt_id.map(str::to_owned));
+            self.store()
+                .call(move |store| store.session_activity_basis(&session_id, attempt_id.as_deref()))
+                .await
+                .map_err(store_error)
         })
     }
 }

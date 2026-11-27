@@ -323,7 +323,7 @@ impl sylvia_provider::http::HttpTransport for UnavailableTransport {
 
 /// The installer's system: the download client (`httpx.Client(timeout=httpx.Timeout(30.0,
 /// read=60.0), follow_redirects=False)`) and the free-space reading.
-fn claude_install_system() -> sylvia_provider::claude_install::InstallSystem {
+pub(crate) fn claude_install_system() -> sylvia_provider::claude_install::InstallSystem {
     let mut settings =
         sylvia_provider::net::ClientSettings::from_system(sylvia_provider::claude_install::INSTALL_TIMEOUTS);
     settings.follow_redirects = false;

@@ -32,9 +32,30 @@ pub(crate) fn dump(value: &Json) -> String {
 /// `_decode_canonical_json`: the stored text must parse, refusing non-standard constants, and
 /// be exactly the canonical text of its value (which also refuses repeated members).
 pub(crate) fn load_json(text: &str) -> StoreResult<Json> {
-    // `_decode_canonical_json`: text `json.loads` refuses raises its `JSONDecodeError`; only
-    // text it reads that is not the exact canonical form is the canonical-representation error.
-    let parsed = sylvia_base::pyjson::loads(text).map_err(crate::error::json_error)?;
+    // `_decode_canonical_json`: `json.loads` with `_reject_duplicate_members` and
+    // `_reject_nonstandard_constant`. Text it refuses raises its `JSONDecodeError`; each hook its
+    // own `ValueError`; a number that overflows to infinity fails `owned_json_value`'s
+    // `TypeError`; only text it reads that is not the exact canonical form is the
+    // canonical-representation error.
+    use sylvia_base::pyjson::{loads_hooked, HookFailure, HookPolicy};
+    let parsed = match loads_hooked(text, HookPolicy { refuse_duplicates: true, refuse_constants: true }) {
+        Ok(hooked) if hooked.non_finite => {
+            return Err(sylvia_domain::DomainError::type_error("Value is not JSON-compatible").into())
+        }
+        Ok(hooked) => hooked.value,
+        Err(HookFailure::Decode(error)) => {
+            return Err(StoreError::Coded(
+                sylvia_base::CodedError::rejected(error.to_string()).with_error_type("JSONDecodeError"),
+            ))
+        }
+        Err(HookFailure::Duplicate(_)) => {
+            return Err(value_error("Canonical JSON object members must be unique"))
+        }
+        Err(HookFailure::Constant(_)) => {
+            return Err(value_error("Canonical JSON constants must be finite and standard"))
+        }
+        Err(HookFailure::Unsupported(error)) => return Err(crate::error::json_error(error)),
+    };
     if dump(&parsed) != text {
         return Err(value_error("Stored JSON is not the exact canonical representation"));
     }
@@ -82,6 +103,9 @@ pub struct CommitAction {
     /// `choice_resolution_id`, `choice_resolution` and `choice_resolution_session_id`: the
     /// answer that completes a pending mechanics choice, when this commit resolves one.
     pub choice_resolution: Option<ChoiceCommit>,
+    /// `campaign_file_commands`: a Campaign File update's continuity commands, committed in this
+    /// action's transaction at the revisions right after it (a character update's bookkeeping).
+    pub campaign_file_commands: Vec<sylvia_domain::authority::CampaignContinuityCommand>,
 }
 
 /// The answer a commit resolves a pending mechanics choice with.
@@ -725,6 +749,19 @@ impl AuthorityStore {
             "INSERT INTO campaign_revisions (campaign_id, revision, action_id, activation_id) VALUES (?, ?, ?, NULL)",
             params![campaign_id, resulting_revision, command.action_id],
         )?;
+        if !command.campaign_file_commands.is_empty() {
+            let consistent = command.status == ActionStatus::Committed
+                && command.campaign_file_commands.iter().enumerate().all(|(index, item)| {
+                    item.campaign_id == campaign_id
+                        && item.turn_id == command.turn_id
+                        && i64::try_from(index).ok().and_then(|index| resulting_revision.checked_add(index))
+                            == Some(item.expected_revision)
+                });
+            if !consistent {
+                return Err(rejected("Campaign File mechanics batch is inconsistent", "command_rejected"));
+            }
+            self.commit_campaign_continuity_batch_in(connection, &command.campaign_file_commands)?;
+        }
         if let Some(fault) = &self.faults.before_commit {
             fault()?;
         }

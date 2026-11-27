@@ -37,6 +37,11 @@ The pseudo-phase `list_tools` traces `StatelessMcpMechanics._list_tools` instead
 tools, or what it raised). The first listing with a session is run again with the variants
 `listing_variants` gives: owner answers overridden (an override may be a refusal, raised), a
 different session or the fixed list.
+
+The pseudo-phase `execute_action` traces `StatelessMcpMechanics.execute_action` (T3m-2) the same
+way: `execution_start` (the command), every owner call and `uuid4` draw, and `execution_end`
+(the receipt, or what it raised). The first call is run again with `execution_variants`; an
+override may also be `Answers`, one answer per successive call.
 Reference tooling only; retired with the Python source.
 """
 
@@ -201,6 +206,31 @@ def dump_input(provider_input: object) -> dict[str, object]:
     })  # type: ignore[return-value]
 
 
+class Answers:
+    """Overridden answers for successive calls of one owner method, in order."""
+
+    def __init__(self, *answers: object) -> None:
+        self.answers = list(answers)
+
+    def next(self) -> object:
+        return self.answers.pop(0)
+
+
+def refusal_fields(error: BaseException) -> dict[str, object]:
+    """A raised error as the Rust tests rebuild it: class, message, code and, for a
+    `MechanicsRejected`, its correction fields."""
+    found: dict[str, object] = {"class": type(error).__name__, "message": str(error),
+                                "code": getattr(error, "code", None)}
+    if hasattr(error, "validation_issues"):
+        found.update({
+            "field_paths": list(error.field_paths),  # type: ignore[attr-defined]
+            "validation_issues": [issue.as_payload()
+                                  for issue in error.validation_issues],  # type: ignore[attr-defined]
+            "state_changed": error.state_changed,  # type: ignore[attr-defined]
+            "refusal_reasons": list(error.refusal_reasons)})  # type: ignore[attr-defined]
+    return found
+
+
 class Traced:
     """The adapter's owner: every call is logged while a phase runs; overrides answer first."""
 
@@ -213,12 +243,14 @@ class Traced:
             answer = OVERRIDES[name]
 
             def overridden(*args: object, **kwargs: object) -> object:
+                answer = OVERRIDES[name]
+                if isinstance(answer, Answers):
+                    answer = answer.next()
                 if isinstance(answer, BaseException):
                     # An override may also be a refusal, raised as the owner would raise it.
                     log({"event": "call", "name": name, "args": plain(list(args)),
                          "kwargs": plain(kwargs), "override": True,
-                         "raised": {"class": type(answer).__name__, "message": str(answer),
-                                    "code": getattr(answer, "code", None)}})
+                         "raised": refusal_fields(answer)})
                     raise answer
                 log({"event": "call", "name": name, "args": plain(list(args)),
                      "kwargs": plain(kwargs), "result": plain(answer), "override": True})
@@ -968,9 +1000,128 @@ def wrap_listing() -> None:
     _stateless_mcp.StatelessMcpMechanics._list_tools = traced  # noqa: SLF001
 
 
+#: The pseudo-phase that traces `StatelessMcpMechanics.execute_action` (T3m-2).
+EXECUTION = "execute_action"
+EXECUTION_DONE = {"value": False}
+
+
+def castable_catalog(owner: object, campaign_id: str, tool_name: str) -> tuple[object, ...]:
+    """The catalog with `tool_name` given a castable `spell` choice."""
+    found = []
+    for tool in owner.catalog(campaign_id):  # type: ignore[attr-defined]
+        if tool.name == tool_name:
+            schema = copy.deepcopy(dict(tool.input_schema))
+            schema["properties"] = {**schema["properties"], "spell": {
+                "type": "string", "enum": ["fire_bolt", "magic_missile", "wish"],
+                "x-sylvia-gm-castable-spells": True}}
+            tool = dataclasses.replace(tool, input_schema=schema)
+        found.append(tool)
+    return tuple(found)
+
+
+def execution_variants(owner: object, command: object) -> list[dict[str, object]]:
+    from sylvia_gm.domain.authority import (
+        AwaitingChoiceReceipt, MechanicsChoiceOption, MechanicsChoiceRequest)
+    from sylvia_gm.domain.errors import (
+        CommandRejected, IdempotencyConflict, MechanicsRejected, MechanicsValidationIssue,
+        RulesetPreconditionRejected, StaleRevision, WrongOwner, WrongWriter)
+    campaign_id = command.campaign_id  # type: ignore[attr-defined]
+    tool_name = command.tool_name  # type: ignore[attr-defined]
+    catalog = owner.catalog(campaign_id)  # type: ignore[attr-defined]
+    without = tuple(tool for tool in catalog if tool.name != tool_name)
+    issue = MechanicsValidationIssue(path="skill", kind="invalid_type", expected_type="string",
+                                     actual_type="integer")
+    enum_issue = MechanicsValidationIssue(path="ability", kind="invalid_enum_value",
+                                          allowed_values=("strength", "dexterity"))
+    spell_issue = MechanicsValidationIssue(path="spell", kind="invalid_enum_value",
+                                           allowed_values=("fire_bolt", "magic_missile", "wish"))
+    choice = AwaitingChoiceReceipt(
+        campaign_id=campaign_id, action_id=command.action_id,  # type: ignore[attr-defined]
+        basis_revision=7, turn_id=command.turn_id,  # type: ignore[attr-defined]
+        choice=MechanicsChoiceRequest(choice_id="choice-1", prompt="Which way?", options=(
+            MechanicsChoiceOption(option_id="left", label="Left"),
+            MechanicsChoiceOption(option_id="right", label="Right"))),
+        choice_sequence=2)
+    return [
+        {"name": "awaiting_choice", "answer": {"execute_action": choice}},
+        {"name": "stale_revision", "answer": {"execute_action": StaleRevision("stale")}},
+        {"name": "wrong_owner", "answer": {"execute_action": WrongOwner("owner")}},
+        {"name": "wrong_writer", "answer": {"execute_action": WrongWriter("writer")}},
+        {"name": "idempotency_conflict",
+         "answer": {"execute_action": IdempotencyConflict("conflict")}},
+        {"name": "command_rejected",
+         "answer": {"execute_action": CommandRejected("Probe refusal", code="probe_refused")}},
+        {"name": "plain_rejected", "answer": {"execute_action": CommandRejected("Probe refusal")}},
+        {"name": "mechanics_rejected", "answer": {"execute_action": MechanicsRejected(
+            "Probe mechanics refusal", code="probe_mechanics", field_paths=("skill",),
+            validation_issues=(issue,), state_changed=True,
+            refusal_reasons=("Reason one.", "Reason two."))}},
+        {"name": "enum_not_castable", "answer": {"execute_action": MechanicsRejected(
+            "Ability is not allowed", code="probe_enum", field_paths=("ability",),
+            validation_issues=(enum_issue,))}},
+        {"name": "castable_refusal", "answer": {
+            "catalog": castable_catalog(owner, campaign_id, tool_name),
+            "model_context_snapshot": listing_snapshot(owner, campaign_id),
+            "execute_action": MechanicsRejected(
+                "Spell is not allowed", code="probe_spell", field_paths=("spell",),
+                validation_issues=(spell_issue, issue), state_changed=False,
+                refusal_reasons=("Kept out.",))}},
+        {"name": "precondition", "answer": {"execute_action": RulesetPreconditionRejected(
+            "The target is out of reach.", reasons=("Missing input 'target_distance'",))}},
+        {"name": "value_error", "answer": {"execute_action": ValueError("probe value")}},
+        {"name": "key_error", "answer": {"execute_action": KeyError("probe")}},
+        {"name": "revalidation_unavailable", "answer": {"catalog": without}},
+        {"name": "no_longer_available", "answer": {"catalog": Answers(catalog, catalog, without)}},
+    ]
+
+
+def wrap_execution() -> None:
+    from sylvia_gm.agent import _stateless_mcp
+
+    _stateless_mcp.uuid = Uuids()  # type: ignore[attr-defined]
+    original = _stateless_mcp.StatelessMcpMechanics.execute_action
+
+    def run(self, command, variant):  # type: ignore[no-untyped-def]
+        log({"event": "execution_start", "variant": variant, "command": plain(command)})
+        ACTIVE["value"] = True
+        try:
+            receipt = original(self, command)
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "execution_end",
+                 "raised": {**refusal_fields(error), **described(error)}})
+            if variant is None:
+                raise
+            return None
+        finally:
+            ACTIVE["value"] = False
+        log({"event": "execution_end", "receipt": plain(receipt)})
+        return receipt
+
+    def traced(self, command):  # type: ignore[no-untyped-def]
+        owner = self._owner  # noqa: SLF001
+        self._owner = Traced(owner)  # noqa: SLF001
+        try:
+            receipt = run(self, command, None)
+            if not EXECUTION_DONE["value"]:
+                EXECUTION_DONE["value"] = True
+                for variant in execution_variants(owner, command):
+                    OVERRIDES.clear()
+                    OVERRIDES.update(variant["answer"])  # type: ignore[arg-type]
+                    run(self, command, variant["name"])
+                    OVERRIDES.clear()
+            return receipt
+        finally:
+            self._owner = owner  # noqa: SLF001
+
+    _stateless_mcp.StatelessMcpMechanics.execute_action = traced
+
+
 for phase in PHASES:
     if phase == LISTING:
         wrap_listing()
+    elif phase == EXECUTION:
+        wrap_execution()
     else:
         wrap(phase)
 

@@ -1,0 +1,690 @@
+{
+ "python": "3.12.11",
+ "owner_id": "campaign-file-runs",
+ "install_id": "srd",
+ "installed_table_digests": {
+  "actions": "4ccf3e45ae2e92700347988454a37a6682f2fbe55261abcaa173b712e0d1e1bb",
+  "agent_session_messages": "4cbb69dcd50bde37648dd50694f8459344993142da92d3123da891b07cf0ae24",
+  "agent_sessions": "42928b9b2f1a8fee5895850fb497cd15c19bdc42fe26f22831dcb5b848acecd2",
+  "authority_schema_extensions": "df5f2da317d38641e651d763fb7617769a78ff3b30b6be9d91a71f7656520ab1",
+  "builder_dm_handoffs": "3fc603377960eb5d60e1709197bb9082410a7433b8dd976ca64acd1702997bf2",
+  "campaign_constructions": "6f1fbae78bb1871bd3cad96c4a0f58a0acb2546cccf36f564d70cc7f991df289",
+  "campaign_continuity_records": "d9887bdf0414cd1a0be98ea275e7e3d84f7d93362481c2426f5da6e1d6b1aeac",
+  "campaign_lifecycle_state": "83c57246ff89e248f2b92a39fc9678231b2043892b17e32beea036b6144ef5ec",
+  "campaign_lifecycle_transitions": "0675b56f0184c2f4e0b2745d23664fe337dc9fa99b3d181f77b617945aa2666c",
+  "campaign_lock_memberships": "12fa96a51131f0c07af6caf124c2acbba934fcdfb330f3dc24f29c9e2ab97fbf",
+  "campaign_locks": "27ef9a07d4564c6b690ffbf7457e4061b2508d4f553838ea7d20c7962bc9466f",
+  "campaign_operations": "593af76585c0cee3ae66622019f1bbad8eb94571484d5af8b5a313416d226f22",
+  "campaign_package_memberships": "4537d5083444bc70b0c53db1d477bf8c1e2d0f6dbfed1bcb4ea4d9f9e1e2f0f9",
+  "campaign_plans": "0b81a18d0d8d918b15b8b6f811b8919533401fa9263ca0c63dea756349ece824",
+  "campaign_recovery_receipts": "349b99343313ac4811777d6dd059edfea0197a02277c6549dc6db2d7414df3b3",
+  "campaign_revisions": "1f6aecfe016a4fe07f663f6e46a613eaf7529b584afbb1e2ee64af6a739dbba4",
+  "campaign_state": "a9f35e1ecc7a235bce89c0b33b5392bc9130e26bed5148ff1657a4846563631f",
+  "campaign_state_namespace_owners": "e138a843d801fcff81057c0dbcbda02bfeafcb0e68d8ca2051204c72922a3be7",
+  "campaigns": "e922b2928dad4b62655b8a0aa9163410399352d00167e49f49fbb61f445631a5",
+  "canonical_events": "666893f9e3a73ff3b089440d1edd50d9636ab93312e181926510e454dfa65ac2",
+  "consequences": "ebb0ffabdfabc90d94fd1bda912767c23051647a6a80b83c7fd6ac5ceae467e3",
+  "idempotency_records": "388da8625e74cf54548bf729f81896d7002e72367d1f713d3982f40e1f3d2de3",
+  "mechanics_choice_resolutions": "f1a1c422ab1aaee2b6a464d6cdfa5fef423431f49c2d33002049a0c390626c05",
+  "mutations": "41dc725b1d89aa25d37557f4dad86d6bff38ddb9eddbc2ae8eeac1c1bc496a43",
+  "narration_interruptions": "f777ce375196608f570ce0449fd7a085463c4bed9838fff8c9473493e981d3b3",
+  "package_activations": "63dc5cd64766d956bc42563985e874037cb0660c0b234a3127a54aa1ee7f3a23",
+  "package_blob_chunks": "cd9ec8a398e581804c1a546b842898048adfef174d978acf65778fad6e1afcac",
+  "package_blobs": "3e2006af2fd9cdb309f96b93f55bcb439acb6867d88ea4097b389008b85153a2",
+  "package_candidate_memberships": "146c7894e38c99c216c38a0ad68ef7b67517823a68093f637180859fd9f432ac",
+  "package_candidates": "29ff5b9f266298d9a2950aad37de3c6715cf8a206e81bfb19cae251158d14c33",
+  "package_capabilities": "74f0c56ae693a61cbcd7b8113f1fbd797d851757de07a58036df7d53b5535dd5",
+  "package_dependencies": "8135e25b096e70e507b7475a8b0882aceec6f13788e57008c3c18084be41a61a",
+  "package_exact_dependencies": "22ada2dedc0107c920ebcfa41f65eab9e0ba901fc0bd13d97e38c7e0c805d089",
+  "package_manifest_files": "ff5a7a08efb43ddf25b6e23c3a3c7dd1b7764398ddc6d629c937772a04901374",
+  "package_manifests": "dc4e91521bef0b0094844afcce78a7a53df63567278507bd2ae93807a78dba1b",
+  "package_participant_artifacts": "6919e93b314f9e8358fed7c31ece7d883b7511bd6062d53ca7cd9134e4b45a75",
+  "package_prompt_fragments": "b0480105bf9c21f835c518d6cfef48dba9b1b31b72a812623bd9e11bb911c557",
+  "package_read_leases": "ce0db56e413dbb832900e49550e689e395ce2ee7ce5a7247fee351f84edb74c3",
+  "package_recovery_roots": "eb62bbc0ad76033aabb9e19f67a2925d20142215f359ef4394803da2987fa28d",
+  "package_staging": "fb81a6b4d70232593fb5b8b06da8bed440d2b1b01895577c3ea610517609a1ba",
+  "package_staging_chunks": "763598886c879ff1813dd4aa853ac01540b77d734294c6db341d9e34687db06e",
+  "package_tools": "d52e0a10c1c8a546a7977a97b28b2ec9c5073b6d48d12dab50cbe616e54a9871",
+  "package_ui_surfaces": "aa733a9149a7afb2c39574244ed94251004e696433b53779c215e23930ab4813",
+  "packages": "db9e5cf0897abd198cb388f807e3724a425bc3eba65fe4c85e725270fc0fb2bf",
+  "participant_adaptations": "29e76e392e99d5d53275ae4d7617c0293f648a8ed29d040d8215ffa102d38cd0",
+  "participant_quarantines": "0b98c6b8e7315cfb3936a0bef17c27590175c2a545c6d86668e7ba62bf5c1d4f",
+  "participants": "fe0835fffa4fea2c55ff7c4374d48052a63a03757d85cddf18189ca10e3b3f85",
+  "pending_mechanics_action_aliases": "dcc6f9ba94ad104c8c7cfa2a155a16c24c061e1d898936dc59089f127e3d78f0",
+  "pending_mechanics_actions": "0130bef94a2ee85a466a70ea4db961e1ae5676195d2cff0bfcd94cb5134e8aee",
+  "provider_private_records": "6806a5c81023affb500b98be942f4fde936e3dcacde1123f56830c1eff97d329",
+  "schema_migrations": "eab2e4f83d92816a4b12d942f326f53f4fbf761f2c352e22702f92ff78dd91e8",
+  "standalone_builder_chat_messages": "b7c8fa65741004b5952e27198025d575db2351fecb89673074055e7e289264ed",
+  "standalone_builder_chats": "82a2087898d7be3219639d5ff6a2277eb13bf10f156f4780bb59b1053e511485",
+  "turns": "adc9b26690a856f57073b5299b6615b192982e468da0ff0b846b579377c8b62e"
+ },
+ "setup_tables": {
+  "agent_session_messages": [
+   [
+    "session-bookkeeping",
+    1,
+    "borrow",
+    "user",
+    "{\"text\":\"I accept the quartermaster's loan of a tent.\"}",
+    null
+   ]
+  ],
+  "agent_sessions": [
+   [
+    "session-bookkeeping",
+    "bookkeeping",
+    "dm",
+    "scripted",
+    "scripted",
+    "active",
+    null,
+    null,
+    "[]",
+    "02f96b0719fa2dbc434c69f96188a917b2f789691d7dfc6ee666691ceecd8923",
+    null,
+    null
+   ]
+  ],
+  "campaign_lifecycle_state": [
+   [
+    "bookkeeping",
+    "dm",
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "campaign_lock_memberships": [
+   [
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee",
+    0,
+    "sylvia.srd-lite.bg3",
+    "0.3.29",
+    "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
+    "primary"
+   ],
+   [
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee",
+    1,
+    "pneuma.srd.5.2.1.reference",
+    "5.2.1",
+    "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
+    "dependency"
+   ]
+  ],
+  "campaign_locks": [
+   [
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee",
+    "bookkeeping",
+    "5abc3a157eb731fda6b7aa5c88a646b0dac0a77ce41ec313c44538f6204ac0a2",
+    "available",
+    null,
+    0
+   ]
+  ],
+  "campaign_package_memberships": [
+   [
+    "bookkeeping",
+    "sylvia.srd-lite.bg3",
+    "0.3.29",
+    "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
+    "primary",
+    0
+   ],
+   [
+    "bookkeeping",
+    "pneuma.srd.5.2.1.reference",
+    "5.2.1",
+    "ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461",
+    "dependency",
+    1
+   ]
+  ],
+  "campaign_revisions": [
+   [
+    "bookkeeping",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "campaign_state": [
+   [
+    "bookkeeping",
+    "sylvia.srd-lite.bg3",
+    "combat",
+    "{\"encounter_active\":false}"
+   ],
+   [
+    "bookkeeping",
+    "sylvia.srd-lite.bg3",
+    "entities",
+    "{\"hero\":{\"hp\":10,\"inventory\":[\"chain_mail\",\"greatsword\"],\"max_hp\":10,\"name\":\"Hero\"}}"
+   ]
+  ],
+  "campaign_state_namespace_owners": [
+   [
+    "bookkeeping",
+    "sylvia.srd-lite.bg3",
+    "sylvia.srd-lite.bg3"
+   ]
+  ],
+  "campaigns": [
+   [
+    "bookkeeping",
+    "Synthetic bookkeeping",
+    "active",
+    "dm",
+    0,
+    "[{\"id\":\"sylvia.srd-lite.bg3\",\"load_order\":0,\"role\":\"primary\",\"sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"version\":\"0.3.29\"},{\"id\":\"pneuma.srd.5.2.1.reference\",\"load_order\":1,\"role\":\"dependency\",\"sha256\":\"ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461\",\"version\":\"5.2.1\"}]",
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee"
+   ]
+  ],
+  "participants": [
+   [
+    "bookkeeping",
+    "hero",
+    "player_character",
+    "sylvia.srd-lite.bg3",
+    "0.3.29",
+    "{\"abilities\":{\"charisma\":10,\"constitution\":10,\"dexterity\":10,\"intelligence\":10,\"strength\":10,\"wisdom\":10},\"background\":\"soldier\",\"classes\":[{\"id\":\"fighter\",\"level\":1}],\"level\":1,\"name\":\"Synthetic Hero\",\"origin_feats\":[\"savage_attacker\",\"skilled\"],\"saving_throw_proficiencies\":[],\"size_rank\":0,\"species\":\"human\",\"speed\":30}",
+    "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
+    "sylvia.srd-lite.bg3.player-character",
+    "f18aefccc825474cba9d8326636207cc38789fc2526b48bc652c46c5ebf07f91",
+    "validated",
+    null
+   ]
+  ],
+  "turns": [
+   [
+    "bookkeeping",
+    "bookkeeping-turn",
+    "open",
+    0
+   ]
+  ]
+ },
+ "runs": [
+  {
+   "name": "a field the schema refuses",
+   "kind": "update",
+   "command": {
+    "session_id": "session-bookkeeping",
+    "update_id": "bad-field-1",
+    "updates": [
+     {
+      "operation": "update_character",
+      "participant_id": "hero",
+      "expected_revision": 0,
+      "fields": {
+       "hp": 900
+      }
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "tent-loan",
+      "category": "continuity",
+      "text": "The tent must be returned tomorrow.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "borrow"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "MechanicsRejected",
+    "code": "mechanics_validation_failed",
+    "message": "Tool parameters do not match the exposed operation schema",
+    "mechanics": {
+     "field_paths": [
+      "updates[0].fields.hp",
+      "updates[0].fields.inventory"
+     ],
+     "validation_issues": [
+      {
+       "path": "updates[0].fields.hp",
+       "kind": "unexpected_field",
+       "actual_type": "integer",
+       "parent_path": "updates[0].fields"
+      },
+      {
+       "path": "updates[0].fields.inventory",
+       "kind": "missing_required_field",
+       "expected_type": "array",
+       "parent_path": "updates[0].fields"
+      }
+     ],
+     "state_changed": false,
+     "refusal_reasons": []
+    }
+   }
+  },
+  {
+   "name": "a stale character revision",
+   "kind": "update",
+   "command": {
+    "session_id": "session-bookkeeping",
+    "update_id": "stale-1",
+    "updates": [
+     {
+      "operation": "update_character",
+      "participant_id": "hero",
+      "expected_revision": 5,
+      "fields": {
+       "inventory": [
+        "chain_mail",
+        "greatsword",
+        "two_person_tent"
+       ]
+      }
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "tent-loan",
+      "category": "continuity",
+      "text": "The tent must be returned tomorrow.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "borrow"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Expected campaign revision is stale"
+   }
+  },
+  {
+   "name": "the fallback inventory refused",
+   "kind": "update",
+   "command": {
+    "session_id": "session-bookkeeping",
+    "update_id": "fallback-1",
+    "updates": [
+     {
+      "operation": "update_inventory",
+      "expected_revision": 0,
+      "holdings": [
+       {
+        "holding_id": "arrows-store",
+        "item_id": "ordinary-arrow",
+        "name": "Arrow",
+        "kind": "item",
+        "stackable": true,
+        "quantity": 5,
+        "owner_id": "waystation",
+        "holder_id": "chest",
+        "visibility": "player_known",
+        "known_by": [
+         "player"
+        ]
+       }
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "borrow"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Use the active Ruleset inventory; fallback is unavailable"
+   }
+  },
+  {
+   "name": "a narrative entity writing an editable field",
+   "kind": "update",
+   "command": {
+    "session_id": "session-bookkeeping",
+    "update_id": "disguised-1",
+    "updates": [
+     {
+      "operation": "record_entity",
+      "entity_id": "hero",
+      "entity_kind": "person",
+      "name": "Hero",
+      "attributes": {
+       "inventory": [
+        "chain_mail",
+        "greatsword",
+        "two_person_tent"
+       ]
+      },
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "borrow"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "character_fields_require_bookkeeping",
+    "message": "Use character_updates for editable Ruleset fields; narrative attributes do not change character holdings"
+   }
+  },
+  {
+   "name": "a character update with a note",
+   "kind": "update",
+   "command": {
+    "session_id": "session-bookkeeping",
+    "update_id": "loan-1",
+    "updates": [
+     {
+      "operation": "update_character",
+      "participant_id": "hero",
+      "expected_revision": 0,
+      "fields": {
+       "inventory": [
+        "chain_mail",
+        "greatsword",
+        "two_person_tent"
+       ]
+      }
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "tent-loan",
+      "category": "continuity",
+      "text": "The tent must be returned tomorrow.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "borrow"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "loan-1",
+     "change_count": 2,
+     "character_updates": [
+      {
+       "participant_id": "hero",
+       "fields": {
+        "inventory": [
+         "chain_mail",
+         "greatsword",
+         "two_person_tent"
+        ]
+       }
+      }
+     ],
+     "resulting_revision": 2
+    }
+   }
+  },
+  {
+   "name": "its replay",
+   "kind": "update",
+   "command": {
+    "session_id": "session-bookkeeping",
+    "update_id": "loan-1",
+    "updates": [
+     {
+      "operation": "update_character",
+      "participant_id": "hero",
+      "expected_revision": 0,
+      "fields": {
+       "inventory": [
+        "chain_mail",
+        "greatsword",
+        "two_person_tent"
+       ]
+      }
+     },
+     {
+      "operation": "record_memory",
+      "fact_id": "tent-loan",
+      "category": "continuity",
+      "text": "The tent must be returned tomorrow.",
+      "visibility": "player_known",
+      "known_by": [
+       "player"
+      ]
+     }
+    ],
+    "basis_message_ids": [
+     "borrow"
+    ],
+    "turn_id": null
+   },
+   "outcome": {
+    "ok": {
+     "status": "campaign_file_updated",
+     "operation_id": "loan-1",
+     "change_count": 2,
+     "character_updates": [
+      {
+       "participant_id": "hero",
+       "fields": {
+        "inventory": [
+         "chain_mail",
+         "greatsword",
+         "two_person_tent"
+        ]
+       }
+      }
+     ],
+     "resulting_revision": 2
+    }
+   }
+  }
+ ],
+ "final_changed_tables": {
+  "actions": [
+   [
+    "bookkeeping",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "bookkeeping-turn",
+    0,
+    1,
+    "dm",
+    "sylvia.srd-lite.bg3",
+    "0.3.29",
+    "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90",
+    "update_srd_carried_inventory",
+    "committed",
+    "{\"updates\":[{\"fields\":{\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"]},\"participant_id\":\"hero\"}]}",
+    "e04ef99424eae5e59abc3d72fab39ca47a7266ea02f2b9e59debd58486d79399",
+    "{\"context\":{\"_update\":{\"fields\":{\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"]},\"participant_id\":\"hero\"}},\"logs\":[],\"narrative_directives\":[],\"narrative_hooks\":{},\"status\":\"committed\",\"tool\":\"update_srd_carried_inventory\"}",
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee"
+   ]
+  ],
+  "campaign_continuity_records": [
+   [
+    "bookkeeping",
+    1,
+    "loan-1-1",
+    "tent-loan",
+    "fact",
+    "active",
+    "{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"gm_commit\",\"subjects\":[],\"text\":\"The tent must be returned tomorrow.\",\"visibility\":\"player_known\"}",
+    "[\"borrow\"]",
+    "loan-1-1",
+    2
+   ]
+  ],
+  "campaign_operations": [
+   [
+    "loan-1-1",
+    "commit_campaign_continuity",
+    "bookkeeping",
+    "{\"basis_message_ids\":[\"borrow\"],\"campaign_id\":\"bookkeeping\",\"kind\":\"fact\",\"operation_id\":\"loan-1-1\",\"operation_kind\":\"commit_campaign_continuity\",\"payload\":{\"category\":\"continuity\",\"known_by\":[\"player\"],\"origin\":\"gm_commit\",\"subjects\":[],\"text\":\"The tent must be returned tomorrow.\",\"visibility\":\"player_known\"},\"record_id\":\"tent-loan\",\"session_id\":\"session-bookkeeping\",\"status\":\"active\",\"turn_id\":\"bookkeeping-turn\"}",
+    "188b3c447e45070eb8ecea3eb3aae9012718dab5494e47b5c8618db4414a8e81",
+    "{\"campaign_id\":\"bookkeeping\",\"kind\":\"fact\",\"operation_id\":\"loan-1-1\",\"record_id\":\"tent-loan\",\"resulting_revision\":2}",
+    "bookkeeping-turn",
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee",
+    1,
+    2
+   ]
+  ],
+  "campaign_revisions": [
+   [
+    "bookkeeping",
+    0,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "bookkeeping",
+    1,
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "bookkeeping",
+    2,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    "loan-1-1"
+   ]
+  ],
+  "campaign_state": [
+   [
+    "bookkeeping",
+    "sylvia.srd-lite.bg3",
+    "combat",
+    "{\"encounter_active\":false}"
+   ],
+   [
+    "bookkeeping",
+    "sylvia.srd-lite.bg3",
+    "entities",
+    "{\"hero\":{\"hp\":10,\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"],\"max_hp\":10,\"name\":\"Hero\"}}"
+   ]
+  ],
+  "campaigns": [
+   [
+    "bookkeeping",
+    "Synthetic bookkeeping",
+    "active",
+    "dm",
+    2,
+    "[{\"id\":\"sylvia.srd-lite.bg3\",\"load_order\":0,\"role\":\"primary\",\"sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"version\":\"0.3.29\"},{\"id\":\"pneuma.srd.5.2.1.reference\",\"load_order\":1,\"role\":\"dependency\",\"sha256\":\"ad3da5b65b26ed1fb5076ef30ffd764713bc52deadfe5d5ae6e83b8078651461\",\"version\":\"5.2.1\"}]",
+    "lock-b64b5ffd24f6b05e8c4acd333c5d343a443e49ee"
+   ]
+  ],
+  "canonical_events": [
+   [
+    "bookkeeping",
+    1,
+    "action_declared",
+    "bookkeeping-turn",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "{\"action_id\":\"character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74\",\"writer\":\"dm\"}",
+    "internal_safe",
+    null,
+    null
+   ],
+   [
+    "bookkeeping",
+    2,
+    "tool_call",
+    "bookkeeping-turn",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "{\"package_id\":\"sylvia.srd-lite.bg3\",\"package_sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"package_version\":\"0.3.29\",\"parameters\":{\"updates\":[{\"fields\":{\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"]},\"participant_id\":\"hero\"}]},\"tool_name\":\"update_srd_carried_inventory\"}",
+    "player_safe",
+    null,
+    null
+   ],
+   [
+    "bookkeeping",
+    3,
+    "tool_result",
+    "bookkeeping-turn",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "{\"result\":{\"context\":{\"_update\":{\"fields\":{\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"]},\"participant_id\":\"hero\"}},\"logs\":[],\"narrative_directives\":[],\"narrative_hooks\":{},\"status\":\"committed\",\"tool\":\"update_srd_carried_inventory\"},\"status\":\"committed\"}",
+    "player_safe",
+    null,
+    null
+   ],
+   [
+    "bookkeeping",
+    4,
+    "state_mutation",
+    "bookkeeping-turn",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "{\"key\":\"entities\",\"namespace\":\"sylvia.srd-lite.bg3\"}",
+    "internal_safe",
+    null,
+    null
+   ],
+   [
+    "bookkeeping",
+    5,
+    "action_committed",
+    "bookkeeping-turn",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "{\"resulting_revision\":1,\"status\":\"committed\"}",
+    "internal_safe",
+    null,
+    null
+   ]
+  ],
+  "idempotency_records": [
+   [
+    "bookkeeping",
+    "loan-1",
+    "e04ef99424eae5e59abc3d72fab39ca47a7266ea02f2b9e59debd58486d79399",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    "committed",
+    "{\"context\":{\"_update\":{\"fields\":{\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"]},\"participant_id\":\"hero\"}},\"logs\":[],\"narrative_directives\":[],\"narrative_hooks\":{},\"status\":\"committed\",\"tool\":\"update_srd_carried_inventory\"}",
+    1
+   ]
+  ],
+  "mutations": [
+   [
+    "bookkeeping",
+    "character-8c3eda73344a95d4e1ca13fce192e6647795922d071d748a9788716ee8441b74",
+    0,
+    "sylvia.srd-lite.bg3",
+    "entities",
+    "{\"hero\":{\"hp\":10,\"inventory\":[\"chain_mail\",\"greatsword\"],\"max_hp\":10,\"name\":\"Hero\"}}",
+    "{\"hero\":{\"hp\":10,\"inventory\":[\"chain_mail\",\"greatsword\",\"two_person_tent\"],\"max_hp\":10,\"name\":\"Hero\"}}"
+   ]
+  ]
+ }
+}

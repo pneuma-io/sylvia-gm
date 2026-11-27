@@ -14,6 +14,7 @@
 //! `commands/table.rs`; `docs/rust-port/commands.md` is the burn-down.
 
 pub mod chat_start;
+pub mod claude_settings_cli;
 pub mod commands;
 pub mod creation_catalog;
 pub mod desktop_update;

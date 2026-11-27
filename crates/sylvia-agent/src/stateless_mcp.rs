@@ -6,6 +6,7 @@
 //! calls and the Campaign File commit come with T3m; the projection a provider is shown is
 //! [`crate::provider_session::tools`].
 
+pub mod execute;
 pub mod listing;
 
 use crate::provider_session::reads::TurnOwner;
