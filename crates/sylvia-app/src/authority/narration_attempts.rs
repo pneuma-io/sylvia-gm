@@ -691,6 +691,17 @@ pub async fn narration_interruption(
     Ok(store.call(move |store| store.interruption(&campaign, &interruption)).await?)
 }
 
+/// `saved_action_receipt(campaign_id, action_id)`: a committed result read for a redirected
+/// narration, never executed again.
+pub async fn saved_action_receipt(
+    store: &StoreHandle,
+    campaign_id: &str,
+    action_id: &str,
+) -> Result<sylvia_domain::authority::ActionReceipt, ActionError> {
+    let (campaign, action) = (campaign_id.to_owned(), action_id.to_owned());
+    Ok(store.call(move |store| store.action_receipt(&campaign, &action)).await?)
+}
+
 /// `private_provider_index(session_id)`: availability and correlation of the session's private
 /// thinking, never its text.
 pub async fn private_provider_index(

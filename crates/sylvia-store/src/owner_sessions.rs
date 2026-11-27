@@ -8,8 +8,10 @@ use crate::lanes::builder_chat_lane;
 use crate::store::AuthorityStore;
 use crate::work::CampaignWorkGuard;
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::authority::LifecycleState;
-use sylvia_domain::session::{SessionContext, SessionMessage, SessionMessageKind, SessionRecord};
+use sylvia_domain::authority::{LifecycleState, WriterRole};
+use sylvia_domain::session::{
+    SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionStatus,
+};
 
 fn rejected(message: &str) -> crate::error::StoreError {
     crate::actions::rejected(message, "command_rejected")
@@ -164,5 +166,192 @@ impl StoreHandle {
             store.update_agent_session_reasoning(&session_id, effort.as_deref(), once.as_deref())
         })
         .await
+    }
+}
+
+/// One live session operation's admission (`agent_session_work`, `builder_session_work`): the
+/// session's context, read again once the work was held, kept with the work until it drops.
+pub struct HeldSession {
+    pub context: SessionContext,
+    _work: SessionWork,
+}
+
+impl StoreHandle {
+    /// `_campaign_work(campaign_id)`: the campaign's work, refused as `_begin_campaign_work`
+    /// refuses it.
+    async fn campaign_work(&self, campaign_id: &str) -> StoreResult<CampaignWorkGuard> {
+        let owned = campaign_id.to_owned();
+        self.lanes()
+            .work
+            .begin(campaign_id, || {
+                let campaign_id = owned.clone();
+                async move { self.call(move |store| store.campaign_lifecycle(&campaign_id)).await }
+            })
+            .await
+    }
+
+    /// `AuthorityOwner.agent_session_work(session_id)`: a DM session's operation under its
+    /// campaign's work, while the session is active and still its campaign's writer.
+    pub async fn agent_session_work(&self, session_id: &str) -> StoreResult<HeldSession> {
+        let initial = self.raw_context(session_id).await?;
+        let Some(campaign_id) = initial.session.campaign_id().map(str::to_owned) else {
+            return Err(rejected("DM sessions require campaign authority"));
+        };
+        let work = self.campaign_work(&campaign_id).await?;
+        let context = self.raw_context(session_id).await?;
+        if context.session.campaign_id() != Some(campaign_id.as_str()) {
+            return Err(rejected("Agent session campaign identity changed"));
+        }
+        if context.session.fields().status != SessionStatus::Active {
+            return Err(rejected("Agent session is not active"));
+        }
+        let id = campaign_id.clone();
+        let writer = self.call(move |store| store.snapshot(&id)).await?.state.writer;
+        if writer != context.session.role() {
+            return Err(rejected("Agent session no longer holds campaign writer authority"));
+        }
+        Ok(HeldSession { context, _work: SessionWork::Campaign(work) })
+    }
+
+    /// `AuthorityOwner.builder_session_work(session_id)`: one active Builder session's operation,
+    /// under a standalone chat's owner lane or its campaign's work.
+    pub async fn builder_session_work(&self, session_id: &str) -> StoreResult<HeldSession> {
+        let initial = self.raw_context(session_id).await?;
+        let check = |context: &SessionContext| -> StoreResult<()> {
+            if context.session.fields().status != SessionStatus::Active {
+                return Err(rejected("Agent session is not active"));
+            }
+            if context.session.role() != WriterRole::Builder {
+                return Err(rejected("Full Builder tools require a Builder session"));
+            }
+            Ok(())
+        };
+        match initial.session.campaign_id().map(str::to_owned) {
+            None => {
+                let guard = self.lanes().owner.acquire(&builder_chat_lane(session_id)).await;
+                let context = self.raw_context(session_id).await?;
+                if context.session.campaign_id().is_some() {
+                    return Err(rejected("Builder chat campaign association changed"));
+                }
+                check(&context)?;
+                Ok(HeldSession { context, _work: SessionWork::BuilderChat(guard) })
+            }
+            Some(campaign_id) => {
+                let work = self.campaign_work(&campaign_id).await?;
+                let context = self.raw_context(session_id).await?;
+                if context.session.campaign_id() != Some(campaign_id.as_str()) {
+                    return Err(rejected("Agent session campaign identity changed"));
+                }
+                check(&context)?;
+                Ok(HeldSession { context, _work: SessionWork::Campaign(work) })
+            }
+        }
+    }
+
+    /// `AuthorityOwner.append_live_steering_message(...)`: steering-bound prose for an active
+    /// Builder or DM session, under its session lane but without its campaign work (the live
+    /// operation already holds that). Only safe prose and steering are accepted.
+    pub async fn append_live_steering_message(
+        &self,
+        session_id: &str,
+        message_id: &str,
+        kind: SessionMessageKind,
+        content: &JsonMap,
+    ) -> StoreResult<SessionMessage> {
+        if !matches!(
+            kind,
+            SessionMessageKind::SafeThink | SessionMessageKind::Talk | SessionMessageKind::Steering
+        ) {
+            return Err(sylvia_domain::DomainError::type_error(
+                "Live steering persistence only accepts safe prose or steering",
+            )
+            .into());
+        }
+        let context = self.raw_context(session_id).await?;
+        if context.session.fields().status != SessionStatus::Active {
+            return Err(rejected("Agent session is not active"));
+        }
+        if !matches!(context.session.role(), WriterRole::Builder | WriterRole::Dm) {
+            return Err(rejected("Live steering requires an agent writer session"));
+        }
+        let _session = self.lanes().sessions.acquire(session_id).await;
+        let (session_id, message_id, content) =
+            (session_id.to_owned(), message_id.to_owned(), content.clone());
+        self.call(move |store| store.append_agent_message(&session_id, &message_id, kind, &content, None))
+            .await
+    }
+
+    /// `AuthorityOwner.append_session_canonical_references(session_id, events)`: the session's
+    /// campaign work, then one canonical reference per event under the session lane.
+    pub async fn append_session_canonical_references(
+        &self,
+        session_id: &str,
+        events: &[sylvia_domain::authority::CanonicalEvent],
+    ) -> StoreResult<Vec<SessionMessage>> {
+        let _work = self.session_campaign_work(session_id).await?;
+        let _session = self.lanes().sessions.acquire(session_id).await;
+        let (session_id, events) = (session_id.to_owned(), events.to_vec());
+        self.call(move |store| store.append_canonical_references(&session_id, &events)).await
+    }
+
+    /// `AuthorityOwner.set_builder_chat_archived(session_id, archived=...)`: stop or resume an
+    /// idle standalone Builder chat, refused while its lane is busy rather than waiting.
+    pub async fn set_builder_chat_archived(
+        &self,
+        session_id: &str,
+        archived: bool,
+    ) -> StoreResult<sylvia_domain::session::BuilderChatRecord> {
+        let Some(_lane) = self.lanes().owner.try_acquire(&builder_chat_lane(session_id)) else {
+            return Err(crate::actions::rejected(
+                "Finish or stop this Builder's work before archiving it",
+                "builder_chat_work_in_progress",
+            ));
+        };
+        let context = self.raw_context(session_id).await?;
+        if context.session.campaign_id().is_some() {
+            return Err(rejected("Archive the campaign to archive its Interview or Builder"));
+        }
+        let status = context.session.fields().status;
+        if !matches!(status, SessionStatus::Active | SessionStatus::Stopped) {
+            return Err(rejected("Resolve this Builder's session state before archiving it"));
+        }
+        let target = if archived { SessionStatus::Stopped } else { SessionStatus::Active };
+        if status != target {
+            let id = session_id.to_owned();
+            if archived {
+                // `SessionApplication.update_status`, under the session lane.
+                let _session = self.lanes().sessions.acquire(session_id).await;
+                self.call(move |store| store.update_agent_session_status(&id, target)).await?;
+            } else {
+                self.call(move |store| store.resume_agent_session(&id)).await?;
+            }
+        }
+        let id = session_id.to_owned();
+        let chats = self.call(|store| store.builder_chat_index()).await?;
+        chats
+            .into_iter()
+            .find(|chat| chat.session().session_id() == id)
+            .ok_or_else(|| crate::error::StoreError::Other("StopIteration".into()))
+    }
+
+    /// `AuthorityOwner.append_private_provider_record(record)`.
+    pub async fn append_private_provider_record(
+        &self,
+        record: &sylvia_domain::provider_records::ProviderPrivateRecord,
+    ) -> StoreResult<()> {
+        let record = record.clone();
+        self.call(move |store| store.append_private_provider_record(&record)).await
+    }
+
+    /// `AuthorityOwner.finish_private_provider_attempt(session_id, attempt_id, completed=...)`.
+    pub async fn finish_private_provider_attempt(
+        &self,
+        session_id: &str,
+        attempt_id: &str,
+        completed: bool,
+    ) -> StoreResult<()> {
+        let (session_id, attempt_id) = (session_id.to_owned(), attempt_id.to_owned());
+        self.call(move |store| store.finish_private_provider_attempt(&session_id, &attempt_id, completed))
+            .await
     }
 }
