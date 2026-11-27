@@ -14,6 +14,7 @@ use sylvia_agent::provider_session::tools::{
 use sylvia_agent::stateless_mcp::{ModelMechanicsTool, ModelToolBehavior};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::pyjson::{self, Dump};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, CodedResult};
 
 fn vectors() -> J {
@@ -140,6 +141,6 @@ fn alias_resolution_matches_python() {
         let requested = case["requested"].as_str().unwrap();
         let actual = resolve_provider_tool_alias(requested, &aliases)
             .map_or(J::Null, |(alias, found)| json!([alias, found.name]));
-        assert_eq!(actual, case["resolved"], "resolving {requested:?}");
+        assert_same_json(&actual, &case["resolved"], format!("resolving {requested:?}"));
     }
 }

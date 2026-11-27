@@ -18,6 +18,7 @@ use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::provider_turn::round::{prepare_provider_round, prepare_round_catalog};
 use sylvia_agent::session_loop::{ProviderControl, SessionProviderInput};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_provider::config::env::Environment;
 use sylvia_provider::types::{ModelInfo, ProviderResponse};
@@ -158,10 +159,10 @@ async fn round_preparation_matches_python() {
             .filter(|event| event["event"] == "audit_context")
             .map(|event| event["context"].clone())
             .collect();
-        assert_eq!(
-            J::Array(provider.contexts.lock().unwrap().clone()),
-            J::Array(audits),
-            "{name}: audit contexts"
+        assert_same_json(
+            &J::Array(provider.contexts.lock().unwrap().clone()),
+            &J::Array(audits),
+            format!("{name}: audit contexts"),
         );
     }
 }

@@ -47,6 +47,21 @@ The pseudo-phase `campaign_file` traces `StatelessMcpMechanics.commit_campaign_f
 `search_knowledge` and `read_reference` (T3m-3): `campaign_file_start` (the method and its
 arguments), every owner call, and `campaign_file_end`. The first real commit is followed by
 `campaign_file_variants`.
+
+The pseudo-phase `turn_events` traces `ProviderSessionAdapter._turn_events` whole (T5a-1):
+`turn_start` (the turn id, adapter, model and provider input), every owner call, `uuid4` draw,
+catalog, callback, provider request and chunk the turn makes, each event relayed to the session
+loop (with `action_handled`), and `turn_end` (or what it raised). It is traced alone: no phase
+inside it is wrapped.
+
+A variant may also change the provider input (`input`: messages appended to the history, kinds
+of message dropped from it, the basis, the recovery kind or the retry receipt), for the turn's
+setup phases (`prepare_turn_recovery`, `restore_saved_turn_progress`, `resume_exchange_results`).
+An appended message's text may name the campaign's first named participant (`{name}`, `{NAME}`
+in capitals, `{given}` for the first name); a variant whose campaign names no participant is
+skipped. The snapshot may be answered with two committed actions added after its events
+(`saved_actions`) or with that participant renamed and a renamed twin added, so two share
+its first name (`rename`).
 Reference tooling only; retired with the Python source.
 """
 
@@ -73,16 +88,19 @@ from sylvia_gm.agent import _provider_session, _provider_turn_phases  # noqa: E4
 from sylvia_gm.agent._provider_turn_state import ProviderTurnState  # noqa: E402
 from sylvia_gm.agent._stateless_mcp import ModelMechanicsTool  # noqa: E402
 from sylvia_gm.domain.authority import (  # noqa: E402
+    ActionReceipt,
+    ActionStatus,
     ModelDecisionActor,
     ModelDecisionBoundary,
     ModelDecisionOwner,
     ModelToolBehavior,
 )
+from sylvia_gm.domain.session import SessionMessage, SessionMessageKind  # noqa: E402
 
 OVERRIDES: dict[str, object] = {}
-#: Phases whose traces log the provider input's callbacks (T3b's batch); earlier traces keep
-#: their rows unchanged.
-BATCH_PHASES = {"prepare_tool_batch", "execute_tool_batch"}
+#: Phases whose traces log the provider input's callbacks (T3b's batch, and T5a's setup, whose
+#: messages read Character Files); earlier traces keep their rows unchanged.
+BATCH_PHASES = {"prepare_tool_batch", "execute_tool_batch", "prepare_turn_recovery"}
 ACTIVE = {"value": False}
 
 
@@ -391,6 +409,32 @@ EXTRA_TOOLS = [
     tool("choose_kit", package_id="sylvia.prep"),
 ]
 
+def contract(behavior: str, **fields: object) -> dict[str, object]:
+    """A saved `provider_mechanics_action_contract` for the turn's basis (`$basis`)."""
+    return {"kind": "provider_mechanics_action_contract", "basis_message_id": "$basis",
+            "action_id": "action-1", "model_behavior": behavior, **fields}
+
+
+def player_message(content: dict[str, object]) -> SessionMessage:
+    return SessionMessage(session_id="session-variant", sequence=1,
+                          message_id="message-variant-player", kind=SessionMessageKind.USER,
+                          content=content)
+
+
+def campaign_file_call(arguments: object, text: str | None = None) -> dict[str, object]:
+    """A resumed assistant turn calling the Campaign File update (`text`: raw argument text)."""
+    return {"role": "assistant", "content": "", "tool_calls": [{
+        "id": "call-variant", "type": "function", "function": {
+            "name": "update_campaign_file",
+            "arguments": text if text is not None else json.dumps(arguments)}}]}
+
+
+def tool_result(result: dict[str, object]) -> dict[str, object]:
+    return {"role": "tool", "tool_call_id": "call-variant", "name": "update_campaign_file",
+            "content": json.dumps(result)}
+
+
+
 # Each variant: turn locals to set (`set`), owner reads to answer (`answer`), tools to add to the
 # current catalog (`tools`), a cancelled control (`cancelled`), or the round's calls replaced
 # (`calls`: each a name, `None` for the first real call's, and argument text, `None` for its own;
@@ -526,6 +570,186 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
          "set": {"campaign_file_mutation_attempted": True},
          "calls": [{"name": None, "arguments": None}]},
     ],
+    "prepare_turn_recovery": [
+        {"name": "a redirected continuation", "input": {"basis": "added", "messages": [
+            ("user", {"text": "Go left instead.", "redirect_interruption_id": "interruption-1",
+                      "canonical_start_sequence": 0})]}},
+        {"name": "a redirect from a text start", "input": {"basis": "added", "messages": [
+            ("user", {"text": "Stop.", "redirect_interruption_id": "interruption-1",
+                      "canonical_start_sequence": "0"})]}},
+        {"name": "a redirect from a boolean start", "input": {"basis": "added", "messages": [
+            ("user", {"text": "Stop.", "redirect_interruption_id": "interruption-1",
+                      "canonical_start_sequence": True})]}},
+        {"name": "a redirect from a boolean start, actions saved", "saved_actions": True,
+         "input": {"basis": "added", "messages": [
+             ("user", {"text": "Stop.", "redirect_interruption_id": "interruption-1",
+                       "canonical_start_sequence": True})]}},
+        {"name": "a redirect from the start, actions saved", "saved_actions": True,
+         "input": {"basis": "added", "messages": [
+             ("user", {"text": "Go left.", "redirect_interruption_id": "interruption-1",
+                       "canonical_start_sequence": 0})]}},
+        {"name": "a redirect not interrupted", "input": {"basis": "added", "messages": [
+            ("user", {"text": "Wait.", "redirect_interruption_id": ""})]}},
+        {"name": "post-mechanics recovery without its receipt",
+         "input": {"recovery_kind": "post_mechanics_narration"}},
+        {"name": "post-mechanics recovery", "input": {
+            "recovery_kind": "post_mechanics_narration", "receipt": {
+                "action_id": "action-recovered", "status": "committed",
+                "result": {"total": 14, "note": "Ça — 🌒", "action_id": "action-recovered"},
+                "resulting_revision": 3}}},
+        {"name": "no basis, contract saved", "input": {"basis": None, "messages": [
+            ("evidence", {"kind": "gm_system_contract", "version": 1, "contract": "x"})]}},
+        {"name": "no basis, no player input", "input": {"basis": None, "drop": ["user"]}},
+        {"name": "a direct player action response", "input": {"basis": "added", "messages": [
+            ("evidence", {"kind": "player_action_response", "action_id": "action-direct"})]}},
+        {"name": "an opening", "input": {"drop": ["user", "talk"], "messages": [
+            ("evidence", {"kind": "campaign_start"})]}},
+        {"name": "a started campaign after talk", "input": {"drop": ["user"], "messages": [
+            ("evidence", {"kind": "campaign_start"}), ("talk", {"text": "Welcome back."})]}},
+        {"name": "a player naming a character", "input": {"messages": [
+            ("user", {"text": "I turn to {NAME} and wait."})]}},
+        {"name": "a player using a first name", "input": {"messages": [
+            ("user", {"text": "Hey {given}, over here!"})]}},
+        {"name": "a name inside a word", "input": {"messages": [
+            ("user", {"text": "I greet x{given} and {given}s today."})]}},
+        {"name": "a first name two characters share", "rename": True, "input": {"messages": [
+            ("user", {"text": "Hey {given}, over here!"})]}},
+        {"name": "saved round facts", "input": {"messages": [
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
+                          "results": [], "narration_facts": [
+                              {"tool": "roll_dice", "committed_actions": [
+                                  {"action_id": "action-1"}]}, "not a fact"]}),
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "other-basis",
+                          "results": [], "narration_facts": [{"tool": "elsewhere"}]})]}},
+        {"name": "saved round facts with unreadable actions", "input": {"messages": [
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
+                          "results": [], "narration_facts": [
+                              {"tool": "roll_dice", "committed_actions": ["action-1"]}]})]}},
+        {"name": "saved round facts with no action list", "input": {"messages": [
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
+                          "results": [], "narration_facts": [
+                              {"tool": "roll_dice", "committed_actions": None}]})]}},
+        {"name": "a saved queue already narrated", "input": {"messages": [
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
+                          "narration_facts": [{"tool": "execute_action_sequence",
+                                               "committed_actions": [{"action_id": 1}]}],
+                          "results": [{"content": json.dumps({
+                              "kind": "action_sequence_result",
+                              "operation": "execute_action_sequence",
+                              "result": {"status": "completed", "sequence_id": "s-1",
+                                         "committed_action_ids": [1.0, True]}})}]})]}},
+        {"name": "a saved queue with unhashable ids", "input": {"messages": [
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
+                          "results": [{"content": json.dumps({
+                              "kind": "action_sequence_result",
+                              "operation": "execute_action_sequence",
+                              "result": {"status": "paused", "sequence_id": "s-1",
+                                         "committed_action_ids": [["a"]]}})}]})]}},
+        {"name": "a saved queue with object ids", "input": {"messages": [
+            ("evidence", {"kind": "provider_tool_results", "basis_message_id": "$basis",
+                          "narration_facts": [{"committed_actions": [{"action_id": "a"}]}],
+                          "results": [{"content": json.dumps({
+                              "kind": "action_sequence_result",
+                              "operation": "execute_action_sequence",
+                              "result": {"status": "paused", "sequence_id": "s-1",
+                                         "committed_action_ids": {"a": 1}}})}]})]}},
+    ],
+    "restore_saved_turn_progress": [
+        {"name": "a contract leaving the intent pending", "set": {
+            "committed_action_ids": {"action-1"}},
+         "input": {"messages": [("evidence", contract("leaves_player_intent_pending"))]}},
+        {"name": "a contract awaiting the player's choice", "set": {
+            "committed_action_ids": {"action-1"}},
+         "input": {"messages": [("evidence", contract(
+             "leaves_player_intent_pending",
+             player_intent_after_preparation="await_player_choice"))]}},
+        {"name": "a contract with an invalid scope", "set": {
+            "committed_action_ids": {"action-1"}},
+         "input": {"messages": [("evidence", contract(
+             "leaves_player_intent_pending", player_intent_after_preparation="rewrite"))]}},
+        {"name": "a contract the player resolves", "set": {
+            "committed_action_ids": {"action-1"}},
+         "input": {"messages": [
+             ("evidence", contract("leaves_player_intent_pending")),
+             ("evidence", contract("resolves_player_intent", decision_owner="player"))]}},
+        {"name": "a contract the GM resolves", "set": {
+            "committed_action_ids": {"action-1"}},
+         "input": {"messages": [
+             ("evidence", contract("leaves_player_intent_pending")),
+             ("evidence", contract("resolves_player_intent", decision_owner="gm"))]}},
+        {"name": "an uncommitted contract", "set": {"committed_action_ids": set()},
+         "input": {"messages": [("evidence", contract("leaves_player_intent_pending"))]}},
+        {"name": "a contract for another basis", "set": {"committed_action_ids": {"action-1"}},
+         "input": {"messages": [("evidence", {
+             **contract("leaves_player_intent_pending"), "basis_message_id": "other"})]}},
+        {"name": "a contract without an action", "input": {"messages": [
+            ("evidence", {**contract("resolves_player_intent"), "action_id": ""})]}},
+        {"name": "a contract with an unknown owner", "input": {"messages": [
+            ("evidence", contract("resolves_player_intent", decision_owner="npc"))]}},
+        {"name": "a contract with an unhashable owner", "input": {"messages": [
+            ("evidence", contract("resolves_player_intent", decision_owner=["gm"]))]}},
+        {"name": "a contract with an unknown behavior", "set": {
+            "committed_action_ids": {"action-1"}},
+         "input": {"messages": [("evidence", contract("rewrites_history"))]}},
+        {"name": "an out-of-character correction only", "set": {
+            "context_owner": {"kind": "gm"}, "current_player_action": "  ",
+            "current_player_message": player_message({"text": " ", "ooc_text": "Slower."})}},
+        {"name": "an out-of-character note with an action", "set": {
+            "context_owner": {"kind": "gm"}, "current_player_action": "I wait.",
+            "current_player_message": player_message({"text": "I wait.", "ooc_text": "Slower."})}},
+        {"name": "a direct response", "set": {"direct_response": True, "opening_request": False,
+                                              "current_user_wire_text": None},
+         "messages": ["SYLVIA_PLAYER_ACTION_RESPONSE_TASK go"]},
+        {"name": "the previous response from history", "set": {
+            "canonical_player_narration": [{"text": ""}, {"text": 3}]},
+         "messages": ["assistant:The old reply.", "assistant-call:Calling."]},
+        {"name": "a resumed Campaign File change", "messages": ["resumed-change"]},
+        {"name": "two player actions", "input": {"messages": [
+            ("user", {"text": "I open the door."}), ("user", {"text": "I step through."})]}},
+    ],
+    "resume_exchange_results": [
+        {"name": "a held draft", "resumed": [{"role": "assistant", "content": "Draft."}]},
+        {"name": "held blocks", "resumed": [campaign_file_call(
+            {"revised_player_facing_response": [{"kind": "narration", "text": "Held."}]})]},
+        {"name": "invalid held blocks", "resumed": [campaign_file_call(
+            {"revised_player_facing_response": [{"kind": "narration"}]})]},
+        {"name": "held text", "resumed": [campaign_file_call(
+            {"revised_player_facing_response": "Held text."})]},
+        {"name": "held tool syntax", "resumed": [campaign_file_call(
+            {"revised_player_facing_response": '<tool_call>{"name": "x"}</tool_call>'})]},
+        {"name": "unreadable arguments", "resumed": [
+            campaign_file_call(None, "{not json"),
+            campaign_file_call(None, "[1]"),
+            {"role": "assistant", "content": "", "tool_calls": [
+                "x", {"function": "y"}, {"function": {"name": 3}}]}]},
+        {"name": "a rejected call", "resumed": [tool_result({"status": "rejected"})]},
+        {"name": "an optional rejected read", "resumed": [
+            tool_result({"status": "rejected", "correction_optional": True})]},
+        {"name": "a failed action", "resumed": [tool_result({"status": "action_failed"})]},
+        {"name": "a settled update with narration", "resumed": [
+            {"role": "assistant", "content": "Draft."},
+            tool_result({"status": "campaign_file_updated", "player_facing_response": "Told.",
+                         "response_blocks": [{"kind": "narration", "text": "Told."}]})]},
+        {"name": "a settled update without narration", "resumed": [
+            tool_result({"status": "campaign_file_updated"})]},
+        {"name": "an unchanged review", "resumed": [
+            campaign_file_call({"revised_player_facing_response": "Held text."}),
+            tool_result({"status": "campaign_file_unchanged", "player_facing_response": "Told."})]},
+        {"name": "invalid saved blocks", "resumed": [
+            tool_result({"status": "campaign_file_updated", "response_blocks": []})]},
+        {"name": "invalid saved narration", "resumed": [
+            tool_result({"status": "campaign_file_unchanged", "player_facing_response": " "})]},
+        {"name": "a committed action", "resumed": [
+            tool_result({"status": "campaign_file_updated", "player_facing_response": "Told."}),
+            tool_result({"status": "action_committed"})]},
+        {"name": "another result", "resumed": [
+            {"role": "assistant", "content": "Draft."}, tool_result({"status": "ok"}),
+            {"role": "tool", "content": "not json"}, {"role": "tool", "content": "[1]"}]},
+        {"name": "an unhashable status", "resumed": [tool_result({"status": ["x"]})]},
+        {"name": "an acknowledgement owed", "set": {"ooc_ack_required": True}, "resumed": [
+            tool_result({"status": "campaign_file_updated", "player_facing_response": "Told.",
+                         "response_blocks": [{"kind": "narration", "text": "Told."}]})]},
+    ],
     "prepare_provider_round": [
         {"name": "player boundary", "tools": True, "answer": {
             "campaign_preparation_boundary": boundary("player"),
@@ -556,9 +780,104 @@ VARIANTS: dict[str, list[dict[str, object]]] = {
 }
 
 
+def basis_of(value: object, basis: object) -> object:
+    """`$basis` replaced by the turn's basis, recursively."""
+    if value == "$basis":
+        return basis
+    if isinstance(value, dict):
+        return {key: basis_of(item, basis) for key, item in value.items()}
+    if isinstance(value, list):
+        return [basis_of(item, basis) for item in value]
+    return value
+
+
+def roster_names(owner: object, campaign_id: object) -> tuple[str, str] | None:
+    """The first named participant's name and first name, or `None` when none is named."""
+    for participant in owner.snapshot(campaign_id).participants:  # type: ignore[attr-defined]
+        name = participant.data.get("name")
+        if isinstance(name, str) and name.strip():
+            return name, name.strip().split()[0]
+    return None
+
+
+def named(value: object, names: tuple[str, str] | None) -> object:
+    """`{name}`, `{NAME}` and `{given}` in a message's text filled from the roster."""
+    if not isinstance(value, dict) or not isinstance(value.get("text"), str):
+        return value
+    text = value["text"]
+    if "{" not in text:
+        return value
+    if names is None:
+        raise LookupError("the campaign names no participant")
+    return {**value, "text": text.replace("{NAME}", names[0].upper()).replace(
+        "{name}", names[0]).replace("{given}", names[1])}
+
+
+def changed_input(provider_input: object, state: ProviderTurnState,
+                  change: dict[str, object], owner: object) -> object:
+    """The provider input with a variant's `input` changes."""
+    history = provider_input.history  # type: ignore[attr-defined]
+    names = roster_names(owner, provider_input.session.campaign_id)  # type: ignore[attr-defined]
+    try:
+        basis = state.basis_message_id
+    except UnboundLocalError:
+        basis = provider_input.basis_message_id  # type: ignore[attr-defined]
+    drop = {SessionMessageKind(kind) for kind in change.get("drop", ())}  # type: ignore[union-attr]
+    messages = [message for message in history.messages if message.kind not in drop]
+    sequence = max((message.sequence for message in history.messages), default=0)
+    added = []
+    for index, (kind, content) in enumerate(change.get("messages", ())):  # type: ignore[union-attr]
+        added.append(SessionMessage(
+            session_id=provider_input.session.session_id,  # type: ignore[attr-defined]
+            sequence=sequence + index + 1, message_id=f"message-variant-{index}",
+            kind=SessionMessageKind(kind), content=named(basis_of(content, basis), names)))
+    changes: dict[str, object] = {
+        "history": dataclasses.replace(history, messages=(*messages, *added))}
+    if "basis" in change:
+        changes["basis_message_id"] = added[0].message_id if change["basis"] == "added" else None
+    if "recovery_kind" in change:
+        changes["recovery_kind"] = change["recovery_kind"]
+    if "receipt" in change:
+        receipt = change["receipt"]
+        changes["retry_action_receipt"] = ActionReceipt(
+            campaign_id=provider_input.session.campaign_id,  # type: ignore[attr-defined]
+            action_id=receipt["action_id"], status=ActionStatus(receipt["status"]),  # type: ignore[index]
+            result=receipt["result"], resulting_revision=receipt["resulting_revision"])  # type: ignore[index]
+    return dataclasses.replace(provider_input, **changes)
+
+
+def changed_messages(state: ProviderTurnState, specs: list[str]) -> None:
+    """`restore_saved_turn_progress`'s variants: the turn's messages changed around its task."""
+    messages = list(state.messages)
+    task = next((index for index, message in enumerate(messages)
+                 if message.get("role") == "user"), len(messages) - 1)
+    for spec in specs:
+        if spec.startswith("SYLVIA_PLAYER_ACTION_RESPONSE_TASK "):
+            messages.insert(task, {"role": "system", "content": spec})
+        elif spec.startswith("assistant:"):
+            messages.insert(1, {"role": "assistant", "content": spec.split(":", 1)[1]})
+        elif spec.startswith("assistant-call:"):
+            messages.insert(2, {"role": "assistant", "content": spec.split(":", 1)[1],
+                                "tool_calls": [{"id": "c", "function": {"name": "x"}}]})
+        elif spec == "resumed-change":
+            messages.append(campaign_file_call({"state_change": "changed", "memories": [
+                {"text": "The notice is signed."}]}))
+    state.messages = messages
+
+
 def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[no-untyped-def]
     state = copy_state(state)
     provider_input = args[0] if args else None
+    owner = object.__getattribute__(self._owner, "_target")  # noqa: SLF001
+    if "input" in variant:
+        try:
+            provider_input = changed_input(provider_input, state, variant["input"], owner)  # type: ignore[arg-type]
+        except LookupError:
+            return
+    if "messages" in variant:
+        changed_messages(state, variant["messages"])  # type: ignore[arg-type]
+    if "resumed" in variant:
+        state.resumed_messages = list(variant["resumed"])  # type: ignore[arg-type]
     for key, value in variant.get("set", {}).items():  # type: ignore[union-attr]
         setattr(state, key, value)
     for key, value in variant.get("obligations", {}).items():  # type: ignore[union-attr]
@@ -598,7 +917,18 @@ def run_variant(function, self, state, args, kwargs, variant):  # type: ignore[n
         provider_input = dataclasses.replace(provider_input, control=control)
     OVERRIDES.clear()
     OVERRIDES.update(variant.get("answer", {}))  # type: ignore[arg-type]
-    owner = object.__getattribute__(self._owner, "_target")  # noqa: SLF001
+    if variant.get("saved_actions") or variant.get("rename"):
+        campaign_id = provider_input.session.campaign_id  # type: ignore[union-attr]
+        real = owner.snapshot(campaign_id)
+        changes = {}
+        if variant.get("saved_actions"):
+            changes["events"] = (*real.events, *saved_actions(real))
+        if variant.get("rename"):
+            renamed = shared_first_names(real.participants)
+            if renamed is None:
+                return
+            changes["participants"] = renamed
+        OVERRIDES["snapshot"] = dataclasses.replace(real, **changes)
     if "combat" in variant or variant.get("lock"):
         real = owner.snapshot(state.campaign_id)
         changes: dict[str, object] = {}
@@ -637,6 +967,40 @@ def reconcile_variant(state: ProviderTurnState, variant: dict[str, object]) -> N
         state.mechanics_preparation_scopes[real.call_id] = mechanic["scope"]  # type: ignore[index]
     if "tool_name" in mechanic:  # type: ignore[operator]
         state.mechanics_tool_names[real.call_id] = mechanic["tool_name"]  # type: ignore[index]
+
+
+def saved_actions(snapshot: object) -> tuple[object, ...]:
+    """Two committed actions after the snapshot's events, each with its tool result."""
+    from sylvia_gm.domain.authority import CanonicalEvent, CanonicalEventType, EventVisibility
+    events = snapshot.events  # type: ignore[attr-defined]
+    top = max((event.sequence for event in events), default=0)
+    turn_id = events[-1].turn_id if events else "turn-variant"
+    added = []
+    for index, action_id in enumerate(("action-saved-1", "action-saved-2")):
+        sequence = top + 2 * index + 1
+        added.append(CanonicalEvent(sequence=sequence, event_type=CanonicalEventType.ACTION_COMMITTED,
+                                    turn_id=turn_id, action_id=action_id, safe_payload={}))
+        added.append(CanonicalEvent(sequence=sequence + 1, event_type=CanonicalEventType.TOOL_RESULT,
+                                    turn_id=turn_id, action_id=action_id,
+                                    safe_payload={"result": {"total": 9 + index, "note": "Ça"}},
+                                    visibility=EventVisibility.PLAYER_SAFE))
+    return tuple(added)
+
+
+def shared_first_names(participants: object) -> tuple[object, ...] | None:
+    """The first named participant renamed, and a twin of it (a new identity) added, so that
+    the two share a first name; `None` when no participant is named."""
+    first = next((participant for participant in participants  # type: ignore[attr-defined]
+                  if isinstance(participant.data.get("name"), str)
+                  and participant.data["name"].strip()), None)
+    if first is None:
+        return None
+    given = first.data["name"].strip().split()[0]
+    renamed = dataclasses.replace(first, data={**first.data, "name": f"{given} Vell"})
+    twin = dataclasses.replace(first, participant_id=f"{first.participant_id}-twin",
+                               data={**first.data, "name": f"{given} Stone"})
+    return tuple(renamed if participant is first else participant
+                 for participant in participants) + (twin,)  # type: ignore[attr-defined]
 
 
 def changed_events(snapshot: object, state: ProviderTurnState, change: object) -> object:
@@ -1314,8 +1678,57 @@ def wrap_campaign_file() -> None:
         setattr(_stateless_mcp.StatelessMcpMechanics, method, traced_method(method))
 
 
+#: The pseudo-phase that traces `ProviderSessionAdapter._turn_events` whole (T5a-1).
+TURN = "turn_events"
+
+
+def wrap_turn() -> None:
+    from sylvia_gm.agent._session_loop import ProviderEventKind
+
+    original = _provider_session.ProviderSessionAdapter._turn_events  # noqa: SLF001
+
+    def traced(self, provider_input, *, turn_id):  # type: ignore[no-untyped-def]
+        supplier = provider_input.catalog_supplier
+        if supplier is not None:
+            def logged(request_id: str) -> object:
+                result = supplier(request_id)
+                log({"event": "catalog", "request_id": request_id, "result": plain(result)})
+                return result
+            provider_input = dataclasses.replace(provider_input, catalog_supplier=logged)
+        provider_input = logged_callbacks(provider_input)
+        provider = self._provider  # noqa: SLF001
+        self._provider = AuditedProvider(provider)  # noqa: SLF001
+        log({"event": "turn_start", "turn_id": turn_id,
+             "adapter": getattr(self, "_trace_adapter", None),
+             "model": plain(getattr(provider, "model_info", None)),
+             "input": dump_input(provider_input)})
+        ACTIVE["value"] = True
+        try:
+            for event in original(self, provider_input, turn_id=turn_id):
+                log({"event": "phase_event", "value": plain(event)})
+                ACTIVE["value"] = False
+                yield event
+                ACTIVE["value"] = True
+                if event.kind is ProviderEventKind.ACTION:
+                    feedback = event.action_feedback
+                    log({"event": "action_handled",
+                         "rejection": plain(feedback.rejection) if feedback is not None else None})
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "turn_end", "raised": refusal_fields(error)})
+            raise
+        finally:
+            ACTIVE["value"] = False
+            self._provider = provider  # noqa: SLF001
+        log({"event": "turn_end"})
+
+    _provider_session.ProviderSessionAdapter._turn_events = traced  # noqa: SLF001
+
+
 for phase in PHASES:
-    if phase == LISTING:
+    if phase == TURN:
+        wrap_turn()
+    elif phase == LISTING:
         wrap_listing()
     elif phase == EXECUTION:
         wrap_execution()

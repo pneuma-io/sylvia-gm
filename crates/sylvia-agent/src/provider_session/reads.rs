@@ -232,6 +232,14 @@ pub trait TurnOwner: OpeningReads {
         offset: &'a Json,
     ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
 
+    /// `actor_decision_request(campaign_id, turn_id=...)`: one opted-in actor's observation and
+    /// offered operations, or `None` when the campaign's package does not isolate participants.
+    fn actor_decision_request<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        turn_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<sylvia_app::actor_decisions::ActorDecisionRequest>>>;
+
     /// `read_campaign_reference(campaign_id, source=..., path=...)`.
     fn read_campaign_reference<'a>(
         &'a self,
