@@ -398,15 +398,11 @@ async fn completions_through_the_provider_match_python() {
                     .iter()
                     .map(|c| serde_json::json!([c.id.to_json(), c.name.to_json(), c.arguments.to_json()]))
                     .collect();
-                sylvia_base::testing::assert_same_json(
-                    &Value::Array(calls),
-                    &expected["tool_calls"],
-                    format!("{name}"),
-                );
+                sylvia_base::testing::assert_same_json(&Value::Array(calls), &expected["tool_calls"], name);
                 sylvia_base::testing::assert_same_json(
                     &response.finish_reason.to_json(),
                     &expected["finish_reason"],
-                    format!("{name}"),
+                    name,
                 );
                 let usage = &response.usage;
                 sylvia_base::testing::assert_same_json(

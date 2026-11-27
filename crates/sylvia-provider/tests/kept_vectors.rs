@@ -100,15 +100,15 @@ fn continuations() {
             (Ok(Delivery::Prompt(content)), Some(expected), None, None) => {
                 sylvia_base::testing::assert_same_json(
                     &json!(["prompt", content]),
-                    &*expected,
-                    format!("{name}"),
+                    expected,
+                    name.to_string(),
                 )
             }
             (Ok(Delivery::Answer(answer)), Some(expected), None, None) => {
                 sylvia_base::testing::assert_same_json(
                     &json!(["answer", Json::Object(answer)]),
-                    &*expected,
-                    format!("{name}"),
+                    expected,
+                    name.to_string(),
                 )
             }
             (Err(ContinuationError::Mismatch(mismatch)), None, Some(reason), None) => {
@@ -288,13 +288,13 @@ fn native() {
         sylvia_base::testing::assert_same_json(
             &Value::Array(found.records),
             &case["records"],
-            format!("{name}"),
+            name.to_string(),
         );
         assert_eq!(found.reason, case["reason"].as_str(), "{name}");
         sylvia_base::testing::assert_same_json(
             &found.answer.unwrap_or(Value::Null),
             &case["answer"],
-            format!("{name}"),
+            name.to_string(),
         );
         let _ = std::fs::remove_dir_all(&root);
     }

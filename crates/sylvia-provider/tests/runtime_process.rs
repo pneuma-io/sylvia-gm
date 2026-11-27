@@ -242,7 +242,7 @@ fn versions_and_statuses() {
         let ours = claude_runtime::parse_authentication_status(outcome_of(&case["outcome"]));
         match (ours, case.get("value"), case.get("error")) {
             (Ok(status), Some(value), None) => {
-                sylvia_base::testing::assert_same_json(&Json::Object(status), &*value, format!("{case}"))
+                sylvia_base::testing::assert_same_json(&Json::Object(status), value, format!("{case}"))
             }
             (Err(error), None, Some(expected)) => {
                 assert_eq!(class_of(&error), expected[0].as_str().unwrap(), "{case}");

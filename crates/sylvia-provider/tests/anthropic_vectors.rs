@@ -429,12 +429,12 @@ async fn completions_through_the_provider_match_python() {
                 sylvia_base::testing::assert_same_json(
                     &Value::Array(calls),
                     &expected["tool_calls"],
-                    format!("{name}"),
+                    name.to_string(),
                 );
                 sylvia_base::testing::assert_same_json(
                     &response.finish_reason.to_json(),
                     &expected["finish_reason"],
-                    format!("{name}"),
+                    name.to_string(),
                 );
                 check_usage(response, expected, name);
                 let native = response.anthropic_content.clone().map(Json::Array).unwrap_or(Json::Null);

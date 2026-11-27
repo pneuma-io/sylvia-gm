@@ -92,7 +92,7 @@ fn versions_parse_and_order_like_python() {
         let left = Version::parse(&case[0]).unwrap();
         let right = Version::parse(&case[1]).unwrap();
         let got = json!([case[0], case[1], left < right, left == right, left <= right, left > right]);
-        sylvia_base::testing::assert_same_json(&&got, &case, concat!(file!(), ":", line!()));
+        sylvia_base::testing::assert_same_json(&got, case, concat!(file!(), ":", line!()));
     }
 }
 
@@ -206,7 +206,7 @@ fn manifests_are_accepted_and_refused_like_python() {
             parse_manifest(&raw, context)
         };
         let expected = declared_difference(name).unwrap_or_else(|| case["result"].clone());
-        sylvia_base::testing::assert_same_json(&outcome(result, summary), &expected, format!("{name}"));
+        sylvia_base::testing::assert_same_json(&outcome(result, summary), &expected, name.to_string());
     }
 }
 
@@ -285,8 +285,8 @@ fn downloads_stage_like_python() {
             progress.push(json!([received, total.map(|total| total as u64)]));
         });
         let got = outcome(result, |path| json!(path.file_name().unwrap().to_string_lossy()));
-        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{name}"));
-        sylvia_base::testing::assert_same_json(&json!(progress), &case["progress"], format!("{name}"));
+        sylvia_base::testing::assert_same_json(&got, &case["result"], name.to_string());
+        sylvia_base::testing::assert_same_json(&json!(progress), &case["progress"], name.to_string());
         let mut files = serde_json::Map::new();
         let mut entries: Vec<_> =
             std::fs::read_dir(&stage).unwrap().map(|entry| entry.unwrap().path()).collect();
@@ -297,11 +297,7 @@ fn downloads_stage_like_python() {
                 json!(hex::encode(sha2::Sha256::digest(std::fs::read(&entry).unwrap()))),
             );
         }
-        sylvia_base::testing::assert_same_json(&J::Object(files), &case["files"], format!("{name}"));
-        sylvia_base::testing::assert_same_json(
-            &json!(*scripted.reads.lock().unwrap()),
-            &case["reads"],
-            format!("{name}"),
-        );
+        sylvia_base::testing::assert_same_json(&J::Object(files), &case["files"], name.to_string());
+        sylvia_base::testing::assert_same_json(&json!(*scripted.reads.lock().unwrap()), &case["reads"], name);
     }
 }

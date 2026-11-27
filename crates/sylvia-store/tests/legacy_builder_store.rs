@@ -205,7 +205,7 @@ fn retain_legacy_workspace_matches_python_on_every_case() {
             });
             sylvia_base::testing::assert_same_json(
                 &outcome(result),
-                &*expected,
+                expected,
                 format!("{name}: attempt {attempt}"),
             );
         }

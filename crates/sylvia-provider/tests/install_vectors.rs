@@ -176,7 +176,7 @@ fn run_case(case: &Value) {
     sylvia_base::testing::assert_same_json(
         &escaped.map(|message| json!(["RuntimeError", message])).unwrap_or(Value::Null),
         &case["escaped"],
-        format!("{name}"),
+        name.to_string(),
     );
     sylvia_base::testing::assert_same_json(
         &Json::Object(installer.progress()),
@@ -223,11 +223,7 @@ fn versions_and_armor_match_python() {
             Ok(parts) => {
                 let numbers: Vec<Value> =
                     parts.iter().map(|part| json!(part.parse::<u64>().unwrap())).collect();
-                sylvia_base::testing::assert_same_json(
-                    &Value::Array(numbers),
-                    &*expected,
-                    format!("{text:?}"),
-                );
+                sylvia_base::testing::assert_same_json(&Value::Array(numbers), expected, format!("{text:?}"));
             }
             Err(error) => assert_eq!(error.message, expected.as_str().unwrap(), "{text:?}"),
         }
