@@ -1,0 +1,3410 @@
+{
+ "python": "3.12",
+ "cases": [
+  {
+   "tool": "select_ruleset",
+   "outcomes": [
+    {
+     "return": {
+      "success": true,
+      "status": "selected",
+      "ruleset": {
+       "id": "srd"
+      }
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Already bound",
+      "code": "builder_source_bound"
+     }
+    },
+    {
+     "raise": {
+      "class": "ValueError",
+      "message": "bad"
+     }
+    }
+   ],
+   "calls": [
+    {
+     "ruleset_id": "srd"
+    },
+    {
+     "ruleset_id": "other"
+    },
+    {
+     "ruleset_id": "x"
+    },
+    {
+     "ruleset_id": ""
+    },
+    {
+     "ruleset_id": 5
+    },
+    {},
+    {
+     "ruleset_id": "srd",
+     "extra": 1
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "status": "selected",
+      "ruleset": {
+       "id": "srd"
+      }
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_selection_rejected",
+      "error": "Already bound"
+     }
+    },
+    {
+     "raised": "ValueError",
+     "message": "bad"
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "select": "srd"
+    },
+    {
+     "select": "other"
+    },
+    {
+     "select": "x"
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "select_setting",
+   "outcomes": [
+    {
+     "return": {
+      "success": true,
+      "status": "selected"
+     }
+    },
+    {
+     "return": {
+      "success": true
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Mismatch",
+      "code": "setting_mismatch"
+     }
+    }
+   ],
+   "calls": [
+    {
+     "candidate_id": "c-1",
+     "setting_id": "world"
+    },
+    {
+     "candidate_id": null,
+     "setting_id": "world"
+    },
+    {
+     "candidate_id": "c-1",
+     "setting_id": "other"
+    },
+    {
+     "candidate_id": " ",
+     "setting_id": "world"
+    },
+    {
+     "candidate_id": 3,
+     "setting_id": "world"
+    },
+    {
+     "setting_id": "world"
+    },
+    {
+     "candidate_id": null,
+     "setting_id": "  "
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "status": "selected"
+     }
+    },
+    {
+     "result": {
+      "success": true
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_selection_rejected",
+      "error": "Mismatch"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_source_parameters_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "select_setting": {
+      "candidate_id": "c-1",
+      "setting_id": "world"
+     }
+    },
+    {
+     "select_setting": {
+      "candidate_id": null,
+      "setting_id": "world"
+     }
+    },
+    {
+     "select_setting": {
+      "candidate_id": "c-1",
+      "setting_id": "other"
+     }
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "references",
+   "references": {
+    "paths": [
+     "ruleset/runtime.yaml",
+     "setting/World.md",
+     "plan/Notes.md",
+     "setting/broken.md",
+     "setting/odd.md",
+     "setting/gone.md"
+    ],
+    "contents": {
+     "ruleset/runtime.yaml": "rules: \u00e9\ud83d\ude80 dragons\n",
+     "setting/World.md": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+     "plan/Notes.md": "",
+     "setting/broken.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "Too big",
+       "code": "package_file_oversized"
+      }
+     },
+     "setting/odd.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "Odd",
+       "code": "something_else"
+      }
+     },
+     "setting/gone.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "missing"
+      }
+     }
+    }
+   },
+   "calls": [
+    {
+     "action": "list"
+    },
+    {
+     "action": "list",
+     "query": "SETTING"
+    },
+    {
+     "action": "list",
+     "offset": 2,
+     "limit": 2
+    },
+    {
+     "action": "list",
+     "offset": 50
+    },
+    {
+     "action": "list",
+     "query": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+    },
+    {
+     "action": "list",
+     "offset": -1
+    },
+    {
+     "action": "list",
+     "limit": true
+    },
+    {
+     "action": "list",
+     "offset": 1.0
+    },
+    {
+     "action": "read",
+     "path": "setting/World.md"
+    },
+    {
+     "action": "read",
+     "path": "setting/World.md",
+     "offset": 7,
+     "limit": 3
+    },
+    {
+     "action": "read",
+     "path": "setting/World.md",
+     "offset": 9000
+    },
+    {
+     "action": "read",
+     "path": "setting/World.md",
+     "offset": 99999
+    },
+    {
+     "action": "read",
+     "path": "setting/World.md",
+     "limit": 40000
+    },
+    {
+     "action": "read",
+     "path": "plan/Notes.md"
+    },
+    {
+     "action": "read",
+     "path": "unknown.md"
+    },
+    {
+     "action": "read",
+     "path": 5
+    },
+    {
+     "action": "delete",
+     "path": "setting/World.md"
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md",
+     "query": "dragon"
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md",
+     "query": "dragon",
+     "limit": 1
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md",
+     "query": "dragon",
+     "offset": 260
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md",
+     "query": "\ud83d\ude80"
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md",
+     "query": "absent"
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md",
+     "query": ""
+    },
+    {
+     "action": "find",
+     "path": "setting/World.md"
+    },
+    {
+     "action": "read",
+     "path": "setting/broken.md"
+    },
+    {
+     "action": "read",
+     "path": "setting/odd.md"
+    },
+    {
+     "action": "find",
+     "path": "setting/gone.md",
+     "query": "x"
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "setting/World.md",
+       "limit": 10
+      },
+      {
+       "path": "ruleset/runtime.yaml"
+      }
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "setting/World.md",
+       "limit": 10
+      },
+      {
+       "path": "setting/broken.md",
+       "limit": 5
+      },
+      {
+       "path": "setting/World.md"
+      }
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": []
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "setting/World.md"
+      },
+      {
+       "path": "setting/World.md"
+      },
+      {
+       "path": "setting/World.md"
+      },
+      {
+       "path": "setting/World.md"
+      },
+      {
+       "path": "setting/World.md"
+      }
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "setting/World.md",
+       "limit": 20000
+      },
+      {
+       "path": "setting/World.md",
+       "limit": 12001
+      }
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "setting/World.md",
+       "extra": 1
+      }
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "unknown.md"
+      }
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      "not a page"
+     ]
+    },
+    {
+     "action": "read_many",
+     "pages": [
+      {
+       "path": "setting/World.md",
+       "limit": 0
+      }
+     ]
+    },
+    {
+     "action": "read_many"
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "paths": [
+       "ruleset/runtime.yaml",
+       "setting/World.md",
+       "plan/Notes.md",
+       "setting/broken.md",
+       "setting/odd.md",
+       "setting/gone.md"
+      ],
+      "total": 6,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "paths": [
+       "setting/World.md",
+       "setting/broken.md",
+       "setting/odd.md",
+       "setting/gone.md"
+      ],
+      "total": 4,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "paths": [
+       "plan/Notes.md",
+       "setting/broken.md"
+      ],
+      "total": 6,
+      "next_offset": 4
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "paths": [],
+      "total": 6,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_query_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_page_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_page_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_page_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "content": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+      "total_characters": 9379,
+      "next_offset": 8000
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "content": "\u00e9\ud83d\ude80 ",
+      "total_characters": 9379,
+      "next_offset": 10
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "content": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+      "total_characters": 9379,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "content": "",
+      "total_characters": 9379,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "content": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+      "total_characters": 9379,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "plan/Notes.md",
+      "content": "",
+      "total_characters": 0,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_path_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_path_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_path_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "matches": [
+       {
+        "offset": 160,
+        "excerpt_offset": 0,
+        "excerpt": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+       },
+       {
+        "offset": 368,
+        "excerpt_offset": 208,
+        "excerpt": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+       }
+      ],
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "matches": [
+       {
+        "offset": 160,
+        "excerpt_offset": 0,
+        "excerpt": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+       }
+      ],
+      "next_offset": 166
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "matches": [
+       {
+        "offset": 368,
+        "excerpt_offset": 208,
+        "excerpt": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+       }
+      ],
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "matches": [
+       {
+        "offset": 8,
+        "excerpt_offset": 0,
+        "excerpt": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xx"
+       }
+      ],
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "path": "setting/World.md",
+      "matches": [],
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_query_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_query_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_unavailable",
+      "reason": "package_file_oversized"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "pages": [
+       {
+        "success": true,
+        "path": "setting/World.md",
+        "content": "Header \u00e9\ud83d\ude80 ",
+        "total_characters": 9379,
+        "next_offset": 10
+       },
+       {
+        "success": true,
+        "path": "ruleset/runtime.yaml",
+        "content": "rules: \u00e9\ud83d\ude80 dragons\n",
+        "total_characters": 18,
+        "next_offset": null
+       }
+      ]
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_unavailable",
+      "reason": "package_file_oversized",
+      "pages": [
+       {
+        "success": true,
+        "path": "setting/World.md",
+        "content": "Header \u00e9\ud83d\ude80 ",
+        "total_characters": 9379,
+        "next_offset": 10
+       },
+       {
+        "success": false,
+        "code": "reference_unavailable",
+        "reason": "package_file_oversized"
+       }
+      ]
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_batch_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "plan/Notes.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/broken.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/odd.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/gone.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "read_reference": "ruleset/runtime.yaml"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/World.md"
+    },
+    {
+     "read_reference": "setting/broken.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "references",
+   "references": null,
+   "calls": [
+    {
+     "action": "list"
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": false,
+      "code": "builder_ruleset_selection_required"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "references": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "reference_copy",
+   "references": {
+    "paths": [
+     "ruleset/runtime.yaml",
+     "setting/World.md",
+     "plan/Notes.md",
+     "setting/broken.md",
+     "setting/odd.md",
+     "setting/gone.md"
+    ],
+    "contents": {
+     "ruleset/runtime.yaml": "rules: \u00e9\ud83d\ude80 dragons\n",
+     "setting/World.md": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+     "plan/Notes.md": "",
+     "setting/broken.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "Too big",
+       "code": "package_file_oversized"
+      }
+     },
+     "setting/odd.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "Odd",
+       "code": "something_else"
+      }
+     },
+     "setting/gone.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "missing"
+      }
+     }
+    }
+   },
+   "files": {
+    "copies/existing.md": "old text\n"
+   },
+   "calls": [
+    {
+     "source_path": "ruleset/runtime.yaml",
+     "destination_path": "copies/runtime.yaml"
+    },
+    {
+     "source_path": "ruleset/runtime.yaml",
+     "destination_path": "copies/existing.md"
+    },
+    {
+     "source_path": "plan/Notes.md",
+     "destination_path": "copies/notes.md",
+     "expected_version": null
+    },
+    {
+     "source_path": "ruleset/runtime.yaml",
+     "destination_path": "../outside.yaml"
+    },
+    {
+     "source_path": "unknown.md",
+     "destination_path": "copies/x.md"
+    },
+    {
+     "source_path": "ruleset/runtime.yaml",
+     "destination_path": "  "
+    },
+    {
+     "source_path": "ruleset/runtime.yaml",
+     "destination_path": "copies/y.md",
+     "expected_version": 3
+    },
+    {
+     "source_path": "ruleset/runtime.yaml",
+     "destination_path": "copies/z.md",
+     "extra": true
+    },
+    {
+     "source_path": "setting/broken.md",
+     "destination_path": "copies/b.md"
+    },
+    {
+     "source_path": "setting/odd.md",
+     "destination_path": "copies/o.md"
+    },
+    {
+     "source_path": "setting/gone.md",
+     "destination_path": "copies/g.md"
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "source_path": "ruleset/runtime.yaml",
+      "path": "copies/runtime.yaml",
+      "bytes_written": 22,
+      "version": "6e560c0f75df6ebb6da82961aecef120a363f3c3148829054480f4a04d7cbf03"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "error_code": "stale_file",
+      "error": "File changed or has not been read. Call read_file again, reconcile the latest content, then retry with its version as expected_version. Ask the user if the requested changes conflict; do not blindly repeat the old replacement."
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "source_path": "plan/Notes.md",
+      "path": "copies/notes.md",
+      "bytes_written": 0,
+      "version": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_path_denied"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_unavailable",
+      "reason": "package_file_oversized"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "reference_copy_unavailable"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "references": null
+    },
+    {
+     "read_reference": "ruleset/runtime.yaml"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "ruleset/runtime.yaml"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "plan/Notes.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/broken.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/odd.md"
+    },
+    {
+     "references": null
+    },
+    {
+     "read_reference": "setting/gone.md"
+    }
+   ],
+   "files_after": {
+    "copies/existing.md": "old text\n",
+    "copies/notes.md": "",
+    "copies/runtime.yaml": "rules: \u00e9\ud83d\ude80 dragons\n"
+   }
+  },
+  {
+   "tool": "reference_copy",
+   "references": null,
+   "files": {},
+   "calls": [
+    {
+     "source_path": "x",
+     "destination_path": "y"
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": false,
+      "code": "builder_ruleset_selection_required"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "references": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "library",
+   "outcomes": [
+    {
+     "return": [
+      {
+       "candidate_id": "candidate-0",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-1",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-2",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-3",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-4",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-5",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-6",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-7",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-8",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-9",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-10",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-11",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-12",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-13",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-14",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-15",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-16",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-17",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-18",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-19",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-20",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-21",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-22",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-23",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-24",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      }
+     ]
+    },
+    {
+     "return": [
+      {
+       "candidate_id": "candidate-1",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      }
+     ]
+    },
+    {
+     "return": {
+      "candidate_id": "candidate-1",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      },
+      "paths": [
+       "files/0.md",
+       "files/1.md",
+       "files/2.md",
+       "files/3.md",
+       "files/4.md",
+       "files/5.md",
+       "files/6.md",
+       "files/7.md",
+       "files/8.md",
+       "files/9.md",
+       "files/10.md",
+       "files/11.md",
+       "files/12.md",
+       "files/13.md",
+       "files/14.md",
+       "files/15.md",
+       "files/16.md",
+       "files/17.md",
+       "files/18.md",
+       "files/19.md",
+       "files/20.md",
+       "files/21.md",
+       "files/22.md",
+       "files/23.md",
+       "files/24.md",
+       "files/25.md",
+       "files/26.md",
+       "files/27.md",
+       "files/28.md",
+       "files/29.md",
+       "files/30.md",
+       "files/31.md",
+       "files/32.md",
+       "files/33.md",
+       "files/34.md",
+       "files/35.md",
+       "files/36.md",
+       "files/37.md",
+       "files/38.md",
+       "files/39.md",
+       "files/40.md",
+       "files/41.md",
+       "files/42.md",
+       "files/43.md",
+       "files/44.md",
+       "files/45.md",
+       "files/46.md",
+       "files/47.md",
+       "files/48.md",
+       "files/49.md",
+       "files/50.md",
+       "files/51.md",
+       "files/52.md",
+       "files/53.md",
+       "files/54.md",
+       "files/55.md",
+       "files/56.md",
+       "files/57.md",
+       "files/58.md",
+       "files/59.md",
+       "files/60.md",
+       "files/61.md",
+       "files/62.md",
+       "files/63.md",
+       "files/64.md",
+       "files/65.md",
+       "files/66.md",
+       "files/67.md",
+       "files/68.md",
+       "files/69.md",
+       "files/70.md",
+       "files/71.md",
+       "files/72.md",
+       "files/73.md",
+       "files/74.md",
+       "files/75.md",
+       "files/76.md",
+       "files/77.md",
+       "files/78.md",
+       "files/79.md",
+       "files/80.md",
+       "files/81.md",
+       "files/82.md",
+       "files/83.md",
+       "files/84.md",
+       "files/85.md",
+       "files/86.md",
+       "files/87.md",
+       "files/88.md",
+       "files/89.md",
+       "files/90.md",
+       "files/91.md",
+       "files/92.md",
+       "files/93.md",
+       "files/94.md",
+       "files/95.md",
+       "files/96.md",
+       "files/97.md",
+       "files/98.md",
+       "files/99.md",
+       "files/100.md",
+       "files/101.md",
+       "files/102.md",
+       "files/103.md",
+       "files/104.md",
+       "files/105.md",
+       "files/106.md",
+       "files/107.md",
+       "files/108.md",
+       "files/109.md",
+       "files/110.md",
+       "files/111.md",
+       "files/112.md",
+       "files/113.md",
+       "files/114.md",
+       "files/115.md",
+       "files/116.md",
+       "files/117.md",
+       "files/118.md",
+       "files/119.md",
+       "files/120.md",
+       "files/121.md",
+       "files/122.md",
+       "files/123.md",
+       "files/124.md",
+       "files/125.md",
+       "files/126.md",
+       "files/127.md",
+       "files/128.md",
+       "files/129.md"
+      ]
+     }
+    },
+    {
+     "return": {
+      "candidate_id": "candidate-1",
+      "content": "Header \u00e9\ud83d\ude80 lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore lore dragon xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx dragon end yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    },
+    {
+     "return": {
+      "candidate_id": "candidate-1",
+      "content": "{}",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Unknown candidate",
+      "code": "library_candidate_unknown"
+     }
+    },
+    {
+     "raise": {
+      "class": "OSError",
+      "message": "disk"
+     }
+    },
+    {
+     "raise": {
+      "class": "TypeError",
+      "message": "wrong"
+     }
+    },
+    {
+     "raise": {
+      "class": "StaleRevision",
+      "message": "old"
+     }
+    },
+    {
+     "return": {
+      "candidate_id": "candidate-1"
+     }
+    },
+    {
+     "return": [
+      {
+       "candidate_id": "candidate-0",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-1",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-2",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-3",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-4",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-5",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-6",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-7",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-8",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-9",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-10",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-11",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-12",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-13",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-14",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-15",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-16",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-17",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-18",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-19",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-20",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-21",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-22",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-23",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      },
+      {
+       "candidate_id": "candidate-24",
+       "label": "Example Rules",
+       "kind": "ruleset"
+      }
+     ]
+    }
+   ],
+   "calls": [
+    {
+     "action": "candidates"
+    },
+    {
+     "action": "candidates",
+     "query": "example",
+     "offset": 0,
+     "limit": 5
+    },
+    {
+     "action": "files",
+     "candidate_id": "candidate-1",
+     "offset": 95
+    },
+    {
+     "action": "read",
+     "candidate_id": "candidate-1",
+     "path": "files/0.md",
+     "offset": 5,
+     "limit": 10
+    },
+    {
+     "action": "record",
+     "candidate_id": "candidate-1",
+     "path": "ruleset"
+    },
+    {
+     "action": "read",
+     "candidate_id": "candidate-9",
+     "path": "x"
+    },
+    {
+     "action": "read",
+     "candidate_id": "candidate-1",
+     "path": "x"
+    },
+    {
+     "action": "read",
+     "candidate_id": "candidate-1",
+     "path": "x"
+    },
+    {
+     "action": "files",
+     "candidate_id": "candidate-1"
+    },
+    {
+     "action": "files",
+     "candidate_id": "candidate-1"
+    },
+    {
+     "action": "files",
+     "query": "x"
+    },
+    {
+     "action": "candidates",
+     "query": 5
+    },
+    {
+     "action": "candidates",
+     "query": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+    },
+    {
+     "action": "files"
+    },
+    {
+     "action": "files",
+     "candidate_id": ""
+    },
+    {
+     "action": "read",
+     "candidate_id": "candidate-1"
+    },
+    {
+     "action": "list",
+     "candidate_id": "candidate-1",
+     "path": "x"
+    },
+    {
+     "action": "candidates",
+     "offset": -2
+    },
+    {
+     "action": "candidates",
+     "unknown": 1
+    },
+    {
+     "action": "candidates",
+     "limit": 30
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "candidates": [
+       {
+        "candidate_id": "candidate-0",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-1",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-2",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-3",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-4",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-5",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-6",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-7",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-8",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-9",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-10",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-11",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-12",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-13",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-14",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-15",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-16",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-17",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-18",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-19",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       }
+      ],
+      "total": 25,
+      "next_offset": 20
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "candidates": [
+       {
+        "candidate_id": "candidate-1",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       }
+      ],
+      "total": 1,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "candidate_id": "candidate-1",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      },
+      "paths": [
+       "files/95.md",
+       "files/96.md",
+       "files/97.md",
+       "files/98.md",
+       "files/99.md",
+       "files/100.md",
+       "files/101.md",
+       "files/102.md",
+       "files/103.md",
+       "files/104.md",
+       "files/105.md",
+       "files/106.md",
+       "files/107.md",
+       "files/108.md",
+       "files/109.md",
+       "files/110.md",
+       "files/111.md",
+       "files/112.md",
+       "files/113.md",
+       "files/114.md"
+      ],
+      "total": 130,
+      "next_offset": 115
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "candidate_id": "candidate-1",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      },
+      "content": "r \u00e9\ud83d\ude80 lore ",
+      "total_characters": 9379,
+      "next_offset": 15
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "candidate_id": "candidate-1",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "content": "{}",
+      "total_characters": 2,
+      "next_offset": null
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_unavailable",
+      "message": "Confirm the source with candidates. Use read with an exact path returned by files, or record with the ruleset, setting, or dependencies/<id> prefix. Both read and record support character offset and limit."
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_unavailable",
+      "message": "Confirm the source with candidates. Use read with an exact path returned by files, or record with the ruleset, setting, or dependencies/<id> prefix. Both read and record support character offset and limit."
+     }
+    },
+    {
+     "raised": "TypeError",
+     "message": "wrong"
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_unavailable",
+      "message": "Confirm the source with candidates. Use read with an exact path returned by files, or record with the ruleset, setting, or dependencies/<id> prefix. Both read and record support character offset and limit."
+     }
+    },
+    {
+     "raised": "KeyError",
+     "message": "'paths'"
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_query_unsupported",
+      "message": "query filters candidates only; it does not search source file contents. Use files to list paths, then read with character offset and limit. For package declarations, use record with a package prefix."
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_query_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_query_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_candidate_required"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_candidate_required"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_path_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_path_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_page_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "candidates": [
+       {
+        "candidate_id": "candidate-0",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-1",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-2",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-3",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-4",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-5",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-6",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-7",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-8",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-9",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-10",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-11",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-12",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-13",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-14",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-15",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-16",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-17",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-18",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       },
+       {
+        "candidate_id": "candidate-19",
+        "label": "Example Rules",
+        "kind": "ruleset"
+       }
+      ],
+      "total": 25,
+      "next_offset": 20
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "candidates": ""
+    },
+    {
+     "candidates": "example"
+    },
+    {
+     "files": "candidate-1"
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "record": [
+      "candidate-1",
+      "ruleset"
+     ]
+    },
+    {
+     "read": [
+      "candidate-9",
+      "x"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "x"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "x"
+     ]
+    },
+    {
+     "files": "candidate-1"
+    },
+    {
+     "files": "candidate-1"
+    },
+    {
+     "candidates": ""
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "library_copy",
+   "outcomes": [
+    {
+     "return": {
+      "content": "# Rules\n\u00e9",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    },
+    {
+     "return": {
+      "content": "{\"z\": 1, \"a\": [\"\\u00e9\", {\"k\": null}]}",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    },
+    {
+     "return": {
+      "content": "new",
+      "closure_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    },
+    {
+     "return": {
+      "content": "{not json",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    },
+    {
+     "return": {
+      "content": 5,
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    },
+    {
+     "return": {
+      "content": "x",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": "not a mapping"
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Unknown",
+      "code": "library_candidate_unknown"
+     }
+    },
+    {
+     "raise": {
+      "class": "KeyError",
+      "message": "missing"
+     }
+    },
+    {
+     "return": {
+      "content": "again",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      }
+     }
+    }
+   ],
+   "files": {
+    "copies/rules.md": "existing\n"
+   },
+   "calls": [
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/rules.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "editable_record",
+     "source_path": "ruleset",
+     "destination_path": "copies/record.json"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/changed.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "editable_record",
+     "source_path": "files/0.md",
+     "destination_path": "copies/bad.json"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/five.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/package.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/unknown.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/key.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/rules.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "../out.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "zip",
+     "source_path": "files/0.md",
+     "destination_path": "copies/rules.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/rules.md"
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/rules.md",
+     "expected_version": 7
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "source_path": "files/0.md",
+     "destination_path": "copies/rules.md",
+     "extra": 1
+    },
+    {
+     "candidate_id": "candidate-1",
+     "expected_closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_type": "file",
+     "destination_path": "copies/rules.md"
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": false,
+      "error_code": "stale_file",
+      "error": "File changed or has not been read. Call read_file again, reconcile the latest content, then retry with its version as expected_version. Ask the user if the requested changes conflict; do not blindly repeat the old replacement."
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "candidate_id": "candidate-1",
+      "closure_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source_type": "editable_record",
+      "source_path": "ruleset",
+      "package": {
+       "id": "example.rules",
+       "version": "1.0.0",
+       "label": "Example"
+      },
+      "path": "copies/record.json",
+      "bytes_written": 65,
+      "version": "b0b69cd2611b43bacb5e4feb82731d43b264bdc828d9ba4b263fee1e22d4d396"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_changed",
+      "candidate_id": "candidate-1",
+      "closure_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_unavailable"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_unavailable"
+     }
+    },
+    {
+     "raised": "KeyError",
+     "message": "'missing'"
+    },
+    {
+     "result": {
+      "success": false,
+      "error_code": "stale_file",
+      "error": "File changed or has not been read. Call read_file again, reconcile the latest content, then retry with its version as expected_version. Ask the user if the requested changes conflict; do not blindly repeat the old replacement."
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_path_denied"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_parameters_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "library_source_copy_parameters_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "record": [
+      "candidate-1",
+      "ruleset"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "record": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    },
+    {
+     "read": [
+      "candidate-1",
+      "files/0.md"
+     ]
+    }
+   ],
+   "files_after": {
+    "copies/record.json": "{\n  \"z\": 1,\n  \"a\": [\n    \"\u00e9\",\n    {\n      \"k\": null\n    }\n  ]\n}\n",
+    "copies/rules.md": "existing\n"
+   }
+  },
+  {
+   "tool": "setting",
+   "checking": false,
+   "outcomes": [
+    {
+     "return": {
+      "package_id": "my.setting",
+      "status": "published",
+      "receipt": {
+       "candidate_id": "c-1"
+      }
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Setting is invalid because aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "code": "setting_invalid",
+      "diagnostics": [
+       {
+        "code": "s0",
+        "phase": "content",
+        "message": "problem 0",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s1",
+        "phase": "content",
+        "message": "problem 1",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s2",
+        "phase": "content",
+        "message": "problem 2",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s3",
+        "phase": "content",
+        "message": "problem 3",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s4",
+        "phase": "content",
+        "message": "problem 4",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s5",
+        "phase": "content",
+        "message": "problem 5",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s6",
+        "phase": "content",
+        "message": "problem 6",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s7",
+        "phase": "content",
+        "message": "problem 7",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s8",
+        "phase": "content",
+        "message": "problem 8",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       },
+       {
+        "code": "s9",
+        "phase": "content",
+        "message": "problem 9",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it",
+        "expected": "string"
+       }
+      ]
+     }
+    },
+    {
+     "raise": {
+      "class": "ValueError",
+      "message": "plain value problem"
+     }
+    },
+    {
+     "raise": {
+      "class": "OSError",
+      "message": "disk"
+     }
+    },
+    {
+     "raise": {
+      "class": "StaleRevision",
+      "message": "old"
+     }
+    },
+    {
+     "return": {}
+    }
+   ],
+   "calls": [
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting "
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting "
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting "
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting "
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting "
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "   "
+    },
+    {
+     "package_id": "x",
+     "version": "1"
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting ",
+     "extra": 1
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": 1,
+     "title": "My Setting "
+    },
+    {
+     "package_id": "  my.setting  ",
+     "version": " 1.0.0",
+     "title": "My Setting "
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "package_id": "my.setting",
+      "status": "published",
+      "receipt": {
+       "candidate_id": "c-1"
+      }
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "setting_invalid",
+      "message": "Setting is invalid because aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "validation_errors": [
+       {
+        "code": "s0",
+        "phase": "content",
+        "message": "problem 0",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s1",
+        "phase": "content",
+        "message": "problem 1",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s2",
+        "phase": "content",
+        "message": "problem 2",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s3",
+        "phase": "content",
+        "message": "problem 3",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s4",
+        "phase": "content",
+        "message": "problem 4",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s5",
+        "phase": "content",
+        "message": "problem 5",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s6",
+        "phase": "content",
+        "message": "problem 6",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       },
+       {
+        "code": "s7",
+        "phase": "content",
+        "message": "problem 7",
+        "file": "World.md",
+        "path": "$.x",
+        "guidance": "Fix it"
+       }
+      ]
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setting_invalid",
+      "message": "plain value problem",
+      "validation_errors": []
+     }
+    },
+    {
+     "raised": "OSError",
+     "message": "disk"
+    },
+    {
+     "raised": "StaleRevision",
+     "message": "old"
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setting_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setting_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setting_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setting_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": true
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "publish": {
+      "package_id": "my.setting",
+      "version": "1.0.0",
+      "title": "My Setting"
+     }
+    },
+    {
+     "publish": {
+      "package_id": "my.setting",
+      "version": "1.0.0",
+      "title": "My Setting"
+     }
+    },
+    {
+     "publish": {
+      "package_id": "my.setting",
+      "version": "1.0.0",
+      "title": "My Setting"
+     }
+    },
+    {
+     "publish": {
+      "package_id": "my.setting",
+      "version": "1.0.0",
+      "title": "My Setting"
+     }
+    },
+    {
+     "publish": {
+      "package_id": "my.setting",
+      "version": "1.0.0",
+      "title": "My Setting"
+     }
+    },
+    {
+     "publish": {
+      "package_id": "my.setting",
+      "version": "1.0.0",
+      "title": "My Setting"
+     }
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "setting",
+   "checking": true,
+   "outcomes": [
+    {
+     "return": {
+      "package_id": "my.setting"
+     }
+    }
+   ],
+   "calls": [
+    {
+     "package_id": "a",
+     "version": "1",
+     "title": "T"
+    }
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "status": "valid_draft",
+      "package_id": "my.setting"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "publish": {
+      "package_id": "a",
+      "version": "1",
+      "title": "T"
+     }
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "content",
+   "items": [
+    {
+     "kind": "campaign_plan",
+     "id": "plan-1",
+     "title": "The Iron Debt",
+     "setup_id": "setup-1",
+     "summary": "A heist in Waterdeep\u00e9"
+    },
+    {
+     "kind": "campaign_plan",
+     "id": "plan-2",
+     "summary": "No title here",
+     "setup_id": ""
+    },
+    {
+     "kind": "ruleset",
+     "id": "srd",
+     "title": "SRD Lite",
+     "tags": [
+      "dragons",
+      "STRASSE"
+     ]
+    }
+   ],
+   "refresh": false,
+   "calls": [
+    [
+     "discover_campaign_content",
+     {}
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": "  iron   DEBT "
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": "stra\u00dfe"
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": "waterdeep\u00e9"
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": "dragons\u2003srd"
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": "nothing"
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq"
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "query": 4
+     }
+    ],
+    [
+     "discover_campaign_content",
+     {
+      "other": "x"
+     }
+    ],
+    [
+     "prepare_campaign_setup",
+     {
+      "campaign_plan_id": "plan-1"
+     }
+    ],
+    [
+     "prepare_campaign_setup",
+     {
+      "campaign_plan_id": "plan-2"
+     }
+    ],
+    [
+     "prepare_campaign_setup",
+     {
+      "campaign_plan_id": "srd"
+     }
+    ],
+    [
+     "prepare_campaign_setup",
+     {
+      "campaign_plan_id": ""
+     }
+    ],
+    [
+     "prepare_campaign_setup",
+     {
+      "campaign_plan_id": "plan-1",
+      "extra": 1
+     }
+    ]
+   ],
+   "answers": [
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "available",
+      "query": "",
+      "items": [
+       {
+        "kind": "campaign_plan",
+        "id": "plan-1",
+        "title": "The Iron Debt",
+        "setup_id": "setup-1",
+        "summary": "A heist in Waterdeep\u00e9"
+       },
+       {
+        "kind": "campaign_plan",
+        "id": "plan-2",
+        "summary": "No title here",
+        "setup_id": ""
+       },
+       {
+        "kind": "ruleset",
+        "id": "srd",
+        "title": "SRD Lite",
+        "tags": [
+         "dragons",
+         "STRASSE"
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "available",
+      "query": "iron   DEBT",
+      "items": [
+       {
+        "kind": "campaign_plan",
+        "id": "plan-1",
+        "title": "The Iron Debt",
+        "setup_id": "setup-1",
+        "summary": "A heist in Waterdeep\u00e9"
+       }
+      ]
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "available",
+      "query": "stra\u00dfe",
+      "items": [
+       {
+        "kind": "ruleset",
+        "id": "srd",
+        "title": "SRD Lite",
+        "tags": [
+         "dragons",
+         "STRASSE"
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "available",
+      "query": "waterdeep\u00e9",
+      "items": [
+       {
+        "kind": "campaign_plan",
+        "id": "plan-1",
+        "title": "The Iron Debt",
+        "setup_id": "setup-1",
+        "summary": "A heist in Waterdeep\u00e9"
+       }
+      ]
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "available",
+      "query": "dragons\u2003srd",
+      "items": [
+       {
+        "kind": "ruleset",
+        "id": "srd",
+        "title": "SRD Lite",
+        "tags": [
+         "dragons",
+         "STRASSE"
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "no_matches",
+      "query": "nothing",
+      "items": []
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_content_query_invalid"
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_content_query_invalid"
+     }
+    },
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_content_query_invalid"
+     }
+    },
+    {
+     "tool": "prepare_campaign_setup",
+     "result": {
+      "success": true,
+      "status": "setup_ready",
+      "campaign_plan_id": "plan-1",
+      "title": "The Iron Debt",
+      "player_character_required": true,
+      "message": "Use New Campaign to confirm the required Player Character and other player choices. Gameplay has not started.",
+      "setup_id": "setup-1"
+     }
+    },
+    {
+     "tool": "prepare_campaign_setup",
+     "result": {
+      "success": true,
+      "status": "setup_ready",
+      "campaign_plan_id": "plan-2",
+      "title": "plan-2",
+      "player_character_required": true,
+      "message": "Use New Campaign to confirm the required Player Character and other player choices. Gameplay has not started."
+     }
+    },
+    {
+     "tool": "prepare_campaign_setup",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_unavailable"
+     }
+    },
+    {
+     "tool": "prepare_campaign_setup",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setup_selection_invalid"
+     }
+    },
+    {
+     "tool": "prepare_campaign_setup",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_setup_selection_invalid"
+     }
+    }
+   ],
+   "callback_calls": [],
+   "files_after": {}
+  },
+  {
+   "tool": "content",
+   "items": [],
+   "refresh": true,
+   "outcomes": [
+    {
+     "return": [
+      {
+       "kind": "campaign_plan",
+       "id": "plan-1",
+       "title": "The Iron Debt",
+       "setup_id": "setup-1",
+       "summary": "A heist in Waterdeep\u00e9"
+      },
+      {
+       "kind": "campaign_plan",
+       "id": "plan-2",
+       "summary": "No title here",
+       "setup_id": ""
+      },
+      {
+       "kind": "ruleset",
+       "id": "srd",
+       "title": "SRD Lite",
+       "tags": [
+        "dragons",
+        "STRASSE"
+       ]
+      }
+     ]
+    },
+    {
+     "return": []
+    }
+   ],
+   "calls": [
+    [
+     "discover_campaign_content",
+     {
+      "query": "iron"
+     }
+    ],
+    [
+     "prepare_campaign_setup",
+     {
+      "campaign_plan_id": "plan-1"
+     }
+    ]
+   ],
+   "answers": [
+    {
+     "tool": "discover_campaign_content",
+     "result": {
+      "success": true,
+      "status": "available",
+      "query": "iron",
+      "items": [
+       {
+        "kind": "campaign_plan",
+        "id": "plan-1",
+        "title": "The Iron Debt",
+        "setup_id": "setup-1",
+        "summary": "A heist in Waterdeep\u00e9"
+       }
+      ]
+     }
+    },
+    {
+     "tool": "prepare_campaign_setup",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_unavailable"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "refresh": null
+    },
+    {
+     "refresh": null
+    }
+   ],
+   "files_after": {}
+  }
+ ]
+}
