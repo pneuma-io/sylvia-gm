@@ -157,10 +157,15 @@ fn player_response_reservations(
 /// ordinary GM narration that no saved response has answered yet.
 pub async fn player_action_context(store: &StoreHandle, campaign_id: &str) -> StoreResult<Vec<JsonMap>> {
     let id = campaign_id.to_owned();
-    store
-        .call(move |store| {
-            let snapshot = store.snapshot(&id)?;
-            let (reserved, response_attempts) = player_response_reservations(store, &id)?;
+    store.call(move |store| player_action_context_on(store, &id)).await
+}
+
+/// `player_action_context(campaign_id)` on the store thread.
+fn player_action_context_on(store: &AuthorityStore, id: &str) -> StoreResult<Vec<JsonMap>> {
+    {
+        {
+            let snapshot = store.snapshot(id)?;
+            let (reserved, response_attempts) = player_response_reservations(store, id)?;
             let last_response = snapshot
                 .events
                 .iter()
@@ -187,6 +192,59 @@ pub async fn player_action_context(store: &StoreHandle, campaign_id: &str) -> St
                     recent.contains(action_id) && !reserved.contains(action_id)
                 })
                 .collect())
+        }
+    }
+}
+
+/// `AuthorityOwner.player_action_response_basis(session_id, action_id, automatic=...)`: the saved
+/// player action a response request in its own GM session answers. Refused when the action is
+/// another session's or missing, when an automatic response was not what the Ruleset asked for,
+/// when a response was already requested, and when Sylvia has already answered it.
+pub async fn player_action_response_basis(
+    store: &StoreHandle,
+    session_id: &str,
+    action_id: &str,
+    automatic: bool,
+) -> StoreResult<JsonMap> {
+    let (session_id, action_id) = (session_id.to_owned(), action_id.to_owned());
+    store
+        .call(move |store| {
+            let context = super::content_reads::active_dm_context(store, &session_id)?;
+            let campaign_id = context.session.campaign_id().unwrap_or_default().to_owned();
+            let snapshot = store.snapshot(&campaign_id)?;
+            let record = player_action_records(&snapshot)
+                .into_iter()
+                .find(|item| item.get("action_id") == Some(&Json::from(action_id.as_str())));
+            let rejected = |message: &str, code: &str| -> sylvia_store::StoreError {
+                sylvia_domain::DomainError::command_rejected_with(message, code, Vec::new()).into()
+            };
+            let origin = record.as_ref().and_then(|record| record.get("origin")).and_then(Json::as_object);
+            let own = |origin: &JsonMap| match origin.get("session_id") {
+                None | Some(Json::Null) => true,
+                Some(found) => found == &Json::from(session_id.as_str()),
+            };
+            let (Some(record), Some(origin)) = (&record, origin) else {
+                return Err(rejected("The saved player action is unavailable to this session", "command_rejected"));
+            };
+            if !own(origin) {
+                return Err(rejected("The saved player action is unavailable to this session", "command_rejected"));
+            }
+            let response = origin.get("policy").and_then(Json::as_object).and_then(|policy| policy.get("response"));
+            if automatic && response != Some(&Json::from("automatic")) {
+                return Err(rejected("The Ruleset did not request an automatic response", "command_rejected"));
+            }
+            let (reserved, _) = player_response_reservations(store, &campaign_id)?;
+            if reserved.contains(&action_id) {
+                return Err(rejected(
+                    "A response was already requested for this action; use Retry response if it was interrupted",
+                    "player_action_response_started",
+                ));
+            }
+            let pending = player_action_context_on(store, &campaign_id)?;
+            if !pending.iter().any(|item| item.get("action_id") == Some(&Json::from(action_id.as_str()))) {
+                return Err(rejected("Sylvia has already responded to this action", "command_rejected"));
+            }
+            Ok(record.clone())
         })
         .await
 }

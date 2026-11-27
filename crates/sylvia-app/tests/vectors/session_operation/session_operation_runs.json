@@ -1,0 +1,895 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "campaign_id": "campaign",
+ "runs": [
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm",
+    "action": "move",
+    "automatic": false
+   },
+   "outcome": {
+    "ok": {
+     "action_id": "move",
+     "turn_id": "turn",
+     "revision": 1,
+     "status": "committed",
+     "origin": {
+      "control": "panel",
+      "expected_revision": 0,
+      "panel_action_id": "move",
+      "policy": {
+       "confirmation": "none",
+       "response": "on_request"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      },
+      "session_id": "gm",
+      "surface_id": "operations.map"
+     },
+     "package_id": "synthetic.coordinate",
+     "tool_name": "move_unit",
+     "parameters": {
+      "actor": "operator",
+      "destination": [
+       4,
+       4
+      ],
+      "mode": "careful"
+     },
+     "result": {
+      "context": {},
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "move_unit"
+     }
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm",
+    "action": "move",
+    "automatic": true
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "The Ruleset did not request an automatic response"
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm",
+    "action": "missing",
+    "automatic": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "The saved player action is unavailable to this session"
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm-2",
+    "action": "move",
+    "automatic": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "The saved player action is unavailable to this session"
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "builder",
+    "action": "move",
+    "automatic": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign narrative state requires an active DM session"
+   }
+  },
+  {
+   "step": {
+    "op": "receipt",
+    "action": "move"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign",
+     "action_id": "move",
+     "status": "committed",
+     "result": {
+      "context": {},
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "move_unit"
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "receipt",
+    "action": "missing"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Stored action result is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "agent_work",
+    "session": "gm"
+   },
+   "outcome": {
+    "ok": {
+     "session_id": "gm",
+     "messages": 4
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "agent_work",
+    "session": "builder"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "DM sessions require campaign authority"
+   }
+  },
+  {
+   "step": {
+    "op": "agent_work",
+    "session": "nobody"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "builder_work",
+    "session": "builder"
+   },
+   "outcome": {
+    "ok": {
+     "session_id": "builder",
+     "messages": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "builder_work",
+    "session": "gm"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Full Builder tools require a Builder session"
+   }
+  },
+  {
+   "step": {
+    "op": "steering",
+    "session": "gm",
+    "message": "steer-1",
+    "kind": "steering",
+    "content": {
+     "text": "Go north."
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "SessionMessage",
+     "session_id": "gm",
+     "sequence": 5,
+     "message_id": "steer-1",
+     "kind": "steering",
+     "content": {
+      "text": "Go north."
+     },
+     "canonical_sequence": null
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "steering",
+    "session": "gm",
+    "message": "talk-1",
+    "kind": "talk",
+    "content": {
+     "text": "North it is."
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "SessionMessage",
+     "session_id": "gm",
+     "sequence": 6,
+     "message_id": "talk-1",
+     "kind": "talk",
+     "content": {
+      "text": "North it is."
+     },
+     "canonical_sequence": null
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "steering",
+    "session": "builder",
+    "message": "think-1",
+    "kind": "safe_think",
+    "content": {
+     "text": "Hm."
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "SessionMessage",
+     "session_id": "builder",
+     "sequence": 1,
+     "message_id": "think-1",
+     "kind": "safe_think",
+     "content": {
+      "text": "Hm."
+     },
+     "canonical_sequence": null
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "steering",
+    "session": "gm",
+    "message": "user-1",
+    "kind": "user",
+    "content": {
+     "text": "No."
+    }
+   },
+   "outcome": {
+    "error": "TypeError",
+    "code": null,
+    "message": "Live steering persistence only accepts safe prose or steering"
+   }
+  },
+  {
+   "step": {
+    "op": "steering",
+    "session": "gm",
+    "message": "steer-1",
+    "kind": "steering",
+    "content": {
+     "text": "Go south."
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Agent message identity payload does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "references",
+    "session": "gm",
+    "sequences": [
+     1,
+     2
+    ]
+   },
+   "outcome": {
+    "ok": [
+     {
+      "__class__": "SessionMessage",
+      "session_id": "gm",
+      "sequence": 7,
+      "message_id": "canonical-1",
+      "kind": "canonical_reference",
+      "content": {
+       "event_type": "action_declared",
+       "visibility": "internal_safe",
+       "safe_payload": {
+        "action_id": "move",
+        "writer": "dm"
+       }
+      },
+      "canonical_sequence": 1
+     },
+     {
+      "__class__": "SessionMessage",
+      "session_id": "gm",
+      "sequence": 1,
+      "message_id": "canonical-2",
+      "kind": "canonical_reference",
+      "content": {
+       "event_type": "tool_call",
+       "safe_payload": {
+        "package_id": "synthetic.coordinate",
+        "package_sha256": "e70e852116bf9b89cb43ee89cb053063da3238268dd4d40f2dffb943668bf3f6",
+        "package_version": "1.0.0",
+        "parameters": {
+         "actor": "operator",
+         "destination": [
+          4,
+          4
+         ],
+         "mode": "careful"
+        },
+        "tool_name": "move_unit"
+       },
+       "visibility": "player_safe"
+      },
+      "canonical_sequence": 2
+     }
+    ]
+   }
+  },
+  {
+   "step": {
+    "op": "references",
+    "session": "gm",
+    "sequences": [
+     1,
+     2
+    ]
+   },
+   "outcome": {
+    "ok": [
+     {
+      "__class__": "SessionMessage",
+      "session_id": "gm",
+      "sequence": 7,
+      "message_id": "canonical-1",
+      "kind": "canonical_reference",
+      "content": {
+       "event_type": "action_declared",
+       "safe_payload": {
+        "action_id": "move",
+        "writer": "dm"
+       },
+       "visibility": "internal_safe"
+      },
+      "canonical_sequence": 1
+     },
+     {
+      "__class__": "SessionMessage",
+      "session_id": "gm",
+      "sequence": 1,
+      "message_id": "canonical-2",
+      "kind": "canonical_reference",
+      "content": {
+       "event_type": "tool_call",
+       "safe_payload": {
+        "package_id": "synthetic.coordinate",
+        "package_sha256": "e70e852116bf9b89cb43ee89cb053063da3238268dd4d40f2dffb943668bf3f6",
+        "package_version": "1.0.0",
+        "parameters": {
+         "actor": "operator",
+         "destination": [
+          4,
+          4
+         ],
+         "mode": "careful"
+        },
+        "tool_name": "move_unit"
+       },
+       "visibility": "player_safe"
+      },
+      "canonical_sequence": 2
+     }
+    ]
+   }
+  },
+  {
+   "step": {
+    "op": "references",
+    "session": "builder",
+    "sequences": [
+     1
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Standalone Builder chats have no campaign chronology"
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "response-1",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": 0,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "thinking",
+     "payload": "Weighing the route."
+    }
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "response-1",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": 0,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "thinking",
+     "payload": "Weighing the route."
+    }
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "response-1",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": 0,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "thinking",
+     "payload": "Another thought."
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Private provider record identity already has different data"
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "native",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": 0,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "continuation",
+     "payload": "[1]"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid native continuation record"
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "native",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": 0,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "continuation",
+     "payload": "{\"id\": 1}"
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Private provider record identity already has different data"
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "response-1",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": 0,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "other",
+     "payload": "Weighing the route."
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid private provider record"
+   }
+  },
+  {
+   "step": {
+    "op": "private",
+    "record": {
+     "session_id": "gm",
+     "attempt_id": "think-1",
+     "response_id": "response-1",
+     "turn_id": "turn",
+     "basis_message_id": "basis",
+     "source_order": -1,
+     "provider_id": "synthetic",
+     "model_id": "synthetic",
+     "kind": "thinking",
+     "payload": "Weighing the route."
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Invalid private provider record"
+   }
+  },
+  {
+   "step": {
+    "op": "finish",
+    "session": "gm",
+    "attempt": "think-1",
+    "completed": true
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "finish",
+    "session": "gm",
+    "attempt": "nothing",
+    "completed": false
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "private_index",
+    "session": "gm"
+   },
+   "outcome": {
+    "ok": [
+     {
+      "attempt_id": "think-1",
+      "response_id": "response-1",
+      "turn_id": "turn",
+      "basis_message_id": "basis",
+      "source_order": 0,
+      "status": "completed",
+      "chunk_count": 1
+     }
+    ]
+   }
+  },
+  {
+   "step": {
+    "op": "append",
+    "session": "gm",
+    "message": "response-request",
+    "kind": "evidence",
+    "content": {
+     "kind": "player_action_response",
+     "player_action_id": "move"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "SessionMessage",
+     "session_id": "gm",
+     "sequence": 8,
+     "message_id": "response-request",
+     "kind": "evidence",
+     "content": {
+      "kind": "player_action_response",
+      "player_action_id": "move"
+     },
+     "canonical_sequence": null
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm",
+    "action": "move",
+    "automatic": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "player_action_response_started",
+    "message": "A response was already requested for this action; use Retry response if it was interrupted"
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm",
+    "action": "move-2",
+    "automatic": false
+   },
+   "outcome": {
+    "ok": {
+     "action_id": "move-2",
+     "turn_id": "turn",
+     "revision": 2,
+     "status": "committed",
+     "origin": {
+      "control": "panel",
+      "expected_revision": 1,
+      "panel_action_id": "move",
+      "policy": {
+       "confirmation": "none",
+       "response": "on_request"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        5,
+        4
+       ],
+       "map_revision": 7
+      },
+      "session_id": "gm",
+      "surface_id": "operations.map"
+     },
+     "package_id": "synthetic.coordinate",
+     "tool_name": "move_unit",
+     "parameters": {
+      "actor": "operator",
+      "destination": [
+       5,
+       4
+      ],
+      "mode": "careful"
+     },
+     "result": {
+      "context": {},
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "move_unit"
+     }
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "narrate",
+    "attempt": "narration-1",
+    "text": "The operator reaches the door."
+   },
+   "outcome": {
+    "ok": [
+     {
+      "__class__": "CanonicalEvent",
+      "sequence": 13,
+      "event_type": "talk",
+      "turn_id": "turn",
+      "action_id": null,
+      "safe_payload": {
+       "text": "The operator reaches the door."
+      },
+      "visibility": "player_safe",
+      "attempt_id": "narration-1",
+      "attempt_ordinal": 0
+     }
+    ]
+   }
+  },
+  {
+   "step": {
+    "op": "basis",
+    "session": "gm",
+    "action": "move-2",
+    "automatic": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Sylvia has already responded to this action"
+   }
+  },
+  {
+   "step": {
+    "op": "archive",
+    "session": "builder",
+    "archived": true
+   },
+   "outcome": {
+    "ok": {
+     "session_id": "builder",
+     "status": "stopped",
+     "display_name": "New chat",
+     "created_ordinal": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "archive",
+    "session": "builder",
+    "archived": true
+   },
+   "outcome": {
+    "ok": {
+     "session_id": "builder",
+     "status": "stopped",
+     "display_name": "New chat",
+     "created_ordinal": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "builder_work",
+    "session": "builder"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Agent session is not active"
+   }
+  },
+  {
+   "step": {
+    "op": "steering",
+    "session": "builder",
+    "message": "think-2",
+    "kind": "safe_think",
+    "content": {
+     "text": "Hm."
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Agent session is not active"
+   }
+  },
+  {
+   "step": {
+    "op": "archive",
+    "session": "builder",
+    "archived": false
+   },
+   "outcome": {
+    "ok": {
+     "session_id": "builder",
+     "status": "active",
+     "display_name": "New chat",
+     "created_ordinal": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "archive",
+    "session": "gm",
+    "archived": true
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Archive the campaign to archive its Interview or Builder"
+   }
+  },
+  {
+   "step": {
+    "op": "archive",
+    "session": "nobody",
+    "archived": true
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "complete_turn",
+    "campaign": "campaign",
+    "turn": "turn"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "complete_turn",
+    "campaign": "campaign",
+    "turn": "turn"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "TURN cannot be completed"
+   }
+  },
+  {
+   "step": {
+    "op": "complete_turn",
+    "campaign": "campaign",
+    "turn": "elsewhere"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "TURN cannot be completed"
+   }
+  },
+  {
+   "step": {
+    "op": "complete_turn",
+    "campaign": "nowhere",
+    "turn": "turn"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  }
+ ]
+}
