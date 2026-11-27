@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 77 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `switch_session_reasoning`, `switch_session_speed`, `steer_session`, `session_context`, `session_history_page`, `interrupt_stream`, `disconnect_stream`, `stream_heartbeat`, `narration_attempt_status`, `reconnect_stream`, `submit_session_input`, `switch_session_model`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 80 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `switch_session_reasoning`, `switch_session_speed`, `steer_session`, `session_context`, `session_history_page`, `interrupt_stream`, `disconnect_stream`, `stream_heartbeat`, `narration_attempt_status`, `reconnect_stream`, `submit_session_input`, `switch_session_model`, `start_dm_session`, `manual_retry_session`, `stop_agent_session`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -100,7 +100,7 @@ Ported: 77 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `interrupt_stream` | `sessions.handle_interrupt_stream` | yes | yes | `session-reads` |
 | `interrupt_provider_stream` | `providers.handle_interrupt_provider_stream` | yes | no | |
 | `retryable_interruption` | `campaigns.handle_retryable_interruption` | yes | no | |
-| `manual_retry_session` | `sessions.handle_manual_retry_session` | yes | no | |
+| `manual_retry_session` | `sessions.handle_manual_retry_session` | yes | yes | `turn-refusals` (before the loop; the retry waits for lane 4's T5) |
 | `disconnect_stream` | `sessions.handle_disconnect_stream` | yes | yes | `session-reads` |
 | `disconnect_provider_stream` | `providers.handle_disconnect_provider_stream` | yes | no | |
 | `stream_heartbeat` | `sessions.handle_stream_heartbeat` | yes | yes | `session-reads` |
@@ -126,13 +126,13 @@ Ported: 77 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `complete_campaign_construction` | `campaigns.handle_complete_campaign_construction` | no | no | |
 | `model_guidance` | `providers.handle_model_guidance` | yes | no | |
 | `finalize_campaign_construction` | `campaigns.handle_finalize_campaign_construction` | yes | yes | `fail-retry`, `reopen`, `stop-redirect` and `ruleless-turn` (step 8 matches; each session stops later, at `start_dm_session`); the application operation by the guided `finalize_runs` |
-| `start_dm_session` | `sessions.handle_start_dm_session` | yes | no | |
+| `start_dm_session` | `sessions.handle_start_dm_session` | yes | yes | `turn-refusals` (before the loop; the opening turn waits for lane 4's T5a) |
 | `catalog` | `campaigns.handle_catalog` | yes | yes | `admin-commands`, `admin-srd` |
 | `execute_action` | `actions.handle_execute_action` | no | no | |
 | `resolve_mechanics_choice` | `actions.handle_resolve_mechanics_choice` | yes | no | |
 | `open_turn` | `actions.handle_open_turn` | no | no | |
 | `complete_turn` | `actions.handle_complete_turn` | no | no | |
-| `stop_agent_session` | `sessions.handle_stop_agent_session` | yes | no | |
+| `stop_agent_session` | `sessions.handle_stop_agent_session` | yes | yes | `turn-refusals` (before the loop; a DM session's `complete_turn` waits for lane 3's N2) |
 | `resume_agent_session` | `sessions.handle_resume_agent_session` | yes | yes | `builder-chat-create` |
 | `rename_campaign` | `campaigns.handle_rename_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
 | `archive_campaign` | `campaigns.handle_archive_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
