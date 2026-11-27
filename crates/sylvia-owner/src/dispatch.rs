@@ -152,6 +152,12 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     if method == "submit_session_input" {
         return commands::sessions::handle_submit_session_input(context, params).await;
     }
+    if method == "start_dm_session" {
+        return commands::sessions::handle_start_dm_session(context, params).await;
+    }
+    if method == "manual_retry_session" {
+        return commands::sessions::handle_manual_retry_session(context, params).await;
+    }
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
@@ -197,6 +203,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "switch_session_speed" => commands::sessions::handle_switch_session_speed(context, params).await,
         "steer_session" => commands::sessions::handle_steer_session(context, params).await,
         "switch_session_model" => commands::sessions::handle_switch_session_model(context, params).await,
+        "stop_agent_session" => commands::sessions::handle_stop_agent_session(context, params).await,
         "interrupt_stream" => commands::sessions::handle_interrupt_stream(context, params).await,
         "disconnect_stream" => commands::sessions::handle_disconnect_stream(context, params).await,
         "stream_heartbeat" => commands::sessions::handle_stream_heartbeat(context, params).await,

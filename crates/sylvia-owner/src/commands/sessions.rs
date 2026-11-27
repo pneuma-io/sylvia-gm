@@ -1013,3 +1013,304 @@ fn session_run_reply(
         Err(SessionFailure::AgentLoop { .. }) => Err(Failure::Internal { error_type: "AgentLoopError" }),
     }
 }
+
+/// The GM turn's provider for a session, as `submit_session_input` and `start_dm_session`
+/// build it: the resolved provider, wrapped for Full Audit when it is on, bound to the session's
+/// reasoning and saved speed, and context-fitted.
+async fn session_provider(
+    ctx: &DispatchContext,
+    session: &sylvia_domain::session::SessionRecord,
+    selection_mode: &str,
+    gm_mode: bool,
+) -> CodedResult<Arc<dyn sylvia_provider::provider::Provider>> {
+    let provider = super::providers::providers(ctx)?.resolve(session).await?;
+    session_provider_from(ctx, session, provider, selection_mode, gm_mode)
+}
+
+/// [`session_provider`] past the resolver: the Full Audit wrapper, the session's reasoning and
+/// speed, and context fitting.
+fn session_provider_from(
+    ctx: &DispatchContext,
+    session: &sylvia_domain::session::SessionRecord,
+    mut provider: Arc<dyn sylvia_provider::provider::Provider>,
+    selection_mode: &str,
+    gm_mode: bool,
+) -> CodedResult<Arc<dyn sylvia_provider::provider::Provider>> {
+    let fields = session.fields();
+    if ctx.store.narration().admin_full_audit_enabled() {
+        let reads = crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
+        provider = Arc::new(sylvia_provider::admin_audit::AdminAuditedProvider::new(
+            provider,
+            Arc::new(move |payload| {
+                let _ = reads.record_admin_full_audit(payload);
+            }),
+            fields.session_id.clone(),
+            fields.role.as_str(),
+            fields.provider_id.clone(),
+            fields.model_id.clone(),
+            selection_mode,
+        ));
+    }
+    let path = super::providers::config_path(ctx);
+    let session_key = Data::Str(fields.session_id.clone());
+    let saved_speed = config_json(&super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::session_speed_settings(sources, &path, &session_key)
+    })?)?;
+    let bound = sylvia_provider::reasoning::bind_session_reasoning(
+        provider,
+        fields.role.as_str(),
+        fields.reasoning_effort.as_deref(),
+        fields.reasoning_effort_once.as_deref(),
+        saved_speed.as_str(),
+    )?;
+    Ok(Arc::new(sylvia_provider::context_fit::context_fitted_provider(Arc::new(bound), gm_mode)))
+}
+
+/// `ProviderSessionAdapter(application_owner, provider, owner_id=..., gm_system_prompt=...,
+/// record_warning=..., campaign_plan_text=..., campaign_plan=...)` for a DM turn.
+fn dm_adapter(
+    ctx: &DispatchContext,
+    provider: Arc<dyn sylvia_provider::provider::Provider>,
+    plan_text: String,
+    plan: Option<JsonMap>,
+) -> CodedResult<Arc<sylvia_agent::provider_session::context::ProviderSessionAdapter>> {
+    let reads = crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
+    Ok(Arc::new(
+        sylvia_agent::provider_session::context::ProviderSessionAdapter::new(
+            Arc::new(reads) as Arc<dyn sylvia_agent::provider_session::reads::OpeningReads>,
+            provider,
+            &ctx.owner_id,
+            ctx.gm_system_prompt.as_deref().map(str::to_owned),
+            // `timeout=120.0`: Python's default.
+            120.0,
+            Some(plan_text),
+            plan,
+            None,
+            &sylvia_provider::config::env::Environment::current(),
+        )?
+        .with_record_warning(Arc::clone(&ctx.record_provider_warning)),
+    ))
+}
+
+/// `handle_start_dm_session`: the campaign's opening GM turn, once. A session whose start event
+/// and opening narration are both saved answers `already_started`; otherwise the opening runs
+/// through lane 4's loop (`rust_port_pending` until T5a).
+pub async fn handle_start_dm_session(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> crate::dispatch::DispatchResult {
+    use sylvia_domain::authority::WriterRole;
+    use sylvia_domain::session::SessionMessageKind;
+    let campaign_id = super::campaigns::required(params, "campaign_id")?;
+    let session_id = super::campaigns::required(params, "session_id")?;
+    let turn_id = super::campaigns::required(params, "turn_id")?;
+    let context = ctx.store.session_context(&session_id).await.map_err(super::campaigns::store_error)?;
+    let mismatch = || CodedError::rejected("Campaign start session authority does not match");
+    if context.session.role() != WriterRole::Dm || context.session.campaign_id() != Some(campaign_id.as_str())
+    {
+        return Err(mismatch().into());
+    }
+    let open_turn = sylvia_app::authority::turns::current_open_turn(&ctx.store, &campaign_id)
+        .await
+        .map_err(super::campaigns::store_error)?;
+    if open_turn.as_deref() != Some(turn_id.as_str()) {
+        return Err(mismatch().into());
+    }
+    let has_start_event = context.messages.iter().any(|message| {
+        message.kind() == SessionMessageKind::Evidence
+            && message.content().get("kind") == Some(&Json::String("campaign_start".into()))
+    });
+    let has_opening_narration = context.messages.iter().any(|message| {
+        message.kind() == SessionMessageKind::CanonicalReference
+            && message.content().get("event_type") == Some(&Json::String("talk".into()))
+    });
+    if has_start_event && has_opening_narration {
+        let mut reply = JsonMap::new();
+        reply.insert("status".into(), "already_started".into());
+        reply.insert("session_id".into(), session_id.into());
+        return Ok(Json::Object(reply));
+    }
+    let provider = session_provider(ctx, &context.session, "session", true).await?;
+    let (plan_text, plan) = admitted_dm_campaign_plan(ctx, &campaign_id, &session_id).await?;
+    let adapter = dm_adapter(ctx, provider, plan_text, plan)?;
+    let suffix = &sylvia_base::hash::sha256_hex(campaign_id.as_bytes())[..24];
+    let mut request = sylvia_agent::session_loop::SessionRunRequest::new(
+        session_id,
+        turn_id.clone(),
+        format!("attempt-campaign-start-{suffix}"),
+        format!("message-campaign-start-{suffix}"),
+        "",
+    );
+    request.input_kind = sylvia_agent::session_loop::SessionInputKind::CampaignStart;
+    session_run_reply(campaign_loop(ctx)?.run(request, adapter.for_turn(&turn_id)).await)
+}
+
+/// `handle_stop_agent_session`: stop the session's live provider work through the loop; a DM
+/// session's open TURN is then completed.
+pub async fn handle_stop_agent_session(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_domain::authority::WriterRole;
+    let session_id = super::campaigns::required(params, "session_id")?;
+    let context = ctx.store.session_context(&session_id).await.map_err(super::campaigns::store_error)?;
+    let stopped = campaign_loop(ctx)?.stop_agent_session(&session_id).await?;
+    if context.session.role() == WriterRole::Dm {
+        let Some(campaign_id) = context.session.campaign_id() else {
+            return Err(protocol("DM sessions require campaign authority"));
+        };
+        let open_turn = sylvia_app::authority::turns::current_open_turn(&ctx.store, campaign_id)
+            .await
+            .map_err(super::campaigns::store_error)?;
+        if open_turn.is_some() {
+            // `AuthorityOwner.complete_turn` (the campaign's work, then the store's write) comes
+            // with lane 3's N2; it is reached only once the loop's stop is ported.
+            return Err(CodedError::new(
+                crate::dispatch::PORT_PENDING,
+                "not yet ported: application/authority.py AuthorityOwner.complete_turn",
+            ));
+        }
+    }
+    Ok(super::builder::session_record_value(&stopped))
+}
+
+/// `_json_value(ManualRetryResult)`: `{input, canonical, replayed}`, the input's dataclass
+/// fields in order with its action receipt.
+fn manual_retry_value(result: &sylvia_domain::authority::ManualRetryResult) -> CodedResult<Json> {
+    let input = &result.input;
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), input.campaign_id.clone().into());
+    value.insert("interruption_id".into(), input.interruption_id.clone().into());
+    value.insert("retry_id".into(), input.retry_id.clone().into());
+    value.insert("failed_attempt_id".into(), input.failed_attempt_id.clone().into());
+    value.insert("canonical_high_water".into(), input.canonical_high_water.into());
+    value.insert("turn_id".into(), input.turn_id.clone().into());
+    value.insert(
+        "action_receipt".into(),
+        match &input.action_receipt {
+            Some(receipt) => crate::owner_json::receipt_value(
+                &sylvia_domain::authority::MechanicsExecutionReceipt::Action(receipt.clone()),
+            )?,
+            None => Json::Null,
+        },
+    );
+    let mut reply = JsonMap::new();
+    reply.insert("input".into(), Json::Object(value));
+    reply.insert(
+        "canonical".into(),
+        Json::Array(
+            result
+                .canonical
+                .iter()
+                .map(crate::owner_json::canonical_event_value)
+                .collect::<CodedResult<_>>()?,
+        ),
+    );
+    reply.insert("replayed".into(), result.replayed.into());
+    Ok(Json::Object(reply))
+}
+
+/// `handle_manual_retry_session`: one explicit retry of an interrupted narration, with the
+/// chat's next-reply model if one is pending (cleared afterwards, as after a submit), through
+/// lane 4's loop (`rust_port_pending` until T5).
+pub async fn handle_manual_retry_session(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> crate::dispatch::DispatchResult {
+    use sylvia_domain::authority::WriterRole;
+    let session_id = super::campaigns::required(params, "session_id")?;
+    let context = ctx.store.session_context(&session_id).await.map_err(super::campaigns::store_error)?;
+    let pending_once = pending_once_model(ctx, &session_id)?;
+    let path = super::providers::config_path(ctx);
+    let session_key = Data::Str(session_id.clone());
+    let clear_pending = || -> CodedResult<()> {
+        let Some((provider_id, model_id)) = &pending_once else { return Ok(()) };
+        let (provider_id, model_id) = (Data::Str(provider_id.clone()), Data::Str(model_id.clone()));
+        super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_writes::clear_session_model_once_settings(
+                sources,
+                &path,
+                &session_key,
+                &provider_id,
+                &model_id,
+            )
+        })?;
+        Ok(())
+    };
+    let mut fields = context.session.fields().clone();
+    if let Some((provider_id, model_id)) = &pending_once {
+        fields.provider_id = provider_id.clone();
+        fields.model_id = model_id.clone();
+    }
+    let effective = sylvia_domain::session::SessionRecord::new(fields.clone())
+        .map_err(|error| sylvia_app::authority::actions::ActionError::Domain(error).into_coded())?;
+    let selection_mode = if pending_once.is_some() { "once" } else { "session" };
+    let resolver = super::providers::providers(ctx)?;
+    let resolved = resolver.resolve(&effective).await;
+    if let Err(error) = resolved {
+        clear_pending()?;
+        return Err(error.into());
+    }
+    let provider =
+        session_provider_from(ctx, &effective, resolved?, selection_mode, fields.role == WriterRole::Dm)?;
+    let control = Arc::new(sylvia_agent::session_loop::ProviderControl::new());
+    let (mut plan_text, mut plan, mut knowledge) = (None, None, None);
+    if fields.role == WriterRole::Dm {
+        if let Some(campaign_id) = &fields.campaign_id {
+            let (text, structured) = admitted_dm_campaign_plan(ctx, campaign_id, &session_id).await?;
+            if let Some(structured) = &structured {
+                let reads =
+                    crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
+                knowledge = Some(reads.campaign_knowledge_catalog_for_plan(campaign_id, structured).await?);
+            }
+            plan_text = Some(text);
+            plan = structured;
+        }
+    }
+    let reads = crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
+    let adapter = Arc::new(
+        sylvia_agent::provider_session::context::ProviderSessionAdapter::new(
+            Arc::new(reads.clone()) as Arc<dyn sylvia_agent::provider_session::reads::OpeningReads>,
+            provider,
+            &ctx.owner_id,
+            ctx.gm_system_prompt.as_deref().map(str::to_owned),
+            // `timeout=120.0`: Python's default.
+            120.0,
+            plan_text,
+            plan,
+            knowledge,
+            &sylvia_provider::config::env::Environment::current(),
+        )?
+        .with_record_warning(Arc::clone(&ctx.record_provider_warning)),
+    );
+    let catalog = match &fields.campaign_id {
+        Some(campaign_id) => reads.catalog(campaign_id).await?,
+        None => Vec::new(),
+    };
+    let input = sylvia_agent::session_loop::SessionProviderInput::new(
+        effective,
+        context,
+        catalog,
+        Arc::clone(&control),
+    );
+    let outcome = async {
+        let interruption_id = super::campaigns::required(params, "interruption_id")?;
+        let retry_id = super::campaigns::required(params, "retry_id")?;
+        let factory_adapter = Arc::clone(&adapter);
+        let cancel_control = Arc::clone(&control);
+        let request = sylvia_agent::session_loop::campaign::RetryRequest {
+            retry_id,
+            interruption_id: Some(interruption_id),
+            narrator: adapter.for_retry(&fields.model_id, input, Arc::clone(&control)),
+            provider_factory: Some(Arc::new(move |turn_id: &str| factory_adapter.for_turn(turn_id))),
+            cancel: Arc::new(move || {
+                let _ = cancel_control.cancel();
+            }),
+            control: Some(Arc::clone(&control)),
+        };
+        match campaign_loop(ctx)?.retry(&session_id, request).await {
+            Ok(result) => Ok(manual_retry_value(&result)?),
+            Err(failure) => session_run_reply(Err(failure)),
+        }
+    }
+    .await;
+    clear_pending()?;
+    outcome
+}
