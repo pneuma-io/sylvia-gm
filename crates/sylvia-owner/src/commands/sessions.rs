@@ -347,21 +347,6 @@ pub async fn handle_session_context(ctx: &DispatchContext, params: &JsonMap) -> 
     Ok(Json::Object(reply))
 }
 
-/// `_json_value(NarrationInterruption)`: the dataclass fields in declaration order.
-fn interruption_value(interruption: &sylvia_domain::authority::NarrationInterruption) -> Json {
-    let text = |value: &Option<String>| value.clone().map_or(Json::Null, Json::String);
-    let mut value = JsonMap::new();
-    value.insert("campaign_id".into(), interruption.campaign_id.clone().into());
-    value.insert("interruption_id".into(), interruption.interruption_id.clone().into());
-    value.insert("turn_id".into(), interruption.turn_id.clone().into());
-    value.insert("last_action_id".into(), text(&interruption.last_action_id));
-    value.insert("failed_attempt_id".into(), interruption.failed_attempt_id.clone().into());
-    value.insert("retryable".into(), interruption.retryable.into());
-    value.insert("resolving_retry_id".into(), text(&interruption.resolving_retry_id));
-    value.insert("resolved_sequence".into(), interruption.resolved_sequence.map_or(Json::Null, Json::from));
-    Json::Object(value)
-}
-
 /// `_optional_nonnegative_int(params, key)`: absent or `null` is `None`.
 fn optional_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<Option<i64>> {
     match params.get(key) {
@@ -393,7 +378,7 @@ pub async fn handle_interrupt_stream(ctx: &DispatchContext, params: &JsonMap) ->
             .await
             .map_err(sylvia_app::authority::actions::ActionError::into_coded)?;
     // No lease or sink is ever tracked before the loop runs turns, so there is nothing to release.
-    Ok(interruption_value(&interruption))
+    Ok(crate::owner_json::interruption_value(&interruption))
 }
 
 /// `handle_disconnect_stream`: the supervisor's `signal_disconnect(..., expected_generation=...)`.
@@ -456,4 +441,575 @@ pub async fn handle_reconnect_stream(ctx: &DispatchContext, params: &JsonMap) ->
 /// turns (the loop's lifecycle hooks are empty), so every lookup finds none.
 fn narration_leases_tracked() -> bool {
     false
+}
+
+/// `_MAX_CAMPAIGN_PLAN_BYTES`: the admitted Plan's usability limit.
+const MAX_CAMPAIGN_PLAN_BYTES: usize = 1024 * 1024;
+
+/// A config value given to a settings function, from a request parameter (`params.get(key)`).
+fn data_of(value: Option<&Json>) -> CodedResult<Data> {
+    match value {
+        None => Ok(Data::None),
+        Some(value) => sylvia_provider::config::data_from_json(value).map_err(super::providers::config_error),
+    }
+}
+
+/// `_selection_from_reference(choices, reference)`: an exact or uniquely named configured model,
+/// never a guess.
+fn selection_from_reference(choices: &[Json], reference: &str) -> CodedResult<(String, String)> {
+    let folded = sylvia_base::pystr::casefold(reference);
+    let mut unique: Vec<(String, String)> = Vec::new();
+    for choice in choices {
+        let (Some(Json::String(provider_id)), Some(Json::String(model_id))) =
+            (choice.get("provider_id"), choice.get("model_id"))
+        else {
+            continue;
+        };
+        let prefix = format!("{}/", provider_id.replace('_', "-"));
+        let upstream = model_id.strip_prefix(&prefix).unwrap_or(model_id);
+        let mut candidates =
+            vec![sylvia_base::pystr::casefold(model_id), sylvia_base::pystr::casefold(upstream)];
+        if let Some(Json::String(name)) = choice.get("model_name") {
+            candidates.push(sylvia_base::pystr::casefold(name));
+        }
+        let pair = (provider_id.clone(), model_id.clone());
+        if candidates.contains(&folded) && !unique.contains(&pair) {
+            unique.push(pair);
+        }
+    }
+    if unique.len() != 1 {
+        return Err(CodedError::rejected(
+            "Model reference is unavailable or ambiguous; use the configured picker",
+        ));
+    }
+    Ok(unique.remove(0))
+}
+
+/// `_release_previous_model_threads(prior, updated, choices)`: a chat that leaves a subscription
+/// model leaves nothing for its kept thread (ChatGPT) or process (Claude Code).
+fn release_previous_model_threads(
+    prior: &SessionRecordFields,
+    updated: &SessionRecordFields,
+    choices: &[Json],
+) -> CodedResult<()> {
+    if (prior.provider_id.as_str(), prior.model_id.as_str())
+        == (updated.provider_id.as_str(), updated.model_id.as_str())
+    {
+        return Ok(());
+    }
+    let Some(previous) = crate::session_reasoning::selected_model_info(prior, choices)? else {
+        return Ok(());
+    };
+    let wire = vec![previous.wire_model_id().to_owned()];
+    match previous.transport.as_str() {
+        "codex_app_server" => {
+            sylvia_provider::chatgpt::release_kept_threads(&wire);
+        }
+        "claude_code" => {
+            sylvia_provider::claude_kept::release_kept_processes(None, Some(&wire));
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+/// `AuthorityOwner.update_agent_session_model`: the session's campaign work and lane, then the
+/// store's update.
+async fn update_session_model(
+    ctx: &DispatchContext,
+    session_id: &str,
+    provider_id: &str,
+    model_id: &str,
+) -> CodedResult<sylvia_domain::session::SessionRecord> {
+    let _work = ctx.store.session_campaign_work(session_id).await.map_err(super::campaigns::store_error)?;
+    let _lane = ctx.store.lanes().sessions.acquire(session_id).await;
+    let (session, provider, model) = (session_id.to_owned(), provider_id.to_owned(), model_id.to_owned());
+    ctx.store
+        .call(move |store| store.update_agent_session_model(&session, &provider, &model))
+        .await
+        .map_err(super::campaigns::store_error)
+}
+
+/// `_switch_session_model(...)`: one idle-session model switch for the chat (`current`), Settings
+/// too (`global`), or the next reply only (`once`).
+async fn switch_session_model(
+    ctx: &DispatchContext,
+    session_id: &str,
+    provider_id: &Data,
+    model_id: &Data,
+    mode: &str,
+    choices: &[Json],
+) -> CodedResult<Json> {
+    campaign_loop(ctx)?.assert_idle(session_id)?;
+    let path = super::providers::config_path(ctx);
+    let selection = config_json(&super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::require_configured_model(
+            sources,
+            &path,
+            provider_id,
+            model_id,
+        )
+    })?)?;
+    let text = |key: &str| selection.get(key).and_then(Json::as_str).unwrap_or_default().to_owned();
+    let (chosen_provider, chosen_model) = (text("provider_id"), text("model_id"));
+    let prior = session_fields(ctx, session_id).await?;
+    let mut destination = prior.clone();
+    destination.provider_id = chosen_provider.clone();
+    destination.model_id = chosen_model.clone();
+    crate::session_reasoning::validate_model_preferences(&destination, choices, mode == "once")?;
+    let session_key = Data::Str(session_id.to_owned());
+    let (provider_data, model_data) = (Data::Str(chosen_provider.clone()), Data::Str(chosen_model.clone()));
+    if mode == "once" {
+        super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_writes::set_session_model_once_settings(
+                sources,
+                &path,
+                &session_key,
+                &provider_data,
+                &model_data,
+            )
+        })?;
+        let context = ctx.store.session_context(session_id).await.map_err(super::campaigns::store_error)?;
+        let mut reply = JsonMap::new();
+        reply.insert("status".into(), "staged_once".into());
+        reply.insert("session".into(), super::builder::session_record_value(&context.session));
+        reply.insert("once".into(), selection.clone());
+        return Ok(Json::Object(reply));
+    }
+    if mode != "current" && mode != "global" {
+        return Err(protocol("Model switch mode is unsupported"));
+    }
+    let updated = update_session_model(ctx, session_id, &chosen_provider, &chosen_model).await?;
+    let updated_fields = updated.fields().clone();
+    release_previous_model_threads(&prior, &updated_fields, choices)?;
+    if mode == "global" {
+        let saved = super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_writes::set_default_model_settings(
+                sources,
+                &path,
+                &provider_data,
+                &model_data,
+            )
+        });
+        if let Err(error) = saved {
+            update_session_model(ctx, session_id, &prior.provider_id, &prior.model_id).await?;
+            return Err(error);
+        }
+    }
+    let pending = config_json(&super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::session_model_once_settings(sources, &path, &session_key)
+    })?)?;
+    if let Json::Object(pending) = &pending {
+        let expected = |key: &str| data_of(pending.get(key));
+        let (expected_provider, expected_model) = (expected("provider_id")?, expected("model_id")?);
+        super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_writes::clear_session_model_once_settings(
+                sources,
+                &path,
+                &session_key,
+                &expected_provider,
+                &expected_model,
+            )
+        })?;
+    }
+    // Speed tiers belong to a model: one the new model does not offer is cleared, visibly.
+    let saved_speed = config_json(&super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::session_speed_settings(sources, &path, &session_key)
+    })?)?;
+    let mut speed =
+        crate::session_reasoning::speed_state(&updated_fields, choices, saved_speed.as_str(), None)?;
+    let speed_cleared = !saved_speed.is_null() && speed.get("valid") != Some(&Json::Bool(true));
+    if speed_cleared {
+        super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_writes::set_session_speed_settings(
+                sources,
+                &path,
+                &session_key,
+                &Data::None,
+            )
+        })?;
+        speed = crate::session_reasoning::speed_state(&updated_fields, choices, None, None)?;
+    }
+    let settings = config_json(&super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::provider_settings(sources, &path)
+    })?)?;
+    let mut reply = JsonMap::new();
+    reply.insert("status".into(), if mode == "global" { "switched_global" } else { "switched" }.into());
+    reply.insert("session".into(), super::builder::session_record_value(&updated));
+    reply.insert("once".into(), Json::Null);
+    reply.insert("default_model".into(), settings.get("default_model").cloned().unwrap_or(Json::Null));
+    reply.insert("speed_state".into(), Json::Object(speed));
+    reply.insert("speed_cleared".into(), speed_cleared.into());
+    Ok(Json::Object(reply))
+}
+
+/// `handle_switch_session_model` (`providers.py`): `_switch_session_model(...)` with the
+/// request's model.
+pub async fn handle_switch_session_model(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let session_id = super::campaigns::required(params, "session_id")?;
+    let provider_id = data_of(params.get("provider_id"))?;
+    let model_id = data_of(params.get("model_id"))?;
+    let mode = super::campaigns::optional_text(params, "mode")?.unwrap_or_else(|| "current".to_owned());
+    let choices = super::providers::model_choices(ctx).await?;
+    switch_session_model(ctx, &session_id, &provider_id, &model_id, &mode, &choices).await
+}
+
+/// `_admitted_dm_campaign_plan(owner, campaign_id=..., session_id=...)`: the DM session's
+/// admitted Plan text and structured Plan, from the latest adventure descended from its handoff.
+async fn admitted_dm_campaign_plan(
+    ctx: &DispatchContext,
+    campaign_id: &str,
+    session_id: &str,
+) -> CodedResult<(String, Option<JsonMap>)> {
+    let suffix = &sylvia_base::hash::sha256_hex(campaign_id.as_bytes())[..24];
+    let (plan_id, handoff_id) = (format!("campaign-plan-{suffix}"), format!("builder-dm-handoff-{suffix}"));
+    let admitted = || CodedError::rejected("DM session requires an admitted Builder campaign plan");
+    let plan = ctx
+        .store
+        .call(move |store| store.campaign_plan_hit(&plan_id))
+        .await
+        .map_err(super::campaigns::store_error)?;
+    let Some(plan) = plan else { return Err(admitted()) };
+    let handoff = ctx
+        .store
+        .call(move |store| store.handoff_hit(&handoff_id))
+        .await
+        .map_err(super::campaigns::store_error)?;
+    let Some(handoff) = handoff else { return Err(admitted()) };
+    let (plan_fields, handoff_fields) = (plan.fields(), handoff.fields());
+    if plan_fields.campaign_id != campaign_id
+        || handoff_fields.campaign_id != campaign_id
+        || handoff_fields.plan_id != plan_fields.plan_id
+        || handoff_fields.dm_session_id != session_id
+    {
+        return Err(CodedError::rejected("DM session does not match the admitted campaign plan"));
+    }
+    let id = campaign_id.to_owned();
+    let adventures = ctx
+        .store
+        .call(move |store| store.campaign_adventures(&id))
+        .await
+        .map_err(super::campaigns::store_error)?;
+    if adventures.first().is_none_or(|first| first.fields().plan_id != plan_fields.plan_id) {
+        return Err(CodedError::rejected("Current adventure is not descended from the admitted handoff"));
+    }
+    let current = adventures.last().expect("nonempty");
+    let content = current.content();
+    let text = match content.get("campaign_plan_markdown") {
+        Some(Json::String(text)) if !sylvia_base::pystr::strip(text).is_empty() => text.clone(),
+        _ => return Err(CodedError::rejected("Admitted campaign plan content is unavailable")),
+    };
+    if text.len() > MAX_CAMPAIGN_PLAN_BYTES {
+        return Err(CodedError::rejected("Admitted campaign plan exceeds the usability limit"));
+    }
+    let domain = |error: sylvia_domain::error::DomainError| {
+        sylvia_app::authority::actions::ActionError::Domain(error).into_coded()
+    };
+    let mut structured = match content.get("campaign_plan") {
+        Some(Json::Object(plan)) => Some(plan.clone()),
+        _ => None,
+    };
+    let continuation = sylvia_domain::campaign_sequel::sequel_preparation(content).map_err(domain)?;
+    if let (Some(continuation), Some(plan)) = (continuation, structured.as_mut()) {
+        // This application projection is not a change to the authored or accepted Plan bytes.
+        plan.insert("_app_adventure_continuation".into(), Json::Object(continuation));
+    }
+    let markdown = sylvia_domain::campaign_sequel::sequel_markdown(content).map_err(domain)?;
+    Ok((markdown, structured))
+}
+
+/// The submit shell's ending choice: absent, or exactly `{"ending_id": text, "choice":
+/// "continue"|"finish"}`.
+fn ending_choice(params: &JsonMap) -> CodedResult<Option<JsonMap>> {
+    let Some(value) = params.get("campaign_ending_choice").filter(|value| !value.is_null()) else {
+        return Ok(None);
+    };
+    let valid = match value {
+        Json::Object(choice) => {
+            let keys: std::collections::BTreeSet<&str> = choice.keys().map(String::as_str).collect();
+            keys == ["choice", "ending_id"].into_iter().collect()
+                && matches!(choice.get("ending_id"), Some(Json::String(_)))
+                && matches!(choice.get("choice"), Some(Json::String(text)) if text == "continue" || text == "finish")
+        }
+        _ => false,
+    };
+    if !valid {
+        return Err(protocol("Campaign ending choice is invalid"));
+    }
+    Ok(value.as_object().cloned())
+}
+
+/// `handle_submit_session_input`: one player input to a DM session or a Builder chat. Every check
+/// before the loop runs is Python's, in Python's order; the run itself (lane 4's
+/// `CampaignSessionLoop.run`, `run_compaction`, and lane 1's Builder branch) answers
+/// `rust_port_pending` until those land. A provider failure keeps Python's provider-error reply.
+pub async fn handle_submit_session_input(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> crate::dispatch::DispatchResult {
+    use crate::dispatch::Failure;
+    use sylvia_domain::authority::WriterRole;
+    let ending = ending_choice(params)?;
+    let builder_start = super::campaigns::optional_bool(params, "builder_start")?;
+    let player_action_id = super::campaigns::optional_text(params, "player_action_id")?;
+    let automatic_response = super::campaigns::optional_bool(params, "automatic_response")?;
+    if automatic_response && player_action_id.is_none() {
+        return Err(protocol("Automatic response requires its saved player action").into());
+    }
+    if builder_start && player_action_id.is_some() {
+        return Err(protocol("Builder start cannot respond to a gameplay action").into());
+    }
+    let user_text = match params.get("user_text") {
+        None => String::new(),
+        Some(Json::String(text)) => text.clone(),
+        Some(_) => return Err(protocol("user_text must be text").into()),
+    };
+    let ooc_text = match params.get("ooc_text") {
+        None | Some(Json::Null) => None,
+        Some(Json::String(text)) => {
+            Some(text.clone()).filter(|text| !sylvia_base::pystr::strip(text).is_empty())
+        }
+        Some(_) => return Err(protocol("ooc_text must be text").into()),
+    };
+    let blank = sylvia_base::pystr::strip(&user_text).is_empty();
+    if blank && ooc_text.is_none() && !builder_start && player_action_id.is_none() && ending.is_none() {
+        return Err(protocol("user_text or ooc_text must be nonempty").into());
+    }
+    if player_action_id.is_some() && (!user_text.is_empty() || ooc_text.is_some()) {
+        return Err(protocol("Action responses do not contain player speech").into());
+    }
+    if builder_start && (!user_text.is_empty() || ooc_text.is_some()) {
+        return Err(protocol("Builder start does not accept invented player input").into());
+    }
+    if sylvia_base::pystr::len(&user_text) > MAX_USER_TEXT_CHARS {
+        return Err(protocol("user_text exceeds the session input limit").into());
+    }
+    if ooc_text.as_deref().is_some_and(|text| sylvia_base::pystr::len(text) > MAX_USER_TEXT_CHARS) {
+        return Err(protocol("ooc_text exceeds the session input limit").into());
+    }
+    let session_id = super::campaigns::required(params, "session_id")?;
+    let question_answers = params.get("builder_question_answers").filter(|value| !value.is_null());
+    let context = ctx.store.session_context(&session_id).await.map_err(super::campaigns::store_error)?;
+    let redirect_given = params.get("redirect_interruption_id").is_some_and(sylvia_provider::pyobj::truthy);
+    if let Some(answers) = question_answers {
+        if builder_start
+            || player_action_id.is_some()
+            || ending.is_some()
+            || ooc_text.is_some()
+            || redirect_given
+        {
+            return Err(protocol("Question answers cannot be combined with other input").into());
+        }
+        sylvia_agent::builder::question_answers::builder_question_answer_content(
+            &context, answers, &user_text,
+        )?;
+    }
+    let model_command = if ooc_text.is_none() { crate::run::model_slash_command(&user_text)? } else { None };
+    if let Some((reference, mode)) = model_command {
+        let Some(reference) = reference else {
+            campaign_loop(ctx)?.assert_idle(&session_id)?;
+            let mut reply = JsonMap::new();
+            reply.insert("status".into(), "model_picker_requested".into());
+            reply.insert("mode".into(), mode.into());
+            return Ok(Json::Object(reply));
+        };
+        let (provider_id, model_id) =
+            selection_from_reference(&super::providers::model_choices(ctx).await?, &reference)?;
+        let choices = super::providers::model_choices(ctx).await?;
+        return Ok(switch_session_model(
+            ctx,
+            &session_id,
+            &Data::Str(provider_id),
+            &Data::Str(model_id),
+            mode,
+            &choices,
+        )
+        .await?);
+    }
+    let role = context.session.role();
+    if ending.is_some()
+        && (role != WriterRole::Dm
+            || builder_start
+            || player_action_id.is_some()
+            || !user_text.is_empty()
+            || ooc_text.is_some()
+            || redirect_given)
+    {
+        return Err(protocol("Ending choices require an idle GM ending without other input").into());
+    }
+    if builder_start && role != WriterRole::Builder {
+        return Err(protocol("builder_start is available only to Builder sessions").into());
+    }
+    if role == WriterRole::Builder && ooc_text.is_some() {
+        return Err(protocol("ooc_text is available only to DM sessions").into());
+    }
+    let turn_id = match context.session.campaign_id() {
+        Some(_) => super::campaigns::required(params, "turn_id")?,
+        None => super::campaigns::optional_text(params, "turn_id")?
+            .unwrap_or_else(|| format!("builder-chat-{session_id}")),
+    };
+    if player_action_id.is_some() {
+        return Err(CodedError::new(
+            crate::dispatch::PORT_PENDING,
+            "not yet ported: application/authority.py AuthorityOwner.player_action_response_basis",
+        )
+        .into());
+    }
+    let path = super::providers::config_path(ctx);
+    let session_key = Data::Str(session_id.clone());
+    let pending_once = pending_once_model(ctx, &session_id)?;
+    let consume_pending_once = || -> CodedResult<()> {
+        let Some((provider_id, model_id)) = &pending_once else { return Ok(()) };
+        let (provider_id, model_id) = (Data::Str(provider_id.clone()), Data::Str(model_id.clone()));
+        super::providers::with_sources(|sources| {
+            sylvia_provider::config::provider_writes::clear_session_model_once_settings(
+                sources,
+                &path,
+                &session_key,
+                &provider_id,
+                &model_id,
+            )
+        })?;
+        Ok(())
+    };
+    let mut effective_fields = context.session.fields().clone();
+    if let Some((provider_id, model_id)) = &pending_once {
+        effective_fields.provider_id = provider_id.clone();
+        effective_fields.model_id = model_id.clone();
+    }
+    let effective_session = sylvia_domain::session::SessionRecord::new(effective_fields.clone())
+        .map_err(|error| sylvia_app::authority::actions::ActionError::Domain(error).into_coded())?;
+    let resolver = super::providers::providers(ctx)?;
+    let mut provider = match resolver.resolve(&effective_session).await {
+        Ok(provider) => provider,
+        Err(error) => {
+            consume_pending_once()?;
+            return Err(error.into());
+        }
+    };
+    let reads = crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
+    if ctx.store.narration().admin_full_audit_enabled() {
+        let sink_reads = reads.clone();
+        provider = Arc::new(sylvia_provider::admin_audit::AdminAuditedProvider::new(
+            provider,
+            Arc::new(move |payload| {
+                let _ = sink_reads.record_admin_full_audit(payload);
+            }),
+            session_id.clone(),
+            effective_fields.role.as_str(),
+            effective_fields.provider_id.clone(),
+            effective_fields.model_id.clone(),
+            if pending_once.is_some() { "once" } else { "session" },
+        ));
+    }
+    let saved_speed = config_json(&super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::session_speed_settings(sources, &path, &session_key)
+    })?)?;
+    let bound = sylvia_provider::reasoning::bind_session_reasoning(
+        provider,
+        effective_fields.role.as_str(),
+        effective_fields.reasoning_effort.as_deref(),
+        effective_fields.reasoning_effort_once.as_deref(),
+        saved_speed.as_str(),
+    )?;
+    let provider: Arc<dyn sylvia_provider::provider::Provider> =
+        Arc::new(sylvia_provider::context_fit::context_fitted_provider(
+            Arc::new(bound),
+            effective_fields.role == WriterRole::Dm,
+        ));
+    if sylvia_base::pystr::strip(&user_text) == "/compact" && ooc_text.is_none() {
+        if role == WriterRole::Builder {
+            if let Some(campaign_id) = context.session.campaign_id() {
+                let basis =
+                    sylvia_app::authority::guided::campaign_construction_basis(&ctx.store, campaign_id)
+                        .await
+                        .map_err(super::campaigns::store_error)?;
+                if basis.builder_session_id == session_id && basis.completion_revision.is_none() {
+                    return Err(protocol(
+                        "The campaign Interview keeps its exact transcript. Compaction is unavailable.",
+                    )
+                    .into());
+                }
+            }
+        }
+        // `run_compaction(session_id, attempt_id, compact_provider)`, then `consume_pending_once`.
+        let outcome = match super::campaigns::required(params, "attempt_id") {
+            Err(error) => Err(Failure::from(error)),
+            Ok(_attempt_id) => Err(CodedError::new(
+                crate::dispatch::PORT_PENDING,
+                "not yet ported: agent/_working_context.py compact_saved_messages (the /compact provider)",
+            )
+            .into()),
+        };
+        consume_pending_once()?;
+        return outcome;
+    }
+    if role == WriterRole::Builder {
+        let _ = provider;
+        return Err(CodedError::new(
+            crate::dispatch::PORT_PENDING,
+            "not yet ported: the Builder branch (sylvia_agent::builder::submit::submit_builder_input, lane 1's B3b)",
+        )
+        .into());
+    }
+    if super::campaigns::optional_bool(params, "allow_public_web")? {
+        return Err(protocol("allow_public_web is available only to Builder sessions").into());
+    }
+    let Some(campaign_id) = context.session.campaign_id() else {
+        return Err(protocol("DM sessions require campaign authority").into());
+    };
+    let (plan_text, plan) = admitted_dm_campaign_plan(ctx, campaign_id, &session_id).await?;
+    let adapter = Arc::new(
+        sylvia_agent::provider_session::context::ProviderSessionAdapter::new(
+            Arc::new(reads) as Arc<dyn sylvia_agent::provider_session::reads::OpeningReads>,
+            provider,
+            &ctx.owner_id,
+            ctx.gm_system_prompt.as_deref().map(str::to_owned),
+            // `ProviderSessionAdapter(..., timeout=120.0)`: Python's default.
+            120.0,
+            Some(plan_text),
+            plan,
+            None,
+            &sylvia_provider::config::env::Environment::current(),
+        )?
+        .with_record_warning(Arc::clone(&ctx.record_provider_warning)),
+    );
+    let outcome = async {
+        let attempt_id = super::campaigns::required(params, "attempt_id")?;
+        let message_id = super::campaigns::required(params, "message_id")?;
+        let mut request = sylvia_agent::session_loop::SessionRunRequest::new(
+            session_id.clone(),
+            turn_id.clone(),
+            attempt_id,
+            message_id,
+            user_text.clone(),
+        );
+        request.ooc_text = ooc_text.clone();
+        request.campaign_ending_choice = ending.clone();
+        request.input_kind = sylvia_agent::session_loop::SessionInputKind::User;
+        request.automatic_response = automatic_response;
+        request.redirect_interruption_id =
+            super::campaigns::optional_text(params, "redirect_interruption_id")?;
+        let result = campaign_loop(ctx)?.run(request, adapter.for_turn(&turn_id)).await;
+        session_run_reply(result)
+    }
+    .await;
+    consume_pending_once()?;
+    outcome
+}
+
+/// A loop run's result as the owner replies: the run's payload, or its failure in Python's
+/// class (`AgentLoopError` is an uncaught `RuntimeError`, the fixed internal-error reply).
+fn session_run_reply(
+    result: Result<sylvia_agent::session_loop::SessionRunResult, sylvia_agent::session_loop::SessionFailure>,
+) -> crate::dispatch::DispatchResult {
+    use crate::dispatch::Failure;
+    use sylvia_agent::provider_turn::TurnFailure;
+    use sylvia_agent::session_loop::SessionFailure;
+    match result {
+        Ok(result) => Ok(crate::owner_json::session_run_value(&result)?),
+        Err(SessionFailure::Turn(TurnFailure::Coded(error))) => Err(Failure::from(error)),
+        Err(SessionFailure::Turn(TurnFailure::Provider(error))) => Err(Failure::Provider(error)),
+        Err(SessionFailure::AgentLoop { .. }) => Err(Failure::Internal { error_type: "AgentLoopError" }),
+    }
 }

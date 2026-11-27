@@ -198,3 +198,88 @@ pub fn session_message_value(message: &SessionMessage) -> CodedResult<Json> {
 pub fn session_messages_value(messages: &[SessionMessage]) -> CodedResult<Json> {
     Ok(Json::Array(messages.iter().map(session_message_value).collect::<CodedResult<_>>()?))
 }
+
+/// `_json_value(NarrationInterruption)`: the dataclass fields in declaration order.
+pub fn interruption_value(interruption: &sylvia_domain::authority::NarrationInterruption) -> Json {
+    let text = |value: &Option<String>| value.clone().map_or(Json::Null, Json::String);
+    let mut value = JsonMap::new();
+    value.insert("campaign_id".into(), interruption.campaign_id.clone().into());
+    value.insert("interruption_id".into(), interruption.interruption_id.clone().into());
+    value.insert("turn_id".into(), interruption.turn_id.clone().into());
+    value.insert("last_action_id".into(), text(&interruption.last_action_id));
+    value.insert("failed_attempt_id".into(), interruption.failed_attempt_id.clone().into());
+    value.insert("retryable".into(), interruption.retryable.into());
+    value.insert("resolving_retry_id".into(), text(&interruption.resolving_retry_id));
+    value.insert("resolved_sequence".into(), interruption.resolved_sequence.map_or(Json::Null, Json::from));
+    Json::Object(value)
+}
+
+/// `_json_value(CanonicalEvent)`.
+pub fn canonical_event_value(event: &sylvia_domain::authority::CanonicalEvent) -> CodedResult<Json> {
+    let text = |value: &Option<String>| value.clone().map_or(Json::Null, Json::String);
+    let mut value = JsonMap::new();
+    value.insert("sequence".into(), event.sequence.into());
+    value.insert("event_type".into(), event.event_type.as_str().into());
+    value.insert("turn_id".into(), event.turn_id.clone().into());
+    value.insert("action_id".into(), text(&event.action_id));
+    value.insert("safe_payload".into(), mapping_value(&event.safe_payload)?);
+    value.insert("visibility".into(), event.visibility.as_str().into());
+    value.insert("attempt_id".into(), text(&event.attempt_id));
+    value.insert("attempt_ordinal".into(), event.attempt_ordinal.map_or(Json::Null, Json::from));
+    Ok(Json::Object(value))
+}
+
+/// `_json_value(ActionReceipt | AwaitingChoiceReceipt)`. An awaiting receipt's `status` is a
+/// property, not a field, so it is not projected.
+pub fn receipt_value(receipt: &sylvia_domain::authority::MechanicsExecutionReceipt) -> CodedResult<Json> {
+    use sylvia_domain::authority::MechanicsExecutionReceipt;
+    let mut value = JsonMap::new();
+    match receipt {
+        MechanicsExecutionReceipt::Action(receipt) => {
+            value.insert("campaign_id".into(), receipt.campaign_id.clone().into());
+            value.insert("action_id".into(), receipt.action_id.clone().into());
+            value.insert("status".into(), receipt.status.as_str().into());
+            value.insert("result".into(), mapping_value(&receipt.result)?);
+            value.insert("resulting_revision".into(), receipt.resulting_revision.into());
+        }
+        MechanicsExecutionReceipt::AwaitingChoice(receipt) => {
+            let options: Vec<Json> = receipt
+                .choice
+                .options
+                .iter()
+                .map(|option| {
+                    let mut item = JsonMap::new();
+                    item.insert("option_id".into(), option.option_id.clone().into());
+                    item.insert("label".into(), option.label.clone().into());
+                    Json::Object(item)
+                })
+                .collect();
+            let mut choice = JsonMap::new();
+            choice.insert("choice_id".into(), receipt.choice.choice_id.clone().into());
+            choice.insert("prompt".into(), receipt.choice.prompt.clone().into());
+            choice.insert("options".into(), Json::Array(options));
+            value.insert("campaign_id".into(), receipt.campaign_id.clone().into());
+            value.insert("action_id".into(), receipt.action_id.clone().into());
+            value.insert("basis_revision".into(), receipt.basis_revision.into());
+            value.insert("turn_id".into(), receipt.turn_id.clone().into());
+            value.insert("choice".into(), Json::Object(choice));
+            value.insert("choice_sequence".into(), receipt.choice_sequence.into());
+        }
+    }
+    Ok(Json::Object(value))
+}
+
+/// `_json_value(SessionRunResult)`: `{canonical, receipts, interruption}`.
+pub fn session_run_value(result: &sylvia_agent::session_loop::SessionRunResult) -> CodedResult<Json> {
+    let mut value = JsonMap::new();
+    value.insert(
+        "canonical".into(),
+        Json::Array(result.canonical.iter().map(canonical_event_value).collect::<CodedResult<_>>()?),
+    );
+    value.insert(
+        "receipts".into(),
+        Json::Array(result.receipts.iter().map(receipt_value).collect::<CodedResult<_>>()?),
+    );
+    value.insert("interruption".into(), result.interruption.as_ref().map_or(Json::Null, interruption_value));
+    Ok(Json::Object(value))
+}
