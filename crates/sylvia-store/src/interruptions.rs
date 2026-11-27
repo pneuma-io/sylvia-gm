@@ -1,7 +1,7 @@
 //! Narration's durable half, from `sqlite_authority.py`: `append_narration_segment` with
 //! `_append_narration_in_connection`, `record_interruption`, `interruption`, `interruptions`,
-//! `append_retry_resolution`, `resolve_interruption` and `_interruption_from_row`, and the
-//! store's `private_provider_index`.
+//! `append_retry_resolution`, `resolve_interruption`, `redirect_interruption`, `reserve_retry`
+//! and `_interruption_from_row`, and the store's `private_provider_index`.
 //!
 //! A segment is one complete player-safe prose run of a narration attempt, appended as a TALK or
 //! THINK canonical event keyed by `(attempt_id, attempt_ordinal)`, so a replayed append returns
@@ -449,6 +449,109 @@ impl AuthorityStore {
                 resolved_sequence: Some(resolved_sequence),
                 ..record
             })
+        })
+    }
+
+    /// `redirect_interruption(session_id=..., message_id=..., content=..., interruption=...,
+    /// attempt_id=...)`: save a GM session's replacement input and reserve its continuation for
+    /// the interruption, in one transaction.
+    pub fn redirect_interruption(
+        &self,
+        session_id: &str,
+        message_id: &str,
+        content: &JsonMap,
+        interruption: &NarrationInterruption,
+        attempt_id: &str,
+    ) -> StoreResult<()> {
+        validate_authority_identity(attempt_id, "Continuation identity", false)?;
+        immediate(self, |connection| {
+            let session = crate::sessions::read_session(connection, session_id)?;
+            if session.campaign_id() != Some(interruption.campaign_id.as_str()) {
+                return Err(rejected("Interruption belongs to another campaign"));
+            }
+            let current = first(
+                connection,
+                "SELECT * FROM narration_interruptions WHERE campaign_id = ? AND interruption_id = ?",
+                &[&interruption.campaign_id, &interruption.interruption_id],
+                interruption_from_row,
+            )?;
+            if current.as_ref() != Some(interruption) {
+                return Err(conflict("Interruption changed before new input was accepted"));
+            }
+            if !interruption.retryable {
+                return Err(rejected("Interruption has already been resolved"));
+            }
+            let saved: Option<i64> = connection
+                .query_row(
+                    "SELECT 1 FROM canonical_events WHERE campaign_id = ? AND attempt_id = ?",
+                    [&interruption.campaign_id, attempt_id],
+                    |row| row.get(0),
+                )
+                .optional()?;
+            if saved.is_some() {
+                return Err(conflict("Continuation identity already has saved output"));
+            }
+            crate::sessions::append_message(
+                connection,
+                session_id,
+                message_id,
+                sylvia_domain::session::SessionMessageKind::User,
+                content,
+                None,
+            )?;
+            connection.execute(
+                "UPDATE narration_interruptions SET resolving_retry_id = ? \
+                 WHERE campaign_id = ? AND interruption_id = ?",
+                params![attempt_id, interruption.campaign_id, interruption.interruption_id],
+            )?;
+            connection.execute_batch("COMMIT")?;
+            Ok(())
+        })
+    }
+
+    /// `reserve_retry(campaign_id, interruption_id, retry_id)`: name the Retry that resolves an
+    /// interruption, once; its identity may be the failed attempt's own, never another's.
+    pub fn reserve_retry(
+        &self,
+        campaign_id: &str,
+        interruption_id: &str,
+        retry_id: &str,
+    ) -> StoreResult<NarrationInterruption> {
+        validate_authority_identity(retry_id, "Retry identity", false)?;
+        immediate(self, |connection| {
+            crate::actions::require_active_campaign(connection, campaign_id)?;
+            let record = first(
+                connection,
+                "SELECT * FROM narration_interruptions WHERE campaign_id = ? AND interruption_id = ?",
+                &[&campaign_id, &interruption_id],
+                interruption_from_row,
+            )?
+            .ok_or_else(|| rejected("Narration interruption is unavailable"))?;
+            match record.resolving_retry_id.as_deref() {
+                Some(existing) if existing != retry_id => {
+                    return Err(conflict("Interruption already has a different retry identity"));
+                }
+                Some(_) => {}
+                None => {
+                    let collision: Option<i64> = connection
+                        .query_row(
+                            "SELECT 1 FROM canonical_events WHERE campaign_id = ? AND attempt_id = ? LIMIT 1",
+                            [campaign_id, retry_id],
+                            |row| row.get(0),
+                        )
+                        .optional()?;
+                    if collision.is_some() && record.failed_attempt_id != retry_id {
+                        return Err(conflict("Retry identity already belongs to another narration attempt"));
+                    }
+                    connection.execute(
+                        "UPDATE narration_interruptions SET resolving_retry_id = ? \
+                         WHERE campaign_id = ? AND interruption_id = ?",
+                        params![retry_id, campaign_id, interruption_id],
+                    )?;
+                }
+            }
+            connection.execute_batch("COMMIT")?;
+            Ok(NarrationInterruption { resolving_retry_id: Some(retry_id.to_owned()), ..record })
         })
     }
 
