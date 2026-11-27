@@ -42,6 +42,11 @@ The pseudo-phase `execute_action` traces `StatelessMcpMechanics.execute_action` 
 way: `execution_start` (the command), every owner call and `uuid4` draw, and `execution_end`
 (the receipt, or what it raised). The first call is run again with `execution_variants`; an
 override may also be `Answers`, one answer per successive call.
+
+The pseudo-phase `campaign_file` traces `StatelessMcpMechanics.commit_campaign_file`,
+`search_knowledge` and `read_reference` (T3m-3): `campaign_file_start` (the method and its
+arguments), every owner call, and `campaign_file_end`. The first real commit is followed by
+`campaign_file_variants`.
 Reference tooling only; retired with the Python source.
 """
 
@@ -264,9 +269,10 @@ class Traced:
             try:
                 result = value(*args, **kwargs)
             except BaseException as error:
+                # The code and a `MechanicsRejected`'s fields too: a refusal the server turns
+                # into a correction contract is rebuilt in its class.
                 log({"event": "call", "name": name, "args": plain(list(args)),
-                     "kwargs": plain(kwargs),
-                     "raised": {"class": type(error).__name__, "message": str(error)}})
+                     "kwargs": plain(kwargs), "raised": refusal_fields(error)})
                 raise
             log({"event": "call", "name": name, "args": plain(list(args)),
                  "kwargs": plain(kwargs), "result": plain(result)})
@@ -1174,11 +1180,147 @@ def wrap_execution() -> None:
     _stateless_mcp.StatelessMcpMechanics.execute_action = traced
 
 
+#: The pseudo-phase that traces the Campaign File commit and the reference reads (T3m-3).
+CAMPAIGN_FILE = "campaign_file"
+CAMPAIGN_FILE_DONE = {"value": False}
+
+
+def campaign_file_variants(owner: object, campaign_id: str, session_id: str,
+                           real: dict[str, object]) -> list[dict[str, object]]:
+    """Calls of `commit_campaign_file`, `search_knowledge` and `read_reference` beside the
+    first real commit: each validation branch, the owner's refusals and the turn lookup."""
+    from sylvia_gm.domain.errors import CommandRejected, MechanicsRejected, MechanicsValidationIssue
+    fact = {"fact_id": "fact-1", "category": "discovery", "text": "The ledger is hidden.",
+            "visibility": "gm_private", "known_by": []}
+    changed = {"state_change": "changed", "state_change_summary": "One discovery."}
+    unchanged = {"state_change": "unchanged", "state_change_summary": "Nothing durable changed."}
+    options = owner.campaign_narrative_options(session_id)  # type: ignore[attr-defined]
+    every_note = {**options, "character_update_schema": {
+        "type": "object", "properties": {"hp": {"type": "integer"}, "note": {"type": "string",
+                                                                          "maxLength": 5}},
+        "required": ["hp"], "additionalProperties": False},
+        "operations": ["record_memory", "record_entity", "update_scene", "update_plan_progress",
+                       "reveal_secret", "update_character", "update_inventory"],
+        "scene_act_ids": ["act-1"], "plan_item_ids": ["act:1"], "eligible_secret_ids": ["secret-1"]}
+    updated = {"status": "campaign_file_updated", "update_id": "update", "campaign_revision": 9,
+               "state_changed": True}
+    refusal = MechanicsRejected(
+        "Character update is invalid", code="character_update_invalid", field_paths=("hp",),
+        validation_issues=(MechanicsValidationIssue(path="hp", kind="wrong_type",
+                                                    expected_type="integer", actual_type="string"),),
+        state_changed=False)
+    commit = {"method": "commit_campaign_file", "campaign_id": campaign_id, "session_id": session_id,
+              "basis_message_id": real["basis_message_id"], "turn_id": real["turn_id"]}
+    search = {"method": "search_knowledge", "campaign_id": campaign_id, "session_id": session_id}
+    read = {"method": "read_reference", "campaign_id": campaign_id, "session_id": session_id}
+    return [
+        {**commit, "name": "nothing changed", "parameters": unchanged},
+        {**commit, "name": "no assessment", "parameters": {}},
+        # 600 characters, 1200 UTF-8 bytes: within the 1000-character bound.
+        {**commit, "name": "a long non-ASCII summary", "parameters": {
+            **unchanged, "state_change_summary": "é" * 600}},
+        {**commit, "name": "a non-ASCII summary over the bound", "parameters": {
+            **unchanged, "state_change_summary": "é" * 1001}},
+        {**commit, "name": "foreign and mistyped collections", "parameters": {
+            **changed, "bogus": 1, "facts": "not a list", "entities": [], "zz_other": None}},
+        {**commit, "name": "too many items", "parameters": {**changed, "facts": [fact] * 65}},
+        {**commit, "name": "item shapes", "parameters": {**changed, "facts": [
+            1, {"fact_id": 5, "category": "oops", "text": "", "visibility": "player_known",
+                "known_by": [1, "a"], "extra": True},
+            {**fact, "text": "x" * 2001, "subjects": "one"}]}},
+        {**commit, "name": "changed without changes", "parameters": changed},
+        {**commit, "name": "unchanged with a change", "parameters": {**unchanged, "facts": [fact]}},
+        {**commit, "name": "a committed change", "parameters": {**changed, "facts": [fact]},
+         "answer": {"update_campaign_file": updated}},
+        {**commit, "name": "the owner refuses", "parameters": {**changed, "facts": [fact]},
+         "answer": {"update_campaign_file": refusal}},
+        {**commit, "name": "the owner fails", "parameters": {**changed, "facts": [fact]},
+         "answer": {"update_campaign_file": KeyError("probe")}},
+        {**commit, "name": "every note type", "parameters": {**changed,
+            "scenes": [{"summary": "At the gate.", "act_id": "act-2"}],
+            "character_updates": [{"hp": "9"}, {"hp": 9, "note": "too long"}, {"hp": 9}],
+            "plan_progress": [{"plan_item_id": "act:1", "progress_status": "engaged",
+                               "progress_summary": "Met the smith."}]},
+         "answer": {"campaign_narrative_options": every_note, "update_campaign_file": updated}},
+        {**commit, "name": "invalid options", "parameters": {**changed, "scenes": [
+            {"summary": "At the gate."}]},
+         "answer": {"campaign_narrative_options": {**options, "scene_act_ids": "act-1"}}},
+        {**commit, "name": "the open turn", "turn_id": None, "parameters": unchanged},
+        {**commit, "name": "no open turn", "turn_id": None, "parameters": unchanged,
+         "answer": {"current_open_turn": None}},
+        {**search, "name": "a search", "query": "ledger", "sources": ["campaign_state"],
+         "limit": 3, "offset": 0},
+        {**search, "name": "a search of every source", "query": "smith", "sources": None,
+         "limit": 5, "offset": 1},
+        {**search, "name": "a refused search", "query": "ledger", "sources": None, "limit": 5,
+         "offset": 0, "answer": {"search_campaign_knowledge": CommandRejected(
+             "Knowledge search limit is invalid", code="campaign_knowledge_limit_invalid")}},
+        {**search, "name": "a failed search", "query": "ledger", "sources": None, "limit": 5,
+         "offset": 0, "answer": {"search_campaign_knowledge": KeyError("probe")}},
+        {**read, "name": "a read of current state", "source": "campaign_state", "path": "current"},
+        {**read, "name": "a read of a missing path", "source": "campaign_plan", "path": "nowhere"},
+        {**read, "name": "a refused read", "source": "campaign_state", "path": "current",
+         "answer": {"read_campaign_reference": CommandRejected("Reference path is unavailable",
+                                                               code="campaign_reference_unavailable")}},
+    ]
+
+
+def wrap_campaign_file() -> None:
+    from sylvia_gm.agent import _stateless_mcp
+
+    methods = {name: getattr(_stateless_mcp.StatelessMcpMechanics, name)
+               for name in ("commit_campaign_file", "search_knowledge", "read_reference")}
+
+    def run(self, method, variant, campaign_id, **kwargs):  # type: ignore[no-untyped-def]
+        log({"event": "campaign_file_start", "variant": variant, "method": method,
+             "campaign_id": campaign_id, **plain(kwargs)})
+        ACTIVE["value"] = True
+        try:
+            result = methods[method](self, campaign_id, **kwargs)
+        except BaseException as error:
+            ACTIVE["value"] = False
+            log({"event": "campaign_file_end",
+                 "raised": {**refusal_fields(error), **described(error)}})
+            if variant is None:
+                raise
+            return None
+        finally:
+            ACTIVE["value"] = False
+        log({"event": "campaign_file_end", "result": plain(result)})
+        return result
+
+    def traced_method(method):  # type: ignore[no-untyped-def]
+        def traced(self, campaign_id, **kwargs):  # type: ignore[no-untyped-def]
+            owner = self._owner  # noqa: SLF001
+            self._owner = Traced(owner)  # noqa: SLF001
+            try:
+                result = run(self, method, None, campaign_id, **kwargs)
+                if method == "commit_campaign_file" and not CAMPAIGN_FILE_DONE["value"]:
+                    CAMPAIGN_FILE_DONE["value"] = True
+                    for variant in campaign_file_variants(owner, campaign_id,
+                                                          kwargs["session_id"], kwargs):
+                        arguments = {key: value for key, value in variant.items()
+                                     if key not in {"name", "method", "campaign_id", "answer"}}
+                        OVERRIDES.clear()
+                        OVERRIDES.update(variant.get("answer", {}))  # type: ignore[arg-type]
+                        run(self, variant["method"], variant["name"], campaign_id, **arguments)
+                        OVERRIDES.clear()
+                return result
+            finally:
+                self._owner = owner  # noqa: SLF001
+        return traced
+
+    for method in methods:
+        setattr(_stateless_mcp.StatelessMcpMechanics, method, traced_method(method))
+
+
 for phase in PHASES:
     if phase == LISTING:
         wrap_listing()
     elif phase == EXECUTION:
         wrap_execution()
+    elif phase == CAMPAIGN_FILE:
+        wrap_campaign_file()
     else:
         wrap(phase)
 
