@@ -2722,7 +2722,9 @@ dependencies = [
  "sylvia-app",
  "sylvia-base",
  "sylvia-domain",
+ "sylvia-engine",
  "sylvia-provider",
+ "sylvia-store",
  "thiserror 2.0.21",
  "tokio",
 ]
