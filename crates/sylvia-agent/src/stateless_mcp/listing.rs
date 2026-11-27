@@ -254,6 +254,16 @@ pub fn narrative_input_schema(operation: &str, options: &JsonMap) -> CodedResult
     Ok(Json::Object(item))
 }
 
+/// `_CAMPAIGN_FILE_COLLECTIONS`: each note type's operation and its batch collection, in order.
+pub fn campaign_file_collections() -> Vec<(String, String)> {
+    exported(&["campaign_file", "collections"])
+        .as_array()
+        .expect("the exported collections")
+        .iter()
+        .map(|pair| (pair[0].as_str().unwrap().to_owned(), pair[1].as_str().unwrap().to_owned()))
+        .collect()
+}
+
 /// `_campaign_file_update_description()`.
 pub fn campaign_file_update_description() -> &'static str {
     exported(&["campaign_file", "description"]).as_str().expect("the exported description")

@@ -206,4 +206,37 @@ pub trait TurnOwner: OpeningReads {
         session_id: &'a str,
         attempt_id: Option<&'a str>,
     ) -> BoxFuture<'a, CodedResult<sylvia_domain::session::SessionActivityBasis>>;
+
+    /// `current_open_turn(campaign_id)`: the campaign's open TURN, if any.
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>>;
+
+    /// `update_campaign_file(session_id=..., update_id=..., updates=..., basis_message_ids=...,
+    /// turn_id=...)`: one validated Campaign File batch committed, refused in Python's class.
+    fn update_campaign_file<'a>(
+        &'a self,
+        session_id: &'a str,
+        update_id: &'a str,
+        updates: Vec<JsonMap>,
+        basis_message_ids: Vec<String>,
+        turn_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
+
+    /// `search_campaign_knowledge(campaign_id, query=..., sources=..., limit=..., offset=...)`:
+    /// the arguments as the MCP request gave them (the owner checks their types itself).
+    fn search_campaign_knowledge<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        query: &'a Json,
+        sources: Option<&'a Json>,
+        limit: &'a Json,
+        offset: &'a Json,
+    ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
+
+    /// `read_campaign_reference(campaign_id, source=..., path=...)`.
+    fn read_campaign_reference<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        source: &'a Json,
+        path: &'a Json,
+    ) -> BoxFuture<'a, Result<JsonMap, crate::stateless_mcp::AuthorityFailure>>;
 }

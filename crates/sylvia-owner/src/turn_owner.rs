@@ -10,7 +10,7 @@ use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
-use sylvia_app::authority::{content_reads, turn_reads};
+use sylvia_app::authority::{campaign_file, content_reads, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ActionCommand;
 use sylvia_domain::authority::ModelDecisionBoundary;
@@ -212,6 +212,67 @@ impl TurnOwner for OwnerReads {
         Box::pin(async move {
             turn_reads::campaign_narrative_options(self.store(), session_id).await.map_err(store_error)
         })
+    }
+
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
+        Box::pin(
+            async move { turns::current_open_turn(self.store(), campaign_id).await.map_err(store_error) },
+        )
+    }
+
+    fn update_campaign_file<'a>(
+        &'a self,
+        session_id: &'a str,
+        update_id: &'a str,
+        updates: Vec<JsonMap>,
+        basis_message_ids: Vec<String>,
+        turn_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        Box::pin(async move {
+            let Some(owner_id) = self.owner_id() else {
+                return Err(CodedError::new(
+                    "internal_error",
+                    "The GM turn's owner reads were built without the owner's identity.",
+                )
+                .with_error_type("RuntimeError")
+                .into());
+            };
+            let update = campaign_file::CampaignFileUpdate {
+                session_id: session_id.to_owned(),
+                update_id: update_id.to_owned(),
+                updates,
+                basis_message_ids,
+                turn_id: turn_id.map(str::to_owned),
+            };
+            campaign_file::update_campaign_file(self.store(), owner_id, &update).await.map_err(|error| {
+                match error {
+                    ActionError::Domain(error) => AuthorityFailure::Domain(error),
+                    ActionError::Store(error) => AuthorityFailure::Coded(store_error(error)),
+                }
+            })
+        })
+    }
+
+    fn search_campaign_knowledge<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _query: &'a Json,
+        _sources: Option<&'a Json>,
+        _limit: &'a Json,
+        _offset: &'a Json,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        // Lane 3's K1.
+        Box::pin(async { Err(pending("search_campaign_knowledge").into()) })
+    }
+
+    fn read_campaign_reference<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _source: &'a Json,
+        _path: &'a Json,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        // Lane 3's K1.
+        Box::pin(async { Err(pending("read_campaign_reference").into()) })
     }
 
     fn session_activity_basis<'a>(
