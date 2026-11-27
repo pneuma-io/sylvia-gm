@@ -15,7 +15,9 @@ definitions. Construction refusals are recorded on their own.
 A response may hang (`{"hang": true}`); the turn is then cancelled after 5 seconds, as Stop
 cancels it, and its outcome is `TimeoutError`.
 
-Only tools whose results hold no platform paths are used, so one file serves both platforms.
+One file serves both platforms. The one platform path, a missing file's error in the `native`
+scenario, ends in the platform's separator after `[workspace]`; the Rust test compares it with
+`/` on both sides (`builder_tool_vectors` pins the separator per platform).
 Reference tooling for the port; retired with the Python source.
 """
 
