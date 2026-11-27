@@ -8,35 +8,100 @@
 //! `admin_full_audit_status`. One instance per owner, shared by
 //! [`crate::StoreHandle::narration`].
 //!
-//! **Narration is not ported yet.** When it is, its commands write here: each narration attempt
-//! into [`NarrationInner::attempts`] (`begin_narration_attempt`, then its prose buffer and
-//! terminal state) and each tool awaiting its result into [`NarrationInner::pending_tools`]
-//! (`_execute_mechanic` before its commit, removed after). Until then no Rust owner has a live
-//! attempt or pending tool, so the projection's true answer is empty, as Python's is with none.
-//! `sylvia-app`'s `tests/player_reads.rs` proves the projection from a state that holds both.
+//! The narration attempt lifecycle (`sylvia_app::authority::narration_attempts`) writes each
+//! attempt into [`NarrationInner::attempts`]. Python holds its reentrant `_narration_lock` across
+//! the store calls an attempt makes; here [`NarrationState::region`] is that hold, an async lock
+//! taken across those awaits, while [`NarrationState::with`] guards the data itself for each
+//! short read or write (so `_provisional_projection`, which Python also reads under the lock,
+//! sees each change whole). Not ported yet: `_pending_tools` writes (`_execute_mechanic` before
+//! its commit, removed after), so the projection's pending tools stay empty, as Python's are with
+//! none. `sylvia-app`'s `tests/player_reads.rs` proves the projection from a state that holds both.
 
 use crate::error::{StoreError, StoreResult};
+use crate::work::CampaignWorkGuard;
 use std::sync::Mutex;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{PlayerProjection, PlayerProjectionKind, ProseChannel};
 
-/// `_NarrationAttempt`: the fields `_provisional_projection` reads. The narration port adds the
-/// rest (its cancel hook, response blocks, ordinal, deadlines, interruption and retry links).
-#[derive(Debug, Clone, PartialEq)]
+/// An attempt's `cancel` handle: called once, when the attempt is interrupted or expires.
+pub type CancelHandle = Box<dyn FnMut() + Send>;
+
+/// `_NarrationAttempt`: one live or terminal narration attempt.
 pub struct NarrationAttempt {
     pub campaign_id: String,
     pub attempt_id: String,
     pub turn_id: String,
+    pub cancel: CancelHandle,
     pub last_action_id: Option<String>,
     pub channel: Option<ProseChannel>,
     pub buffer: String,
+    /// `response_blocks`: the TALK's admitted response blocks, once streamed.
+    pub response_blocks: Option<Vec<JsonMap>>,
+    pub ordinal: i64,
+    pub disconnect_deadline: Option<f64>,
     pub terminal: bool,
+    pub cancelled: bool,
+    pub interruption_id: Option<String>,
+    pub retry_basis_id: Option<String>,
+    /// `work_registered`: the campaign work the attempt holds until it ends (its guard finishes
+    /// the work when it drops).
+    pub work: Option<CampaignWorkGuard>,
+}
+
+impl NarrationAttempt {
+    /// A new attempt with `_NarrationAttempt`'s defaults: no prose, ordinal 0, live.
+    pub fn new(
+        campaign_id: impl Into<String>,
+        attempt_id: impl Into<String>,
+        turn_id: impl Into<String>,
+        cancel: CancelHandle,
+        last_action_id: Option<String>,
+    ) -> Self {
+        Self {
+            campaign_id: campaign_id.into(),
+            attempt_id: attempt_id.into(),
+            turn_id: turn_id.into(),
+            cancel,
+            last_action_id,
+            channel: None,
+            buffer: String::new(),
+            response_blocks: None,
+            ordinal: 0,
+            disconnect_deadline: None,
+            terminal: false,
+            cancelled: false,
+            interruption_id: None,
+            retry_basis_id: None,
+            work: None,
+        }
+    }
+}
+
+impl std::fmt::Debug for NarrationAttempt {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("NarrationAttempt")
+            .field("campaign_id", &self.campaign_id)
+            .field("attempt_id", &self.attempt_id)
+            .field("turn_id", &self.turn_id)
+            .field("last_action_id", &self.last_action_id)
+            .field("channel", &self.channel)
+            .field("buffer", &self.buffer)
+            .field("ordinal", &self.ordinal)
+            .field("disconnect_deadline", &self.disconnect_deadline)
+            .field("terminal", &self.terminal)
+            .field("cancelled", &self.cancelled)
+            .field("interruption_id", &self.interruption_id)
+            .field("retry_basis_id", &self.retry_basis_id)
+            .field("work_registered", &self.work.is_some())
+            .finish_non_exhaustive()
+    }
 }
 
 /// What `_narration_lock` guards, each in insertion order as Python's dicts keep it.
 #[derive(Debug, Default)]
 pub struct NarrationInner {
-    /// `_attempts`, keyed by `(campaign_id, session_id)`.
+    /// `_attempts`, keyed by `(campaign_id, attempt_id)`.
     pub attempts: Vec<((String, String), NarrationAttempt)>,
     /// `_pending_tools`, keyed by `(campaign_id, action_id)`.
     pub pending_tools: Vec<((String, String), PlayerProjection)>,
@@ -57,11 +122,36 @@ pub const MECHANICS_DIAGNOSTICS_KEPT: usize = 200;
 #[derive(Debug, Default)]
 pub struct NarrationState {
     inner: Mutex<NarrationInner>,
+    /// `_narration_lock` held across an attempt's store calls.
+    region: tokio::sync::Mutex<()>,
+    /// `_disconnect_grace_seconds`, injected when the owner opens.
+    disconnect_grace_seconds: Mutex<Option<f64>>,
 }
 
 impl NarrationState {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Hold the narration lock across awaits, for an attempt's operation that calls the store.
+    pub async fn region(&self) -> tokio::sync::MutexGuard<'_, ()> {
+        self.region.lock().await
+    }
+
+    /// `AuthorityOwner(..., disconnect_grace_seconds=...)`: how long a disconnected attempt waits
+    /// for its client, which must be positive and finite.
+    pub fn set_disconnect_grace(&self, seconds: f64) -> StoreResult<()> {
+        if !seconds.is_finite() || seconds <= 0.0 {
+            return Err(crate::error::value_error("Disconnect grace must be positive and finite"));
+        }
+        *self.disconnect_grace_seconds.lock().unwrap_or_else(std::sync::PoisonError::into_inner) =
+            Some(seconds);
+        Ok(())
+    }
+
+    /// `_disconnect_grace_seconds`: `None` until injected.
+    pub fn disconnect_grace(&self) -> Option<f64> {
+        *self.disconnect_grace_seconds.lock().unwrap_or_else(std::sync::PoisonError::into_inner)
     }
 
     /// Run `f` under the narration lock.

@@ -221,13 +221,16 @@ async fn provisional_state_projects_as_pythons() {
         for item in live["attempts"].as_array().unwrap() {
             let (key, value) = (&item[0], &item[1]);
             let attempt = NarrationAttempt {
-                campaign_id: value["campaign_id"].as_str().unwrap().into(),
-                attempt_id: value["attempt_id"].as_str().unwrap().into(),
-                turn_id: value["turn_id"].as_str().unwrap().into(),
-                last_action_id: value["last_action_id"].as_str().map(str::to_owned),
                 channel: value["channel"].as_str().map(|channel| ProseChannel::parse(channel).unwrap()),
                 buffer: value["buffer"].as_str().unwrap().into(),
                 terminal: value["terminal"].as_bool().unwrap(),
+                ..NarrationAttempt::new(
+                    value["campaign_id"].as_str().unwrap(),
+                    value["attempt_id"].as_str().unwrap(),
+                    value["turn_id"].as_str().unwrap(),
+                    Box::new(|| {}),
+                    value["last_action_id"].as_str().map(str::to_owned),
+                )
             };
             inner
                 .attempts

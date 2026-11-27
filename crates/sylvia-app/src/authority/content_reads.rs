@@ -453,7 +453,7 @@ fn exact_setting_knowledge(
 
 /// `_campaign_setting_knowledge(campaign_id, plan)`: the Setting knowledge the plan binds, read
 /// from the locked package (or its dependency-only rebind).
-fn campaign_setting_knowledge(
+pub(super) fn campaign_setting_knowledge(
     store: &AuthorityStore,
     campaign_id: &str,
     plan: &JsonMap,

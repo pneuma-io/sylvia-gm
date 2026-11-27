@@ -1310,6 +1310,7 @@ mod tests {
             store,
             providers: None,
             session_loop: None,
+            campaign_loop: None,
             bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                 sylvia_app::bundled_packages::BundledSources::from_repository_root(
                     &crate::util::source_root(),
@@ -1487,6 +1488,7 @@ mod tests {
             store,
             providers: None,
             session_loop: None,
+            campaign_loop: None,
             bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                 sylvia_app::bundled_packages::BundledSources::from_repository_root(
                     &crate::util::source_root(),
@@ -1600,6 +1602,7 @@ mod tests {
             store,
             providers: None,
             session_loop: None,
+            campaign_loop: None,
             bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                 sylvia_app::bundled_packages::BundledSources::from_repository_root(
                     &crate::util::source_root(),
@@ -1736,6 +1739,7 @@ mod tests {
                 store,
                 providers: None,
                 session_loop: None,
+                campaign_loop: None,
                 bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
                     sylvia_app::bundled_packages::BundledSources::from_repository_root(
                         &crate::util::source_root(),

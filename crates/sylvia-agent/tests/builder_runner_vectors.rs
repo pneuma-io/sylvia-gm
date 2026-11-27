@@ -126,6 +126,17 @@ fn mask(value: &Json, roots: &[String]) -> Json {
     pyjson::loads(&text).unwrap()
 }
 
+/// The separator after the workspace placeholder, `/` on both sides. A missing file's error
+/// names `[workspace]` plus the platform's separator, so Python recorded `\` on Windows; the
+/// separator itself is pinned per platform by `builder_tool_vectors.{windows,linux}.json`.
+/// Both serialized forms are rewritten: a path inside a tool result's JSON text (four
+/// backslashes here), then one in a plain string (two).
+fn same_separator(value: &Json) -> Json {
+    let text = serde_json::to_string(value).unwrap();
+    let text = text.replace("[workspace]\\\\\\\\", "[workspace]/").replace("[workspace]\\\\", "[workspace]/");
+    pyjson::loads(&text).unwrap()
+}
+
 fn outcome(result: Result<(), TurnError>) -> Json {
     match result {
         Ok(()) => json!(["ok"]),
@@ -151,6 +162,7 @@ fn builder_runner_matches_python() {
     let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
     let mut failures = Vec::new();
     let mut check = |what: String, python: &Json, rust: Json| {
+        let (python, rust) = (&same_separator(python), same_separator(&rust));
         if &rust != python {
             let (python, rust) = (python.to_string(), rust.to_string());
             failures.push(format!(

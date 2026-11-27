@@ -126,7 +126,7 @@ fn action(row: &Named<'_>) -> StoreResult<ActionRecord> {
     })
 }
 
-fn event(row: &Named<'_>) -> StoreResult<CanonicalEvent> {
+pub(crate) fn event(row: &Named<'_>) -> StoreResult<CanonicalEvent> {
     Ok(CanonicalEvent {
         sequence: row.int("sequence")?,
         event_type: parse(&row.text("event_type")?, CanonicalEventType::parse, "CanonicalEventType")?,
