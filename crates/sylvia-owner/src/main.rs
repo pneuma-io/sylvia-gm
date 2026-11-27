@@ -36,10 +36,10 @@ fn main() {
             _ => {}
         }
     }
-    // Python's entry point also serves `--ruleset-test-worker`. That mode is not ported yet.
+    // Python's frozen entry point also serves `--ruleset-test-worker`
+    // (`interfaces/ruleset_test_worker.py`), which lane 1's `ruleset_testing` starts.
     if first == Some("--ruleset-test-worker") {
-        eprintln!("Sylvia GM owner: the ruleset test worker is not ported to Rust yet");
-        std::process::exit(sylvia_owner::run::EXIT_STARTUP_FAILED);
+        std::process::exit(sylvia_owner::ruleset_test_worker::main(&arguments[2..]));
     }
     let runtime = tokio::runtime::Builder::new_multi_thread()
         .enable_all()
