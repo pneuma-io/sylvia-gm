@@ -1,0 +1,474 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "scenarios": [
+  {
+   "name": "closed",
+   "runs": [
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c1",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "continue"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This ending does not support open-world continuation"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c2",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "ok": "Finish the story."
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c3",
+      "choice": {
+       "ending_id": "elsewhere",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c4",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish",
+       "note": "extra"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c5",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "later"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c6",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": [
+        "finish"
+       ]
+      }
+     },
+     "outcome": {
+      "error": "TypeError",
+      "code": null,
+      "message": "unhashable type: 'list'"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c7",
+      "choice": {
+       "ending_id": "elsewhere",
+       "choice": [
+        "finish"
+       ]
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c8",
+      "choice": {
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "init",
+      "message": "c9",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "nobody",
+      "message": "c10",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "session_unavailable",
+      "message": "Agent session is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "append",
+      "session": "session-dm-ending",
+      "message": "choice",
+      "kind": "user",
+      "content": {
+       "text": "",
+       "campaign_ending_choice": {
+        "ending_id": "signal-settled",
+        "choice": "finish"
+       },
+       "ooc_text": "Finish the story."
+      }
+     },
+     "outcome": {
+      "ok": {
+       "message_id": "choice",
+       "sequence": 3
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "second-click",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "An ending choice is already saved; use OOC to change direction"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "choice",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "ok": "Finish the story."
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "choice",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "continue"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "An ending choice is already saved; use OOC to change direction"
+     }
+    }
+   ]
+  },
+  {
+   "name": "open",
+   "runs": [
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c1",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "continue"
+      }
+     },
+     "outcome": {
+      "ok": "Continue adventuring in this world."
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c2",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "ok": "Finish the story."
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c3",
+      "choice": {
+       "ending_id": "elsewhere",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c4",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish",
+       "note": "extra"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c5",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "later"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c6",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": [
+        "finish"
+       ]
+      }
+     },
+     "outcome": {
+      "error": "TypeError",
+      "code": null,
+      "message": "unhashable type: 'list'"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c7",
+      "choice": {
+       "ending_id": "elsewhere",
+       "choice": [
+        "finish"
+       ]
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "c8",
+      "choice": {
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "init",
+      "message": "c9",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "This campaign ending is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "nobody",
+      "message": "c10",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "session_unavailable",
+      "message": "Agent session is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "append",
+      "session": "session-dm-ending",
+      "message": "choice",
+      "kind": "user",
+      "content": {
+       "text": "",
+       "campaign_ending_choice": {
+        "ending_id": "signal-settled",
+        "choice": "continue"
+       },
+       "ooc_text": "Continue adventuring in this world."
+      }
+     },
+     "outcome": {
+      "ok": {
+       "message_id": "choice",
+       "sequence": 3
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "second-click",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "continue"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "An ending choice is already saved; use OOC to change direction"
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "choice",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "continue"
+      }
+     },
+     "outcome": {
+      "ok": "Continue adventuring in this world."
+     }
+    },
+    {
+     "step": {
+      "op": "choice",
+      "session": "session-dm-ending",
+      "message": "choice",
+      "choice": {
+       "ending_id": "signal-settled",
+       "choice": "finish"
+      }
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "An ending choice is already saved; use OOC to change direction"
+     }
+    }
+   ]
+  }
+ ]
+}

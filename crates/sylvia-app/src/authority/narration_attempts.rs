@@ -5,7 +5,8 @@
 //! `expire_narration`, `interrupt_narration` (with `_expire_narration_locked`),
 //! `_flush_attempt_buffer`, `_attempt` and `_live_attempt`; and the interruption reads
 //! `unresolved_session_interruption`, `retryable_interruption`, `narration_interruption`, with
-//! `_can_redirect_interruption`, and `private_provider_index`.
+//! `_can_redirect_interruption`, and `private_provider_index`; and the turn's other owner calls:
+//! `redirect_narration`, `manual_retry`, `saved_action_receipt` and `campaign_ending_choice_text`.
 //!
 //! Every attempt lives in the owner's [`NarrationState`], keyed by `(campaign_id, attempt_id)`.
 //! Each operation holds [`NarrationState::region`] where Python holds `_narration_lock`
@@ -28,6 +29,7 @@ use sylvia_domain::authority::{
     response_blocks_text, validate_authority_identity, validate_response_blocks, CanonicalEvent,
     CanonicalReplay, ManualRetryResult, NarrationInterruption, ProseChannel, RetryNarrationInput, WriterRole,
 };
+use sylvia_domain::pyops::py_type_name;
 use sylvia_domain::session::{SessionContext, SessionMessageKind};
 use sylvia_domain::DomainError;
 use sylvia_store::interruptions::{new_interruption_id, NarrationSegment};
@@ -811,6 +813,78 @@ pub async fn manual_retry<N: RetryNarration>(
             }
             Err(failure)
         }
+    }
+}
+
+/// `campaign_ending_choice_text(session_id, message_id, choice)`: admit a real player's ending
+/// button and give its explicit OOC instruction. The choice must name the session's current
+/// ending and be `continue` (only for an open-world ending) or `finish`; once an ending choice is
+/// saved, only that same saved message's own choice is admitted again.
+pub async fn campaign_ending_choice_text(
+    store: &StoreHandle,
+    session_id: &str,
+    message_id: &str,
+    choice: &JsonMap,
+) -> Result<String, ActionError> {
+    let _work = store.session_campaign_work(session_id).await?;
+    let id = session_id.to_owned();
+    let page = store.call(move |store| store.session_history_page(&id, None, 50)).await?;
+    let unavailable = || rejected("This campaign ending is unavailable");
+    let selected = choice.get("choice");
+    let Some(ending) = page.campaign_ending else { return Err(unavailable()) };
+    let mut keys: Vec<&str> = choice.keys().map(String::as_str).collect();
+    keys.sort_unstable();
+    if keys != ["choice", "ending_id"] {
+        return Err(unavailable());
+    }
+    let field = |key: &str| {
+        ending
+            .get(key)
+            .cloned()
+            .ok_or_else(|| ActionError::from(DomainError::uncaught("KeyError", format!("'{key}'"))))
+    };
+    if choice.get("ending_id") != Some(&field("ending_id")?) {
+        return Err(unavailable());
+    }
+    // `selected not in {"continue", "finish"}`: a list or object is unhashable.
+    if let Some(value @ (Json::Array(_) | Json::Object(_))) = selected {
+        return Err(DomainError::uncaught(
+            "TypeError",
+            format!("unhashable type: '{}'", py_type_name(value)),
+        )
+        .into());
+    }
+    let selected = match selected.and_then(Json::as_str) {
+        Some(selected @ ("continue" | "finish")) => selected,
+        _ => return Err(unavailable()),
+    };
+    let context = store.session_context(session_id).await?;
+    let previous = context.messages.iter().find(|item| item.message_id() == message_id);
+    if !field("choice")?.is_null()
+        && previous.is_none_or(|previous| {
+            previous.content().get("campaign_ending_choice") != Some(&Json::Object(choice.clone()))
+        })
+    {
+        return Err(rejected("An ending choice is already saved; use OOC to change direction"));
+    }
+    if selected == "continue" {
+        if !truthy(&field("open_world")?) {
+            return Err(rejected("This ending does not support open-world continuation"));
+        }
+        return Ok("Continue adventuring in this world.".to_owned());
+    }
+    Ok("Finish the story.".to_owned())
+}
+
+/// Python's truth value of a JSON value.
+fn truthy(value: &Json) -> bool {
+    match value {
+        Json::Null => false,
+        Json::Bool(flag) => *flag,
+        Json::Number(number) => number.as_f64().is_some_and(|value| value != 0.0),
+        Json::String(text) => !text.is_empty(),
+        Json::Array(items) => !items.is_empty(),
+        Json::Object(map) => !map.is_empty(),
     }
 }
 
