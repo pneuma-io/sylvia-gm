@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 63 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 65 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -42,7 +42,7 @@ Ported: 63 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `send_character_chat_message` | `character_chat.handle_send_character_chat_message` | yes | no | |
 | `builder_chat_index` | `builder.handle_builder_chat_index` | yes | yes | `startup` |
 | `start_import_repair` | `builder.handle_start_import_repair` | yes | no | |
-| `create_builder_chat` | `builder.handle_create_builder_chat` | yes | no | |
+| `create_builder_chat` | `builder.handle_create_builder_chat` | yes | yes | `builder-chat-create` |
 | `rename_builder_chat` | `builder.handle_rename_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |
 | `delete_builder_chat` | `builder.handle_delete_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |
 | `archive_builder_chat` | `builder.handle_archive_builder_chat` | yes | no | |
@@ -133,7 +133,7 @@ Ported: 63 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `open_turn` | `actions.handle_open_turn` | no | no | |
 | `complete_turn` | `actions.handle_complete_turn` | no | no | |
 | `stop_agent_session` | `sessions.handle_stop_agent_session` | yes | no | |
-| `resume_agent_session` | `sessions.handle_resume_agent_session` | yes | no | |
+| `resume_agent_session` | `sessions.handle_resume_agent_session` | yes | yes | `builder-chat-create` |
 | `rename_campaign` | `campaigns.handle_rename_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
 | `archive_campaign` | `campaigns.handle_archive_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
 | `restore_archived_campaign` | `campaigns.handle_restore_archived_campaign` | yes | yes | none yet; lane 3's Python run through `sylvia-app/tests/lifecycle.rs` and the owner's dispatch (`commands/campaigns.rs`) |
