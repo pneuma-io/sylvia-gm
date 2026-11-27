@@ -16,6 +16,7 @@ pub mod runner;
 pub mod skills;
 pub mod title;
 pub mod tools;
+pub mod turn;
 
 use std::sync::OnceLock;
 use sylvia_base::{pyjson, CodedError, Json};

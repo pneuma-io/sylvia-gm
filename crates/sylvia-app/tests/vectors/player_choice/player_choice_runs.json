@@ -1,0 +1,114 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "runs": [
+  {
+   "name": "the answer while the GM session holds campaign work",
+   "command": {
+    "campaign_id": "campaign",
+    "action_id": "move",
+    "resolution_id": "resolve",
+    "owner_id": "owner",
+    "expected_revision": 0,
+    "choice_id": "route",
+    "option_id": "north",
+    "session_id": "gm",
+    "choice_sequence": 0
+   },
+   "holding_session": "gm",
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_work_in_progress",
+    "message": "Player actions are unavailable while campaign work is running"
+   }
+  },
+  {
+   "name": "the answer without the reserving session",
+   "command": {
+    "campaign_id": "campaign",
+    "action_id": "move",
+    "resolution_id": "resolve",
+    "owner_id": "owner",
+    "expected_revision": 0,
+    "choice_id": "route",
+    "option_id": "north",
+    "session_id": null,
+    "choice_sequence": 0
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Mechanics choice resolution does not match its reservation"
+   }
+  },
+  {
+   "name": "the answer committing with the player action's origin",
+   "command": {
+    "campaign_id": "campaign",
+    "action_id": "move",
+    "resolution_id": "resolve",
+    "owner_id": "owner",
+    "expected_revision": 0,
+    "choice_id": "route",
+    "option_id": "north",
+    "session_id": "gm",
+    "choice_sequence": 0
+   },
+   "holding_session": null,
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign",
+     "action_id": "move",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "move_unit",
+      "context": {
+       "_route": "north"
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "name": "its replay",
+   "command": {
+    "campaign_id": "campaign",
+    "action_id": "move",
+    "resolution_id": "resolve",
+    "owner_id": "owner",
+    "expected_revision": 0,
+    "choice_id": "route",
+    "option_id": "north",
+    "session_id": "gm",
+    "choice_sequence": 0
+   },
+   "holding_session": null,
+   "outcome": {
+    "ok": {
+     "__class__": "ActionReceipt",
+     "campaign_id": "campaign",
+     "action_id": "move",
+     "status": "committed",
+     "result": {
+      "context": {
+       "_route": "north"
+      },
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "move_unit"
+     },
+     "resulting_revision": 1
+    }
+   }
+  }
+ ]
+}
