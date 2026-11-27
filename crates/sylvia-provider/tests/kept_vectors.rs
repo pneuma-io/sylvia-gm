@@ -209,9 +209,8 @@ fn expiry() {
     // Python's `KeptProcess.close`, the closed flag is set first and the callbacks run after it,
     // on the reaper's thread, so wait for the callback too.
     let deadline = std::time::Instant::now() + Duration::from_secs(10);
-    let reaped = || {
-        pool.is_empty() && kept.is_closed() && closed.load(std::sync::atomic::Ordering::SeqCst) == 1
-    };
+    let reaped =
+        || pool.is_empty() && kept.is_closed() && closed.load(std::sync::atomic::Ordering::SeqCst) == 1;
     while !reaped() && std::time::Instant::now() < deadline {
         std::thread::sleep(Duration::from_millis(20));
     }
