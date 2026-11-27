@@ -832,10 +832,9 @@ pub fn ruleset_test_runtime_facts(
             required_preconditions.push((*name).to_owned());
         }
     }
-    let requires_handoff = runtime
-        .ruleset
-        .iter()
-        .any(|(key, value)| matches!(key, Data::Str(text) if text == "model_decision_scope") && matches!(value, Data::Dict(_)));
+    let requires_handoff = runtime.ruleset.iter().any(|(key, value)| {
+        matches!(key, Data::Str(text) if text == "model_decision_scope") && matches!(value, Data::Dict(_))
+    });
     Ok(RulesetTestRuntimeFacts { required_preconditions, requires_handoff })
 }
 

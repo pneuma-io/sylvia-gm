@@ -172,27 +172,27 @@ fn check_requests(run: &Run, scenario: &Value, name: &str) {
 
 fn check_usage(response: &sylvia_provider::types::ProviderResponse, expected: &Value, context: &str) {
     let usage = &response.usage;
-    assert_eq!(
-        serde_json::json!([
+    sylvia_base::testing::assert_same_json(
+        &serde_json::json!([
             usage.prompt_tokens.to_json(),
             usage.completion_tokens.to_json(),
             usage.total_tokens.to_json(),
             usage.reasoning_tokens
         ]),
-        expected["usage"],
-        "usage, {context}"
+        &expected["usage"],
+        format!("usage, {context}"),
     );
     assert_eq!(response.usage_reported, expected["usage_reported"].as_bool(), "usage reported, {context}");
     let cache = &response.cache_usage;
-    assert_eq!(
-        serde_json::json!([
+    sylvia_base::testing::assert_same_json(
+        &serde_json::json!([
             cache.cache_read_tokens,
             cache.cache_write_tokens,
             cache.cache_miss_tokens,
             cache.total_prompt_tokens
         ]),
-        expected["cache"],
-        "cache, {context}"
+        &expected["cache"],
+        format!("cache, {context}"),
     );
 }
 
@@ -233,7 +233,7 @@ fn check_chunk(actual: &ProviderStreamChunk, expected: &Value, context: &str) {
         "reasoning, {context}"
     );
     let finish = actual.finish_reason.as_ref().map(PyValue::to_json).unwrap_or(Value::Null);
-    assert_eq!(finish, expected["finish_reason"], "finish, {context}");
+    sylvia_base::testing::assert_same_json(&finish, &expected["finish_reason"], format!("finish, {context}"));
     match (&actual.tool_call_delta, &expected["tool_call_delta"]) {
         (None, Value::Null) => {}
         (Some(delta), want) if !want.is_null() => {
@@ -426,8 +426,16 @@ async fn completions_through_the_provider_match_python() {
                     .iter()
                     .map(|c| serde_json::json!([c.id.to_json(), c.name.to_json(), c.arguments.to_json()]))
                     .collect();
-                assert_eq!(Value::Array(calls), expected["tool_calls"], "{name}");
-                assert_eq!(response.finish_reason.to_json(), expected["finish_reason"], "{name}");
+                sylvia_base::testing::assert_same_json(
+                    &Value::Array(calls),
+                    &expected["tool_calls"],
+                    format!("{name}"),
+                );
+                sylvia_base::testing::assert_same_json(
+                    &response.finish_reason.to_json(),
+                    &expected["finish_reason"],
+                    format!("{name}"),
+                );
                 check_usage(response, expected, name);
                 let native = response.anthropic_content.clone().map(Json::Array).unwrap_or(Json::Null);
                 assert_eq!(

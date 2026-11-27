@@ -2,7 +2,9 @@
 //! `compare_package_candidates`: static reads of one installed package candidate's exact closure,
 //! never campaign data.
 
-use crate::package_runtime::{load_bounded_runtime_yaml, PackageRuntimeFailure, PACKAGE_RUNTIME_BYTE_LIMIT, PACKAGE_RUNTIME_PATH};
+use crate::package_runtime::{
+    load_bounded_runtime_yaml, PackageRuntimeFailure, PACKAGE_RUNTIME_BYTE_LIMIT, PACKAGE_RUNTIME_PATH,
+};
 use std::collections::BTreeSet;
 use sylvia_base::pyyaml::Data;
 use sylvia_base::{pystr, Json, JsonMap};
@@ -113,9 +115,13 @@ fn inspect_on(store: &AuthorityStore, candidate_id: &str) -> StoreResult<JsonMap
         }
         // `manifest.metadata["label"]` and `manifest.provenance["publisher"]`: admission
         // requires both.
-        let label = manifest.metadata.get("label").cloned().ok_or_else(|| StoreError::Other("'label'".into()))?;
-        let publisher =
-            manifest.provenance.get("publisher").cloned().ok_or_else(|| StoreError::Other("'publisher'".into()))?;
+        let label =
+            manifest.metadata.get("label").cloned().ok_or_else(|| StoreError::Other("'label'".into()))?;
+        let publisher = manifest
+            .provenance
+            .get("publisher")
+            .cloned()
+            .ok_or_else(|| StoreError::Other("'publisher'".into()))?;
         packages.push(object(vec![
             ("id", entry.package_id().into()),
             ("version", entry.version().into()),
@@ -264,11 +270,18 @@ pub async fn package_candidate_text(
     let value = store
         .call(move |store| {
             let candidate = store.package_candidate(&id)?;
-            let Some(entry) = candidate.package_lock().entries().iter().find(|item| item.package_id() == package)
+            let Some(entry) =
+                candidate.package_lock().entries().iter().find(|item| item.package_id() == package)
             else {
                 return Err(rejected_with("Installed package is unavailable", "package_unavailable"));
             };
-            store.package_file_bytes(entry.package_id(), entry.version(), entry.sha256(), &path, PACKAGE_TEXT_BYTE_LIMIT)
+            store.package_file_bytes(
+                entry.package_id(),
+                entry.version(),
+                entry.sha256(),
+                &path,
+                PACKAGE_TEXT_BYTE_LIMIT,
+            )
         })
         .await?;
     let Some(value) = value else {
@@ -313,7 +326,8 @@ fn file_index(value: &JsonMap) -> StoreResult<std::collections::BTreeMap<String,
     let mut indexed = std::collections::BTreeMap::new();
     for raw_file in raw_files {
         let Json::Object(file) = raw_file else { return Err(invalid()) };
-        let (Some(Json::String(path)), Some(Json::String(sha256))) = (file.get("path"), file.get("sha256")) else {
+        let (Some(Json::String(path)), Some(Json::String(sha256))) = (file.get("path"), file.get("sha256"))
+        else {
             return Err(invalid());
         };
         indexed.insert(path.clone(), sha256.clone());
@@ -324,17 +338,24 @@ fn file_index(value: &JsonMap) -> StoreResult<std::collections::BTreeMap<String,
 /// `AuthorityOwner.compare_package_candidates(left_id, right_id)`: whether the two closures are
 /// the same, and each package added, removed or changed (its versions, content hashes and the
 /// files whose hashes differ), by package id.
-pub async fn compare_package_candidates(store: &StoreHandle, left_id: &str, right_id: &str) -> StoreResult<JsonMap> {
+pub async fn compare_package_candidates(
+    store: &StoreHandle,
+    left_id: &str,
+    right_id: &str,
+) -> StoreResult<JsonMap> {
     let left = inspect_package_candidate(store, left_id).await?;
     let right = inspect_package_candidate(store, right_id).await?;
     let left_packages = package_index(&left)?;
     let right_packages = package_index(&right)?;
-    let find = |packages: &[(String, JsonMap)], id: &str| packages.iter().find(|(key, _)| key == id).map(|(_, p)| p.clone());
+    let find = |packages: &[(String, JsonMap)], id: &str| {
+        packages.iter().find(|(key, _)| key == id).map(|(_, p)| p.clone())
+    };
     let package_ids: BTreeSet<String> =
         left_packages.iter().chain(right_packages.iter()).map(|(id, _)| id.clone()).collect();
     let mut changes = Vec::new();
     for package_id in package_ids {
-        let (left_package, right_package) = (find(&left_packages, &package_id), find(&right_packages, &package_id));
+        let (left_package, right_package) =
+            (find(&left_packages, &package_id), find(&right_packages, &package_id));
         let (Some(left_package), Some(right_package)) = (&left_package, &right_package) else {
             changes.push(object(vec![
                 ("package_id", package_id.clone().into()),
@@ -352,7 +373,9 @@ pub async fn compare_package_candidates(store: &StoreHandle, left_id: &str, righ
             .map(String::as_str)
             .collect();
         let field = |package: &JsonMap, key: &str| package.get(key).cloned().unwrap_or(Json::Null);
-        if field(left_package, "content_sha256") != field(right_package, "content_sha256") || !changed_files.is_empty() {
+        if field(left_package, "content_sha256") != field(right_package, "content_sha256")
+            || !changed_files.is_empty()
+        {
             changes.push(object(vec![
                 ("package_id", package_id.clone().into()),
                 ("change", "changed".into()),

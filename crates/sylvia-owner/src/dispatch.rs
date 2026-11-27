@@ -186,7 +186,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::campaigns::handle_export_campaign(context, params).await
         }
         "package_candidates" => commands::packages::handle_package_candidates(context, params).await,
-        "inspect_package_candidate" => commands::packages::handle_inspect_package_candidate(context, params).await,
+        "inspect_package_candidate" => {
+            commands::packages::handle_inspect_package_candidate(context, params).await
+        }
         "package_candidate_text" => commands::packages::handle_package_candidate_text(context, params).await,
         "compare_package_candidates" => {
             commands::packages::handle_compare_package_candidates(context, params).await

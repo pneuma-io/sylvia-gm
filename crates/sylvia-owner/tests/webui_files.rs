@@ -468,8 +468,16 @@ fn drive() {
             first_difference(got_step, step, "")
         );
     }
-    assert_eq!(got["files_before_cleanup"], expected["files_before_cleanup"]);
-    assert_eq!(got["files_after_cleanup"], expected["files_after_cleanup"]);
+    sylvia_base::testing::assert_same_json(
+        &got["files_before_cleanup"],
+        &expected["files_before_cleanup"],
+        concat!(file!(), ":", line!()),
+    );
+    sylvia_base::testing::assert_same_json(
+        &got["files_after_cleanup"],
+        &expected["files_after_cleanup"],
+        concat!(file!(), ":", line!()),
+    );
     println!("webui_files: {} steps as Python", got["steps"].as_array().unwrap().len());
 }
 

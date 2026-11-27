@@ -17,8 +17,12 @@ fn ruleset_test_runtime_facts_match_python() {
             Some(name) => vectors["runtimes"][name].as_str().expect("kept runtime"),
             None => case["runtime"].as_str().expect("runtime"),
         };
-        let required: Vec<&str> =
-            case["required"].as_array().expect("required").iter().map(|name| name.as_str().expect("name")).collect();
+        let required: Vec<&str> = case["required"]
+            .as_array()
+            .expect("required")
+            .iter()
+            .map(|name| name.as_str().expect("name"))
+            .collect();
         let package_id = case["package_id"].as_str().expect("package id");
         let actual = match ruleset_test_runtime_facts(package_id, runtime.as_bytes(), &required) {
             Ok(facts) => {
@@ -35,7 +39,7 @@ fn ruleset_test_runtime_facts_match_python() {
                 serde_json::json!({"raise": class})
             }
         };
-        assert_eq!(actual.to_string(), case["expected"].to_string(), "{label}");
+        sylvia_base::testing::assert_same_json(&actual, &case["expected"], label);
     }
     assert!(handoffs > 0, "a case declares a decision scope");
 }

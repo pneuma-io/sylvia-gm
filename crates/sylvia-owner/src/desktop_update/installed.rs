@@ -51,8 +51,10 @@ pub const UNINSTALL_VALUES: [&str; 6] =
     ["DisplayName", "DisplayVersion", "Publisher", "InstallLocation", "MainBinaryName", "UninstallString"];
 
 /// A registration's values, as UTF-16 code units: Python's `str` from the registry may hold a
-/// lone surrogate, which then simply compares unequal.
-pub type RegistrationRow = BTreeMap<String, Vec<u16>>;
+/// lone surrogate, which then simply compares unequal. In the order they were read, as Python's
+/// `dict` keeps them: the uninstall key's values in [`UNINSTALL_VALUES`] order, then
+/// `ProductLocation`.
+pub type RegistrationRow = indexmap::IndexMap<String, Vec<u16>>;
 
 /// `InstalledRegistration`.
 pub trait Registration: Send + Sync {

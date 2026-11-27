@@ -241,7 +241,9 @@ fn versions_and_statuses() {
     for case in vectors["auth_statuses"].as_array().unwrap() {
         let ours = claude_runtime::parse_authentication_status(outcome_of(&case["outcome"]));
         match (ours, case.get("value"), case.get("error")) {
-            (Ok(status), Some(value), None) => assert_eq!(Json::Object(status), *value, "{case}"),
+            (Ok(status), Some(value), None) => {
+                sylvia_base::testing::assert_same_json(&Json::Object(status), &*value, format!("{case}"))
+            }
             (Err(error), None, Some(expected)) => {
                 assert_eq!(class_of(&error), expected[0].as_str().unwrap(), "{case}");
                 assert_eq!(error.message, expected[1].as_str().unwrap(), "{case}");
@@ -334,7 +336,11 @@ fn claude_frames() {
         let connection = claude(&workspace, json!([{"write": case["data"]}, {"exit": 0}]));
         connection.start().expect("starts");
         let events = events_until_exit(&connection);
-        assert_eq!(Value::Array(events), case["events"], "frames {name}");
+        sylvia_base::testing::assert_same_json(
+            &Value::Array(events),
+            &case["events"],
+            format!("frames {name}"),
+        );
         connection.close();
         let _ = std::fs::remove_dir_all(&workspace);
     }
@@ -401,9 +407,10 @@ fn claude_process_behaviour() {
     let home = folder("claude-cli");
     assert_eq!(claude_runtime::runtime_version(&me(), &home).unwrap(), "2.1.400");
     let status = claude_runtime::authentication_status(&me(), &home).unwrap();
-    assert_eq!(
-        Json::Object(status),
-        json!({"signed_in": false, "auth_method": "claude.ai", "billing": "subscription"})
+    sylvia_base::testing::assert_same_json(
+        &Json::Object(status),
+        &json!({"signed_in": false, "auth_method": "claude.ai", "billing": "subscription"}),
+        concat!(file!(), ":", line!()),
     );
     let missing = claude_runtime::runtime_version(&home.join("missing"), &home).unwrap_err();
     assert_eq!(missing.message, "The Claude executable could not report its version.");
@@ -545,7 +552,11 @@ fn codex_handshake_and_calls() {
         ]
     );
     let result = connection.call("thread/start", json!({"model": "gpt"}), Duration::from_secs(20)).unwrap();
-    assert_eq!(Json::Object(result), json!({"ok": true}));
+    sylvia_base::testing::assert_same_json(
+        &Json::Object(result),
+        &json!({"ok": true}),
+        concat!(file!(), ":", line!()),
+    );
     let record = home.join("workspace").join(RECORD);
     let expected = [
         json!({"id": 1, "method": "initialize", "params": {"clientInfo": {"name": "sylvia_gm", "title": "Sylvia GM", "version": "0.3.0"}, "capabilities": {"experimentalApi": true}}}),

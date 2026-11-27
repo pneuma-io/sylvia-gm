@@ -283,9 +283,17 @@ fn installation_contexts_are_read_like_python() {
         let context = (!context.is_null()).then_some(&context);
         let data = std::path::PathBuf::from(case["data"].as_str().unwrap().replace("<tmp>", &tmp));
         let got = outcome(Installation::from_launch(context, &data).map(summary));
-        assert_eq!(got, case["from_launch"], "{} (from_launch)", case["name"]);
+        sylvia_base::testing::assert_same_json(
+            &got,
+            &case["from_launch"],
+            format!("{} (from_launch)", case["name"]),
+        );
         let got = outcome(Installation::for_recovery(context, &data).map(summary));
-        assert_eq!(got, case["for_recovery"], "{} (for_recovery)", case["name"]);
+        sylvia_base::testing::assert_same_json(
+            &got,
+            &case["for_recovery"],
+            format!("{} (for_recovery)", case["name"]),
+        );
     }
 }
 

@@ -385,8 +385,14 @@ fn history_fields(
     actions: &[sylvia_domain::authority::ActionRecord],
     events: &[sylvia_domain::authority::CanonicalEvent],
 ) -> CodedResult<()> {
-    value.insert("actions".into(), Json::Array(actions.iter().map(action_record_value).collect::<CodedResult<_>>()?));
-    value.insert("events".into(), Json::Array(events.iter().map(canonical_event_value).collect::<CodedResult<_>>()?));
+    value.insert(
+        "actions".into(),
+        Json::Array(actions.iter().map(action_record_value).collect::<CodedResult<_>>()?),
+    );
+    value.insert(
+        "events".into(),
+        Json::Array(events.iter().map(canonical_event_value).collect::<CodedResult<_>>()?),
+    );
     Ok(())
 }
 
@@ -396,7 +402,9 @@ fn turns_value(turns: &[(String, sylvia_domain::authority::TurnStatus)]) -> Json
 }
 
 /// `_json_value(CampaignDisplaySnapshot)`.
-pub fn display_snapshot_value(snapshot: &sylvia_domain::authority::CampaignDisplaySnapshot) -> CodedResult<Json> {
+pub fn display_snapshot_value(
+    snapshot: &sylvia_domain::authority::CampaignDisplaySnapshot,
+) -> CodedResult<Json> {
     let mut value = campaign_state_fields(&snapshot.state)?;
     history_fields(&mut value, &snapshot.actions, &snapshot.events)?;
     value.insert("turns".into(), turns_value(&snapshot.turns));

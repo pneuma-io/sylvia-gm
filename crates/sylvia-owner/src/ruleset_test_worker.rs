@@ -11,8 +11,8 @@ use sylvia_agent::builder::ruleset_tests::{run_scenario, summarize_coverage};
 use sylvia_app::package_runtime::{ruleset_test_runtime_facts, PackageRuntimeFailure, PACKAGE_RUNTIME_PATH};
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::package_archive::admit_package_archive;
 use sylvia_domain::authority::PackageRole;
+use sylvia_domain::package_archive::admit_package_archive;
 use sylvia_domain::package_library::closure_sha256;
 use sylvia_domain::pyops::py_truthy;
 use sylvia_domain::ruleset_tests::{parse_ruleset_tests, RULESET_TESTS_PATH};
@@ -115,7 +115,8 @@ fn missing_tests() -> JsonMap {
 pub async fn run_archive(archive: &[u8], root: &Path) -> Result<JsonMap, Raised> {
     let admitted = admit_package_archive(archive)?;
     // `next(manifest for manifest in admitted.manifests if manifest.role.value == "primary")`.
-    let Some(primary_index) = admitted.manifests.iter().position(|manifest| manifest.role == PackageRole::Primary)
+    let Some(primary_index) =
+        admitted.manifests.iter().position(|manifest| manifest.role == PackageRole::Primary)
     else {
         return Err(Raised("StopIteration"));
     };
@@ -124,7 +125,8 @@ pub async fn run_archive(archive: &[u8], root: &Path) -> Result<JsonMap, Raised>
         .files
         .iter()
         .filter(|item| {
-            admitted.manifests[item.manifest].package_id == primary.package_id && item.file.path() == RULESET_TESTS_PATH
+            admitted.manifests[item.manifest].package_id == primary.package_id
+                && item.file.path() == RULESET_TESTS_PATH
         })
         .collect();
     let [tests] = files.as_slice() else {
@@ -146,7 +148,8 @@ pub async fn run_archive(archive: &[u8], root: &Path) -> Result<JsonMap, Raised>
         .map(|tool| tool.name.clone())
         .collect();
     let Some(runtime_file) = admitted.files.iter().find(|item| {
-        admitted.manifests[item.manifest].package_id == primary.package_id && item.file.path() == PACKAGE_RUNTIME_PATH
+        admitted.manifests[item.manifest].package_id == primary.package_id
+            && item.file.path() == PACKAGE_RUNTIME_PATH
     }) else {
         return Err(Raised("StopIteration"));
     };
@@ -188,7 +191,9 @@ pub async fn run_archive(archive: &[u8], root: &Path) -> Result<JsonMap, Raised>
 
 /// `argparse`'s refusal: the usage and the message on stderr, exit 2.
 fn usage_error(message: &str) -> i32 {
-    eprintln!("usage: sylvia-gm-owner [-h] --archive ARCHIVE --result RESULT\nsylvia-gm-owner: error: {message}");
+    eprintln!(
+        "usage: sylvia-gm-owner [-h] --archive ARCHIVE --result RESULT\nsylvia-gm-owner: error: {message}"
+    );
     2
 }
 
@@ -230,7 +235,8 @@ pub fn main(arguments: &[OsString]) -> i32 {
         (None, _) => return usage_error("the following arguments are required: --archive"),
         (_, None) => return usage_error("the following arguments are required: --result"),
     };
-    let runtime = tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("the worker runtime");
+    let runtime =
+        tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("the worker runtime");
     let outcome = runtime.block_on(async {
         let size = std::fs::metadata(&archive)?.len();
         if size > ARCHIVE_LIMIT {

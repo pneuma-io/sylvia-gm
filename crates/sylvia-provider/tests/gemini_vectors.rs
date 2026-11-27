@@ -190,21 +190,29 @@ fn check_response(response: &ProviderResponse, expected: &Value, context: &str) 
         .iter()
         .map(|c| serde_json::json!([c.id.to_json(), c.name.to_json(), c.arguments.to_json()]))
         .collect();
-    assert_eq!(Value::Array(calls), expected["tool_calls"], "calls, {context}");
-    assert_eq!(response.finish_reason.to_json(), expected["finish_reason"], "finish, {context}");
+    sylvia_base::testing::assert_same_json(
+        &Value::Array(calls),
+        &expected["tool_calls"],
+        format!("calls, {context}"),
+    );
+    sylvia_base::testing::assert_same_json(
+        &response.finish_reason.to_json(),
+        &expected["finish_reason"],
+        format!("finish, {context}"),
+    );
     if let Some(model) = expected.get("model") {
         assert_eq!(response.model, model.as_str().unwrap(), "model, {context}");
     }
     let usage = &response.usage;
-    assert_eq!(
-        serde_json::json!([
+    sylvia_base::testing::assert_same_json(
+        &serde_json::json!([
             usage.prompt_tokens.to_json(),
             usage.completion_tokens.to_json(),
             usage.total_tokens.to_json(),
             usage.reasoning_tokens
         ]),
-        expected["usage"],
-        "usage, {context}"
+        &expected["usage"],
+        format!("usage, {context}"),
     );
     assert_eq!(response.usage_reported, expected["usage_reported"].as_bool(), "usage reported, {context}");
     let metadata = response.chat_completion_metadata.clone().map(Json::Object).unwrap_or(Json::Null);
@@ -244,7 +252,7 @@ fn check_chunk(actual: &ProviderStreamChunk, expected: &Value, context: &str) {
         "reasoning, {context}"
     );
     let finish = actual.finish_reason.as_ref().map(PyValue::to_json).unwrap_or(Value::Null);
-    assert_eq!(finish, expected["finish_reason"], "finish, {context}");
+    sylvia_base::testing::assert_same_json(&finish, &expected["finish_reason"], format!("finish, {context}"));
     match (&actual.tool_call_delta, &expected["tool_call_delta"]) {
         (None, Value::Null) => {}
         (Some(delta), want) if !want.is_null() => {

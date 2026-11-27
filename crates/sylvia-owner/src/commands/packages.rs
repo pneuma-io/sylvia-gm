@@ -31,10 +31,15 @@ pub async fn handle_package_candidate_text(ctx: &DispatchContext, params: &JsonM
     let candidate_id = required(params, "candidate_id")?;
     let package_id = required(params, "package_id")?;
     let path = required(params, "path")?;
-    sylvia_app::authority::package_candidates::package_candidate_text(&ctx.store, &candidate_id, &package_id, &path)
-        .await
-        .map(Json::Object)
-        .map_err(store_error)
+    sylvia_app::authority::package_candidates::package_candidate_text(
+        &ctx.store,
+        &candidate_id,
+        &package_id,
+        &path,
+    )
+    .await
+    .map(Json::Object)
+    .map_err(store_error)
 }
 
 /// `handle_compare_package_candidates`: two candidates' closures compared by package.

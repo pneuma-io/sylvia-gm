@@ -141,7 +141,11 @@ pub(super) fn hide_private_tool_inputs(
 /// `AuthorityOwner.desktop_snapshot(campaign_id, display_only=...)`: the snapshot the desktop
 /// sees, without package-declared engine state (`visibility: engine`), its mutation history or
 /// the tool inputs of a package that has such state.
-pub async fn desktop_snapshot(store: &StoreHandle, campaign_id: &str, display_only: bool) -> StoreResult<DesktopSnapshot> {
+pub async fn desktop_snapshot(
+    store: &StoreHandle,
+    campaign_id: &str,
+    display_only: bool,
+) -> StoreResult<DesktopSnapshot> {
     let campaign_id = campaign_id.to_owned();
     store
         .call(move |store| {
@@ -159,9 +163,16 @@ pub async fn desktop_snapshot(store: &StoreHandle, campaign_id: &str, display_on
             }
             let mut snapshot = store.snapshot(&campaign_id)?;
             let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
-            hide_private_tool_inputs(&snapshot.state.package_lock, &private_keys, &mut snapshot.actions, &mut snapshot.events);
+            hide_private_tool_inputs(
+                &snapshot.state.package_lock,
+                &private_keys,
+                &mut snapshot.actions,
+                &mut snapshot.events,
+            );
             snapshot.state.state.retain(|key, _| !private_keys.contains(key));
-            snapshot.mutations.retain(|item| !private_keys.contains(&format!("{}.{}", item.namespace, item.key)));
+            snapshot
+                .mutations
+                .retain(|item| !private_keys.contains(&format!("{}.{}", item.namespace, item.key)));
             Ok(DesktopSnapshot::Full(snapshot))
         })
         .await
