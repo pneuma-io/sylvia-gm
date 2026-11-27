@@ -1,6 +1,6 @@
 {
   "name": "submit-refusals",
-  "description": "submit_session_input before any turn runs, on a No Ruleset campaign's DM session and a Builder chat (stand-in model): every check before the session is read, in Python's order; question answers combined or misplaced; the /model command (picker, the refused forms, an unknown model, by name, by id, next reply only, Settings too, and an OOC message that is not a command); the role and turn checks; the GM branch up to the run (allow_public_web, no attempt or message id); and switch_session_model's refusals and modes with the context after each. A submit that runs a turn or compaction waits for lane 4's loop; then shut down.",
+  "description": "submit_session_input before any turn runs, on a No Ruleset campaign's DM session and a Builder chat (stand-in model): every check before the session is read, in Python's order; question answers combined or misplaced; the /model command (picker, the refused forms, an unknown model, by name, by id, next reply only, Settings too, and an OOC message that is not a command); the role and turn checks; the GM branch up to the run (allow_public_web, no attempt or message id); a player action's response basis (an unknown action, also automatic, and on the chat); and switch_session_model's refusals and modes with the context after each. A submit that runs a turn or compaction waits for lane 4's loop; then shut down.",
   "standin": true,
   "summarise_tables": [
     "^package_",
@@ -522,6 +522,30 @@
         "attempt_id": "attempt-1",
         "message_id": "message-1",
         "redirect_interruption_id": ""
+      }
+    },
+    {
+      "method": "submit_session_input",
+      "params": {
+        "session_id": "${session_id}",
+        "turn_id": "${turn_id}",
+        "player_action_id": "action-missing"
+      }
+    },
+    {
+      "method": "submit_session_input",
+      "params": {
+        "session_id": "${session_id}",
+        "turn_id": "${turn_id}",
+        "player_action_id": "action-missing",
+        "automatic_response": true
+      }
+    },
+    {
+      "method": "submit_session_input",
+      "params": {
+        "session_id": "${chat}",
+        "player_action_id": "action-missing"
       }
     },
     {
