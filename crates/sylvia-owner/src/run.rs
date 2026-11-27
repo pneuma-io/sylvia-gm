@@ -1010,6 +1010,12 @@ fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
     }
     let providers: Arc<dyn crate::services::ProviderResolver> =
         Arc::new(crate::providers::OwnerProviders::new(&storage_root));
+    // `CampaignSessionLoop(owner, ...)`: the GM turn's owner reads, which also execute its
+    // mechanics. The lifecycle hooks are the supervisor's, ported with the narration stream.
+    let campaign_loop = Arc::new(sylvia_agent::session_loop::campaign::CampaignSessionLoop::new(
+        Arc::new(crate::owner_reads::OwnerReads::for_owner(store.clone(), owner_id.clone())),
+        sylvia_agent::session_loop::campaign::LoopHooks::default(),
+    ));
     let context = DispatchContext {
         owner_id,
         storage_root,
@@ -1019,6 +1025,7 @@ fn launch(envelope: &JsonMap) -> Result<Launched, LaunchFailure> {
         store,
         providers: Some(providers),
         session_loop: None,
+        campaign_loop: Some(campaign_loop),
         bundled: Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
             sylvia_app::bundled_packages::BundledSources::from_repository_root(&crate::util::source_root()),
         )),

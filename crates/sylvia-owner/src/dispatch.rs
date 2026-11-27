@@ -40,6 +40,9 @@ pub struct DispatchContext {
     pub providers: Option<Arc<dyn ProviderResolver>>,
     /// `session_loop` (lane 4).
     pub session_loop: Option<Arc<dyn SessionLoop>>,
+    /// `session_loop` as the commands use it: lane 4's `CampaignSessionLoop`, built at launch
+    /// over the GM turn's owner reads. `None` only in a context a unit test builds by hand.
+    pub campaign_loop: Option<Arc<sylvia_agent::session_loop::campaign::CampaignSessionLoop>>,
     /// The bundled package sources (the shipped Ruleset, Setting, Plan and archives), built once at
     /// launch from [`crate::util::source_root`].
     pub bundled: Arc<sylvia_app::bundled_packages::BundledPackages>,
@@ -56,6 +59,7 @@ impl std::fmt::Debug for DispatchContext {
             .field("method", &self.method)
             .field("providers", &self.providers.is_some())
             .field("session_loop", &self.session_loop.is_some())
+            .field("campaign_loop", &self.campaign_loop.is_some())
             .finish_non_exhaustive()
     }
 }
@@ -183,6 +187,11 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "builder_chat_index" => commands::builder::handle_builder_chat_index(context, params).await,
         "create_builder_chat" => commands::builder::handle_create_builder_chat(context, params).await,
         "resume_agent_session" => commands::sessions::handle_resume_agent_session(context, params).await,
+        "switch_session_reasoning" => {
+            commands::sessions::handle_switch_session_reasoning(context, params).await
+        }
+        "switch_session_speed" => commands::sessions::handle_switch_session_speed(context, params).await,
+        "steer_session" => commands::sessions::handle_steer_session(context, params).await,
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,

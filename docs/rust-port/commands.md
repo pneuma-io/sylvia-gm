@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 65 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 68 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `switch_session_reasoning`, `switch_session_speed`, `steer_session`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -89,13 +89,13 @@ Ported: 65 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `set_default_model` | `providers.handle_set_default_model` | yes | yes | `provider-settings` |
 | `set_chat_defaults` | `providers.handle_set_chat_defaults` | yes | yes | `provider-settings` |
 | `switch_session_model` | `providers.handle_switch_session_model` | yes | no | |
-| `switch_session_reasoning` | `sessions.handle_switch_session_reasoning` | yes | no | |
-| `switch_session_speed` | `sessions.handle_switch_session_speed` | yes | no | |
+| `switch_session_reasoning` | `sessions.handle_switch_session_reasoning` | yes | yes | `session-switches` |
+| `switch_session_speed` | `sessions.handle_switch_session_speed` | yes | yes | `session-switches` |
 | `inspect_provider_thinking` | `providers.handle_inspect_provider_thinking` | yes | no | |
 | `session_context` | `sessions.handle_session_context` | yes | no | |
 | `session_history_page` | `sessions.handle_session_context` | yes | no | |
 | `ingest_builder_sources` | `builder.handle_ingest_builder_sources` | no | no | |
-| `steer_session` | `sessions.handle_steer_session` | yes | no | |
+| `steer_session` | `sessions.handle_steer_session` | yes | yes | `session-switches` |
 | `submit_session_input` | `sessions.handle_submit_session_input` | yes | no | |
 | `interrupt_stream` | `sessions.handle_interrupt_stream` | yes | no | |
 | `interrupt_provider_stream` | `providers.handle_interrupt_provider_stream` | yes | no | |
