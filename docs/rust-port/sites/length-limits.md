@@ -261,9 +261,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `agent/_builder_session.py:434` | `_builder_reference_tool.inspect_page` | len() against a limit | `if not isinstance(query, str) or len(query) > 120:` | |
-| `agent/_builder_session.py:448` | `_builder_reference_tool.inspect_page` | len() against a limit | `not isinstance(query, str) or not query or len(query) > 120` | |
-| `agent/_builder_session.py:844` | `_campaign_content_tools.discover` | len() against a limit | `if not isinstance(query, str) or len(query) > 160:` | |
+| `agent/_builder_session.py:434` | `_builder_reference_tool.inspect_page` | len() against a limit | `if not isinstance(query, str) or len(query) > 120:` | `sylvia-agent` source_tool_vectors (a 121-character query refused) |
+| `agent/_builder_session.py:448` | `_builder_reference_tool.inspect_page` | len() against a limit | `not isinstance(query, str) or not query or len(query) > 120` | `sylvia-agent` source_tool_vectors (empty and missing find queries) |
+| `agent/_builder_session.py:844` | `_campaign_content_tools.discover` | len() against a limit | `if not isinstance(query, str) or len(query) > 160:` | `sylvia-agent` source_tool_vectors (a 161-character query refused) |
 | `agent/_builder_session.py:960` | `_creation_subflow_completion_tool.complete` | len() against a limit | `or len(summary) > 2000` | |
 | `agent/_builder_session.py:962` | `_creation_subflow_completion_tool.complete` | len() against a limit | `or len(conflicts) > 16` | |
 | `agent/_builder_session.py:964` | `_creation_subflow_completion_tool.complete` | len() against a limit | `not isinstance(item, str) or not item.strip() or len(item) > 500` | |
@@ -274,7 +274,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_builder_title.py:60` | `FirstReplyTitle.feed` | len() against a limit | `if not final and len(self._prefix) <= 256 and TITLE_PREFIX.startswith(candidate):` | |
 | `agent/_campaign_memory.py:70` | `select_campaign_memory` | len() against a limit | `if len(selected) < _MAX_MEMORY_RECORDS and used_bytes + size <= _MAX_MEMORY_BYTES:` | |
 | `agent/_character_profile_tools.py:142` | `character_profile_tools.execute` | len() against a limit | `if len(json.dumps(value, ensure_ascii=False).encode()) > 65536:` | `sylvia-agent` character_tool_vectors (a 70,000-character entry refused) |
-| `agent/_library_source_tool.py:46` | `library_source_tool.inspect` | len() against a limit | `if not isinstance(query, str) or len(query) > 120:` | |
+| `agent/_library_source_tool.py:46` | `library_source_tool.inspect` | len() against a limit | `if not isinstance(query, str) or len(query) > 120:` | `sylvia-agent` source_tool_vectors (a 121-character query refused) |
 | `agent/_participant_file_tool.py:41` | `participant_file_tool.use_file` | len() against a limit | `if len(data) > _MAX_DRAFT_BYTES:` | `sylvia-agent` character_tool_vectors (a 256 KiB draft refused) |
 | `agent/_provider_session.py:1278` | `_validated_speaker_name` | len() against a limit | `or len(name) > _SPEAKER_NAME_MAX_LENGTH` | |
 | `agent/_provider_session.py:1748` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not gm_system_prompt.strip() or len(encoded_prompt) > _MAX_GM_SYSTEM_PROMPT_BYTES:` | |

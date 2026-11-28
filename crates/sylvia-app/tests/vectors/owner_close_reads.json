@@ -1,0 +1,52 @@
+{
+ "cases": [
+  {
+   "name": "inspect_package_candidate",
+   "outcome": {
+    "raise": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   }
+  },
+  {
+   "name": "package_candidate_text export-only",
+   "outcome": {
+    "raise": "CommandRejected",
+    "code": "package_preview_unsupported",
+    "message": "Installed package file is export-only"
+   }
+  },
+  {
+   "name": "package_candidate_text text",
+   "outcome": {
+    "raise": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   }
+  },
+  {
+   "name": "compare_package_candidates",
+   "outcome": {
+    "raise": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   }
+  },
+  {
+   "name": "desktop_snapshot",
+   "outcome": {
+    "raise": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   }
+  },
+  {
+   "name": "desktop_snapshot display_only",
+   "outcome": {
+    "raise": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   }
+  }
+ ]
+}
