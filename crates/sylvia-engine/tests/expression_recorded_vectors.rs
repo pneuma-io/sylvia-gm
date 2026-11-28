@@ -69,8 +69,9 @@ fn every_recorded_evaluation_replays_as_python() {
             Some(result) => json!({"result": result}),
             None => json!({"error": case["error"], "message": case["message"]}),
         };
-        if json_difference(&actual, &expected).is_some() {
-            failures.push(format!("{text}: python {expected}, rust {actual}"));
+        if let Some(difference) = json_difference(&actual, &expected) {
+            failures.push(format!("{text}: {difference}
+  python {expected}, rust {actual}"));
         }
     }
     assert!(
