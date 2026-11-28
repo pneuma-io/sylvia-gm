@@ -75,7 +75,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_actor_decisions.py:29` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
 | `agent/_builder_session.py:234` | `_provider_history` | Dump::DEFAULT.ascii(false) | `"content": json.dumps(_json_value(content["result"]), ensure_ascii=False),` | |
 | `agent/_builder_session.py:285` | `_provider_history` | Dump::CANONICAL | `application_data = json.dumps( {"kind": message.kind.value, "content": _json_value(content)}, sort_keys=True, separators=(",", ":"), ensure_ascii=F...` | |
-| `agent/_builder_session.py:854` | `_campaign_content_tools.discover` | Dump::DEFAULT.ascii(false).sorted(true) | `searchable = json.dumps(item, sort_keys=True, ensure_ascii=False).casefold()` | |
+| `agent/_builder_session.py:854` | `_campaign_content_tools.discover` | Dump::DEFAULT.ascii(false).sorted(true) | `searchable = json.dumps(item, sort_keys=True, ensure_ascii=False).casefold()` | `sylvia-agent` source_tool_vectors (discover_campaign_content) |
 | `agent/_builder_session.py:1552` | `_campaign_plan_example` | Dump::CANONICAL | `return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)` | |
 | `agent/_builder_session.py:1604` | `_campaign_source_tool.inspect` | Dump::CANONICAL | `content = json.dumps( { "binding": authority.ruleset.as_payload(), "campaign_setting": authority.setting.as_payload(), "package_closure_sha256": au...` | |
 | `agent/_character_draft_tool.py:62` | `character_draft_tool.open_draft` | Dump::INDENT2.ascii(false) | `content = json.dumps(dict(draft), ensure_ascii=False, indent=2) + "\n"` | `sylvia-agent` character_tool_vectors (the draft file written) |
@@ -87,7 +87,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_fixed_tool_projection.py:106` | `compact_schema.dump` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
 | `agent/_history.py:38` | `save_history` | Dump::DEFAULT.ascii(false) | `f.write(json.dumps(msg, ensure_ascii=False) + "\n")` | |
 | `agent/_inference_identity.py:17` | `inference_context_id` | Dump::WIRE.sorted(true) | `encoded = json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()` | |
-| `agent/_library_source_copy_tool.py:74` | `library_source_copy_tool.copy` | Dump::INDENT2.ascii(false) | `content = json.dumps(json.loads(content), ensure_ascii=False, indent=2) + "\n"` | |
+| `agent/_library_source_copy_tool.py:74` | `library_source_copy_tool.copy` | Dump::INDENT2.ascii(false) | `content = json.dumps(json.loads(content), ensure_ascii=False, indent=2) + "\n"` | `sylvia-agent` source_tool_vectors (an editable record copied) |
 | `agent/_participant_file_tool.py:51` | `participant_file_tool.use_file` | Dump::DEFAULT.ascii(false) + allow_nan= | `draft[key] = json.dumps(draft[key], ensure_ascii=False, allow_nan=False)` | `sylvia-agent` character_tool_vectors (object state and Setting data re-encoded) |
 | `agent/_provider_session.py:295` | `_forced_single_tool_call_from_json` | Dump::CANONICAL | `arguments=json.dumps( parameters, sort_keys=True, separators=(",", ":"), ensure_ascii=False, ),` | |
 | `agent/_provider_session.py:412` | `_package_tool_alias` | Dump::WIRE | `identity = json.dumps( [package_id, version, sha256, name, capability], ensure_ascii=True, separators=(",", ":"), )` | `sylvia-agent` tool_projection_vectors |

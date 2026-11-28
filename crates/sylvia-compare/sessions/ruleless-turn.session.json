@@ -80,6 +80,8 @@
     "scrub": [
       {"pattern": "data: [A-Za-z0-9+/=]{40,}", "with": "data: <protected credential>"}
     ],
-    "volatile_files": ["^diagnostics/"]
+    "volatile_files": ["^diagnostics/"],
+    "ignore_headers_row_8": ["User-Agent", "Accept-Encoding", "Connection", "X-Stainless-*"],
+    "header_name_case_row_40": true
   }
 }

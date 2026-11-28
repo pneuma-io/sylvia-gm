@@ -28,6 +28,11 @@ use super::rejected;
 use super::ruleset_tools::{ruleset_draft_check_tool, ruleset_test_tool, Cancelled};
 use super::runner::{AgentRunner, RunnerOptions, StreamEvent, StreamEventKind, TurnError};
 use super::skills::{builder_skill_references, load_builder_skill};
+use super::source_tools::{
+    builder_reference_copy_tool, builder_reference_tool, campaign_content_tools, campaign_setting_tool,
+    library_source_copy_tool, library_source_tool, CampaignContent, LibrarySources, ReferenceSource,
+    SettingPublisher,
+};
 use super::title::{title_instruction, FirstReplyTitle};
 use super::tools::{ToolHandler, ToolSpec, ToolsetName};
 use crate::native_continuation::requires_reasoning_with_tools;
@@ -153,15 +158,15 @@ pub struct BuilderTurnTools {
     pub read_participant: Option<ParticipantReader>,
     pub campaign_plan_authority: bool,
     pub publish_campaign_plan: bool,
-    pub publish_campaign_setting: bool,
-    pub check_campaign_setting: bool,
+    pub publish_campaign_setting: Option<SettingPublisher>,
+    pub check_campaign_setting: Option<SettingPublisher>,
     pub check_campaign_plan: bool,
     pub repair_tools: Vec<ToolSpec>,
     pub profile_tools: Vec<ToolSpec>,
-    pub campaign_content_authority: bool,
-    pub references: bool,
+    pub campaign_content_authority: Option<CampaignContent>,
+    pub references: Option<ReferenceSource>,
     pub source_tools: Vec<ToolSpec>,
-    pub library_sources: bool,
+    pub library_sources: Option<Arc<dyn LibrarySources>>,
 }
 
 /// One canonical Builder turn's inputs (`stream_builder_turn`'s keyword arguments).
@@ -270,17 +275,16 @@ pub fn application_tools(
         specs.push(tool);
         specs.push(file);
     }
-    if tools.campaign_content_authority {
-        specs.push(pending("discover_campaign_content")?);
-        specs.push(pending("prepare_campaign_setup")?);
+    if let Some(authority) = &tools.campaign_content_authority {
+        specs.extend(campaign_content_tools(authority.clone())?);
     }
-    if tools.references {
-        specs.push(pending("inspect_builder_references")?);
-        specs.push(pending("copy_builder_reference")?);
+    if let Some(references) = &tools.references {
+        specs.push(builder_reference_tool(Arc::clone(references))?);
+        specs.push(builder_reference_copy_tool(Arc::clone(references), workspace)?);
     }
-    if tools.library_sources && context.session.campaign_id().is_none() && !character {
-        specs.push(pending("inspect_library_sources")?);
-        specs.push(pending("copy_library_source")?);
+    if let (Some(library), None, false) = (&tools.library_sources, context.session.campaign_id(), character) {
+        specs.push(library_source_tool(Arc::clone(library))?);
+        specs.push(library_source_copy_tool(Arc::clone(library), workspace)?);
     }
     if matches!(skill.as_deref(), None | Some("BUILD CAMPAIGN PLAN"))
         && !character
@@ -294,11 +298,11 @@ pub fn application_tools(
         }
     }
     let setting_skill = matches!(skill.as_deref(), None | Some("BUILD CAMPAIGN SETTING")) && !character;
-    if setting_skill && tools.publish_campaign_setting {
-        specs.push(pending("publish_campaign_setting")?);
+    if let (true, Some(publisher)) = (setting_skill, &tools.publish_campaign_setting) {
+        specs.push(campaign_setting_tool(Arc::clone(publisher), false)?);
     }
-    if setting_skill && tools.check_campaign_setting {
-        specs.push(pending("check_campaign_setting_draft")?);
+    if let (true, Some(checker)) = (setting_skill, &tools.check_campaign_setting) {
+        specs.push(campaign_setting_tool(Arc::clone(checker), true)?);
     }
     let selected = context.session.fields().selected_skill.as_deref();
     if matches!(selected, None | Some("BUILD RULESET")) && tools.publish_ruleset_candidate {

@@ -665,6 +665,14 @@ async fn serve(
         updates.close().await;
     }
     display_reads.close().await;
+    // `supervisor.shutdown()`: `owner.close()` (lane 3's `close_owner`) drains the running
+    // operations, interrupts every live narration attempt, clears the owner's memory and closes
+    // the store. It runs here, outside any held operation, before the workers are joined, as in
+    // Python. Narration leases and provider-work cancellation come with lease tracking (T5).
+    if let Err(error) = sylvia_app::authority::owner_close::close_owner(&owner.context.store).await {
+        // `except Exception: logger.warning("Owner close raised during shutdown")`.
+        let _ = error;
+    }
     let deadline = tokio::time::sleep(Duration::from_secs(5));
     tokio::pin!(deadline);
     while !workers.is_empty() {

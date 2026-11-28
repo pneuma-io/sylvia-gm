@@ -178,6 +178,12 @@ fn decode(data: &[u8], encoding: &str) -> Decoded {
     }
 }
 
+/// `data.decode(json.detect_encoding(data), "surrogatepass")`: the text `json.loads(data)`
+/// reads, and whether a lone surrogate in it became U+FFFD; or the `UnicodeDecodeError` message.
+pub fn decode_detected(data: &[u8]) -> Result<(String, bool), String> {
+    decode(data, detect_encoding(data))
+}
+
 /// `json.loads(data)` for `bytes`: a `UnicodeDecodeError`, Python's `JSONDecodeError`, or the
 /// value. Text Python reads and [`super::loads`] refuses keeps that function's message.
 pub fn loads_bytes(data: &[u8]) -> Result<Json, CodedError> {

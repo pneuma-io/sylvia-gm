@@ -9,7 +9,7 @@ pub mod turn_state;
 
 use serde_json::Value as J;
 use std::sync::Mutex;
-use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
+use sylvia_agent::provider_session::reads::{HeldWork, NarrationAttemptStart, OpeningReads, TurnOwner};
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
@@ -27,8 +27,10 @@ use sylvia_domain::authority::{
     PackageDependency, PackageLock, PackageLockEntry, PackageRole, Participant, ParticipantFields,
     TurnStatus, WriterRole,
 };
+use sylvia_domain::authority::{NarrationInterruption, ProseChannel};
 use sylvia_domain::error::{DomainError, MechanicsDetails, MechanicsValidationIssue};
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::provider_records::ProviderPrivateRecord;
 use sylvia_domain::session::SessionActivityBasis;
 use sylvia_domain::session::{
     SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
@@ -394,6 +396,11 @@ impl Recorded {
     }
 }
 
+/// A session-loop owner call no recorded phase makes.
+fn loop_call<'a, T: Send + 'a>(name: &'static str) -> BoxFuture<'a, Result<T, AuthorityFailure>> {
+    Box::pin(async move { panic!("no recorded phase reaches the session loop's {name}") })
+}
+
 pub fn ready<'a, T: Send + 'a>(value: T) -> BoxFuture<'a, CodedResult<T>> {
     Box::pin(async move { Ok(value) })
 }
@@ -664,6 +671,165 @@ impl TurnOwner for Recorded {
         // A recorded request is T6's (`run_required_actor_decision`); none is recorded yet.
         assert!(result.is_null(), "a recorded actor decision request is not replayed before T6");
         ready(None)
+    }
+    // The session loop's DM run (T5a-2) is proven by the comparison tool's sessions; no phase
+    // vector reaches these calls, so a test that does fails here.
+    fn agent_session_work<'a>(
+        &'a self,
+        _session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
+        loop_call("agent_session_work")
+    }
+    fn campaign_ending_choice_text<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _message_id: &'a str,
+        _choice: &'a JsonMap,
+    ) -> BoxFuture<'a, Result<String, AuthorityFailure>> {
+        loop_call("campaign_ending_choice_text")
+    }
+    fn player_action_response_basis<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _action_id: &'a str,
+        _automatic: bool,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        loop_call("player_action_response_basis")
+    }
+    fn unresolved_session_interruption<'a>(
+        &'a self,
+        _context: &'a SessionContext,
+    ) -> BoxFuture<'a, Result<Option<(NarrationInterruption, bool)>, AuthorityFailure>> {
+        loop_call("unresolved_session_interruption")
+    }
+    fn narration_interruption<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _interruption_id: &'a str,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        loop_call("narration_interruption")
+    }
+    fn redirect_narration<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _message_id: &'a str,
+        _content: &'a JsonMap,
+        _interruption_id: &'a str,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        loop_call("redirect_narration")
+    }
+    fn saved_action_receipt<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _action_id: &'a str,
+    ) -> BoxFuture<'a, Result<ActionReceipt, AuthorityFailure>> {
+        loop_call("saved_action_receipt")
+    }
+    fn start_narration_attempt(
+        &self,
+        _start: NarrationAttemptStart,
+    ) -> BoxFuture<'_, Result<(), AuthorityFailure>> {
+        loop_call("start_narration_attempt")
+    }
+    fn emit_narration_token<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+        _channel: ProseChannel,
+        _token: &'a str,
+        _response_blocks: Option<&'a J>,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        loop_call("emit_narration_token")
+    }
+    fn flush_narration<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        loop_call("flush_narration")
+    }
+    fn bind_narration_action<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+        _action_id: &'a str,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        loop_call("bind_narration_action")
+    }
+    fn complete_narration_attempt<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<Vec<CanonicalEvent>, AuthorityFailure>> {
+        loop_call("complete_narration_attempt")
+    }
+    fn interrupt_narration<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        loop_call("interrupt_narration")
+    }
+    fn disconnect_narration<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+        _now: f64,
+    ) -> BoxFuture<'a, Result<f64, AuthorityFailure>> {
+        loop_call("disconnect_narration")
+    }
+    fn reconnect_narration<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+        _now: f64,
+        _acknowledged_sequence: i64,
+    ) -> BoxFuture<'a, Result<CanonicalReplay, AuthorityFailure>> {
+        loop_call("reconnect_narration")
+    }
+    fn expire_narration<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+        _now: f64,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        loop_call("expire_narration")
+    }
+    fn append_private_provider_record<'a>(
+        &'a self,
+        _record: &'a ProviderPrivateRecord,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        loop_call("append_private_provider_record")
+    }
+    fn finish_private_provider_attempt<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _attempt_id: &'a str,
+        _completed: bool,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        loop_call("finish_private_provider_attempt")
+    }
+    fn append_session_canonical_references<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _events: &'a [CanonicalEvent],
+    ) -> BoxFuture<'a, Result<Vec<SessionMessage>, AuthorityFailure>> {
+        loop_call("append_session_canonical_references")
+    }
+    fn append_live_steering_message<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _message_id: &'a str,
+        _kind: SessionMessageKind,
+        _content: &'a JsonMap,
+    ) -> BoxFuture<'a, Result<SessionMessage, AuthorityFailure>> {
+        loop_call("append_live_steering_message")
+    }
+    fn stop_agent_session<'a>(
+        &'a self,
+        _session_id: &'a str,
+    ) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
+        loop_call("stop_agent_session")
     }
     fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
         ready(opt(&self.next("current_open_turn", serde_json::json!([campaign_id]))))

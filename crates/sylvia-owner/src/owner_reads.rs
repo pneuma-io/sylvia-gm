@@ -53,16 +53,20 @@ impl OwnerReads {
 
     /// `campaign_index()`.
     pub async fn campaign_index(&self) -> CodedResult<Vec<CampaignIndexEntry>> {
+        // `with self._operation():`, refused once the owner is closing.
+        let _operation = self.store.operation().map_err(coded)?;
         self.store.call(|store| store.campaign_index_entries()).await.map_err(coded)
     }
 
     /// `admin_full_audit_enabled()`.
-    pub fn admin_full_audit_enabled(&self) -> bool {
-        self.store.narration().admin_full_audit_enabled()
+    pub fn admin_full_audit_enabled(&self) -> CodedResult<bool> {
+        let _operation = self.store.operation().map_err(coded)?;
+        Ok(self.store.narration().admin_full_audit_enabled())
     }
 
     /// `record_admin_full_audit(payload)`, Python's synchronous in-memory sink.
     pub fn record_admin_full_audit(&self, payload: Json) -> CodedResult<()> {
+        let _operation = self.store.operation().map_err(coded)?;
         self.store.narration().record_admin_full_audit(payload).map_err(coded)
     }
 
@@ -366,10 +370,10 @@ mod tests {
             text(&store.call(|store| store.campaign_index_entries()).await.map_err(coded))
         );
         // The audit sink and the flag read the handle's one shared state.
-        assert!(!reads.admin_full_audit_enabled());
+        assert!(!reads.admin_full_audit_enabled().unwrap());
         store.narration().set_admin_full_audit(true);
         reads.record_admin_full_audit(serde_json::json!({"kind": "defect"})).unwrap();
-        assert!(reads.admin_full_audit_enabled());
+        assert!(reads.admin_full_audit_enabled().unwrap());
         assert_eq!(store.narration().inspector_traces(), vec![serde_json::json!({"kind": "defect"})]);
         drop((reads, store));
         tokio::task::spawn_blocking(move || thread.join()).await.unwrap();

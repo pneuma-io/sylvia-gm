@@ -243,6 +243,7 @@ fn inspect_on(store: &AuthorityStore, candidate_id: &str) -> StoreResult<JsonMap
 /// manifest facts, its runtime's private mechanics and procedures, its gameplay support claims
 /// and its admitted files.
 pub async fn inspect_package_candidate(store: &StoreHandle, candidate_id: &str) -> StoreResult<JsonMap> {
+    let _operation = store.operation()?;
     let id = candidate_id.to_owned();
     store.call(move |store| inspect_on(store, &id)).await
 }
@@ -266,6 +267,8 @@ pub async fn package_candidate_text(
     {
         return Err(rejected_with("Installed package file is export-only", "package_preview_unsupported"));
     }
+    // `with self._operation():` after the export-only check, as in Python.
+    let operation = store.operation()?;
     let (id, package, path) = (candidate_id.to_owned(), package_id.to_owned(), portable_path.to_owned());
     let value = store
         .call(move |store| {
@@ -284,6 +287,8 @@ pub async fn package_candidate_text(
             )
         })
         .await?;
+    // The decoding and the reply are outside the operation, as Python's are.
+    drop(operation);
     let Some(value) = value else {
         return Err(rejected_with("Installed package file is unavailable", "package_file_unavailable"));
     };
@@ -335,7 +340,8 @@ fn file_index(value: &JsonMap) -> StoreResult<std::collections::BTreeMap<String,
     Ok(indexed)
 }
 
-/// `AuthorityOwner.compare_package_candidates(left_id, right_id)`: whether the two closures are
+/// `AuthorityOwner.compare_package_candidates(left_id, right_id)`, guarded only through its two
+/// `inspect_package_candidate` reads, as Python's is: whether the two closures are
 /// the same, and each package added, removed or changed (its versions, content hashes and the
 /// files whose hashes differ), by package id.
 pub async fn compare_package_candidates(

@@ -19,6 +19,7 @@ pub mod ruleset_tests;
 pub mod ruleset_tools;
 pub mod runner;
 pub mod skills;
+pub mod source_tools;
 pub mod title;
 pub mod tools;
 pub mod turn;

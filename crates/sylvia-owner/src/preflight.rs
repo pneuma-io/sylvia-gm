@@ -231,7 +231,7 @@ impl PreflightReads for OwnerReads {
 
     fn admin_full_audit_enabled(&self) -> BoxFuture<'_, CodedResult<bool>> {
         let enabled = OwnerReads::admin_full_audit_enabled(self);
-        Box::pin(async move { Ok(enabled) })
+        Box::pin(async move { enabled })
     }
 
     /// The owner's `record_admin_full_audit`. Its only failure is a malformed payload, which

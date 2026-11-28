@@ -371,6 +371,13 @@
   ],
   "volatile_files": [
    "^diagnostics/"
-  ]
+  ],
+  "ignore_headers_row_8": [
+   "User-Agent",
+   "Accept-Encoding",
+   "Connection",
+   "X-Stainless-*"
+  ],
+  "header_name_case_row_40": true
  }
 }

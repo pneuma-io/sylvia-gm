@@ -149,7 +149,7 @@ pub(super) fn operation_payload(
 }
 
 /// `_package_lock_payload`.
-fn package_lock_payload(package_lock: &PackageLock) -> Json {
+pub(super) fn package_lock_payload(package_lock: &PackageLock) -> Json {
     sylvia_store::guided_start::package_lock_payload(package_lock)
 }
 
@@ -196,7 +196,7 @@ pub struct BindRequest<'a> {
 /// `AuthorityOwner._validate_campaign_inputs(captured)`, in one store call: the primary Ruleset
 /// is active, each participant has its exact package, kind and schema proof (or is an admitted
 /// format-1 participant), state keys are unique and nothing uses a reserved canonical channel.
-fn validate_campaign_inputs(
+pub(super) fn validate_campaign_inputs(
     store: &sylvia_store::AuthorityStore,
     package_lock: &PackageLock,
     participants: &[Participant],
@@ -765,25 +765,10 @@ pub async fn bind_guided_campaign_basis(
         ("builder_session", Json::Object(builder)),
     ];
     if !bind.participants.is_empty() {
-        let mut participants: Vec<&Participant> = bind.participants.iter().collect();
-        participants.sort_by(|left, right| left.participant_id().cmp(right.participant_id()));
-        let payloads = participants.into_iter().map(super::actions::participant_context).collect();
-        values.push(("participants", Json::Array(payloads)));
+        values.push(("participants", super::campaign_creation::participants_payload(bind.participants)));
     }
     if !bind.initial_state.is_empty() {
-        let mut state: Vec<&StateValue> = bind.initial_state.iter().collect();
-        state.sort_by(|left, right| (left.namespace(), left.key()).cmp(&(right.namespace(), right.key())));
-        let payloads = state
-            .into_iter()
-            .map(|item| {
-                let mut row = JsonMap::new();
-                row.insert("namespace".into(), item.namespace().into());
-                row.insert("key".into(), item.key().into());
-                row.insert("value".into(), item.value().clone());
-                Json::Object(row)
-            })
-            .collect();
-        values.push(("initial_state", Json::Array(payloads)));
+        values.push(("initial_state", super::campaign_creation::initial_state_payload(bind.initial_state)));
     }
     if let Some(candidate) = bind.package_candidate_id {
         values.push(("package_candidate_id", Json::from(candidate)));
