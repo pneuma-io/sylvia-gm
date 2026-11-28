@@ -99,8 +99,8 @@ Ported: 96 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `submit_session_input` | `sessions.handle_submit_session_input` | yes | yes | `submit-refusals` (before the loop; the run waits for lane 4's T5a) |
 | `interrupt_stream` | `sessions.handle_interrupt_stream` | yes | yes | `session-reads` |
 | `interrupt_provider_stream` | `providers.handle_interrupt_provider_stream` | yes | no | |
-| `retryable_interruption` | `campaigns.handle_retryable_interruption` | yes | yes | `action-commands` (with no interruption; one needs a failed turn) |
-| `manual_retry_session` | `sessions.handle_manual_retry_session` | yes | yes | `turn-refusals` (before the loop; the retry waits for lane 4's T5) |
+| `retryable_interruption` | `campaigns.handle_retryable_interruption` | yes | yes | `action-commands` (with no interruption), `fail-retry`, `reopen` and `opening-retry` (after a failed turn or opening) |
+| `manual_retry_session` | `sessions.handle_manual_retry_session` | yes | yes | `turn-refusals` (before the loop), `fail-retry`, `reopen` and `opening-retry` (the Retry and its replay) |
 | `disconnect_stream` | `sessions.handle_disconnect_stream` | yes | yes | `session-reads` |
 | `disconnect_provider_stream` | `providers.handle_disconnect_provider_stream` | yes | no | |
 | `stream_heartbeat` | `sessions.handle_stream_heartbeat` | yes | yes | `session-reads` |
