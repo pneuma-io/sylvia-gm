@@ -174,6 +174,11 @@ fn deeper_than_32(value: &Json) -> bool {
     false
 }
 
+/// `_parse(source)` for `character_card_import`: the same bounded, unique-member JSON read.
+pub(crate) fn parse_profile_json(data: &[u8]) -> DomainResult<Json> {
+    parse(data)
+}
+
 /// `_parse(source)`: bound both decoding and recursive JSON before structural validation.
 fn parse(data: &[u8]) -> DomainResult<Json> {
     if data.is_empty() || data.len() > MAX_PROFILE_BYTES {

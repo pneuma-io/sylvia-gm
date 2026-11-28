@@ -338,6 +338,30 @@ fn build(case: &J, script: &Script, workspace: &Path) -> Result<Vec<ToolSpec>, S
                 None,
             )
         }
+        "card" => {
+            let (save, read, import) = (script.clone(), script.clone(), script.clone());
+            let import_source: Option<sylvia_agent::builder::character_profile_tools::ProfileImport> =
+                if case.get("no_import").is_some() {
+                    None
+                } else {
+                    Some(Arc::new(move |data: &[u8]| {
+                        Ok(map(&import.answer(json!({"import": sha256_hex(data)}))?))
+                    }))
+                };
+            character_profile_tools(
+                workspace,
+                Arc::new(move |data: &[u8]| Ok(map(&save.answer(json!({"save": sha256_hex(data)}))?))),
+                Arc::new(move |artifact_id: &str, digest: &str| {
+                    let profile = read.answer(json!({"read_profile": [artifact_id, digest]}))?;
+                    Ok(CharacterProfile {
+                        artifact_id: artifact_id.into(),
+                        content_sha256: digest.into(),
+                        profile,
+                    })
+                }),
+                import_source,
+            )
+        }
         _ => content_definition_tool(&named, case["setting_character_schema"].as_object().cloned())
             .map(|tool| vec![tool]),
     };
@@ -367,7 +391,7 @@ fn character_tools_match_python() {
         for (call, recorded) in
             case["calls"].as_array().unwrap().iter().zip(compact["answers"].as_array().unwrap())
         {
-            let found = if case["tool"] == "profile" {
+            let found = if case["tool"] == "profile" || case["tool"] == "card" {
                 let name = call[0].as_str().unwrap();
                 let tool = tools.iter().find(|tool| tool.name == name).unwrap();
                 let mut found = map(&answer(tool, &call[1]));
@@ -376,18 +400,6 @@ fn character_tools_match_python() {
             } else {
                 answer(&tools[0], call)
             };
-            let pending = case["tool"] == "profile"
-                && matches!(
-                    call[0].as_str(),
-                    Some("preview_character_card_import" | "import_character_card")
-                )
-                && found["result"]["success"] == false
-                && found["result"].get("error_code").is_some();
-            if pending {
-                // Card import is not ported: past the parameter check it answers pending.
-                assert_eq!(found["result"]["error_code"], "rust_port_pending", "{label}");
-                continue;
-            }
             assert_same_json(&found, &expected_answer(recorded), format!("{label} call {call}"));
         }
         assert_same_json(
