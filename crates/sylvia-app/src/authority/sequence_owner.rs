@@ -13,9 +13,9 @@
 //! spawned task, and nothing here re-enters a lane or the narration lock from one: store calls
 //! run on the store thread and never take an owner lane.
 //!
-//! Not yet ported, so refused (`StoreError::NotPorted`) rather than answered differently:
-//! `campaign_panels`, which a sequence reads only to rebind a coordinate-map step's selection
-//! (`rebind_map`, a panel step whose selection carries `map_revision`).
+//! `campaign_panels`, which a sequence reads to rebind a coordinate-map step's selection
+//! (`rebind_map`, a panel step whose selection carries `map_revision`), is the authority's own
+//! (`campaign_panels`).
 
 use super::actions::ActionError;
 use super::content_reads::CatalogTool;
@@ -27,7 +27,7 @@ use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{ActionReceipt, CampaignSnapshot};
 use sylvia_domain::session::{SessionContext, SessionMessageKind};
 use sylvia_store::actions::IdempotencyHit;
-use sylvia_store::{StoreError, StoreHandle};
+use sylvia_store::StoreHandle;
 
 use sylvia_store::reentry::{holding_lane, holding_narration, holds_lane, holds_narration};
 
@@ -288,8 +288,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         })
     }
 
-    fn campaign_panels<'a>(&'a self, _campaign_id: &'a str) -> SequenceFuture<'a, JsonMap> {
-        Box::pin(async move { Err(ActionError::from(StoreError::NotPorted("campaign_panels"))) })
+    fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, JsonMap> {
+        Box::pin(super::campaign_panels::campaign_panels(self.store, campaign_id, None))
     }
 
     fn player_action_in_owned_work<'a>(

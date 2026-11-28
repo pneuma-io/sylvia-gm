@@ -144,3 +144,31 @@ impl AuthorityStore {
             .collect()
     }
 }
+
+impl AuthorityStore {
+    /// `current_campaign_entities(campaign_id)`: each entity record's latest active version, for
+    /// panels (not the action or audit history). A predecessor before migration 9 has none, and
+    /// reading a panel never migrates it.
+    pub fn current_campaign_entities(&self, campaign_id: &str) -> StoreResult<Vec<JsonMap>> {
+        let connection = self.connect()?;
+        let version: i64 = connection.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if version < 9 {
+            return Ok(Vec::new());
+        }
+        let (columns, rows) = named_rows(
+            &connection,
+            "SELECT record.record_id, record.payload_json FROM campaign_continuity_records AS record              JOIN (SELECT record_id, MAX(sequence) AS sequence FROM campaign_continuity_records              WHERE campaign_id = ? AND kind = 'entity' GROUP BY record_id) AS latest              ON latest.record_id = record.record_id AND latest.sequence = record.sequence              WHERE record.campaign_id = ? AND record.kind = 'entity' AND record.status = 'active'              ORDER BY record.record_id",
+            &[&campaign_id, &campaign_id],
+        )?;
+        rows.into_iter()
+            .map(|values| {
+                let row = Named { columns: &columns, values };
+                // `{"record_id": ..., **payload}`: the payload's own `record_id` keeps the first place.
+                let mut entity = JsonMap::new();
+                entity.insert("record_id".into(), py_str(row.get("record_id")?).into());
+                entity.extend(load_payload(&row.text("payload_json")?)?);
+                Ok(entity)
+            })
+            .collect()
+    }
+}
