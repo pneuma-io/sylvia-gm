@@ -6,17 +6,24 @@
 
 use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
-use sylvia_agent::provider_session::reads::{HeldWork, NarrationAttemptStart, TurnOwner};
+use sylvia_agent::provider_session::reads::{
+    AttemptStarted, HeldWork, LoopRetryNarration, ManualRetryCall, NarrationAttemptStart, RetryRefusal,
+    TurnOwner,
+};
+use sylvia_agent::session_loop::campaign::NarrationStream;
+use sylvia_agent::session_loop::SessionFailure;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::narration_attempts::{self as narration, NarrationStart};
+use sylvia_app::authority::narration_attempts::{RetryNarration, RetryStream};
 use sylvia_app::authority::{campaign_file, content_reads, knowledge, player_reads, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::authority::{
-    ActionCommand, ActionReceipt, CanonicalEvent, CanonicalReplay, NarrationInterruption, ProseChannel,
+    ActionCommand, ActionReceipt, CanonicalEvent, CanonicalReplay, ManualRetryResult, NarrationInterruption,
+    ProseChannel, RetryNarrationInput,
 };
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::provider_records::ProviderPrivateRecord;
@@ -25,6 +32,51 @@ use sylvia_domain::session::{
 };
 use sylvia_provider::BoxFuture;
 use sylvia_store::snapshots::DisplayQuery;
+
+/// The loop's Retry narrator, as lane 3's `manual_retry` runs a narrator.
+struct LoopNarration<'n> {
+    inner: Box<dyn LoopRetryNarration + 'n>,
+}
+
+impl RetryNarration for LoopNarration<'_> {
+    type Error = SessionFailure;
+
+    fn narrate<'a>(
+        &'a mut self,
+        input: RetryNarrationInput,
+        stream: &'a mut RetryStream<'_>,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), SessionFailure>> + Send + 'a>> {
+        Box::pin(async move {
+            let mut bridge = RetryStreamBridge { stream };
+            self.inner.narrate(input, &mut bridge).await
+        })
+    }
+}
+
+/// The loop's `NarrationStream` over the owner's `RetryStream`. A refused token stops the narrator.
+/// The owner keeps its own error and returns it as the Retry's failure, so the message here is
+/// only the stop signal.
+struct RetryStreamBridge<'s, 't> {
+    stream: &'s mut RetryStream<'t>,
+}
+
+impl NarrationStream for RetryStreamBridge<'_, '_> {
+    fn emit<'a>(
+        &'a mut self,
+        channel: ProseChannel,
+        token: &'a str,
+        response_blocks: Option<Vec<JsonMap>>,
+    ) -> BoxFuture<'a, CodedResult<()>> {
+        Box::pin(async move {
+            let blocks =
+                response_blocks.map(|blocks| Json::Array(blocks.into_iter().map(Json::Object).collect()));
+            self.stream
+                .emit(channel, token, blocks.as_ref())
+                .await
+                .map_err(|refused| CodedError::rejected(refused.message).with_error_type("CommandRejected"))
+        })
+    }
+}
 
 /// A store operation's refusal, in its class.
 fn store_failure(error: sylvia_store::StoreError) -> AuthorityFailure {
@@ -610,19 +662,32 @@ impl TurnOwner for OwnerReads {
 
     fn manual_retry<'a>(
         &'a self,
-        _call: sylvia_agent::provider_session::reads::ManualRetryCall,
-        _on_attempt_started: sylvia_agent::provider_session::reads::AttemptStarted<'a>,
-        _narrator: Box<dyn sylvia_agent::provider_session::reads::LoopRetryNarration + 'a>,
-    ) -> BoxFuture<
-        'a,
-        Result<
-            sylvia_domain::authority::ManualRetryResult,
-            sylvia_agent::provider_session::reads::RetryRefusal,
-        >,
-    > {
-        // Lane 3's `manual_retry` with a fallible, async `on_attempt_started` (their next PR).
-        Box::pin(async {
-            Err(sylvia_agent::provider_session::reads::RetryRefusal::Owner(pending("manual_retry").into()))
+        call: ManualRetryCall,
+        on_attempt_started: AttemptStarted<'a>,
+        narrator: Box<dyn LoopRetryNarration + 'a>,
+    ) -> BoxFuture<'a, Result<ManualRetryResult, RetryRefusal>> {
+        Box::pin(async move {
+            let cancel = call.cancel;
+            let request = narration::ManualRetry {
+                campaign_id: call.campaign_id,
+                interruption_id: call.interruption_id,
+                retry_id: call.retry_id,
+                cancel: Box::new(move || cancel()),
+            };
+            match narration::manual_retry(
+                self.store(),
+                request,
+                on_attempt_started,
+                LoopNarration { inner: narrator },
+            )
+            .await
+            {
+                Ok(result) => Ok(result),
+                Err(narration::RetryFailure::Owner(error)) => {
+                    Err(RetryRefusal::Owner(authority_failure(error)))
+                }
+                Err(narration::RetryFailure::Narrator(error)) => Err(RetryRefusal::Narrator(error)),
+            }
         })
     }
 
