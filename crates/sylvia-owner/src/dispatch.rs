@@ -162,6 +162,16 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
         "catalog" => commands::campaigns::handle_catalog(context, params).await,
+        "execute_action" => commands::actions::handle_execute_action(context, params).await,
+        "resolve_mechanics_choice" => {
+            commands::actions::handle_resolve_mechanics_choice(context, params).await
+        }
+        "open_turn" => commands::actions::handle_open_turn(context, params).await,
+        "complete_turn" => commands::actions::handle_complete_turn(context, params).await,
+        "retryable_interruption" => commands::actions::handle_retryable_interruption(context, params).await,
+        "begin_campaign_construction" => {
+            commands::campaigns::handle_begin_campaign_construction(context, params).await
+        }
         "snapshot" | "display_snapshot" => commands::campaigns::handle_snapshot(context, params).await,
         "backup_database" => commands::campaigns::handle_backup_database(context, params).await,
         "campaign_creation_catalog" => {
