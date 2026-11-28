@@ -25,13 +25,13 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/campaign_library_selection.py:319` | `resolve_campaign_plan_selection` | hashlib.sha256 | `install_id=f"plan-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` |  `sylvia-app` selection_vectors |
 | `application/campaign_library_selection.py:422` | `materialize_template_party` | hashlib.sha256 | `participant_namespace=hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24],` |  `sylvia-app` party_vectors |
 | `application/campaign_library_selection.py:555` | `materialize_library_party` | hashlib.sha256 | `+ hashlib.sha256(f"{operation_id}\0{artifact_id}".encode()).hexdigest()[:24]` |  `sylvia-app` party_vectors |
-| `application/character_card_import.py:168` | `_asset_uri` | hashlib.sha256 | `return "card://default/" + hashlib.sha256(uri.encode()).hexdigest()` | |
-| `application/character_card_import.py:171` | `_asset_uri` | hashlib.sha256 | `return "card://inline/" + hashlib.sha256(uri.encode()).hexdigest()` | |
-| `application/character_card_import.py:238` | `preview_character_card` | hashlib.sha256 | `digest = hashlib.sha256(source).hexdigest()` | |
-| `application/character_card_import.py:462` | `load_import_original` | hashlib.sha256 | `or hashlib.sha256(source).hexdigest() != digest` | |
-| `application/character_card_import.py:524` | `_read_pending_preview` | hashlib.sha256 | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
-| `application/character_card_import.py:535` | `_confirmed_card_result` | hashlib.sha256 | `profile_digest = hashlib.sha256(canonical_json_bytes(preview.profile)).hexdigest()` | |
-| `application/character_card_import.py:536` | `_confirmed_card_result` | hashlib.sha256 | `operation_hash = hashlib.sha256(("desktop-card:" + digest).encode()).hexdigest()[:24]` | |
+| `application/character_card_import.py:168` | `_asset_uri` | hashlib.sha256 | `return "card://default/" + hashlib.sha256(uri.encode()).hexdigest()` | yes |
+| `application/character_card_import.py:171` | `_asset_uri` | hashlib.sha256 | `return "card://inline/" + hashlib.sha256(uri.encode()).hexdigest()` | yes |
+| `application/character_card_import.py:238` | `preview_character_card` | hashlib.sha256 | `digest = hashlib.sha256(source).hexdigest()` | yes |
+| `application/character_card_import.py:462` | `load_import_original` | hashlib.sha256 | `or hashlib.sha256(source).hexdigest() != digest` | yes |
+| `application/character_card_import.py:524` | `_read_pending_preview` | hashlib.sha256 | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | yes |
+| `application/character_card_import.py:535` | `_confirmed_card_result` | hashlib.sha256 | `profile_digest = hashlib.sha256(canonical_json_bytes(preview.profile)).hexdigest()` | yes |
+| `application/character_card_import.py:536` | `_confirmed_card_result` | hashlib.sha256 | `operation_hash = hashlib.sha256(("desktop-card:" + digest).encode()).hexdigest()[:24]` | yes |
 | `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` character_profile_vectors |
@@ -224,8 +224,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_builder_session.py:1664` | `_campaign_plan_tool` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(skill.text.encode("utf-8")).hexdigest()` | `sylvia-agent` plan_tool_vectors (the tracked skill digest) |
 | `agent/_builder_session.py:1854` | `_campaign_plan_draft_tool.create` | hashlib.sha256 | `plan_suffix = hashlib.sha256( canonical_json_bytes({"premise": premise, "title": title}) ).hexdigest()[:16]` | `sylvia-agent` plan_tool_vectors (the draft's Plan id) |
 | `agent/_content_definition_tool.py:116` | `content_definition_tool.read` | hashlib.sha256 | `"definition_sha256": hashlib.sha256(canonical_json_bytes(definition)).hexdigest()}` | `sylvia-agent` character_tool_vectors (content_definition sections) |
-| `agent/_context_ledger.py:436` | `host_seal` | hashlib.sha256 | `digest = hashlib.sha256(b"sylvia-gm-host-record-seal/v1\x00" + session_id.encode("utf-8"))` | |
-| `agent/_context_ledger.py:491` | `_sha` | hashlib.sha256 | `return hashlib.sha256(text.encode("utf-8")).hexdigest()` | |
+| `agent/_context_ledger.py:436` | `host_seal` | hashlib.sha256 | `digest = hashlib.sha256(b"sylvia-gm-host-record-seal/v1\x00" + session_id.encode("utf-8"))` | `sylvia-agent` ledger_settings_vectors |
+| `agent/_context_ledger.py:491` | `_sha` | hashlib.sha256 | `return hashlib.sha256(text.encode("utf-8")).hexdigest()` | `sylvia-agent` ledger_state_vectors |
 | `agent/_inference_identity.py:18` | `inference_context_id` | hashlib.sha256 | `return "sylvia-" + hashlib.sha256(encoded).hexdigest()` | |
 | `agent/_provider_session.py:417` | `_package_tool_alias` | hashlib.sha256 | `digest = hashlib.sha256(identity.encode("utf-8")).hexdigest()[:12]` | `sylvia-agent` tool_projection_vectors |
 | `agent/_provider_turn_phases.py:387` | `retry_repeated_response` | hashlib.sha256 | `"response_sha256": hashlib.sha256(state.narration.encode("utf-8")).hexdigest(),` | |

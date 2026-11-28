@@ -1,0 +1,34 @@
+{
+  "name": "card-import",
+  "description": "Desktop character card import on a fresh profile: preview_character_card_file's refusals (no path, an empty path, a .txt file, a folder, an unsupported card), a V2 JSON card previewed twice and a V3 PNG card; confirm_character_card_import's refusals (no digest, a malformed digest, an unknown preview) and both cards confirmed, one twice. The previews, the retained originals and the saved profiles are compared.",
+  "seed_files": [
+    {"path": "cards/vela-v2.json", "copy_from": "crates/sylvia-app/tests/vectors/character_card/vela-v2.json"},
+    {"path": "cards/vela-v3.png", "copy_from": "crates/sylvia-app/tests/vectors/character_card/vela-v3.png"},
+    {"path": "cards/vela.txt", "copy_from": "crates/sylvia-app/tests/vectors/character_card/vela-v2.json"},
+    {"path": "cards/broken.json", "text": "{}"},
+    {"path": "cards/folder.json", "directory": true}
+  ],
+  "rules": {
+    "ignore_keys": ["diagnostic_id"],
+    "volatile_files": ["^diagnostics/"]
+  },
+  "steps": [
+    {"method": "preview_character_card_file", "params": {}},
+    {"method": "preview_character_card_file", "params": {"source_path": ""}},
+    {"method": "preview_character_card_file", "params": {"source_path": "${work}/cards/vela.txt"}},
+    {"method": "preview_character_card_file", "params": {"source_path": "${work}/cards/folder.json"}},
+    {"method": "preview_character_card_file", "params": {"source_path": "${work}/cards/broken.json"}},
+    {"method": "preview_character_card_file", "expect_ok": true, "params": {"source_path": "${work}/cards/vela-v2.json"},
+     "save": {"v2": "/result/source_sha256"}},
+    {"method": "preview_character_card_file", "expect_ok": true, "params": {"source_path": "${work}/cards/vela-v2.json"}},
+    {"method": "preview_character_card_file", "expect_ok": true, "params": {"source_path": "${work}/cards/vela-v3.png"},
+     "save": {"v3": "/result/source_sha256"}},
+    {"method": "confirm_character_card_import", "params": {}},
+    {"method": "confirm_character_card_import", "params": {"source_sha256": "not-a-digest"}},
+    {"method": "confirm_character_card_import", "params": {"source_sha256": "0000000000000000000000000000000000000000000000000000000000000000"}},
+    {"method": "confirm_character_card_import", "expect_ok": true, "params": {"source_sha256": "${v2}"}},
+    {"method": "confirm_character_card_import", "expect_ok": true, "params": {"source_sha256": "${v2}"}},
+    {"method": "confirm_character_card_import", "expect_ok": true, "params": {"source_sha256": "${v3}"}},
+    {"method": "shutdown"}
+  ]
+}

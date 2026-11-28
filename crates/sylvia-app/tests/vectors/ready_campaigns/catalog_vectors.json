@@ -1,0 +1,539 @@
+{
+ "python": "3.12",
+ "cases": [
+  {
+   "name": "shipped",
+   "edits": [],
+   "outcome": {
+    "ok": [
+     {
+      "id": "a-debt-in-iron",
+      "content_sha256": "1329d07415f597f8db22b53376f11e3c970a568ec608164fa69aa91e46787bd2",
+      "title": "A Debt in Iron",
+      "summary": "As Lodge trainee Tavin Bell, begin beside a missing-relic notice and your signed pledge. Quarterkeeper Ysra asks for a Warden survey plate's return and an honest account.",
+      "party": [
+       {
+        "name": "Tavin Bell",
+        "role": "player_character",
+        "level": 1,
+        "classes": [
+         {
+          "id": "fighter",
+          "level": 1
+         }
+        ],
+        "summary": "The adventure's included Fighter, with his authored equipment and history."
+       },
+       {
+        "name": "Oren Reed",
+        "role": "companion",
+        "level": 1,
+        "classes": [
+         {
+          "id": "cleric",
+          "level": 1
+         }
+        ],
+        "summary": "Cleric \u00b7 Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+        "profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+        "hp": 9,
+        "armor_class": 17
+       }
+      ]
+     },
+     {
+      "id": "last-cart-through",
+      "content_sha256": "5caac49c18e17e231704f36588020435e0f15ab8c67815141df2dda0def6b105",
+      "title": "Last Cart Through",
+      "summary": "A broken Guild wagon blocks a forest crossing. Its driver needs help while a hungry Rifthound watches from the treeline.",
+      "party": [
+       {
+        "name": "Bram Alder",
+        "role": "player_character",
+        "level": 2,
+        "classes": [
+         {
+          "id": "fighter",
+          "level": 2
+         }
+        ],
+        "summary": "Fighter \u00b7 Level 2. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+        "profile": "# Bram Alder\n\nHuman Fighter, level 2. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nAction Surge, one use per Short or Long Rest. Tactical Mind uses Second Wind; retain Defense. Fixed HP increase, including Constitution: 8.",
+        "hp": 20,
+        "armor_class": 17
+       },
+       {
+        "name": "Oren Reed",
+        "role": "companion",
+        "level": 2,
+        "classes": [
+         {
+          "id": "cleric",
+          "level": 2
+         }
+        ],
+        "summary": "Cleric \u00b7 Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+        "profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+        "hp": 15,
+        "armor_class": 17
+       }
+      ]
+     },
+     {
+      "id": "the-cartographers-wake",
+      "content_sha256": "1334a695dd8d46c25ec63d32e09efc57b938f89ddd4961600bb872cf92bcf210",
+      "title": "The Cartographer\u2019s Wake",
+      "summary": "At a Nexus cartographer's wake, the final chart is missing. A broken cellar latch and a witness's account offer the first leads.",
+      "party": [
+       {
+        "name": "Pip Venn",
+        "role": "player_character",
+        "level": 2,
+        "classes": [
+         {
+          "id": "rogue",
+          "level": 2
+         }
+        ],
+        "summary": "Rogue \u00b7 Level 2. Use a shortsword or shortbow and seek a Sneak Attack opening. You have two Expertise choices; Cunning Action arrives at level two.",
+        "profile": "# Pip Venn\n\nHuman Rogue, level 2. Pronouns: they/them.\n\nQuick with a grin; checks that everyone has an exit. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Pip\n\nUse a shortsword or shortbow and seek a Sneak Attack opening. You have two Expertise choices; Cunning Action arrives at level two. Expertise: Stealth and Perception. Thieves' Cant is known.\n\n## Creation choices\n\nStandard array, then the Criminal background increases, is reflected in the final ability scores. Criminal supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies history. Skilled choices: insight survival deception. Class skill choices: acrobatics investigation perception persuasion. Starting equipment uses class option A and background option A, with 24 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nDash, Disengage or Hide as a Bonus Action. Fixed HP increase, including Constitution: 7.",
+        "hp": 17,
+        "armor_class": 14
+       },
+       {
+        "name": "Bram Alder",
+        "role": "companion",
+        "level": 2,
+        "classes": [
+         {
+          "id": "fighter",
+          "level": 2
+         }
+        ],
+        "summary": "Fighter \u00b7 Level 2. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+        "profile": "# Bram Alder\n\nHuman Fighter, level 2. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nAction Surge, one use per Short or Long Rest. Tactical Mind uses Second Wind; retain Defense. Fixed HP increase, including Constitution: 8.",
+        "hp": 20,
+        "armor_class": 17
+       },
+       {
+        "name": "Oren Reed",
+        "role": "companion",
+        "level": 2,
+        "classes": [
+         {
+          "id": "cleric",
+          "level": 2
+         }
+        ],
+        "summary": "Cleric \u00b7 Level 2. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+        "profile": "# Oren Reed\n\nHuman Cleric, level 2. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.\n\n## Prepared level-two choices\n\nTwo uses; Divine Spark and Turn Undead. Five Cleric spells prepared; add Shield of Faith. Fixed HP increase, including Constitution: 6.",
+        "hp": 15,
+        "armor_class": 17
+       }
+      ]
+     },
+     {
+      "id": "rift-awakening",
+      "content_sha256": "bd1de46b1ceb1da138864ef84eff47647d4568f4bf9d6f786c997b759932e2c1",
+      "title": "Rift Awakening",
+      "summary": "Wake beneath an unfamiliar sky in a woodland clearing. A weathered sign points toward Thornwall. Explore your surroundings and choose your first steps in the Severed Lands.",
+      "party": [
+       {
+        "name": "Neri Vale",
+        "role": "player_character",
+        "level": 1,
+        "classes": [
+         {
+          "id": "bard",
+          "level": 1
+         }
+        ],
+        "summary": "Bard \u00b7 Level 1. Help allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.",
+        "profile": "# Neri Vale\n\nHuman Bard, level 1. Pronouns: they/them.\n\nCurious and playful; collects odd turns of phrase. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Neri\n\nHelp allies and talk your way through trouble. Vicious Mockery is your repeatable attack; save Healing Word for an ally who needs help.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: acrobatics investigation stealth. Class skill choices: persuasion deception performance. Starting equipment uses class option A and background option A, with 27 GP retained. Also carried, at no cost: phosphorescent moss for Light. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+        "hp": 9,
+        "armor_class": 13
+       },
+       {
+        "name": "Bram Alder",
+        "role": "companion",
+        "level": 1,
+        "classes": [
+         {
+          "id": "fighter",
+          "level": 1
+         }
+        ],
+        "summary": "Fighter \u00b7 Level 1. A direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.",
+        "profile": "# Bram Alder\n\nHuman Fighter, level 1. Pronouns: they/them.\n\nSteady and dry-witted; likes a clear plan and a hot meal. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Bram\n\nA direct greatsword fighter in chain mail. Attack on your turn and use Second Wind when hurt; you begin with two uses.\n\n## Creation choices\n\nStandard array, then the Soldier background increases, is reflected in the final ability scores. Soldier supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies nature. Skilled choices: survival acrobatics stealth. Class skill choices: perception insight. Starting equipment uses class option A and background option A, with 18 GP retained. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+        "hp": 12,
+        "armor_class": 17
+       },
+       {
+        "name": "Oren Reed",
+        "role": "companion",
+        "level": 1,
+        "classes": [
+         {
+          "id": "cleric",
+          "level": 1
+         }
+        ],
+        "summary": "Cleric \u00b7 Level 1. Protect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies.",
+        "profile": "# Oren Reed\n\nHuman Cleric, level 1. Pronouns: they/them.\n\nPatient and practical; asks what would help before offering advice. No fixed home, allegiance, or campaign history is assigned.\n\n## Playing Oren\n\nProtect the party with Bless and a shield. Sacred Flame attacks at range; Cure Wounds and Healing Word restore allies. Divine Order: Protector.\n\n## Creation choices\n\nStandard array, then the Acolyte background increases, is reflected in the final ability scores. Acolyte supplies its listed skills, tool, and origin feat. Human Versatile supplies Skilled; Skillful supplies perception. Skilled choices: history survival athletics. Class skill choices: medicine persuasion. Starting equipment uses class option A and background option A, with 15 GP retained. Also carried, at no cost: two lodestones for Mending. Languages: Common, Dwarvish, and Elvish. Human Resourceful grants Heroic Inspiration after a Long Rest.\n\nAll identity, personality, background, ability, equipment, skill, and spell choices can be changed on an independent copy. Keep the declared creation rules when changing mechanical choices.",
+        "hp": 9,
+        "armor_class": 17
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "too large",
+   "raw_pad": 1048576,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is too large"
+   }
+  },
+  {
+   "name": "not JSON",
+   "raw": "not json",
+   "outcome": {
+    "error": "JSONDecodeError",
+    "message": "Expecting value: line 1 column 1 (char 0)"
+   }
+  },
+  {
+   "name": "format version 2",
+   "edits": [
+    [
+     "set",
+     "/format_version",
+     2
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is incompatible"
+   }
+  },
+  {
+   "name": "format version true",
+   "edits": [
+    [
+     "set",
+     "/format_version",
+     true
+    ]
+   ],
+   "outcome": {
+    "ok_sha256": "7c9a64c34e49c8c4b116317283e318990bcb4b0065d1ed4abb13263c5b49e129"
+   }
+  },
+  {
+   "name": "format version 1.0",
+   "edits": [
+    [
+     "set",
+     "/format_version",
+     1.0
+    ]
+   ],
+   "outcome": {
+    "ok_sha256": "7c9a64c34e49c8c4b116317283e318990bcb4b0065d1ed4abb13263c5b49e129"
+   }
+  },
+  {
+   "name": "provenance not an object",
+   "edits": [
+    [
+     "set",
+     "/provenance",
+     []
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is incompatible"
+   }
+  },
+  {
+   "name": "three campaigns",
+   "edits": [
+    [
+     "delete",
+     "/campaigns/3"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is incomplete"
+   }
+  },
+  {
+   "name": "campaigns not a list",
+   "edits": [
+    [
+     "set",
+     "/campaigns",
+     {}
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is incomplete"
+   }
+  },
+  {
+   "name": "a row with another key",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/extra",
+     1
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "a row without its party",
+   "edits": [
+    [
+     "delete",
+     "/campaigns/0/party"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "an empty party",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/party",
+     []
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "seven in a party",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/party",
+     [
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      },
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      },
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      },
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      },
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      },
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      },
+      {
+       "role": "companion",
+       "required_character_id": "nobody"
+      }
+     ]
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "a member not an object",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/party/0",
+     "member"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "an identity not a string",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/id",
+     7
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "bindings not an object",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/bindings",
+     []
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign inventory is invalid"
+   }
+  },
+  {
+   "name": "duplicate identities",
+   "edits": [
+    [
+     "set",
+     "/campaigns/1/id",
+     "a-debt-in-iron"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "Prepared campaign identities conflict"
+   }
+  },
+  {
+   "name": "an unknown adventure",
+   "edits": [
+    [
+     "set",
+     "/campaigns/0/id",
+     "no-such-adventure"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "The prepared party requires its exact bundled adventure and packages"
+   }
+  },
+  {
+   "name": "a changed Plan",
+   "edits": [
+    [
+     "set",
+     "/campaigns/2/plan_content_sha256",
+     "0000000000000000000000000000000000000000000000000000000000000000"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "The prepared party requires its exact bundled adventure and packages"
+   }
+  },
+  {
+   "name": "changed bindings",
+   "edits": [
+    [
+     "set",
+     "/campaigns/2/bindings/package_closure_sha256",
+     "0000000000000000000000000000000000000000000000000000000000000000"
+    ]
+   ],
+   "outcome": {
+    "error": "ValueError",
+    "message": "The prepared party requires its exact bundled adventure and packages"
+   }
+  },
+  {
+   "name": "a public preview",
+   "edits": [
+    [
+     "set",
+     "/campaigns/1/party/0/character",
+     null
+    ]
+   ],
+   "outcome": {
+    "ok_sha256": "1e25edd8716672255c6c35b95687d8c8f540b4b875b5c200eb7f865973018635"
+   }
+  },
+  {
+   "name": "a character without its summary",
+   "edits": [
+    [
+     "delete",
+     "/campaigns/1/party/1/character/summary"
+    ]
+   ],
+   "outcome": {
+    "error": "KeyError",
+    "message": "'summary'"
+   }
+  },
+  {
+   "name": "a character without its state",
+   "edits": [
+    [
+     "delete",
+     "/campaigns/1/party/1/character/entity_state"
+    ]
+   ],
+   "outcome": {
+    "error": "KeyError",
+    "message": "'entity_state'"
+   }
+  },
+  {
+   "name": "a member without its role",
+   "edits": [
+    [
+     "delete",
+     "/campaigns/1/party/1/role"
+    ]
+   ],
+   "outcome": {
+    "error": "KeyError",
+    "message": "'role'"
+   }
+  },
+  {
+   "name": "a participant not an object",
+   "edits": [
+    [
+     "set",
+     "/campaigns/1/party/1/character/participant",
+     [
+      1
+     ]
+    ]
+   ],
+   "outcome": {
+    "error": "TypeError",
+    "message": "list indices must be integers or slices, not str"
+   }
+  }
+ ]
+}

@@ -247,7 +247,7 @@ pub(super) fn package_tool(
 fn materialize_tool(
     entry: &sylvia_domain::authority::PackageLockEntry,
     declaration: &sylvia_domain::package_library::ToolDeclaration,
-    runtime: &[u8],
+    runtime: &std::sync::Arc<Vec<u8>>,
 ) -> StoreResult<Option<CatalogTool>> {
     use crate::package_mechanic::{
         materialize_package_mechanic, materialize_player_action_checker, materialize_player_action_previewer,

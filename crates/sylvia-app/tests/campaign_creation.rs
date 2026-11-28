@@ -242,6 +242,11 @@ async fn run(
             store.ready_campaign_start_work(&text("operation_id")).await?;
             Json::Null
         }
+        "start_and_reject" => {
+            let operation_id = text("operation_id");
+            let mut held = store.ready_campaign_start_work(&operation_id).await?;
+            store.reject_uncreated_ready_campaign_held(&mut held, &operation_id).await?.into()
+        }
         "start_and_confirm" => {
             let inner = &step["confirm"];
             let held = store.ready_campaign_start_work(inner["operation_id"].as_str().unwrap()).await?;
@@ -299,7 +304,7 @@ async fn confirmations_and_completions_answer_as_pythons_owner() {
     let mut campaigns = HashMap::new();
     let mut failures = Vec::new();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 40);
+    assert_eq!(runs.len(), 42);
     for (index, item) in runs.iter().enumerate() {
         let got = match run(&handle, &item["step"], &mut campaigns).await {
             Ok(value) => json!({"ok": value}),

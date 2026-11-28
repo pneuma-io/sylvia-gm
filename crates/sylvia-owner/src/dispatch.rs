@@ -185,6 +185,10 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "campaign_creation_catalog" => {
             commands::campaigns::handle_campaign_creation_catalog(context, params).await
         }
+        "ready_campaign_catalog" => commands::campaigns::handle_ready_campaign_catalog(context, params).await,
+        "customize_ready_campaign" | "start_ready_campaign" => {
+            commands::campaigns::handle_customize_ready_campaign(context, params).await
+        }
         "campaign_party_options" => commands::campaigns::handle_campaign_party_options(context, params).await,
         "advance_guided_campaign_draft" => {
             commands::campaigns::handle_advance_guided_campaign_draft(context, params).await
@@ -200,6 +204,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "trash_campaign" => commands::campaigns::handle_trash_campaign(context, params).await,
         "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
+        "export_campaign_plan_file" => {
+            commands::campaigns::handle_export_campaign_plan_file(context, params).await
+        }
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
         }
@@ -213,6 +220,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "install_package" => commands::packages::handle_install_package(context, params).await,
         "install_package_file" => commands::packages::handle_install_package_file(context, params).await,
+        "preview_character_card_file" | "confirm_character_card_import" => {
+            commands::packages::handle_confirm_character_card_import(context, params).await
+        }
         "export_package_candidate" | "export_package_candidate_file" => {
             commands::packages::handle_export_package_candidate(context, params).await
         }

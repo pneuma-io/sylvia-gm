@@ -7,7 +7,8 @@ Run from the repository root with the snapshot's interpreter:
 Every tool is Python's own: `_participant_artifact_tool`, `_participant_draft_check_tool`,
 `participant_file_tool`, `character_draft_tool`, `reuse_character_copy_tool`,
 `character_profile_tools` and `content_definition_tool`. The owner callbacks are stand-ins that
-record each call and answer the case's scripted outcome: a result, or an exception of a named
+record each call and answer the case's scripted outcome (card import's storage too, with cards built
+as `tests/test_rich_character_profiles.py` builds them): a result, or an exception of a named
 class (`raise`), which the Rust test raises as the same class. Declarations are SRD Lite's real
 player-character declaration and a small companion one.
 
@@ -30,6 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT))
 
 from sylvia_gm.agent._builder_session import (  # noqa: E402
     _participant_artifact_tool,
@@ -54,6 +56,7 @@ from sylvia_gm.domain.package_library import (  # noqa: E402
     manifest_from_record,
 )
 from sylvia_gm.tools._converter import tool_spec_to_openai  # noqa: E402
+from tests.test_rich_character_profiles import card, png  # noqa: E402
 
 OUTPUT = Path(__file__).with_name("character_tool_vectors.json")
 NL = chr(10)
@@ -478,6 +481,32 @@ def cases():
     ]
     result.append({"tool": "profile", "files": profile_files, "calls": profile_calls, "outcomes": profile_outcomes})
 
+    # Previewing and importing cards (`application/character_card_import.py`), with the owner's
+    # import storage scripted, and without it.
+    v2_card, v3_card = card(2), card(3)
+    card_text = json.dumps(v2_card)
+    card_files = {"cards/vela.json": card_text, "cards/vela.png": {"base64": base64.b64encode(png(v3_card, "ccv3")).decode()},
+                  "cards/broken.json": "{}", "cards/notes.json": json.dumps({**v2_card, "spec_version": "9.0"})}
+    preview = lambda path: ["preview_character_card_import", {"path": path}]  # noqa: E731
+    importing = lambda path, version: ["import_character_card", {"path": path, "expected_version": version}]  # noqa: E731
+    card_calls = [
+        preview("cards/vela.json"), preview("cards/vela.png"), preview("cards/broken.json"),
+        preview("cards/notes.json"), preview("cards/missing.json"), preview("../vela.json"),
+        importing("cards/vela.json", DIGEST), importing("cards/vela.json", file_version(card_text)),
+        importing("cards/vela.json", file_version(card_text)), importing("cards/vela.json", file_version(card_text)),
+        importing("cards/vela.json", file_version(card_text)), importing("cards/broken.json", file_version("{}")),
+        ["import_character_card", {"path": "cards/vela.json"}],
+    ]
+    card_outcomes = [
+        {"return": {"kind": "character_profile", "id": PROFILE, "import_source_sha256": DIGEST}},
+        {"raise": {"class": "CommandRejected", "message": "Library full", "code": "library_full"}},
+        {"raise": {"class": "OSError", "message": "disk"}},
+        {"raise": {"class": "ValueError", "message": "Original-source conflict"}},
+    ]
+    result.append({"tool": "card", "files": card_files, "calls": card_calls, "outcomes": card_outcomes})
+    result.append({"tool": "card", "no_import": True, "files": card_files,
+                   "calls": [importing("cards/vela.json", file_version(card_text))], "outcomes": []})
+
     # The content definition tool.
     definition_calls = [{}, {"name": "character_creation"}, {"name": "character_profile_v2"},
                         {"name": "character_profile_v2", "section": "/requirements"},
@@ -537,6 +566,14 @@ def run(compact, named):
             elif kind == "profile":
                 save, read = profile_callbacks(script)
                 tools = list(character_profile_tools(workspace, save=save, read=read))
+            elif kind == "card":
+                save, read = profile_callbacks(script)
+
+                def import_source(data):
+                    return script.answer({"import": hashlib.sha256(data).hexdigest()})
+
+                tools = list(character_profile_tools(
+                    workspace, save=save, read=read, import_source=None if case.get("no_import") else import_source))
             else:
                 tools = [content_definition_tool(declarations, case["setting_character_schema"])]
         except Exception as error:  # noqa: BLE001 - recorded
@@ -544,7 +581,7 @@ def run(compact, named):
         by_name = {tool.name: tool for tool in tools}
         answers = []
         for params in case["calls"]:
-            if kind == "profile":
+            if kind in ("profile", "card"):
                 name, params = params
                 answers.append({"tool": name, **call(by_name[name], params)})
             else:

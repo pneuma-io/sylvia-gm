@@ -52,6 +52,13 @@ pub struct Session {
     /// example). Placeholders are replaced first. A relaunch step may give its own.
     #[serde(default)]
     pub launch: JsonMap,
+    /// Environment variables for the owner under test, Python's and Rust's alike (a forced
+    /// context mode, for example). Text keys and values; set after the profile folders, which a
+    /// session may not replace, and refused when `--env` names the same variable. A non-empty
+    /// map is recorded as the recording's `env`, so a check against a recording made with other
+    /// values fails.
+    #[serde(default)]
+    pub env: std::collections::BTreeMap<String, String>,
     /// The requests, in order.
     pub steps: Vec<Step>,
     /// What may differ between runs of this session, on top of the built-in defaults.
@@ -256,6 +263,7 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
             command.env.push((key.to_owned(), value));
         }
     }
+    apply_session_env(&session.env, &mut command)?;
     let command = &command;
 
     let standin = if session.standin { Some(Standin::start(session.standin_narration)?) } else { None };
@@ -285,6 +293,9 @@ pub fn record(session: &Session, command: &OwnerCommand, work: &Path) -> Result<
 
     let mut recording = JsonMap::new();
     recording.insert("session".into(), session.name.clone().into());
+    if let Some(env) = recorded_env(&session.env) {
+        recording.insert("env".into(), env);
+    }
     // Present only when the session did not run to the end; a reference never has it.
     if !stopped.is_null() {
         recording.insert("stopped".into(), stopped);
@@ -697,10 +708,113 @@ fn list_files(root: &Path) -> Result<Json, String> {
     Ok(found.into_iter().map(|(_, item)| Json::Object(item)).collect())
 }
 
+/// The variables `record` gives every owner its own empty profile with; a session may not
+/// replace them.
+const PROFILE_VARIABLES: [&str; 8] = [
+    "USERPROFILE",
+    "HOME",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "XDG_STATE_HOME",
+    "XDG_CACHE_HOME",
+    "XDG_CONFIG_HOME",
+    "XDG_DATA_HOME",
+];
+
+/// Add a session's `env` to the owner's command, refusing a profile variable, an empty name or
+/// one with `=`, and a variable `--env` also sets (which would make the run differ from the
+/// session file without the recording showing it).
+fn apply_session_env(
+    env: &std::collections::BTreeMap<String, String>,
+    command: &mut OwnerCommand,
+) -> Result<(), String> {
+    for (key, value) in env {
+        if key.is_empty() || key.contains('=') || key.contains('\0') || value.contains('\0') {
+            return Err(format!("session env variable {key:?} is not a valid environment variable"));
+        }
+        if PROFILE_VARIABLES.iter().any(|reserved| reserved.eq_ignore_ascii_case(key)) {
+            return Err(format!(
+                "session env may not set {key}: the comparison tool owns the profile folders"
+            ));
+        }
+        if command.env.iter().any(|(existing, _)| existing.eq_ignore_ascii_case(key)) {
+            return Err(format!("{key} is set both by --env and by the session's env"));
+        }
+        command.env.push((key.clone(), value.clone()));
+    }
+    Ok(())
+}
+
+/// The recording's `env`: the session's variables in name order, or nothing when it sets none,
+/// so recordings of sessions without `env` stay as they were.
+fn recorded_env(env: &std::collections::BTreeMap<String, String>) -> Option<Json> {
+    (!env.is_empty()).then(|| {
+        Json::Object(env.iter().map(|(key, value)| (key.clone(), Json::String(value.clone()))).collect())
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use serde_json::json;
+
+    fn session_with_env(env: Json) -> Result<Session, serde_json::Error> {
+        serde_json::from_value(json!({"name": "s", "description": "d", "steps": [], "env": env}))
+    }
+
+    #[test]
+    fn session_env_is_text_applied_to_the_owner_and_recorded() {
+        let session = session_with_env(json!({"SYLVIA_GM_CONTEXT_MODE": "ledger", "A_FLAG": "1"})).unwrap();
+        let mut command = OwnerCommand {
+            program: "owner".into(),
+            args: Vec::new(),
+            env: vec![("HOME".into(), "h".into())],
+        };
+        apply_session_env(&session.env, &mut command).unwrap();
+        assert_eq!(
+            command.env,
+            vec![
+                ("HOME".to_owned(), "h".to_owned()),
+                ("A_FLAG".to_owned(), "1".to_owned()),
+                ("SYLVIA_GM_CONTEXT_MODE".to_owned(), "ledger".to_owned()),
+            ]
+        );
+        // Recorded in name order, so a recording made with other values differs.
+        assert_eq!(
+            recorded_env(&session.env).map(|env| env.to_string()),
+            Some(r#"{"A_FLAG":"1","SYLVIA_GM_CONTEXT_MODE":"ledger"}"#.to_owned())
+        );
+        let other = session_with_env(json!({"SYLVIA_GM_CONTEXT_MODE": "full", "A_FLAG": "1"})).unwrap();
+        assert_ne!(recorded_env(&session.env), recorded_env(&other.env));
+        // A session without `env` records nothing, so existing recordings are unchanged.
+        let plain: Session =
+            serde_json::from_value(json!({"name": "s", "description": "d", "steps": []})).unwrap();
+        assert!(plain.env.is_empty());
+        assert_eq!(recorded_env(&plain.env), None);
+    }
+
+    #[test]
+    fn session_env_refuses_non_text_profile_and_conflicting_variables() {
+        assert!(session_with_env(json!({"FLAG": 1})).is_err());
+        assert!(session_with_env(json!({"FLAG": null})).is_err());
+        assert!(session_with_env(json!(["FLAG"])).is_err());
+        let command = || OwnerCommand {
+            program: "owner".into(),
+            args: Vec::new(),
+            env: vec![("FLAG".into(), "cli".into())],
+        };
+        for (env, message) in [
+            (json!({"HOME": "/elsewhere"}), "may not set HOME"),
+            (json!({"xdg_data_home": "/elsewhere"}), "may not set xdg_data_home"),
+            (json!({"flag": "session"}), "set both by --env"),
+            (json!({"": "x"}), "not a valid environment variable"),
+            (json!({"A=B": "x"}), "not a valid environment variable"),
+        ] {
+            let session = session_with_env(env).unwrap();
+            let error = apply_session_env(&session.env, &mut command()).unwrap_err();
+            assert!(error.contains(message), "{error}");
+        }
+    }
 
     #[test]
     fn placeholders_keep_types_or_splice_text() {

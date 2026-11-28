@@ -1,0 +1,293 @@
+{
+  "name": "ready-campaigns",
+  "description": "Connect a model, read the prepared campaigns, start each of the four as a local copy (one replayed), refuse a changed and an unknown template (and the same start again behind its fence), stop at a model guidance warning then continue with the override, save editable copies of a prepared party, refuse a changed customization and a start without its name, read the index back, shut down.",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "steps": [
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "configured_context_window": 1000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "ready_campaign_catalog",
+      "expect_ok": true,
+      "save": {
+        "iron": "/result/0/content_sha256",
+        "cart": "/result/1/content_sha256",
+        "wake": "/result/2/content_sha256",
+        "rift": "/result/3/content_sha256"
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-iron",
+        "template_id": "a-debt-in-iron",
+        "expected_content_sha256": "${iron}",
+        "display_name": "A Debt in Iron",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      },
+      "save": {
+        "iron_campaign": "/result/campaign_id"
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-cart",
+        "template_id": "last-cart-through",
+        "expected_content_sha256": "${cart}",
+        "display_name": "Last Cart Through",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-wake",
+        "template_id": "the-cartographers-wake",
+        "expected_content_sha256": "${wake}",
+        "display_name": "The Cartographer's Wake",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-rift",
+        "template_id": "rift-awakening",
+        "expected_content_sha256": "${rift}",
+        "display_name": "The Rift Awakening",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-iron",
+        "template_id": "a-debt-in-iron",
+        "expected_content_sha256": "${iron}",
+        "display_name": "A Debt in Iron",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "params": {
+        "operation_id": "ready-stale",
+        "template_id": "a-debt-in-iron",
+        "expected_content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "display_name": "Stale",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "params": {
+        "operation_id": "ready-stale",
+        "template_id": "a-debt-in-iron",
+        "expected_content_sha256": "${iron}",
+        "display_name": "Stale",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "params": {
+        "operation_id": "ready-unknown",
+        "template_id": "no-such-adventure",
+        "expected_content_sha256": "${iron}",
+        "display_name": "Unknown",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-guided",
+        "template_id": "last-cart-through",
+        "expected_content_sha256": "${cart}",
+        "display_name": "Guided Cart",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "ready-guided",
+        "template_id": "last-cart-through",
+        "expected_content_sha256": "${cart}",
+        "display_name": "Guided Cart",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "customize_ready_campaign",
+      "params": {
+        "operation_id": "custom-wake",
+        "template_id": "the-cartographers-wake",
+        "expected_content_sha256": "${wake}"
+      }
+    },
+    {
+      "method": "customize_ready_campaign",
+      "params": {
+        "operation_id": "custom-stale",
+        "template_id": "rift-awakening",
+        "expected_content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "method": "start_ready_campaign",
+      "params": {
+        "operation_id": "ready-nameless",
+        "template_id": "rift-awakening",
+        "expected_content_sha256": "${rift}",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true
+    },
+    {
+      "method": "display_snapshot",
+      "params": {
+        "campaign_id": "${iron_campaign}"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id",
+      "resolve_party",
+      "local_start",
+      "rows/payload_sha256",
+      "rows/semantic_payload_sha256",
+      "rows/canonical_representation_sha256",
+      "rows/plan_content_sha256",
+      "rows/content_sha256",
+      "$json/content_sha256",
+      "$json/canonical_representation_sha256"
+    ],
+    "alias": [
+      {
+        "name": "campaign",
+        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+        "keys": [
+          "campaign_id",
+          "path"
+        ]
+      },
+      {
+        "name": "derived",
+        "pattern": "(session-dm|turn-dm|construction-complete|campaign-plan|construction-evidence|builder-dm-handoff|attempt-campaign-start)-[0-9a-f]{24}",
+        "keys": [
+          "session_id",
+          "dm_session_id",
+          "turn_id",
+          "dm_turn_id",
+          "dm_attempt_id",
+          "handoff_id",
+          "message_id",
+          "evidence_id",
+          "plan_id",
+          "operation_id",
+          "completion_operation_id",
+          "construction_operation_id",
+          "$json"
+        ]
+      },
+      {
+        "name": "lock",
+        "pattern": "lock-[0-9a-f]{40}",
+        "keys": [
+          "lock_id",
+          "current_lock_id",
+          "basis_lock_id",
+          "package_lock_id",
+          "authority_lock_id"
+        ]
+      },
+      {
+        "name": "continuity",
+        "pattern": "initial-[0-9a-f]{32}",
+        "keys": [
+          "entry_id"
+        ]
+      },
+      {
+        "name": "turn-key",
+        "pattern": "^turn-dm-[0-9a-f]{24}$",
+        "keys": []
+      }
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  }
+}

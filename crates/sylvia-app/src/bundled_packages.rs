@@ -72,6 +72,8 @@ pub struct BundledSources {
     pub campaign_plans_root: PathBuf,
     /// `sylvia_gm/campaign/srd-starters.json`, the twelve authored SRD starter characters.
     pub srd_starters: PathBuf,
+    /// `sylvia_gm/campaign/ready-campaigns.json`, the four prepared parties.
+    pub ready_campaigns: PathBuf,
 }
 
 impl BundledSources {
@@ -92,6 +94,7 @@ impl BundledSources {
                 .join("the-rift-awakening.json"),
             campaign_plans_root: root.join("campaign-plans"),
             srd_starters: root.join("src").join("sylvia_gm").join("campaign").join("srd-starters.json"),
+            ready_campaigns: root.join("src").join("sylvia_gm").join("campaign").join("ready-campaigns.json"),
         }
     }
 }

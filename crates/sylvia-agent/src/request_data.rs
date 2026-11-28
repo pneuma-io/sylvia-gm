@@ -16,7 +16,7 @@ pub fn player_message_guidance() -> &'static str {
 }
 
 /// `_DATA_PREFIXES`.
-const DATA_PREFIXES: [&str; 9] = [
+pub(crate) const DATA_PREFIXES: [&str; 9] = [
     "SYLVIA_GM_CAMPAIGN_PREPARATION ",
     "SYLVIA_GM_FRESH_CAMPAIGN_STATE ",
     "SYLVIA_PLAYER_CONTROL_RESULTS ",
@@ -28,7 +28,7 @@ const DATA_PREFIXES: [&str; 9] = [
     "SYLVIA_GM_UNRELEASED_GM_BOUNDARY_DRAFT ",
 ];
 /// `_CONTROL_PREFIXES`.
-const CONTROL_PREFIXES: [&str; 9] = [
+pub(crate) const CONTROL_PREFIXES: [&str; 9] = [
     "SYLVIA_GM_CAMPAIGN_PREPARATION (application-owned control,",
     "SYLVIA_PLAYER_ACTION_RESPONSE_TASK ",
     "SYLVIA_GM_DECISION_REQUEST ",
