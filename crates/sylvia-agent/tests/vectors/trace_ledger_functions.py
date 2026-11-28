@@ -45,17 +45,35 @@ def plain(value: object) -> object:
     and `MechanicNames` its catalog and reserved names (what it is built from)."""
     if isinstance(value, loader.MechanicNames):
         return {"__names__": {"catalog": sorted(value._catalog_short), "reserved": sorted(value._reserved)}}
+    if isinstance(value, ledger.JournalState):
+        return {"__journal__": journal_fields(value)}
     if isinstance(value, ledger.Tagged):
         return {"__tagged__": {"message": plain(dict(value)), "tags": plain(value.ledger_tags)}}
     if isinstance(value, Mapping):
         return {str(key): plain(item) for key, item in value.items()}
     if isinstance(value, (set, frozenset)):
         return {"__set__": sorted((plain(item) for item in value), key=repr)}
+    if isinstance(value, ledger.WireFrame):
+        return {"__frame__": {key: plain(item) for key, item in vars(value).items()}}
     if isinstance(value, (list, tuple)):
         return [plain(item) for item in value]
     if value is None or isinstance(value, (str, bool, int, float)):
         return value
     return {"__repr__": repr(value), "__class__": type(value).__name__}
+
+
+def journal_fields(state: object) -> dict[str, object]:
+    """A `JournalState`'s fields as JSON: integer keys as text, `present` as sorted pairs."""
+    return {
+        "epoch": state.epoch, "generation": state.generation, "entries": plain(state.entries),
+        "head": state.head, "view": plain(state.view), "keyframe_bytes": state.keyframe_bytes,
+        "update_bytes": state.update_bytes,
+        "heads": {str(key): value for key, value in state.heads.items()},
+        "present": sorted([label, digest] for label, digest in state.present),
+        "native": {str(key): plain(value) for key, value in state.native.items()},
+        "thinking_floor": state.thinking_floor, "last_prefix": plain(state.last_prefix),
+        "last_toolset": plain(state.last_toolset),
+    }
 
 
 def log(entry: dict[str, object]) -> None:
