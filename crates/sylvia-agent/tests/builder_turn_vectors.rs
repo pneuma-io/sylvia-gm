@@ -11,6 +11,9 @@ use std::collections::VecDeque;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::builder::character_tools::ParticipantInput;
+use sylvia_agent::builder::source_tools::{
+    CampaignContent, LibrarySources, ReferenceSource, SettingPublisher,
+};
 use sylvia_agent::builder::turn::{exported_tool, stream_builder_turn, BuilderTurn, BuilderTurnTools};
 use sylvia_agent::provider_turn::TurnFailure;
 use sylvia_agent::session_loop::provider::{SessionEvents, SessionFailure, SessionProviderError};
@@ -207,6 +210,29 @@ fn fresh_work(name: &str) -> std::path::PathBuf {
     work
 }
 
+/// The generator's `Anything()` library reader: no scenario calls it.
+struct NoLibrary;
+
+impl LibrarySources for NoLibrary {
+    fn candidates(&self, _query: &str) -> Result<Vec<JsonMap>, sylvia_domain::DomainError> {
+        Ok(Vec::new())
+    }
+    fn files(&self, _candidate_id: &str) -> Result<JsonMap, sylvia_domain::DomainError> {
+        Ok(JsonMap::new())
+    }
+    fn read(&self, _candidate_id: &str, _path: &str) -> Result<JsonMap, sylvia_domain::DomainError> {
+        Ok(JsonMap::new())
+    }
+    fn record(&self, _candidate_id: &str, _prefix: &str) -> Result<JsonMap, sylvia_domain::DomainError> {
+        Ok(JsonMap::new())
+    }
+}
+
+/// The generator's `stub` Setting publisher.
+fn setting_stand_in() -> SettingPublisher {
+    Arc::new(|_: &str, _: &str, _: &str| Ok(JsonMap::new()))
+}
+
 /// The generator's recorded declarations.
 fn declarations(value: &Json) -> Vec<ParticipantArtifactDeclaration> {
     value
@@ -282,16 +308,16 @@ fn builder_turn_matches_python() {
         let has = |flag: &str| flags.iter().any(|item| item == flag);
         let tools = BuilderTurnTools {
             publish_ruleset_candidate: has("publish_ruleset_candidate"),
-            campaign_content_authority: has("campaign_content"),
-            library_sources: has("library_sources"),
-            references: has("references"),
+            campaign_content_authority: has("campaign_content").then(CampaignContent::default),
+            library_sources: has("library_sources").then(|| Arc::new(NoLibrary) as Arc<dyn LibrarySources>),
+            references: has("references").then(|| Arc::new(|| Ok(None)) as ReferenceSource),
             profile_tools: if has("profile_tools") {
                 profile_names.iter().map(|name| exported_tool(name).unwrap()).collect()
             } else {
                 Vec::new()
             },
-            publish_campaign_setting: has("publish_campaign_setting"),
-            check_campaign_setting: has("check_campaign_setting"),
+            publish_campaign_setting: has("publish_campaign_setting").then(setting_stand_in),
+            check_campaign_setting: has("check_campaign_setting").then(setting_stand_in),
             campaign_plan_authority: has("campaign_plan_authority"),
             check_campaign_plan: has("check_campaign_plan"),
             publish_campaign_plan: has("publish_campaign_plan"),
