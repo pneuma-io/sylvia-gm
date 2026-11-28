@@ -58,7 +58,7 @@ use sylvia_domain::error::{DomainError, DomainResult};
 const FILE_LIMIT: i64 = sylvia_store::package_reads::DEFAULT_MAXIMUM_FILES;
 
 /// A `PackageRuntimeError` (a `ValueError` with diagnostics), or the exception Python lets through.
-fn runtime_error(failure: PackageRuntimeFailure) -> DomainError {
+pub(crate) fn runtime_error(failure: PackageRuntimeFailure) -> DomainError {
     match failure {
         PackageRuntimeFailure::Rejected(error) => DomainError::Diagnosed {
             error_type: "PackageRuntimeError",

@@ -1432,6 +1432,101 @@ pub async fn handle_campaign_creation_catalog(ctx: &DispatchContext, params: &Js
     Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
 }
 
+/// The domain error a library function raised, as the owner replies to it.
+fn domain_error(error: sylvia_domain::DomainError) -> sylvia_base::CodedError {
+    store_error(sylvia_store::StoreError::from(error))
+}
+
+/// `handle_ready_campaign_catalog`: the prepared parties' public previews
+/// (`ready_campaign_catalog()`). An `OSError`, `ValueError`, `KeyError` or `TypeError` is
+/// "unavailable or incompatible".
+pub async fn handle_ready_campaign_catalog(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let catalog = sylvia_app::ready_campaigns::ready_campaign_catalog(&ctx.bundled).map_err(|error| {
+        let caught = error.is_value_error()
+            || matches!(
+                error.python_class(),
+                "OSError"
+                    | "FileNotFoundError"
+                    | "PermissionError"
+                    | "IsADirectoryError"
+                    | "NotADirectoryError"
+                    | "ValueError"
+                    | "JSONDecodeError"
+                    | "UnicodeError"
+                    | "UnicodeDecodeError"
+                    | "KeyError"
+                    | "TypeError"
+            );
+        if caught {
+            sylvia_base::CodedError::new(
+                "ready_campaign_invalid",
+                "Prepared campaigns are unavailable or incompatible",
+            )
+            .with_error_type("CommandRejected")
+        } else {
+            domain_error(error)
+        }
+    })?;
+    Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
+}
+
+/// `handle_customize_ready_campaign`, for `customize_ready_campaign` and
+/// `start_ready_campaign`: editable copies of a prepared party, or a started copy of the
+/// campaign. The start settles the Game Master's chat choices before anything is created
+/// (`display_name` is read after them, as in Python) and applies them once the copy is ready.
+pub async fn handle_customize_ready_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let operation_id = required(params, "operation_id")?;
+    let template_id = required(params, "template_id")?;
+    let expected_content_sha256 = required(params, "expected_content_sha256")?;
+    if ctx.method == "customize_ready_campaign" {
+        let _operation = super::operation(ctx)?;
+        let (storage_root, bundled) = (ctx.storage_root.clone(), std::sync::Arc::clone(&ctx.bundled));
+        let reply = ctx
+            .store
+            .call(move |store| {
+                Ok(sylvia_app::ready_campaigns::customize_ready_campaign(
+                    store,
+                    &bundled,
+                    &storage_root,
+                    &operation_id,
+                    &template_id,
+                    &expected_content_sha256,
+                ))
+            })
+            .await
+            .map_err(store_error)?
+            .map_err(domain_error)?;
+        return Ok(Json::Object(reply));
+    }
+    let provider_id = required(params, "provider_id")?;
+    let model_id = required(params, "model_id")?;
+    let start = crate::chat_start::chat_start_for(ctx, "dm", &provider_id, &model_id, params).await?;
+    let request = sylvia_app::ready_campaigns::ReadyStart {
+        operation_id,
+        template_id,
+        expected_content_sha256,
+        display_name: required(params, "display_name")?,
+        provider_id,
+        model_id,
+        model_guidance_override: optional_bool(params, "model_guidance_override")?,
+    };
+    let mut result = sylvia_app::ready_campaigns::start_ready_campaign(
+        &ctx.store,
+        &ctx.bundled,
+        &ctx.storage_root,
+        &request,
+    )
+    .await
+    .map_err(store_error)?;
+    // A model capability warning returns before any Game Master chat exists.
+    let ready = result.get("local_ready").is_some_and(|ready| ready == &Json::Bool(true));
+    if let (true, Some(Json::String(session_id))) = (ready, result.get("dm_session_id").cloned()) {
+        crate::chat_start::apply_chat_start(ctx, &session_id, &start).await?;
+        result.insert("chat_start".into(), crate::chat_start::chat_start_projection(&start));
+    }
+    Ok(Json::Object(result))
+}
+
 /// `handle_snapshot` and `handle_display_snapshot`: the desktop's snapshot of a campaign
 /// (`AuthorityOwner.desktop_snapshot`), complete or, for `display_snapshot`, display-only.
 pub async fn handle_snapshot(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {

@@ -280,7 +280,16 @@ pub fn normalise(recording: &Json, rules: &Rules) -> Result<Json, String> {
             }
         }
     }
-    Ok(walk(&recording, "", None, &compiled, &mut seen, &mut counts))
+    let mut normal = walk(&recording, "", None, &compiled, &mut seen, &mut counts);
+    // Files are listed by path. A run-specific identifier in a path (a campaign's folder) can
+    // reorder them between runs, so they are ordered again by the aliased path.
+    if let Some(files) = normal.get_mut("files").and_then(Json::as_array_mut) {
+        files.sort_by(|left, right| {
+            let path = |file: &Json| file.get("path").and_then(Json::as_str).unwrap_or_default().to_owned();
+            path(left).cmp(&path(right))
+        });
+    }
+    Ok(normal)
 }
 
 fn walk(
@@ -467,6 +476,34 @@ mod tests {
         let normal = |value| normalise(value, &rules).unwrap();
         assert!(compare(&normal(&first), &normal(&second), 10).is_empty());
         assert_eq!(compare(&normal(&first), &normal(&swapped), 10).len(), 1);
+    }
+
+    #[test]
+    fn files_are_ordered_by_their_aliased_path() {
+        let rules = Rules {
+            alias: vec![Alias {
+                name: "campaign".into(),
+                pattern: "campaign-[0-9a-f]{8}".into(),
+                keys: vec!["campaign_id".into(), "path".into()],
+            }],
+            ..Rules::default()
+        };
+        // The same two campaigns, created in the same order, listed in path order.
+        let first = json!({
+            "steps": [{"campaign_id": "campaign-bbbbbbbb"}, {"campaign_id": "campaign-aaaaaaaa"}],
+            "files": [{"path": "campaigns/campaign-aaaaaaaa/plan", "bytes": 2},
+                      {"path": "campaigns/campaign-bbbbbbbb/plan", "bytes": 1}]
+        });
+        let second = json!({
+            "steps": [{"campaign_id": "campaign-11111111"}, {"campaign_id": "campaign-22222222"}],
+            "files": [{"path": "campaigns/campaign-11111111/plan", "bytes": 1},
+                      {"path": "campaigns/campaign-22222222/plan", "bytes": 2}]
+        });
+        let normal = |value| normalise(value, &rules).unwrap();
+        assert!(compare(&normal(&first), &normal(&second), 10).is_empty());
+        let mut wrong = second.clone();
+        wrong["files"][0]["bytes"] = json!(3);
+        assert_eq!(compare(&normal(&first), &normal(&wrong), 10).len(), 1);
     }
 
     #[test]

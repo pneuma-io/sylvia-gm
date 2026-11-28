@@ -34,9 +34,9 @@ Ported: 97 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `handshake_status` | `campaigns.handle_handshake_status` | no | yes | `local-services` |
 | `campaign_index` | `campaigns.handle_campaign_index` | yes | yes | `startup`, `ruleless-turn` |
 | `campaign_creation_catalog` | `campaigns.handle_campaign_creation_catalog` | yes | yes | `startup` |
-| `ready_campaign_catalog` | `campaigns.handle_ready_campaign_catalog` | yes | no | |
-| `customize_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | no | |
-| `start_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | no | |
+| `ready_campaign_catalog` | `campaigns.handle_ready_campaign_catalog` | yes | yes | `ready-campaigns` |
+| `customize_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | yes | `ready-campaigns` |
+| `start_ready_campaign` | `campaigns.handle_customize_ready_campaign` | yes | yes | `ready-campaigns` |
 | `delete_reusable_library_entry` | `campaigns.handle_delete_reusable_library_entry` | yes | no | |
 | `character_chat` | `character_chat.handle_character_chat` | yes | no | |
 | `send_character_chat_message` | `character_chat.handle_send_character_chat_message` | yes | no | |
