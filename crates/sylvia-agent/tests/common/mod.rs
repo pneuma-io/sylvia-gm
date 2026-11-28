@@ -10,8 +10,6 @@ pub mod turn_state;
 use serde_json::Value as J;
 use std::sync::Mutex;
 use sylvia_agent::provider_session::reads::{HeldWork, NarrationAttemptStart, OpeningReads, TurnOwner};
-use sylvia_domain::authority::{NarrationInterruption, ProseChannel};
-use sylvia_domain::provider_records::ProviderPrivateRecord;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
@@ -29,8 +27,10 @@ use sylvia_domain::authority::{
     PackageDependency, PackageLock, PackageLockEntry, PackageRole, Participant, ParticipantFields,
     TurnStatus, WriterRole,
 };
+use sylvia_domain::authority::{NarrationInterruption, ProseChannel};
 use sylvia_domain::error::{DomainError, MechanicsDetails, MechanicsValidationIssue};
 use sylvia_domain::package_library::{PackageLockAvailability, PackageLockRecord};
+use sylvia_domain::provider_records::ProviderPrivateRecord;
 use sylvia_domain::session::SessionActivityBasis;
 use sylvia_domain::session::{
     SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
@@ -674,7 +674,10 @@ impl TurnOwner for Recorded {
     }
     // The session loop's DM run (T5a-2) is proven by the comparison tool's sessions; no phase
     // vector reaches these calls, so a test that does fails here.
-    fn agent_session_work<'a>(&'a self, _session_id: &'a str) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
+    fn agent_session_work<'a>(
+        &'a self,
+        _session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
         loop_call("agent_session_work")
     }
     fn campaign_ending_choice_text<'a>(
@@ -722,7 +725,10 @@ impl TurnOwner for Recorded {
     ) -> BoxFuture<'a, Result<ActionReceipt, AuthorityFailure>> {
         loop_call("saved_action_receipt")
     }
-    fn start_narration_attempt(&self, _start: NarrationAttemptStart) -> BoxFuture<'_, Result<(), AuthorityFailure>> {
+    fn start_narration_attempt(
+        &self,
+        _start: NarrationAttemptStart,
+    ) -> BoxFuture<'_, Result<(), AuthorityFailure>> {
         loop_call("start_narration_attempt")
     }
     fn emit_narration_token<'a>(
@@ -735,7 +741,11 @@ impl TurnOwner for Recorded {
     ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
         loop_call("emit_narration_token")
     }
-    fn flush_narration<'a>(&'a self, _campaign_id: &'a str, _attempt_id: &'a str) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+    fn flush_narration<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
         loop_call("flush_narration")
     }
     fn bind_narration_action<'a>(
@@ -815,7 +825,10 @@ impl TurnOwner for Recorded {
     ) -> BoxFuture<'a, Result<SessionMessage, AuthorityFailure>> {
         loop_call("append_live_steering_message")
     }
-    fn stop_agent_session<'a>(&'a self, _session_id: &'a str) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
+    fn stop_agent_session<'a>(
+        &'a self,
+        _session_id: &'a str,
+    ) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
         loop_call("stop_agent_session")
     }
     fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {

@@ -14,13 +14,15 @@ use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::narration_attempts::{self as narration, NarrationStart};
 use sylvia_app::authority::{campaign_file, content_reads, knowledge, player_reads, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
+use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::authority::{
     ActionCommand, ActionReceipt, CanonicalEvent, CanonicalReplay, NarrationInterruption, ProseChannel,
 };
-use sylvia_domain::provider_records::ProviderPrivateRecord;
-use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
-use sylvia_domain::session::{SessionActivityBasis, SessionContext, SessionMessage, SessionMessageKind, SessionRecord};
+use sylvia_domain::provider_records::ProviderPrivateRecord;
+use sylvia_domain::session::{
+    SessionActivityBasis, SessionContext, SessionMessage, SessionMessageKind, SessionRecord,
+};
 use sylvia_provider::BoxFuture;
 use sylvia_store::snapshots::DisplayQuery;
 
@@ -330,7 +332,10 @@ impl TurnOwner for OwnerReads {
         })
     }
 
-    fn agent_session_work<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
+    fn agent_session_work<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
         Box::pin(async move {
             let held = self.store().agent_session_work(session_id).await.map_err(store_failure)?;
             let context = held.context.clone();
@@ -340,12 +345,15 @@ impl TurnOwner for OwnerReads {
 
     fn campaign_ending_choice_text<'a>(
         &'a self,
-        _session_id: &'a str,
-        _message_id: &'a str,
-        _choice: &'a JsonMap,
+        session_id: &'a str,
+        message_id: &'a str,
+        choice: &'a JsonMap,
     ) -> BoxFuture<'a, Result<String, AuthorityFailure>> {
-        // Lane 3's N2b (#483).
-        Box::pin(async { Err(pending("campaign_ending_choice_text").into()) })
+        Box::pin(async move {
+            narration::campaign_ending_choice_text(self.store(), session_id, message_id, choice)
+                .await
+                .map_err(authority_failure)
+        })
     }
 
     fn player_action_response_basis<'a>(
@@ -384,13 +392,16 @@ impl TurnOwner for OwnerReads {
 
     fn redirect_narration<'a>(
         &'a self,
-        _session_id: &'a str,
-        _message_id: &'a str,
-        _content: &'a JsonMap,
-        _interruption_id: &'a str,
+        session_id: &'a str,
+        message_id: &'a str,
+        content: &'a JsonMap,
+        interruption_id: &'a str,
     ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
-        // Lane 3's N2b (#483).
-        Box::pin(async { Err(pending("redirect_narration").into()) })
+        Box::pin(async move {
+            narration::redirect_narration(self.store(), session_id, message_id, content, interruption_id)
+                .await
+                .map_err(authority_failure)
+        })
     }
 
     fn saved_action_receipt<'a>(
@@ -399,11 +410,16 @@ impl TurnOwner for OwnerReads {
         action_id: &'a str,
     ) -> BoxFuture<'a, Result<ActionReceipt, AuthorityFailure>> {
         Box::pin(async move {
-            narration::saved_action_receipt(self.store(), campaign_id, action_id).await.map_err(authority_failure)
+            narration::saved_action_receipt(self.store(), campaign_id, action_id)
+                .await
+                .map_err(authority_failure)
         })
     }
 
-    fn start_narration_attempt(&self, start: NarrationAttemptStart) -> BoxFuture<'_, Result<(), AuthorityFailure>> {
+    fn start_narration_attempt(
+        &self,
+        start: NarrationAttemptStart,
+    ) -> BoxFuture<'_, Result<(), AuthorityFailure>> {
         Box::pin(async move {
             let cancel = start.cancel;
             let start = NarrationStart {
@@ -427,9 +443,16 @@ impl TurnOwner for OwnerReads {
         response_blocks: Option<&'a Json>,
     ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
         Box::pin(async move {
-            narration::emit_narration_token(self.store(), campaign_id, attempt_id, channel, token, response_blocks)
-                .await
-                .map_err(authority_failure)
+            narration::emit_narration_token(
+                self.store(),
+                campaign_id,
+                attempt_id,
+                channel,
+                token,
+                response_blocks,
+            )
+            .await
+            .map_err(authority_failure)
         })
     }
 
@@ -474,7 +497,9 @@ impl TurnOwner for OwnerReads {
         attempt_id: &'a str,
     ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
         Box::pin(async move {
-            narration::interrupt_narration(self.store(), campaign_id, attempt_id).await.map_err(authority_failure)
+            narration::interrupt_narration(self.store(), campaign_id, attempt_id)
+                .await
+                .map_err(authority_failure)
         })
     }
 
@@ -512,7 +537,9 @@ impl TurnOwner for OwnerReads {
         now: f64,
     ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
         Box::pin(async move {
-            narration::expire_narration(self.store(), campaign_id, attempt_id, now).await.map_err(authority_failure)
+            narration::expire_narration(self.store(), campaign_id, attempt_id, now)
+                .await
+                .map_err(authority_failure)
         })
     }
 
@@ -520,7 +547,9 @@ impl TurnOwner for OwnerReads {
         &'a self,
         record: &'a ProviderPrivateRecord,
     ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
-        Box::pin(async move { self.store().append_private_provider_record(record).await.map_err(store_failure) })
+        Box::pin(
+            async move { self.store().append_private_provider_record(record).await.map_err(store_failure) },
+        )
     }
 
     fn finish_private_provider_attempt<'a>(
@@ -530,7 +559,10 @@ impl TurnOwner for OwnerReads {
         completed: bool,
     ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
         Box::pin(async move {
-            self.store().finish_private_provider_attempt(session_id, attempt_id, completed).await.map_err(store_failure)
+            self.store()
+                .finish_private_provider_attempt(session_id, attempt_id, completed)
+                .await
+                .map_err(store_failure)
         })
     }
 
@@ -559,8 +591,11 @@ impl TurnOwner for OwnerReads {
         })
     }
 
-    fn stop_agent_session<'a>(&'a self, _session_id: &'a str) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
-        // Not ported yet by lane 3.
+    fn stop_agent_session<'a>(
+        &'a self,
+        _session_id: &'a str,
+    ) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
+        // Lane 3's next PR (with `player_projection_page`).
         Box::pin(async { Err(pending("stop_agent_session").into()) })
     }
 

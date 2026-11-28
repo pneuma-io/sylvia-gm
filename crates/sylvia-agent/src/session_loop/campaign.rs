@@ -126,7 +126,11 @@ impl ActiveRun {
             })?;
             let mut content = JsonMap::new();
             content.insert("text".into(), text.into());
-            completed.push((format!("{}-segment-{}", self.attempt_id, provisional.segment_ordinal), kind, content));
+            completed.push((
+                format!("{}-segment-{}", self.attempt_id, provisional.segment_ordinal),
+                kind,
+                content,
+            ));
         }
         Ok(completed)
     }
@@ -205,7 +209,10 @@ fn is_command_rejected(error: &CodedError) -> bool {
 
 /// `resolve_retry_basis_message(context, failed_attempt_id)`: the one durable player input or
 /// opening message a retry chain resolves to.
-pub fn resolve_retry_basis_message(context: &SessionContext, failed_attempt_id: &str) -> CodedResult<SessionMessage> {
+pub fn resolve_retry_basis_message(
+    context: &SessionContext,
+    failed_attempt_id: &str,
+) -> CodedResult<SessionMessage> {
     let ambiguous = || rejected("Retry input identity is unavailable or ambiguous");
     let is_input = |message: &SessionMessage| {
         matches!(message.kind(), SessionMessageKind::User | SessionMessageKind::Evidence)
@@ -242,8 +249,11 @@ pub fn resolve_retry_basis_message(context: &SessionContext, failed_attempt_id: 
     else {
         return Err(ambiguous());
     };
-    let original: Vec<&SessionMessage> =
-        context.messages.iter().filter(|message| message.message_id() == original_id && is_input(message)).collect();
+    let original: Vec<&SessionMessage> = context
+        .messages
+        .iter()
+        .filter(|message| message.message_id() == original_id && is_input(message))
+        .collect();
     if original.len() != 1 {
         return Err(ambiguous());
     }
@@ -289,7 +299,11 @@ pub fn resolve_interruption_basis(
 }
 
 /// `_recovery_kind(context, basis, interruption)`: the phase an interrupted GM turn resumes from.
-fn recovery_kind(context: &SessionContext, basis: &SessionMessage, interruption: &NarrationInterruption) -> &'static str {
+fn recovery_kind(
+    context: &SessionContext,
+    basis: &SessionMessage,
+    interruption: &NarrationInterruption,
+) -> &'static str {
     if pending_campaign_file_checkpoint(context, basis.message_id()) {
         "campaign_file_checkpoint"
     } else if interruption.last_action_id.is_some() {
@@ -375,19 +389,41 @@ impl DmEvents<'_> {
                 self.private_record(text, Some(response_id), "continuation", source_order).await
             }
             ProviderEvent::SafeThink { text } => owner
-                .emit_narration_token(&active.campaign_id, &active.attempt_id, ProseChannel::SafeThink, &text, None)
+                .emit_narration_token(
+                    &active.campaign_id,
+                    &active.attempt_id,
+                    ProseChannel::SafeThink,
+                    &text,
+                    None,
+                )
                 .await
                 .map_err(owner_failure),
             ProviderEvent::Talk { text, response_blocks, .. } => {
-                let blocks = response_blocks.map(|blocks| Json::Array(blocks.into_iter().map(Json::Object).collect()));
+                let blocks =
+                    response_blocks.map(|blocks| Json::Array(blocks.into_iter().map(Json::Object).collect()));
                 owner
-                    .emit_narration_token(&active.campaign_id, &active.attempt_id, ProseChannel::Talk, &text, blocks.as_ref())
+                    .emit_narration_token(
+                        &active.campaign_id,
+                        &active.attempt_id,
+                        ProseChannel::Talk,
+                        &text,
+                        blocks.as_ref(),
+                    )
                     .await
                     .map_err(owner_failure)
             }
             ProviderEvent::Action { command, feedback } => {
-                owner.flush_narration(&active.campaign_id, &active.attempt_id).await.map_err(owner_failure)?;
-                let receipt = match stateless_mcp::execute::execute_action(owner, &command, self.run.ids.as_ref()).await {
+                owner
+                    .flush_narration(&active.campaign_id, &active.attempt_id)
+                    .await
+                    .map_err(owner_failure)?;
+                let receipt = match stateless_mcp::execute::execute_action(
+                    owner,
+                    &command,
+                    self.run.ids.as_ref(),
+                )
+                .await
+                {
                     Ok(receipt) => receipt,
                     Err(AuthorityFailure::Domain(error)) if error.mechanics().is_some() => {
                         let Some(feedback) = feedback else {
@@ -412,7 +448,8 @@ impl DmEvents<'_> {
                             .await
                             .map_err(owner_failure)?;
                         self.run.record_gm_turn_activity(request).await?;
-                        let canonical = self.run.canonical_since(&active.campaign_id, self.initial_high_water).await?;
+                        let canonical =
+                            self.run.canonical_since(&active.campaign_id, self.initial_high_water).await?;
                         owner
                             .append_session_canonical_references(&request.session_id, &canonical)
                             .await
@@ -444,7 +481,12 @@ impl DmEvents<'_> {
                 ]);
                 content.insert("activity".into(), Json::Object(activity));
                 owner
-                    .append_agent_message(&request.session_id, &message_id, SessionMessageKind::Evidence, &content)
+                    .append_agent_message(
+                        &request.session_id,
+                        &message_id,
+                        SessionMessageKind::Evidence,
+                        &content,
+                    )
                     .await
                     .map_err(failure)?;
                 Ok(())
@@ -468,7 +510,9 @@ impl DmEvents<'_> {
         let record = ProviderPrivateRecord {
             session_id: request.session_id.clone(),
             attempt_id: request.attempt_id.clone(),
-            response_id: response_id.filter(|id| !id.is_empty()).unwrap_or_else(|| request.attempt_id.clone()),
+            response_id: response_id
+                .filter(|id| !id.is_empty())
+                .unwrap_or_else(|| request.attempt_id.clone()),
             turn_id: request.turn_id.clone(),
             basis_message_id: request.message_id.clone(),
             source_order,
@@ -488,9 +532,10 @@ impl SessionEvents for DmEvents<'_> {
             self.source_order += 1;
             match self.handle(event, source_order).await {
                 // A run that ended at an awaited choice stops its provider there.
-                Ok(()) if self.outcome.early.is_some() => {
-                    Err(SessionProviderError { error: failure(rejected("The run ended at a choice")), loop_reason: None })
-                }
+                Ok(()) if self.outcome.early.is_some() => Err(SessionProviderError {
+                    error: failure(rejected("The run ended at a choice")),
+                    loop_reason: None,
+                }),
                 Ok(()) => Ok(()),
                 Err(error) => Err(SessionProviderError { error, loop_reason: None }),
             }
@@ -573,19 +618,23 @@ impl CampaignSessionLoop {
         }
         let terminal = context.messages.iter().any(|message| {
             content_is(message, "attempt_id", &request.attempt_id)
-                && ((content_is(message, "kind", "gm_turn_activity") && content_is(message, "activity", "turn_completed"))
+                && ((content_is(message, "kind", "gm_turn_activity")
+                    && content_is(message, "activity", "turn_completed"))
                     || (content_is(message, "kind", "session_attempt_terminal")
                         && content_is(message, "status", "interrupted")))
         });
         if terminal {
-            let error = CodedError::new("idempotency_conflict", "Agent session attempt identity is already terminal")
-                .with_error_type("IdempotencyConflict");
+            let error =
+                CodedError::new("idempotency_conflict", "Agent session attempt identity is already terminal")
+                    .with_error_type("IdempotencyConflict");
             return Err(failure(error));
         }
         let snapshot = owner.snapshot(&campaign_id).await.map_err(failure)?;
         let initial_high_water = snapshot.events.last().map_or(0, |event| event.sequence);
-        let application_event =
-            matches!(request.input_kind, SessionInputKind::CampaignStart | SessionInputKind::PlayerActionResponse);
+        let application_event = matches!(
+            request.input_kind,
+            SessionInputKind::CampaignStart | SessionInputKind::PlayerActionResponse
+        );
         let ooc_given = request.ooc_text.as_deref().is_some_and(|text| !text.is_empty());
         if application_event && (!request.user_text.is_empty() || ooc_given) {
             return Err(failure(rejected("Application response requests do not contain player speech")));
@@ -605,7 +654,10 @@ impl CampaignSessionLoop {
         } else if request.player_action_id.is_some() || request.automatic_response {
             return Err(failure(rejected("Player action response context requires its application event")));
         }
-        if request.redirect_interruption_id.is_none() && !application_event && request.campaign_ending_choice.is_none() {
+        if request.redirect_interruption_id.is_none()
+            && !application_event
+            && request.campaign_ending_choice.is_none()
+        {
             // Plain input never leaves an interrupted turn behind it (architecture contract 8.3).
             if let Some((interruption, redirectable)) =
                 owner.unresolved_session_interruption(&context).await.map_err(owner_failure)?
@@ -629,7 +681,10 @@ impl CampaignSessionLoop {
                 content.insert("ooc_text".into(), json!(ooc));
             }
             let start = previous_input.content().get("canonical_start_sequence").cloned();
-            content.insert("canonical_start_sequence".into(), start.unwrap_or_else(|| json!(initial_high_water)));
+            content.insert(
+                "canonical_start_sequence".into(),
+                start.unwrap_or_else(|| json!(initial_high_water)),
+            );
             for (key, value) in [
                 ("input_id", json!(request.attempt_id)),
                 ("attempt_id", json!(request.attempt_id)),
@@ -649,8 +704,12 @@ impl CampaignSessionLoop {
             self.append_dm_input(&request, application_event, initial_high_water).await?;
         }
         let history = owner.session_context(&request.session_id).await.map_err(failure)?;
-        let mut provider_input =
-            SessionProviderInput::new(context.session.clone(), history, Vec::new(), Arc::new(ProviderControl::new()));
+        let mut provider_input = SessionProviderInput::new(
+            context.session.clone(),
+            history,
+            Vec::new(),
+            Arc::new(ProviderControl::new()),
+        );
         provider_input.basis_message_id = Some(request.message_id.clone());
         let last_action_id = redirection.as_ref().and_then(|redirected| redirected.last_action_id.clone());
         if let Some(action_id) = &last_action_id {
@@ -659,13 +718,20 @@ impl CampaignSessionLoop {
             provider_input.retry_action_receipt = Some(receipt);
         }
         self.install_callbacks(&mut provider_input, &campaign_id, &request);
-        self.run_dm_provider(&request, provider, provider_input, initial_high_water, redirection.as_ref()).await
+        self.run_dm_provider(&request, provider, provider_input, initial_high_water, redirection.as_ref())
+            .await
     }
 
     /// The provider input's catalog supplier, knowledge searcher, reference reader and
     /// narrative writer, over the stateless MCP client.
-    fn install_callbacks(&self, input: &mut SessionProviderInput, campaign_id: &str, request: &SessionRunRequest) {
-        let (owner, campaign, session) = (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+    fn install_callbacks(
+        &self,
+        input: &mut SessionProviderInput,
+        campaign_id: &str,
+        request: &SessionRunRequest,
+    ) {
+        let (owner, campaign, session) =
+            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
         input.catalog_supplier = Some(Arc::new(move |catalog_request_id: String| {
             let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
             Box::pin(async move {
@@ -680,33 +746,43 @@ impl CampaignSessionLoop {
                 .await
             })
         }));
-        let (owner, campaign, session) = (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
-        input.knowledge_searcher = Some(Arc::new(move |query: String, sources: Option<Vec<String>>, limit, offset| {
+        let (owner, campaign, session) =
+            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+        input.knowledge_searcher =
+            Some(Arc::new(move |query: String, sources: Option<Vec<String>>, limit, offset| {
+                let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
+                Box::pin(async move {
+                    stateless_mcp::campaign_file::search_knowledge(
+                        owner.as_ref(),
+                        &campaign,
+                        &query,
+                        sources.as_deref(),
+                        limit,
+                        offset,
+                        Some(&session),
+                    )
+                    .await
+                    .map_err(AuthorityFailure::into_coded)
+                })
+            }));
+        let (owner, campaign, session) =
+            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+        input.reference_reader = Some(Arc::new(move |source: String, path: String| {
             let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
             Box::pin(async move {
-                stateless_mcp::campaign_file::search_knowledge(
+                stateless_mcp::campaign_file::read_reference(
                     owner.as_ref(),
                     &campaign,
-                    &query,
-                    sources.as_deref(),
-                    limit,
-                    offset,
+                    &source,
+                    &path,
                     Some(&session),
                 )
                 .await
                 .map_err(AuthorityFailure::into_coded)
             })
         }));
-        let (owner, campaign, session) = (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
-        input.reference_reader = Some(Arc::new(move |source: String, path: String| {
-            let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
-            Box::pin(async move {
-                stateless_mcp::campaign_file::read_reference(owner.as_ref(), &campaign, &source, &path, Some(&session))
-                    .await
-                    .map_err(AuthorityFailure::into_coded)
-            })
-        }));
-        let (owner, campaign, session) = (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+        let (owner, campaign, session) =
+            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
         let (basis, turn_id) = (request.message_id.clone(), request.turn_id.clone());
         input.narrative_writer = Some(Arc::new(move |parameters: JsonMap| {
             let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
@@ -745,7 +821,9 @@ impl CampaignSessionLoop {
                 let records = owner.player_action_context(campaign_id).await.map_err(failure)?;
                 let mut ids = Vec::new();
                 for record in records {
-                    ids.push(record.get("action_id").cloned().ok_or_else(|| failure(key_error("action_id")))?);
+                    ids.push(
+                        record.get("action_id").cloned().ok_or_else(|| failure(key_error("action_id")))?,
+                    );
                 }
                 content.insert("player_action_id".into(), json!(request.player_action_id));
                 content.insert("player_action_ids".into(), Json::Array(ids));
@@ -769,7 +847,8 @@ impl CampaignSessionLoop {
         ] {
             content.insert(key.into(), value);
         }
-        let message_kind = if application_event { SessionMessageKind::Evidence } else { SessionMessageKind::User };
+        let message_kind =
+            if application_event { SessionMessageKind::Evidence } else { SessionMessageKind::User };
         owner
             .append_agent_message(&request.session_id, &request.message_id, message_kind, &content)
             .await
@@ -778,7 +857,11 @@ impl CampaignSessionLoop {
     }
 
     /// `canonical_replay(campaign_id, acknowledged_sequence=...).canonical`.
-    async fn canonical_since(&self, campaign_id: &str, initial_high_water: i64) -> Result<Vec<CanonicalEvent>, SessionFailure> {
+    async fn canonical_since(
+        &self,
+        campaign_id: &str,
+        initial_high_water: i64,
+    ) -> Result<Vec<CanonicalEvent>, SessionFailure> {
         Ok(self.owner.canonical_replay(campaign_id, initial_high_water).await.map_err(failure)?.canonical)
     }
 
@@ -810,11 +893,22 @@ impl CampaignSessionLoop {
         let mut narration_started = false;
         let mut receipts = Vec::new();
         let outcome = self
-            .provider_attempt(request, provider, provider_input, initial_high_water, redirection, &active, &mut narration_started, &mut receipts)
+            .provider_attempt(
+                request,
+                provider,
+                provider_input,
+                initial_high_water,
+                redirection,
+                &active,
+                &mut narration_started,
+                &mut receipts,
+            )
             .await;
         let outcome = match outcome {
             Ok(result) => Ok(result),
-            Err(error) => self.unwind(request, error, &active, narration_started, initial_high_water, receipts).await,
+            Err(error) => {
+                self.unwind(request, error, &active, narration_started, initial_high_water, receipts).await
+            }
         };
         // `finally`: the provider's events ended with its run.
         if narration_started {
@@ -892,10 +986,16 @@ impl CampaignSessionLoop {
         if active.control.cancelled() {
             return Err(failure(rejected("Agent session provider work was cancelled")));
         }
-        owner.complete_narration_attempt(&active.campaign_id, &active.attempt_id).await.map_err(owner_failure)?;
+        owner
+            .complete_narration_attempt(&active.campaign_id, &active.attempt_id)
+            .await
+            .map_err(owner_failure)?;
         self.record_gm_turn_activity(request).await?;
         let canonical = self.canonical_since(&active.campaign_id, initial_high_water).await?;
-        owner.append_session_canonical_references(&request.session_id, &canonical).await.map_err(owner_failure)?;
+        owner
+            .append_session_canonical_references(&request.session_id, &canonical)
+            .await
+            .map_err(owner_failure)?;
         Ok(SessionRunResult { canonical, receipts: std::mem::take(receipts), interruption: None })
     }
 
@@ -911,8 +1011,12 @@ impl CampaignSessionLoop {
         receipts: Vec<MechanicsExecutionReceipt>,
     ) -> Result<SessionRunResult, SessionFailure> {
         let error = match error {
-            SessionFailure::Turn(TurnFailure::Provider(provider_error)) if request.input_kind == SessionInputKind::User => {
-                SessionFailure::Turn(TurnFailure::Provider(provider_error.with_accepted_message_id(&request.message_id)))
+            SessionFailure::Turn(TurnFailure::Provider(provider_error))
+                if request.input_kind == SessionInputKind::User =>
+            {
+                SessionFailure::Turn(TurnFailure::Provider(
+                    provider_error.with_accepted_message_id(&request.message_id),
+                ))
             }
             other => other,
         };
@@ -920,7 +1024,8 @@ impl CampaignSessionLoop {
             return Err(error);
         }
         let was_cancelled = active.control.cancelled();
-        let interruption = match self.owner.interrupt_narration(&active.campaign_id, &active.attempt_id).await {
+        let interruption = match self.owner.interrupt_narration(&active.campaign_id, &active.attempt_id).await
+        {
             Ok(interruption) => interruption,
             Err(owner_error) => {
                 let owner_error = owner_error.into_coded();
@@ -941,12 +1046,16 @@ impl CampaignSessionLoop {
         // Committed results belong in chat history even when only narration failed.
         let canonical = match self.canonical_since(&active.campaign_id, initial_high_water).await {
             Ok(canonical) => canonical,
-            Err(SessionFailure::Turn(TurnFailure::Coded(owner_error))) if was_cancelled && owner_closed(&owner_error) => {
+            Err(SessionFailure::Turn(TurnFailure::Coded(owner_error)))
+                if was_cancelled && owner_closed(&owner_error) =>
+            {
                 return Err(cancelled_during_shutdown());
             }
             Err(other) => return Err(other),
         };
-        if let Err(owner_error) = self.owner.append_session_canonical_references(&request.session_id, &canonical).await {
+        if let Err(owner_error) =
+            self.owner.append_session_canonical_references(&request.session_id, &canonical).await
+        {
             let owner_error = owner_error.into_coded();
             if was_cancelled && owner_closed(&owner_error) {
                 return Err(cancelled_during_shutdown());
@@ -992,7 +1101,8 @@ impl CampaignSessionLoop {
         let recovery = recovery_kind(&context, &basis, interruption);
         let status = if category == "user_cancelled" { "stopped" } else { "failed" };
         let timing = self.finish_activity(session_id, &interruption.failed_attempt_id, status, active)?;
-        let input_id = basis.content().get("input_id").cloned().unwrap_or_else(|| json!(interruption.failed_attempt_id));
+        let input_id =
+            basis.content().get("input_id").cloned().unwrap_or_else(|| json!(interruption.failed_attempt_id));
         let content = object(vec![
             ("kind", json!("session_attempt_terminal")),
             ("input_id", input_id),
@@ -1030,7 +1140,9 @@ impl CampaignSessionLoop {
             }
         };
         match active {
-            Some(active) if active.attempt_id == attempt_id => active.control.progress.finish(status).map_err(failure),
+            Some(active) if active.attempt_id == attempt_id => {
+                active.control.progress.finish(status).map_err(failure)
+            }
             _ => Ok(JsonMap::new()),
         }
     }
@@ -1135,7 +1247,12 @@ impl CampaignSessionLoop {
                 }
                 let content = object(vec![("text", json!(text))]);
                 owner
-                    .append_live_steering_message(session_id, message_id, SessionMessageKind::Steering, &content)
+                    .append_live_steering_message(
+                        session_id,
+                        message_id,
+                        SessionMessageKind::Steering,
+                        &content,
+                    )
                     .await
                     .map_err(AuthorityFailure::into_coded)?;
                 Ok(())
@@ -1146,9 +1263,13 @@ impl CampaignSessionLoop {
     /// `assert_idle(session_id)`: no run is pending, preparing or active.
     pub fn assert_idle(&self, session_id: &str) -> CodedResult<()> {
         let state = self.state();
-        if state.active.contains_key(session_id) || state.pending.contains(session_id) || state.preparing.contains(session_id)
+        if state.active.contains_key(session_id)
+            || state.pending.contains(session_id)
+            || state.preparing.contains(session_id)
         {
-            return Err(rejected("Agent session settings cannot change during pending or active provider work"));
+            return Err(rejected(
+                "Agent session settings cannot change during pending or active provider work",
+            ));
         }
         Ok(())
     }
@@ -1172,12 +1293,13 @@ impl CampaignSessionLoop {
             active
         };
         if let Some(active) = active {
-            let interruption = match self.owner.interrupt_narration(&active.campaign_id, &active.attempt_id).await {
-                Ok(interruption) => Some(interruption),
-                // Provider completion may win this race; stopping the now-idle session remains valid.
-                Err(error) if error.is_command_rejected() => None,
-                Err(error) => return Err(error.into_coded()),
-            };
+            let interruption =
+                match self.owner.interrupt_narration(&active.campaign_id, &active.attempt_id).await {
+                    Ok(interruption) => Some(interruption),
+                    // Provider completion may win this race; stopping the now-idle session remains valid.
+                    Err(error) if error.is_command_rejected() => None,
+                    Err(error) => return Err(error.into_coded()),
+                };
             if let Some(interruption) = interruption {
                 self.state().last_interruption.insert(session_id.to_owned(), interruption.clone());
                 self.record_interrupted_terminal(session_id, &interruption, "user_cancelled", Some(&active))
@@ -1227,7 +1349,8 @@ impl CampaignSessionLoop {
             (state.active.get(session_id).cloned(), state.pending.contains(session_id))
         };
         // Read after the live snapshot: terminal evidence is saved before live work is removed.
-        let attempt_id = attempt_id.map(str::to_owned).or_else(|| active.as_ref().map(|run| run.attempt_id.clone()));
+        let attempt_id =
+            attempt_id.map(str::to_owned).or_else(|| active.as_ref().map(|run| run.attempt_id.clone()));
         let basis = self.owner.session_activity_basis(session_id, attempt_id.as_deref()).await?;
         let is_builder = basis.session.role() == WriterRole::Builder;
         if !is_builder && !basis.has_compaction {
@@ -1311,7 +1434,9 @@ impl CampaignSessionLoop {
 fn coded(error: SessionFailure) -> CodedError {
     match error {
         SessionFailure::Turn(TurnFailure::Coded(error)) => error,
-        SessionFailure::Turn(TurnFailure::Provider(error)) => CodedError::new("internal_error", error.to_string()),
+        SessionFailure::Turn(TurnFailure::Provider(error)) => {
+            CodedError::new("internal_error", error.to_string())
+        }
         SessionFailure::AgentLoop { reason, message } => CodedError::new(reason, message),
     }
 }

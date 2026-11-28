@@ -256,7 +256,10 @@ pub trait TurnOwner: OpeningReads {
 
     /// `agent_session_work(session_id)`: the session's context, read once its campaign's work is
     /// held; the work is released when the returned guard drops.
-    fn agent_session_work<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>>;
+    fn agent_session_work<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>>;
 
     /// `campaign_ending_choice_text(session_id, message_id, choice)`.
     fn campaign_ending_choice_text<'a>(
@@ -306,7 +309,10 @@ pub trait TurnOwner: OpeningReads {
 
     /// `start_narration_attempt(campaign_id=..., attempt_id=..., turn_id=..., cancel=...,
     /// last_action_id=..., interruption_id=...)`.
-    fn start_narration_attempt(&self, start: NarrationAttemptStart) -> BoxFuture<'_, Result<(), AuthorityFailure>>;
+    fn start_narration_attempt(
+        &self,
+        start: NarrationAttemptStart,
+    ) -> BoxFuture<'_, Result<(), AuthorityFailure>>;
 
     /// `emit_narration_token(campaign_id, attempt_id, channel, token, response_blocks=...)`.
     fn emit_narration_token<'a>(
@@ -403,8 +409,10 @@ pub trait TurnOwner: OpeningReads {
     ) -> BoxFuture<'a, Result<SessionMessage, AuthorityFailure>>;
 
     /// `stop_agent_session(session_id)`: the owner's Stop Session.
-    fn stop_agent_session<'a>(&'a self, session_id: &'a str)
-        -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>>;
+    fn stop_agent_session<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>>;
 }
 
 /// `agent_session_work`'s answer: the session's context, with the held work. The work is
