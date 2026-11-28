@@ -2,8 +2,9 @@
 
 Launched by sylvia-compare as the Python owner (`python -B trace_ledger_functions.py`), with
 `SYLVIA_GM_CONTEXT_MODE=ledger` so every GM request goes through the ledger. Each traced
-function of `agent/_context_ledger.py` is replaced in the module's namespace (so calls from
-inside the module are traced too) by a wrapper that logs its arguments before the call and its
+function of `agent/_context_ledger.py` (or, named `loader:<name>` and `projection:<name>`, of
+`_tool_loader.py` and `_fixed_tool_projection.py`, wrapped before anything imports them) is
+replaced in the module's namespace (so calls from inside the module are traced too) by a wrapper that logs its arguments before the call and its
 result, or the exception's class and message, after it. A message argument keeps its ledger
 tags (`{"message": ..., "tags": ...}`). Writes JSON lines to the file `SYLVIA_LEDGER_TRACE`
 names. `uuid.uuid4` is seeded for the whole process, so the dice an action's uuid seeds roll
@@ -29,15 +30,21 @@ import uuid  # noqa: E402
 _UUIDS = random.Random(20261128)
 uuid.uuid4 = lambda: uuid.UUID(int=_UUIDS.getrandbits(128), version=4)
 
-import sylvia_gm.interfaces.owner_process as owner_process  # noqa: E402
-from sylvia_gm.agent import _context_ledger as ledger  # noqa: E402
+# The loader and the fixed projection are wrapped before anything imports them by name (the
+# ledger binds the loader's functions at its own import).
+from sylvia_gm.agent import _fixed_tool_projection as projection  # noqa: E402
+from sylvia_gm.agent import _tool_loader as loader  # noqa: E402
 
 TRACE_LOG = Path(os.environ["SYLVIA_LEDGER_TRACE"])
 TRACED = [name for name in os.environ.get("SYLVIA_LEDGER_TRACED", "").split(",") if name]
+MODULES = {"loader": loader, "projection": projection}
 
 
 def plain(value: object) -> object:
-    """A JSON copy of a traced value: a tagged message keeps its tags, sets become sorted lists."""
+    """A JSON copy of a traced value: a tagged message keeps its tags, sets become sorted lists,
+    and `MechanicNames` its catalog and reserved names (what it is built from)."""
+    if isinstance(value, loader.MechanicNames):
+        return {"__names__": {"catalog": sorted(value._catalog_short), "reserved": sorted(value._reserved)}}
     if isinstance(value, ledger.Tagged):
         return {"__tagged__": {"message": plain(dict(value)), "tags": plain(value.ledger_tags)}}
     if isinstance(value, Mapping):
@@ -72,8 +79,19 @@ def traced(name: str, function):  # noqa: ANN001, ANN202 - any module function
     return wrapper
 
 
-for function_name in TRACED:
-    setattr(ledger, function_name, traced(function_name, getattr(ledger, function_name)))
+# `loader:name` and `projection:name` are traced in those modules, before the ledger imports.
+for qualified in TRACED:
+    module_name, _, function_name = qualified.rpartition(":")
+    if module_name:
+        module = MODULES[module_name]
+        setattr(module, function_name, traced(qualified, getattr(module, function_name)))
+
+import sylvia_gm.interfaces.owner_process as owner_process  # noqa: E402
+from sylvia_gm.agent import _context_ledger as ledger  # noqa: E402
+
+for qualified in TRACED:
+    if ":" not in qualified:
+        setattr(ledger, qualified, traced(qualified, getattr(ledger, qualified)))
 
 if __name__ == "__main__":
     raise SystemExit(owner_process.main())
