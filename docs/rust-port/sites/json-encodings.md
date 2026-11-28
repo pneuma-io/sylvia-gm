@@ -72,7 +72,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `agent/_actor_decisions.py:29` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
+| `agent/_actor_decisions.py:29` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` turn_vectors (actor_decision) |
 | `agent/_builder_session.py:234` | `_provider_history` | Dump::DEFAULT.ascii(false) | `"content": json.dumps(_json_value(content["result"]), ensure_ascii=False),` | |
 | `agent/_builder_session.py:285` | `_provider_history` | Dump::CANONICAL | `application_data = json.dumps( {"kind": message.kind.value, "content": _json_value(content)}, sort_keys=True, separators=(",", ":"), ensure_ascii=F...` | |
 | `agent/_builder_session.py:854` | `_campaign_content_tools.discover` | Dump::DEFAULT.ascii(false).sorted(true) | `searchable = json.dumps(item, sort_keys=True, ensure_ascii=False).casefold()` | `sylvia-agent` source_tool_vectors (discover_campaign_content) |
@@ -102,7 +102,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_session.py:1586` | `_campaign_opening_task_message` | Dump::CANONICAL | `+ json.dumps( _plain_json(opening_footing), sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | `sylvia-agent` opening_messages_vectors |
 | `agent/_provider_session.py:1921` | `ProviderSessionAdapter.for_retry.narrate` | Dump::CANONICAL | `+ json.dumps( safe_basis, sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | `sylvia-compare` fail-retry, reopen and opening-retry sessions |
 | `agent/_provider_session.py:2428` | `ProviderSessionAdapter._relevant_character_files_message` | Dump::CANONICAL | `+ json.dumps( { "interpretation": ( "These are the exact Character Files selected by an unambiguous " "roster-name match in the current player word...` | |
-| `agent/_provider_session.py:2687` | `ProviderSessionAdapter._participant_result_message` | Dump::DEFAULT.ascii(false).sorted(true) | `+ json.dumps(_plain_json(result), ensure_ascii=False, sort_keys=True)` | |
+| `agent/_provider_session.py:2687` | `ProviderSessionAdapter._participant_result_message` | Dump::DEFAULT.ascii(false).sorted(true) | `+ json.dumps(_plain_json(result), ensure_ascii=False, sort_keys=True)` | `sylvia-agent` turn_vectors (actor_decision) |
 | `agent/_provider_session.py:2721` | `ProviderSessionAdapter._request_messages` | Dump::DEFAULT.ascii(false) | `+ json.dumps(current.get("content"), ensure_ascii=False)` | |
 | `agent/_provider_session.py:2879` | `ProviderSessionAdapter._messages` | Dump::DEFAULT.ascii(false) | `+ json.dumps(_plain_json(player_actions), ensure_ascii=False)` | |
 | `agent/_provider_session.py:3028` | `ProviderSessionAdapter._messages` | Dump::CANONICAL | `+ json.dumps( {"text": narration}, sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
@@ -112,7 +112,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_provider_session.py:3825` | `ProviderSessionAdapter._campaign_context_message` | Dump::CANONICAL | `+ json.dumps( self._current_campaign_context_payload( provider_input, include_opening_direction=include_opening_direction, ), sort_keys=True, separ...` | |
 | `agent/_provider_session.py:3889` | `ProviderSessionAdapter._campaign_context_messages` | Dump::CANONICAL | `+ json.dumps( _plain_json(explainers), sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | `sylvia-agent` opening_messages_vectors |
 | `agent/_provider_session.py:3902` | `ProviderSessionAdapter._campaign_context_messages` | Dump::CANONICAL | `+ json.dumps( _plain_json(fresh), sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | `sylvia-agent` opening_messages_vectors |
-| `agent/_provider_turn_phases.py:242` | `execute_required_transition` | Dump::CANONICAL | `+ json.dumps( transition_result, sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
+| `agent/_provider_turn_phases.py:242` | `execute_required_transition` | Dump::CANONICAL | `+ json.dumps( transition_result, sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | `sylvia-agent` turn_vectors (actor_decision) |
 | `agent/_provider_turn_phases.py:1800` | `stream_provider_round` | Dump::CANONICAL | `+ json.dumps( state.pending_narration_facts, sort_keys=True, separators=(",", ":"), ensure_ascii=False, )` | |
 | `agent/_provider_turn_phases.py:2480` | `reconcile_tool_batch` | Dump::CANONICAL | `"content": json.dumps( state.local_tool_results[state.assembly.call_id], sort_keys=True, separators=(",", ":"), ensure_ascii=False, ),` || `sylvia-agent` batch_vectors (reconcile) |
 | `agent/_provider_turn_phases.py:2581` | `reconcile_tool_batch` | Dump::CANONICAL | `"content": json.dumps( round_result, sort_keys=True, separators=(",", ":"), ensure_ascii=False, ),` || `sylvia-agent` batch_vectors (reconcile) |

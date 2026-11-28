@@ -491,7 +491,9 @@ impl OpeningReads for Recorded {
         &'a self,
         campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<CampaignConstructionBasis>> {
-        ready(construction_basis(&self.next("campaign_construction_basis", serde_json::json!([campaign_id]))))
+        // A campaign created directly (not through construction) has none: Python's refusal.
+        let result = self.next_result("campaign_construction_basis", serde_json::json!([campaign_id]));
+        Box::pin(async move { result.map(|value| construction_basis(&value)) })
     }
 }
 
@@ -677,10 +679,46 @@ impl TurnOwner for Recorded {
         campaign_id: &'a str,
         turn_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<sylvia_app::actor_decisions::ActorDecisionRequest>>> {
-        let result = self.next("actor_decision_request", serde_json::json!([campaign_id, turn_id]));
-        // A recorded request is T6's (`run_required_actor_decision`); none is recorded yet.
-        assert!(result.is_null(), "a recorded actor decision request is not replayed before T6");
-        ready(None)
+        let result = self.next_result("actor_decision_request", serde_json::json!([campaign_id, turn_id]));
+        Box::pin(async move { result.map(|value| (!value.is_null()).then(|| actor_request(&value))) })
+    }
+    fn actor_context<'a>(
+        &'a self,
+        session_id: &'a str,
+        context_id: &'a str,
+        provider_id: &'a str,
+        model_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<JsonMap>>> {
+        let result = self
+            .next_result("actor_context", serde_json::json!([session_id, context_id, provider_id, model_id]));
+        Box::pin(async move { result.map(|value| value.as_object().cloned()) })
+    }
+    fn actor_decision_command<'a>(
+        &'a self,
+        request: &'a sylvia_app::actor_decisions::ActorDecisionRequest,
+        choice_id: &'a str,
+        session_id: &'a str,
+        owner_id: &'a str,
+        provider_id: Option<&'a str>,
+        model_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<ActionCommand, AuthorityFailure>> {
+        let raised = self.reads.lock().unwrap().first().and_then(|read| read.get("raised")).cloned();
+        let result = self.next(
+            "actor_decision_command",
+            serde_json::json!([
+                actor_request_json(request),
+                choice_id,
+                session_id,
+                owner_id,
+                provider_id,
+                model_id
+            ]),
+        );
+        let outcome = match raised.filter(|raised| !raised.is_null()) {
+            Some(raised) => Err(recorded_failure(&raised)),
+            None => Ok(recorded_command(&result)),
+        };
+        Box::pin(async move { outcome })
     }
     // The session loop's DM run (T5a-2) is proven by the comparison tool's sessions; no phase
     // vector reaches these calls, so a test that does fails here.
@@ -736,10 +774,19 @@ impl TurnOwner for Recorded {
     }
     fn saved_action_receipt<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _action_id: &'a str,
+        campaign_id: &'a str,
+        action_id: &'a str,
     ) -> BoxFuture<'a, Result<ActionReceipt, AuthorityFailure>> {
-        loop_call("saved_action_receipt")
+        let raised = self.reads.lock().unwrap().first().and_then(|read| read.get("raised")).cloned();
+        let result = self.next("saved_action_receipt", serde_json::json!([campaign_id, action_id]));
+        let outcome = match raised.filter(|raised| !raised.is_null()) {
+            Some(raised) => Err(recorded_failure(&raised)),
+            None => match recorded_execution(&result) {
+                ActionExecution::Receipt(receipt) => Ok(receipt),
+                other => panic!("a saved receipt, not {other:?}"),
+            },
+        };
+        Box::pin(async move { outcome })
     }
     fn start_narration_attempt(
         &self,
@@ -811,19 +858,27 @@ impl TurnOwner for Recorded {
     ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
         loop_call("expire_narration")
     }
+    // Written by the turn itself for an isolated participant's exchange (T6b); the session
+    // loop's own private records are its events, which no phase vector answers here.
     fn append_private_provider_record<'a>(
         &'a self,
-        _record: &'a ProviderPrivateRecord,
+        record: &'a ProviderPrivateRecord,
     ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
-        loop_call("append_private_provider_record")
+        let result = self
+            .next_result("append_private_provider_record", serde_json::json!([private_record_json(record)]));
+        Box::pin(async move { result.map(|_| ()).map_err(AuthorityFailure::from) })
     }
     fn finish_private_provider_attempt<'a>(
         &'a self,
-        _session_id: &'a str,
-        _attempt_id: &'a str,
-        _completed: bool,
+        session_id: &'a str,
+        attempt_id: &'a str,
+        completed: bool,
     ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
-        loop_call("finish_private_provider_attempt")
+        let result = self.next_result(
+            "finish_private_provider_attempt",
+            serde_json::json!([session_id, attempt_id, completed]),
+        );
+        Box::pin(async move { result.map(|_| ()).map_err(AuthorityFailure::from) })
     }
     fn append_session_canonical_references<'a>(
         &'a self,
@@ -926,6 +981,79 @@ pub fn action_command_json(command: &ActionCommand) -> J {
         "writer": command.writer.as_str(), "expected_revision": command.expected_revision,
         "turn_id": command.turn_id, "package_id": command.package_id, "tool_name": command.tool_name,
         "parameters": command.parameters, "initiating_session_id": command.initiating_session_id,
+    })
+}
+
+/// `plain(request)` for an `ActorDecisionRequest`.
+pub fn actor_request_json(request: &sylvia_app::actor_decisions::ActorDecisionRequest) -> J {
+    serde_json::json!({
+        "__class__": "ActorDecisionRequest", "campaign_id": request.campaign_id, "turn_id": request.turn_id,
+        "package_id": request.package_id, "package_version": request.package_version,
+        "package_sha256": request.package_sha256, "actor_id": request.actor_id, "actor_name": request.actor_name,
+        "revision": request.revision, "decision_id": request.decision_id, "instructions": request.instructions,
+        "persona": request.persona, "observation": request.observation,
+        "actions": request.actions.iter().map(|action| serde_json::json!({
+            "__class__": "ActorDecisionAction", "identity": action.identity, "label": action.label,
+            "operation": action.operation, "arguments": action.arguments,
+        })).collect::<Vec<_>>(),
+    })
+}
+
+/// One recorded `ActorDecisionRequest` (`plain(request)`).
+pub fn actor_request(value: &J) -> sylvia_app::actor_decisions::ActorDecisionRequest {
+    let text = |value: &J, key: &str| value[key].as_str().unwrap().to_owned();
+    sylvia_app::actor_decisions::ActorDecisionRequest {
+        campaign_id: text(value, "campaign_id"),
+        turn_id: text(value, "turn_id"),
+        package_id: text(value, "package_id"),
+        package_version: text(value, "package_version"),
+        package_sha256: text(value, "package_sha256"),
+        actor_id: text(value, "actor_id"),
+        actor_name: text(value, "actor_name"),
+        revision: value["revision"].as_i64().unwrap(),
+        decision_id: text(value, "decision_id"),
+        instructions: text(value, "instructions"),
+        persona: text(value, "persona"),
+        observation: map(&value["observation"]),
+        actions: value["actions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|action| sylvia_app::actor_decisions::ActorDecisionAction {
+                identity: text(action, "identity"),
+                label: text(action, "label"),
+                operation: text(action, "operation"),
+                arguments: map(&action["arguments"]),
+            })
+            .collect(),
+    }
+}
+
+/// One recorded `ActionCommand` (`plain(command)`).
+pub fn recorded_command(value: &J) -> ActionCommand {
+    let text = |key: &str| value[key].as_str().unwrap().to_owned();
+    ActionCommand {
+        campaign_id: text("campaign_id"),
+        action_id: text("action_id"),
+        idempotency_key: text("idempotency_key"),
+        owner_id: text("owner_id"),
+        writer: WriterRole::parse(value["writer"].as_str().unwrap()).unwrap(),
+        expected_revision: value["expected_revision"].as_i64().unwrap(),
+        turn_id: text("turn_id"),
+        package_id: text("package_id"),
+        tool_name: text("tool_name"),
+        parameters: map(&value["parameters"]),
+        initiating_session_id: value["initiating_session_id"].as_str().map(str::to_owned),
+    }
+}
+
+/// `plain(record)` for a `ProviderPrivateRecord`.
+pub fn private_record_json(record: &ProviderPrivateRecord) -> J {
+    serde_json::json!({
+        "__class__": "ProviderPrivateRecord", "session_id": record.session_id, "attempt_id": record.attempt_id,
+        "response_id": record.response_id, "turn_id": record.turn_id, "basis_message_id": record.basis_message_id,
+        "source_order": record.source_order, "provider_id": record.provider_id, "model_id": record.model_id,
+        "kind": record.kind, "payload": record.payload,
     })
 }
 

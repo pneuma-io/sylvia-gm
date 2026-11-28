@@ -306,11 +306,18 @@ pub struct Scripted {
     model: ModelInfo,
     streams: Mutex<Vec<Vec<J>>>,
     requests: Mutex<Vec<J>>,
+    /// The `set_audit_context` payloads Rust gave, in order.
+    audits: Mutex<Vec<J>>,
 }
 
 impl Scripted {
     pub fn new(model_info: &J, events: &[J]) -> Self {
-        Self { model: model(model_info), streams: Mutex::new(streams(events)), requests: Mutex::default() }
+        Self {
+            model: model(model_info),
+            streams: Mutex::new(streams(events)),
+            requests: Mutex::default(),
+            audits: Mutex::default(),
+        }
     }
 
     /// Rust sent Python's requests (messages, tools, timeout, options), all of them.
@@ -326,6 +333,17 @@ impl Scripted {
             super::text(&J::Array(self.requests.lock().unwrap().clone())),
             super::text(&J::Array(sent)),
             "{name}: the requests"
+        );
+        // Each request's Full Audit context, as Python's provider was given it.
+        let audited: Vec<J> = events
+            .iter()
+            .filter(|event| event["event"] == "audit_context")
+            .map(|event| event["context"].clone())
+            .collect();
+        sylvia_base::testing::assert_same_json(
+            &J::Array(self.audits.lock().unwrap().clone()),
+            &J::Array(audited),
+            format!("{name}: the audit contexts"),
         );
     }
 }
@@ -351,7 +369,8 @@ impl Provider for Scripted {
     fn close(&self) -> BoxFuture<'_, ()> {
         Box::pin(async {})
     }
-    fn set_audit_context(&self, _context: &JsonMap) -> bool {
+    fn set_audit_context(&self, context: &JsonMap) -> bool {
+        self.audits.lock().unwrap().push(J::Object(context.clone()));
         true
     }
 }

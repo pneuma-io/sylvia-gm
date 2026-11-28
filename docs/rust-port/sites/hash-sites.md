@@ -218,7 +218,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `agent/_actor_decisions.py:60` | `run_actor_decision` | hashlib.sha256 | `context_id = hashlib.sha256(_json(identity).encode()).hexdigest()` | |
+| `agent/_actor_decisions.py:60` | `run_actor_decision` | hashlib.sha256 | `context_id = hashlib.sha256(_json(identity).encode()).hexdigest()` | `sylvia-agent` turn_vectors (actor_decision) |
 | `agent/_builder_session.py:613` | `_builder_prompt` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(loaded_skill.text.encode("utf-8")).hexdigest()` | |
 | `agent/_builder_session.py:1298` | `_builder_skill_loader_tool.load` | hashlib.sha256 | `"sha256": hashlib.sha256(loaded.text.encode("utf-8")).hexdigest(),` | |
 | `agent/_builder_session.py:1664` | `_campaign_plan_tool` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(skill.text.encode("utf-8")).hexdigest()` | `sylvia-agent` plan_tool_vectors (the tracked skill digest) |
