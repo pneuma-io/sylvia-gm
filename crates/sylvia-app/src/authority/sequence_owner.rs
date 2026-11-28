@@ -17,17 +17,12 @@
 //! `campaign_panels`, which a sequence reads only to rebind a coordinate-map step's selection
 //! (`rebind_map`, a panel step whose selection carries `map_revision`).
 
-// `SequenceOwner`'s methods are declared `fn ...(...) -> impl Future<Output = ...> + Send + 'a`,
-// as lane 2's own test owner implements them (`tests/action_sequence_runs.rs`).
-#![allow(clippy::manual_async_fn)]
-
 use super::actions::ActionError;
 use super::content_reads::CatalogTool;
 use super::direct_actions;
 use crate::action_sequences::{
-    PlayerActionAnswer, PlayerActionRequest, ResolvedControl, SequenceOwner, SequenceResult,
+    PlayerActionAnswer, PlayerActionRequest, ResolvedControl, SequenceFuture, SequenceOwner,
 };
-use std::future::Future;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{ActionReceipt, CampaignSnapshot};
 use sylvia_domain::session::{SessionContext, SessionMessageKind};
@@ -55,48 +50,33 @@ fn failure(error: direct_actions::Failure) -> ActionError {
 }
 
 impl SequenceOwner for AuthoritySequences<'_> {
-    fn with_operation<'a, R, F, Fut>(&'a self, body: F) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move {
+    fn with_operation<'a, R: Send + 'a>(&'a self, body: SequenceFuture<'a, R>) -> SequenceFuture<'a, R> {
+        Box::pin(async move {
             let _operation = self.store.operation()?;
-            body().await
-        }
+            body.await
+        })
     }
 
-    fn with_lane<'a, R, F, Fut>(
+    fn with_lane<'a, R: Send + 'a>(
         &'a self,
         campaign_id: &'a str,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move {
+        body: SequenceFuture<'a, R>,
+    ) -> SequenceFuture<'a, R> {
+        Box::pin(async move {
             if holds_lane(campaign_id) {
-                return body().await;
+                return body.await;
             }
             let _lane = self.store.lanes().owner.acquire(campaign_id).await;
-            holding_lane(campaign_id, body()).await
-        }
+            holding_lane(campaign_id, body).await
+        })
     }
 
-    fn with_direct_action_work<'a, R, F, Fut>(
+    fn with_direct_action_work<'a, R: Send + 'a>(
         &'a self,
         campaign_id: &'a str,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move {
+        body: SequenceFuture<'a, R>,
+    ) -> SequenceFuture<'a, R> {
+        Box::pin(async move {
             let store = self.store;
             let owned = campaign_id.to_owned();
             let _work = store
@@ -107,46 +87,32 @@ impl SequenceOwner for AuthoritySequences<'_> {
                     async move { store.call(move |store| store.campaign_lifecycle(&campaign_id)).await }
                 })
                 .await?;
-            body().await
-        }
+            body.await
+        })
     }
 
-    fn with_narration_lock<'a, R, F, Fut>(
-        &'a self,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move {
+    fn with_narration_lock<'a, R: Send + 'a>(&'a self, body: SequenceFuture<'a, R>) -> SequenceFuture<'a, R> {
+        Box::pin(async move {
             if holds_narration() {
-                return body().await;
+                return body.await;
             }
             let _region = self.store.narration().region().await;
-            holding_narration(body()).await
-        }
+            holding_narration(body).await
+        })
     }
 
-    fn active_dm_context<'a>(
-        &'a self,
-        session_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a {
-        async move {
+    fn active_dm_context<'a>(&'a self, session_id: &'a str) -> SequenceFuture<'a, SessionContext> {
+        Box::pin(async move {
             let id = session_id.to_owned();
             Ok(self.store.call(move |store| super::content_reads::active_dm_context(store, &id)).await?)
-        }
+        })
     }
 
-    fn session_context<'a>(
-        &'a self,
-        session_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a {
-        async move {
+    fn session_context<'a>(&'a self, session_id: &'a str) -> SequenceFuture<'a, SessionContext> {
+        Box::pin(async move {
             let id = session_id.to_owned();
             Ok(self.store.call(move |store| store.session_context(&id)).await?)
-        }
+        })
     }
 
     fn append_session_message<'a>(
@@ -155,8 +121,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         message_id: &'a str,
         kind: SessionMessageKind,
         content: &'a JsonMap,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
             // `SessionApplication.append_message`: the session's lane, then the store's append.
             let _session = self.store.lanes().sessions.acquire(session_id).await;
             let (session, message, content) = (session_id.to_owned(), message_id.to_owned(), content.clone());
@@ -164,67 +130,55 @@ impl SequenceOwner for AuthoritySequences<'_> {
                 .call(move |store| store.append_agent_message(&session, &message, kind, &content, None))
                 .await?;
             Ok(())
-        }
+        })
     }
 
-    fn snapshot<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<CampaignSnapshot>> + Send + 'a {
-        async move {
+    fn snapshot<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, CampaignSnapshot> {
+        Box::pin(async move {
             let id = campaign_id.to_owned();
             Ok(self.store.call(move |store| store.snapshot(&id)).await?)
-        }
+        })
     }
 
     fn action_hit<'a>(
         &'a self,
         campaign_id: &'a str,
         action_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Option<IdempotencyHit>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Option<IdempotencyHit>> {
+        Box::pin(async move {
             let (campaign, action) = (campaign_id.to_owned(), action_id.to_owned());
             Ok(self.store.call(move |store| store.action_hit(&campaign, &action)).await?)
-        }
+        })
     }
 
-    fn has_pending_mechanics_action<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<bool>> + Send + 'a {
-        async move {
+    fn has_pending_mechanics_action<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, bool> {
+        Box::pin(async move {
             let id = campaign_id.to_owned();
             Ok(self.store.call(move |store| Ok(store.pending_mechanics_action(&id)?.is_some())).await?)
-        }
+        })
     }
 
-    fn current_open_turn<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Option<String>>> + Send + 'a {
-        async move {
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, Option<String>> {
+        Box::pin(async move {
             let id = campaign_id.to_owned();
             Ok(self.store.call(move |store| store.current_open_turn(&id)).await?)
-        }
+        })
     }
 
-    fn campaign_work_count<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<usize>> + Send + 'a {
+    fn campaign_work_count<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, usize> {
         // The registry every campaign work lease counts in, the GM turn's `agent_session_work`
         // among them (`_campaign_work_counts`).
-        async move { Ok(self.store.lanes().work.count(campaign_id)) }
+        Box::pin(async move { Ok(self.store.lanes().work.count(campaign_id)) })
     }
 
     fn campaign_session_contexts<'a>(
         &'a self,
         campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<SessionContext>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Vec<SessionContext>> {
+        Box::pin(async move {
             let id = campaign_id.to_owned();
             Ok(self.store.call(move |store| store.campaign_session_contexts(&id, &[])).await?)
-        }
+        })
     }
 
     fn player_action_markers<'a>(
@@ -232,8 +186,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         campaign_id: &'a str,
         action_ids: &'a [&'a str],
         kind: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<JsonMap>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Vec<JsonMap>> {
+        Box::pin(async move {
             let (campaign, ids, kind) = (
                 campaign_id.to_owned(),
                 action_ids.iter().map(|id| (*id).to_owned()).collect::<Vec<String>>(),
@@ -246,20 +200,20 @@ impl SequenceOwner for AuthoritySequences<'_> {
                     store.player_action_markers(&campaign, &ids, &kind)
                 })
                 .await?)
-        }
+        })
     }
 
     fn player_control_scope<'a>(
         &'a self,
         snapshot: &'a CampaignSnapshot,
-    ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Option<JsonMap>> {
+        Box::pin(async move {
             let state = snapshot.state.clone();
             self.store
                 .call(move |store| Ok(direct_actions::player_control_scope(store, &state)))
                 .await?
                 .map_err(failure)
-        }
+        })
     }
 
     fn resolve_panel_control<'a>(
@@ -267,8 +221,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<ResolvedControl>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ResolvedControl> {
+        Box::pin(async move {
             let (snapshot, source, selection) = (snapshot.clone(), source.clone(), selection.clone());
             self.store
                 .call(move |store| {
@@ -276,7 +230,7 @@ impl SequenceOwner for AuthoritySequences<'_> {
                 })
                 .await?
                 .map_err(failure)
-        }
+        })
     }
 
     fn resolve_card_control<'a>(
@@ -284,8 +238,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<ResolvedControl>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ResolvedControl> {
+        Box::pin(async move {
             let (snapshot, source, selection) = (snapshot.clone(), source.clone(), selection.clone());
             self.store
                 .call(move |store| {
@@ -293,7 +247,7 @@ impl SequenceOwner for AuthoritySequences<'_> {
                 })
                 .await?
                 .map_err(failure)
-        }
+        })
     }
 
     fn check_player_action<'a>(
@@ -301,10 +255,10 @@ impl SequenceOwner for AuthoritySequences<'_> {
         tool: &'a CatalogTool,
         parameters: &'a JsonMap,
         snapshot: &'a CampaignSnapshot,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
             direct_actions::check_player_action(tool, parameters, &snapshot.state, false).map_err(failure)
-        }
+        })
     }
 
     fn player_action_preview<'a>(
@@ -314,8 +268,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Option<JsonMap>> {
+        Box::pin(async move {
             let (tool, parameters, snapshot, source, selection) =
                 (tool.clone(), parameters.clone(), snapshot.clone(), source.clone(), selection.clone());
             self.store
@@ -331,36 +285,30 @@ impl SequenceOwner for AuthoritySequences<'_> {
                 })
                 .await?
                 .map_err(failure)
-        }
+        })
     }
 
-    fn campaign_panels<'a>(
-        &'a self,
-        _campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<JsonMap>> + Send + 'a {
-        async move { Err(ActionError::from(StoreError::NotPorted("campaign_panels"))) }
+    fn campaign_panels<'a>(&'a self, _campaign_id: &'a str) -> SequenceFuture<'a, JsonMap> {
+        Box::pin(async move { Err(ActionError::from(StoreError::NotPorted("campaign_panels"))) })
     }
 
     fn player_action_in_owned_work<'a>(
         &'a self,
         request: &'a PlayerActionRequest,
-    ) -> impl Future<Output = SequenceResult<PlayerActionAnswer>> + Send + 'a {
-        direct_actions::player_action_in_owned_work(self.store, self.owner_id, request)
+    ) -> SequenceFuture<'a, PlayerActionAnswer> {
+        Box::pin(direct_actions::player_action_in_owned_work(self.store, self.owner_id, request))
     }
 
     fn append_player_action_references<'a>(
         &'a self,
         session_id: &'a str,
         receipt: &'a ActionReceipt,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        direct_actions::append_references(self.store, Some(session_id), receipt)
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(direct_actions::append_references(self.store, Some(session_id), receipt))
     }
 
-    fn catalog<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<CatalogTool>>> + Send + 'a {
-        async move {
+    fn catalog<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, Vec<CatalogTool>> {
+        Box::pin(async move {
             // `_catalog(campaign_id)`: the transition check, then the admitted tools.
             self.store.lanes().work.ensure_not_transitioning(campaign_id)?;
             let id = campaign_id.to_owned();
@@ -368,15 +316,15 @@ impl SequenceOwner for AuthoritySequences<'_> {
                 .store
                 .call(move |store| super::content_reads::catalog_on(store, &id, false, false))
                 .await?)
-        }
+        })
     }
 
     fn open_narration_attempts<'a>(
         &'a self,
         campaign_id: &'a str,
         turn_id: Option<&'a str>,
-    ) -> impl Future<Output = SequenceResult<Vec<String>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Vec<String>> {
+        Box::pin(async move {
             let Some(turn_id) = turn_id else { return Ok(Vec::new()) };
             Ok(self.store.narration().with(|inner| {
                 inner
@@ -388,7 +336,7 @@ impl SequenceOwner for AuthoritySequences<'_> {
                     .map(|((_, attempt_id), _)| attempt_id.clone())
                     .collect()
             }))
-        }
+        })
     }
 
     fn bind_narration_action<'a>(
@@ -396,8 +344,8 @@ impl SequenceOwner for AuthoritySequences<'_> {
         campaign_id: &'a str,
         attempt_id: &'a str,
         action_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
             if holds_narration() {
                 // `_execute` already holds `_narration_lock` (an `RLock`).
                 let _operation = self.store.operation()?;
@@ -411,6 +359,6 @@ impl SequenceOwner for AuthoritySequences<'_> {
             }
             super::narration_attempts::bind_narration_action(self.store, campaign_id, attempt_id, action_id)
                 .await
-        }
+        })
     }
 }

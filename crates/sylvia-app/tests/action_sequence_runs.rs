@@ -7,16 +7,14 @@
 //! exit around the body); the run's result or exception must be Python's, and the whole trace must
 //! be consumed.
 
-// The scripted owner's methods spell out the trait's `impl Future + Send` return type.
-#![allow(clippy::manual_async_fn)]
-
 use serde_json::{json, Value as Json};
 use std::collections::VecDeque;
 use std::future::Future;
 use std::sync::Mutex;
 use sylvia_app::action_sequences::{
     action_sequence, compose_action_sequence, execute_action_sequence, last_attempt_commit, ComposeRequest,
-    ExecuteRequest, PlayerActionAnswer, PlayerActionRequest, ResolvedControl, SequenceOwner, SequenceResult,
+    ExecuteRequest, PlayerActionAnswer, PlayerActionRequest, ResolvedControl, SequenceFuture, SequenceOwner,
+    SequenceResult,
 };
 use sylvia_app::authority::actions::ActionError;
 use sylvia_app::authority::content_reads::CatalogTool;
@@ -394,77 +392,51 @@ impl Scripted {
         }
     }
 
-    async fn guarded<R, Fut>(&self, guard: &str, args: Json, body: impl FnOnce() -> Fut) -> SequenceResult<R>
-    where
-        Fut: Future<Output = SequenceResult<R>>,
-    {
+    /// The held region: `body` was made before the guard and starts here, after the enter.
+    async fn guarded<R>(
+        &self,
+        guard: &str,
+        args: Json,
+        body: impl Future<Output = SequenceResult<R>>,
+    ) -> SequenceResult<R> {
         self.enter(guard, args.clone())?;
-        let result = body().await;
+        let result = body.await;
         self.exit(guard, args);
         result
     }
 }
 
 impl SequenceOwner for Scripted {
-    fn with_operation<'a, R, F, Fut>(&'a self, body: F) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move { self.guarded("operation", json!([]), body).await }
+    fn with_operation<'a, R: Send + 'a>(&'a self, body: SequenceFuture<'a, R>) -> SequenceFuture<'a, R> {
+        Box::pin(async move { self.guarded("operation", json!([]), body).await })
     }
 
-    fn with_lane<'a, R, F, Fut>(
+    fn with_lane<'a, R: Send + 'a>(
         &'a self,
         campaign_id: &'a str,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move { self.guarded("lane", json!([campaign_id]), body).await }
+        body: SequenceFuture<'a, R>,
+    ) -> SequenceFuture<'a, R> {
+        Box::pin(async move { self.guarded("lane", json!([campaign_id]), body).await })
     }
 
-    fn with_direct_action_work<'a, R, F, Fut>(
+    fn with_direct_action_work<'a, R: Send + 'a>(
         &'a self,
         campaign_id: &'a str,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move { self.guarded("direct_action_work", json!([campaign_id]), body).await }
+        body: SequenceFuture<'a, R>,
+    ) -> SequenceFuture<'a, R> {
+        Box::pin(async move { self.guarded("direct_action_work", json!([campaign_id]), body).await })
     }
 
-    fn with_narration_lock<'a, R, F, Fut>(
-        &'a self,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a,
-    {
-        async move { self.guarded("narration", json!([]), body).await }
+    fn with_narration_lock<'a, R: Send + 'a>(&'a self, body: SequenceFuture<'a, R>) -> SequenceFuture<'a, R> {
+        Box::pin(async move { self.guarded("narration", json!([]), body).await })
     }
 
-    fn active_dm_context<'a>(
-        &'a self,
-        session_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a {
-        async move { Ok(session(&self.call("active_dm_context", json!([session_id]))?)) }
+    fn active_dm_context<'a>(&'a self, session_id: &'a str) -> SequenceFuture<'a, SessionContext> {
+        Box::pin(async move { Ok(session(&self.call("active_dm_context", json!([session_id]))?)) })
     }
 
-    fn session_context<'a>(
-        &'a self,
-        session_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a {
-        async move { Ok(session(&self.call("session_context", json!([session_id]))?)) }
+    fn session_context<'a>(&'a self, session_id: &'a str) -> SequenceFuture<'a, SessionContext> {
+        Box::pin(async move { Ok(session(&self.call("session_context", json!([session_id]))?)) })
     }
 
     fn append_session_message<'a>(
@@ -473,63 +445,55 @@ impl SequenceOwner for Scripted {
         message_id: &'a str,
         kind: SessionMessageKind,
         content: &'a JsonMap,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
             let args = json!({"session_id": session_id, "message_id": message_id, "kind": kind.as_str(), "content": content});
             self.call("append_session_message", args).map(|_| ())
-        }
+        })
     }
 
-    fn snapshot<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<CampaignSnapshot>> + Send + 'a {
-        async move { Ok(snapshot(&self.call("snapshot", json!([campaign_id]))?)) }
+    fn snapshot<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, CampaignSnapshot> {
+        Box::pin(async move { Ok(snapshot(&self.call("snapshot", json!([campaign_id]))?)) })
     }
 
     fn action_hit<'a>(
         &'a self,
         campaign_id: &'a str,
         action_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Option<IdempotencyHit>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Option<IdempotencyHit>> {
+        Box::pin(async move {
             let hit = self.call("action_hit", json!([campaign_id, action_id]))?;
             Ok((!hit.is_null()).then(|| IdempotencyHit {
                 payload_hash: text(&hit["payload_hash"]),
                 receipt: action_receipt(&hit["receipt"]),
             }))
-        }
+        })
     }
 
-    fn has_pending_mechanics_action<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<bool>> + Send + 'a {
-        async move { Ok(self.call("has_pending_mechanics_action", json!([campaign_id]))?.as_bool().unwrap()) }
+    fn has_pending_mechanics_action<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, bool> {
+        Box::pin(async move {
+            Ok(self.call("has_pending_mechanics_action", json!([campaign_id]))?.as_bool().unwrap())
+        })
     }
 
-    fn current_open_turn<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Option<String>>> + Send + 'a {
-        async move { Ok(optional_text(&self.call("current_open_turn", json!([campaign_id]))?)) }
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, Option<String>> {
+        Box::pin(async move { Ok(optional_text(&self.call("current_open_turn", json!([campaign_id]))?)) })
     }
 
-    fn campaign_work_count<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<usize>> + Send + 'a {
-        async move { Ok(self.call("campaign_work_count", json!([campaign_id]))?.as_u64().unwrap() as usize) }
+    fn campaign_work_count<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, usize> {
+        Box::pin(async move {
+            Ok(self.call("campaign_work_count", json!([campaign_id]))?.as_u64().unwrap() as usize)
+        })
     }
 
     fn campaign_session_contexts<'a>(
         &'a self,
         campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<SessionContext>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Vec<SessionContext>> {
+        Box::pin(async move {
             let contexts = self.call("campaign_session_contexts", json!([campaign_id]))?;
             Ok(contexts.as_array().unwrap().iter().map(session).collect())
-        }
+        })
     }
 
     fn player_action_markers<'a>(
@@ -537,20 +501,20 @@ impl SequenceOwner for Scripted {
         campaign_id: &'a str,
         action_ids: &'a [&'a str],
         kind: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<JsonMap>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Vec<JsonMap>> {
+        Box::pin(async move {
             let markers = self.call("player_action_markers", json!([campaign_id, action_ids, kind]))?;
             Ok(markers.as_array().unwrap().iter().map(object).collect())
-        }
+        })
     }
 
     fn player_control_scope<'a>(
         &'a self,
         snapshot: &'a CampaignSnapshot,
-    ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Option<JsonMap>> {
+        Box::pin(async move {
             Ok(self.call("player_control_scope", json!([snapshot_args(snapshot)]))?.as_object().cloned())
-        }
+        })
     }
 
     fn resolve_panel_control<'a>(
@@ -558,8 +522,8 @@ impl SequenceOwner for Scripted {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<ResolvedControl>> + Send + 'a {
-        async move { self.control("resolve_panel_control", snapshot, source, selection) }
+    ) -> SequenceFuture<'a, ResolvedControl> {
+        Box::pin(async move { self.control("resolve_panel_control", snapshot, source, selection) })
     }
 
     fn resolve_card_control<'a>(
@@ -567,8 +531,8 @@ impl SequenceOwner for Scripted {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<ResolvedControl>> + Send + 'a {
-        async move { self.control("resolve_card_control", snapshot, source, selection) }
+    ) -> SequenceFuture<'a, ResolvedControl> {
+        Box::pin(async move { self.control("resolve_card_control", snapshot, source, selection) })
     }
 
     fn check_player_action<'a>(
@@ -576,11 +540,11 @@ impl SequenceOwner for Scripted {
         tool: &'a CatalogTool,
         parameters: &'a JsonMap,
         snapshot: &'a CampaignSnapshot,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
             let args = json!([tool_args(tool), parameters, snapshot_args(snapshot)]);
             self.call("check_player_action", args).map(|_| ())
-        }
+        })
     }
 
     fn player_action_preview<'a>(
@@ -590,25 +554,22 @@ impl SequenceOwner for Scripted {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Option<JsonMap>> {
+        Box::pin(async move {
             let args = json!([tool_args(tool), parameters, snapshot_args(snapshot), source, selection]);
             Ok(self.call("player_action_preview", args)?.as_object().cloned())
-        }
+        })
     }
 
-    fn campaign_panels<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<JsonMap>> + Send + 'a {
-        async move { Ok(object(&self.call("campaign_panels", json!([campaign_id]))?)) }
+    fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, JsonMap> {
+        Box::pin(async move { Ok(object(&self.call("campaign_panels", json!([campaign_id]))?)) })
     }
 
     fn player_action_in_owned_work<'a>(
         &'a self,
         request: &'a PlayerActionRequest,
-    ) -> impl Future<Output = SequenceResult<PlayerActionAnswer>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, PlayerActionAnswer> {
+        Box::pin(async move {
             let args = json!({
                 "campaign_id": request.campaign_id, "source": request.source, "operation_id": request.operation_id,
                 "expected_revision": request.expected_revision, "selection": request.selection,
@@ -616,36 +577,33 @@ impl SequenceOwner for Scripted {
                 "preview_only": request.preview_only,
             });
             Ok(receipt(&self.call("player_action_in_owned_work", args)?))
-        }
+        })
     }
 
     fn append_player_action_references<'a>(
         &'a self,
         session_id: &'a str,
         receipt: &'a ActionReceipt,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
             self.call("append_player_action_references", json!([session_id, receipt_args(receipt)]))
                 .map(|_| ())
-        }
+        })
     }
 
-    fn catalog<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<CatalogTool>>> + Send + 'a {
-        async move {
+    fn catalog<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, Vec<CatalogTool>> {
+        Box::pin(async move {
             let tools = self.call("catalog", json!([campaign_id]))?;
             Ok(tools.as_array().unwrap().iter().map(|record| tool(&self.base, record)).collect())
-        }
+        })
     }
 
     fn open_narration_attempts<'a>(
         &'a self,
         campaign_id: &'a str,
         turn_id: Option<&'a str>,
-    ) -> impl Future<Output = SequenceResult<Vec<String>>> + Send + 'a {
-        async move {
+    ) -> SequenceFuture<'a, Vec<String>> {
+        Box::pin(async move {
             let attempts = self.call("attempts", Json::Null)?;
             Ok(attempts
                 .as_array()
@@ -658,7 +616,7 @@ impl SequenceOwner for Scripted {
                 })
                 .map(|attempt| text(&attempt["attempt_id"]))
                 .collect())
-        }
+        })
     }
 
     fn bind_narration_action<'a>(
@@ -666,8 +624,10 @@ impl SequenceOwner for Scripted {
         campaign_id: &'a str,
         attempt_id: &'a str,
         action_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a {
-        async move { self.call("bind_narration_action", json!([campaign_id, attempt_id, action_id])).map(|_| ()) }
+    ) -> SequenceFuture<'a, ()> {
+        Box::pin(async move {
+            self.call("bind_narration_action", json!([campaign_id, attempt_id, action_id])).map(|_| ())
+        })
     }
 }
 
