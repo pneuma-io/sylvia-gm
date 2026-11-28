@@ -1,6 +1,7 @@
 //! `application/authority.py`: `AuthorityOwner` operations that sit above the store.
 
 pub mod actions;
+pub mod actor_decisions;
 pub mod campaign_creation;
 pub mod campaign_file;
 pub mod construction_handoff;
