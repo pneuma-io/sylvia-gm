@@ -1,0 +1,430 @@
+{
+  "name": "campaign-construction",
+  "description": "The campaign construction commands outside the guided interview (stand-in model): confirm_new_campaign's refusals in Python's order (an owner-assigned session, the candidate, the provider and model, the chat start, the name, the turn and the skill), a confirmation with no packages and its replay and identity conflict, and one with SRD Lite's installed candidate; begin_campaign_construction on each (an unknown lane, a stale revision, the begin, its replay and conflict, the brief in the Builder session); complete_campaign_construction's refusals, completion, replay and conflict, and an unknown campaign; then the index and snapshot, and shut down. Python's confirmation makes uuid4 campaign identities, so the campaign and lock identities are aliases, and six hash cells whose payloads hold them are ignored by exact pointer: the two Builder sessions' agent_sessions.payload_sha256 and the four begin and complete campaign_operations.semantic_payload_sha256. Those columns are compared byte for byte, with fixed identities and no ignore rule, for the same operation kinds and the Builder sessions in campaign-snapshots (and action-commands).",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "alias": [
+      {
+        "name": "campaign",
+        "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}",
+        "keys": [
+          "campaign_id"
+        ]
+      },
+      {
+        "name": "lock",
+        "pattern": "lock-[0-9a-f]{40}",
+        "keys": [
+          "authority_lock_id",
+          "lock_id",
+          "basis_lock_id",
+          "current_lock_id"
+        ]
+      }
+    ],
+    "ignore_pointers": [
+      "/database/tables/agent_sessions/rows/0/payload_sha256",
+      "/database/tables/agent_sessions/rows/1/payload_sha256",
+      "/database/tables/campaign_operations/rows/2/semantic_payload_sha256",
+      "/database/tables/campaign_operations/rows/3/semantic_payload_sha256",
+      "/database/tables/campaign_operations/rows/4/semantic_payload_sha256",
+      "/database/tables/campaign_operations/rows/5/semantic_payload_sha256"
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "package_candidates",
+      "expect_ok": true,
+      "save": {
+        "srd": "/result/1/candidate_id"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "builder_session_id": "session-mine"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {}
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "candidate_id": ""
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "candidate_id": 7
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "candidate_id": "candidate-missing"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "provider_id": "${provider_id}"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "display_name": "Quick Start Campaign"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "display_name": "Quick Start Campaign",
+        "turn_id": "turn-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "builder_skill": ""
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "display_name": "Quick Start Campaign",
+        "turn_id": "turn-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "reasoning_effort": "nonsense"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "display_name": "Quick Start Campaign",
+        "turn_id": "turn-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "quick": "/result/campaign_id",
+        "quick_builder": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "display_name": "Quick Start Campaign",
+        "turn_id": "turn-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-quick",
+        "display_name": "Another Name",
+        "turn_id": "turn-quick",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "confirm_new_campaign",
+      "params": {
+        "operation_id": "confirm-srd",
+        "display_name": "Rules Campaign",
+        "turn_id": "turn-srd",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "candidate_id": "${srd}",
+        "builder_skill": "BUILD CAMPAIGN PLAN"
+      },
+      "save": {
+        "srd_campaign": "/result/campaign_id"
+      }
+    },
+    {
+      "method": "campaign_index"
+    },
+    {
+      "method": "session_context",
+      "params": {
+        "session_id": "${quick_builder}"
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {
+          "premise": "A quick start premise."
+        },
+        "operation_id": "begin-quick",
+        "campaign_id": "${quick}",
+        "lane": "sideways",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {
+          "premise": "A quick start premise."
+        },
+        "operation_id": "begin-quick",
+        "campaign_id": "${quick}",
+        "lane": "quick_start",
+        "expected_revision": 5
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {
+          "premise": "A quick start premise."
+        },
+        "operation_id": "begin-quick",
+        "campaign_id": "${quick}",
+        "lane": "quick_start",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {
+          "premise": "A quick start premise."
+        },
+        "operation_id": "begin-quick",
+        "campaign_id": "${quick}",
+        "lane": "quick_start",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {
+          "premise": "Another premise."
+        },
+        "operation_id": "begin-quick",
+        "campaign_id": "${quick}",
+        "lane": "quick_start",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {
+          "premise": "A custom premise."
+        },
+        "operation_id": "begin-srd",
+        "campaign_id": "${srd_campaign}",
+        "lane": "customize",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${quick_builder}"
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {}
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": []
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Quick Plan"
+        }
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Quick Plan"
+        },
+        "operation_id": "complete-quick"
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Quick Plan"
+        },
+        "operation_id": "complete-quick",
+        "campaign_id": "${quick}"
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Quick Plan",
+          "acts": [
+            "act1"
+          ]
+        },
+        "operation_id": "complete-quick",
+        "campaign_id": "${quick}",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Quick Plan",
+          "acts": [
+            "act1"
+          ]
+        },
+        "operation_id": "complete-quick",
+        "campaign_id": "${quick}",
+        "expected_revision": 1
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Quick Plan",
+          "acts": [
+            "act1"
+          ]
+        },
+        "operation_id": "complete-quick",
+        "campaign_id": "${quick}",
+        "expected_revision": 1
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Other Plan"
+        },
+        "operation_id": "complete-quick",
+        "campaign_id": "${quick}",
+        "expected_revision": 1
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "Custom Plan",
+          "acts": [
+            "act1",
+            "act2"
+          ]
+        },
+        "operation_id": "complete-srd",
+        "campaign_id": "${srd_campaign}",
+        "expected_revision": 1
+      }
+    },
+    {
+      "method": "complete_campaign_construction",
+      "params": {
+        "canonical_plan": {
+          "title": "No Begin"
+        },
+        "operation_id": "complete-missing",
+        "campaign_id": "campaign-missing",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "campaign_index"
+    },
+    {
+      "method": "display_snapshot",
+      "params": {
+        "campaign_id": "${quick}"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}
