@@ -161,7 +161,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "player_projection_page" => commands::campaigns::handle_player_projection_page(context, params).await,
         "catalog" => commands::campaigns::handle_catalog(context, params).await,
+        "snapshot" | "display_snapshot" => commands::campaigns::handle_snapshot(context, params).await,
         "backup_database" => commands::campaigns::handle_backup_database(context, params).await,
         "campaign_creation_catalog" => {
             commands::campaigns::handle_campaign_creation_catalog(context, params).await
@@ -183,6 +185,14 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
+        }
+        "package_candidates" => commands::packages::handle_package_candidates(context, params).await,
+        "inspect_package_candidate" => {
+            commands::packages::handle_inspect_package_candidate(context, params).await
+        }
+        "package_candidate_text" => commands::packages::handle_package_candidate_text(context, params).await,
+        "compare_package_candidates" => {
+            commands::packages::handle_compare_package_candidates(context, params).await
         }
         "install_package" => commands::packages::handle_install_package(context, params).await,
         "install_package_file" => commands::packages::handle_install_package_file(context, params).await,

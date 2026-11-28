@@ -66,6 +66,7 @@ pub async fn player_action(
     owner_id: &str,
     request: &PlayerActionRequest,
 ) -> Result<PlayerActionAnswer, ActionError> {
+    let _operation = store.operation()?;
     let owned = request.campaign_id.clone();
     let _work = store
         .lanes()
@@ -156,7 +157,7 @@ enum Prepared {
 }
 
 /// A failure on the store thread: Python's exception unchanged, or a store failure.
-enum Failure {
+pub(super) enum Failure {
     Domain(DomainError),
     Store(StoreError),
 }
@@ -268,13 +269,13 @@ fn prepare(
         &control.tool.input_schema,
         &participant_ids,
     )?;
-    let control_scope = player_control_scope(store, &snapshot)?;
+    let control_scope = player_control_scope(store, &snapshot.state)?;
     crate::player_actions::validate_player_control(
         control_scope.as_ref(),
         &control.parameters,
         control.actor_parameter.as_deref(),
     )?;
-    check_player_action(&control.tool, &control.parameters, &snapshot, request.preview_only)?;
+    check_player_action(&control.tool, &control.parameters, &snapshot.state, request.preview_only)?;
     let mut policy = JsonMap::new();
     policy.insert("confirmation".into(), controls.confirmation.as_str().into());
     policy.insert("response".into(), controls.response.as_str().into());
@@ -403,22 +404,21 @@ fn resolve_card_control(
 
 /// `_player_control_scope(snapshot)`: the player's actor identities, through the same Ruleset
 /// scope as the GM's context.
-fn player_control_scope(
+pub(super) fn player_control_scope(
     store: &AuthorityStore,
-    snapshot: &CampaignSnapshot,
+    state: &sylvia_domain::authority::CampaignState,
 ) -> Result<Option<JsonMap>, Failure> {
-    let Some(declared) = super::content_reads::decision_scope_declaration(store, &snapshot.state)? else {
+    let Some(declared) = super::content_reads::decision_scope_declaration(store, state)? else {
         return Ok(None);
     };
-    crate::decision_scope::project_player_control_scope(&snapshot.state, &declared)
+    crate::decision_scope::project_player_control_scope(state, &declared)
         .map(Some)
         .map_err(|error| Failure::Store(super::snapshots::projection_rejected(error)))
 }
 
 /// The participants' context payloads, as the package checks read them.
-fn participants(snapshot: &CampaignSnapshot) -> JsonMap {
-    snapshot
-        .state
+fn participants(state: &sylvia_domain::authority::CampaignState) -> JsonMap {
+    state
         .participants
         .iter()
         .map(|participant| {
@@ -429,15 +429,15 @@ fn participants(snapshot: &CampaignSnapshot) -> JsonMap {
 
 /// `_check_player_action(tool, parameters, snapshot, player_view=...)`: the package's own checks,
 /// at projection and right before execution; a player's view sees only known geometry.
-fn check_player_action(
+pub(super) fn check_player_action(
     tool: &super::content_reads::CatalogTool,
     parameters: &JsonMap,
-    snapshot: &CampaignSnapshot,
+    campaign: &sylvia_domain::authority::CampaignState,
     player_view: bool,
 ) -> Result<(), Failure> {
     let Some(checker) = &tool.check_player_action else { return Ok(()) };
-    let mut state = snapshot.state.state.clone();
-    let mut participants = participants(snapshot);
+    let mut state = campaign.state.clone();
+    let mut participants = participants(campaign);
     if player_view {
         let known = |value: JsonMap| -> Result<JsonMap, Failure> {
             match sylvia_engine::spatial::player_known::player_known_spatial_value(&Json::Object(value)) {
@@ -642,7 +642,7 @@ fn resolve_panel_control(
             };
             let projection =
                 crate::network_graph::project_network_graph(&data, &BTreeSet::new()).map_err(graph)?;
-            let scope = player_control_scope(store, snapshot)?;
+            let scope = player_control_scope(store, &snapshot.state)?;
             let controlled: BTreeSet<String> = match &scope {
                 Some(scope) if scope.get("available") == Some(&Json::Bool(true)) => scope
                     .get("actors")
@@ -744,16 +744,17 @@ fn player_action_preview(
     } else {
         parameters.clone()
     };
-    let presentation = match previewer.preview(&parameters, &snapshot.state.state, &participants(snapshot)) {
-        Ok(presentation) => presentation,
-        Err(pending) => {
-            return Err(StoreError::Coded(sylvia_base::CodedError::new(
-                super::actions::PORT_PENDING,
-                pending.0,
-            ))
-            .into())
-        }
-    };
+    let presentation =
+        match previewer.preview(&parameters, &snapshot.state.state, &participants(&snapshot.state)) {
+            Ok(presentation) => presentation,
+            Err(pending) => {
+                return Err(StoreError::Coded(sylvia_base::CodedError::new(
+                    super::actions::PORT_PENDING,
+                    pending.0,
+                ))
+                .into())
+            }
+        };
     match (presentation, segment) {
         (Some(presentation), Some(segment)) => {
             // `{**segment, **presentation, "map_preview": presentation.get(...) or segment.get(...)}`.

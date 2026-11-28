@@ -173,15 +173,31 @@ fn run_case(case: &Value) {
         *routes.cancel.lock().unwrap() = Some(installer.clone());
     }
     let escaped = installer.run().err();
-    assert_eq!(
-        escaped.map(|message| json!(["RuntimeError", message])).unwrap_or(Value::Null),
-        case["escaped"],
-        "{name}"
+    sylvia_base::testing::assert_same_json(
+        &escaped.map(|message| json!(["RuntimeError", message])).unwrap_or(Value::Null),
+        &case["escaped"],
+        name.to_string(),
     );
-    assert_eq!(Json::Object(installer.progress()), case["progress"], "progress for {name}");
-    assert_eq!(json!(*routes.requested.lock().unwrap()), case["requested"], "requests for {name}");
-    assert_eq!(json!(*checks.lock().unwrap()), case["checks"], "checks for {name}");
-    assert_eq!(Value::Array(files(&home.join("install"))), case["files"], "files for {name}");
+    sylvia_base::testing::assert_same_json(
+        &Json::Object(installer.progress()),
+        &case["progress"],
+        format!("progress for {name}"),
+    );
+    sylvia_base::testing::assert_same_json(
+        &json!(*routes.requested.lock().unwrap()),
+        &case["requested"],
+        format!("requests for {name}"),
+    );
+    sylvia_base::testing::assert_same_json(
+        &json!(*checks.lock().unwrap()),
+        &case["checks"],
+        format!("checks for {name}"),
+    );
+    sylvia_base::testing::assert_same_json(
+        &Value::Array(files(&home.join("install"))),
+        &case["files"],
+        format!("files for {name}"),
+    );
     *routes.cancel.lock().unwrap() = None;
     let _ = std::fs::remove_dir_all(&home);
 }
@@ -207,7 +223,7 @@ fn versions_and_armor_match_python() {
             Ok(parts) => {
                 let numbers: Vec<Value> =
                     parts.iter().map(|part| json!(part.parse::<u64>().unwrap())).collect();
-                assert_eq!(Value::Array(numbers), *expected, "{text:?}");
+                sylvia_base::testing::assert_same_json(&Value::Array(numbers), expected, format!("{text:?}"));
             }
             Err(error) => assert_eq!(error.message, expected.as_str().unwrap(), "{text:?}"),
         }

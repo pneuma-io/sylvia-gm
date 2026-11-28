@@ -126,6 +126,13 @@ fn unique_keys_flatten(constructor: &mut Constructor, node: NodeId) -> Result<()
     constructor.base_flatten_mapping(node)
 }
 
+/// `yaml.load(runtime_bytes.decode("utf-8"), Loader=_BoundedRuntimeLoader)`: the raw runtime
+/// document as the execution loader builds it, the graph checked first, for readers that need
+/// the authored tables rather than [`RuntimeTables`] (`AuthorityOwner.inspect_package_candidate`).
+pub fn load_bounded_runtime_yaml(runtime_bytes: &[u8]) -> Result<Data, PackageRuntimeFailure> {
+    load_yaml(runtime_bytes, false)
+}
+
 /// `yaml.load(text, Loader=_UniqueRuntimeLoader)` with `_load_runtime`'s exception handling.
 /// `yaml.load(text, Loader=_UniqueRuntimeLoader if authoring else _BoundedRuntimeLoader)`: both
 /// check the node graph first; only the authoring loader refuses duplicate keys.
@@ -791,6 +798,45 @@ impl ParsedRuntime {
 
 /// `_PARSED_RUNTIMES`' bound: at most this many parsed runtimes stay in the process.
 const PARSED_RUNTIME_LIMIT: usize = 16;
+
+/// What the Ruleset test worker reads of the primary package's runtime
+/// (`interfaces/ruleset_test_worker.py` `run_archive`).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RulesetTestRuntimeFacts {
+    /// `{name for name in required if runtime.tools[name].pre_conditions}`, in `required`'s order.
+    pub required_preconditions: Vec<String>,
+    /// `runtime.model_decision_scope is not None`: the Ruleset declares a `model_decision_scope`
+    /// object (an empty one counts; no fallback to the boundary).
+    pub requires_handoff: bool,
+}
+
+/// `ruleset_test_runtime_facts(package_id, runtime_bytes, required)`: the cached
+/// `_parse_runtime`, then which required tools have pre-conditions (Python's truthiness) and
+/// whether the Ruleset needs a decision handoff. A required name the runtime lacks is
+/// `runtime.tools[name]`'s `KeyError`, for the first missing name in `required`'s order.
+pub fn ruleset_test_runtime_facts(
+    package_id: &str,
+    runtime_bytes: &[u8],
+    required: &[&str],
+) -> Result<RulesetTestRuntimeFacts, PackageRuntimeFailure> {
+    let runtime = parse_runtime(package_id, runtime_bytes)?;
+    let mut required_preconditions = Vec::new();
+    for name in required {
+        let Some(tool) = runtime.tool(name) else {
+            return Err(PackageRuntimeFailure::Uncaught {
+                class: "KeyError",
+                message: sylvia_base::pystr::repr(name),
+            });
+        };
+        if sylvia_engine::ruleset::pydata::truthy(&tool.pre_conditions) {
+            required_preconditions.push((*name).to_owned());
+        }
+    }
+    let requires_handoff = runtime.ruleset.iter().any(|(key, value)| {
+        matches!(key, Data::Str(text) if text == "model_decision_scope") && matches!(value, Data::Dict(_))
+    });
+    Ok(RulesetTestRuntimeFacts { required_preconditions, requires_handoff })
+}
 
 /// `package_model_decision_boundary(package_id=..., runtime_bytes=...)`: the validated
 /// Ruleset-owned active-actor control projection, `model_decision_scope or

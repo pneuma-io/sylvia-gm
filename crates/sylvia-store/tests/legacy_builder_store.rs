@@ -164,11 +164,23 @@ fn detach_matches_python_on_every_case() {
             }
         } else {
             assert_eq!(calls.len(), 1, "{name}");
-            assert_eq!(outcome(replay(&store, &root, &calls[0])), case["outcome"], "{name}: outcome");
+            sylvia_base::testing::assert_same_json(
+                &outcome(replay(&store, &root, &calls[0])),
+                &case["outcome"],
+                format!("{name}: outcome"),
+            );
         }
         drop(store);
-        assert_eq!(tables(&root.join("authority.sqlite3")), case["tables"], "{name}: the session tables");
-        assert_eq!(tree(&root), case["tree"], "{name}: the storage tree");
+        sylvia_base::testing::assert_same_json(
+            &tables(&root.join("authority.sqlite3")),
+            &case["tables"],
+            format!("{name}: the session tables"),
+        );
+        sylvia_base::testing::assert_same_json(
+            &tree(&root),
+            &case["tree"],
+            format!("{name}: the storage tree"),
+        );
     }
 }
 
@@ -191,10 +203,18 @@ fn retain_legacy_workspace_matches_python_on_every_case() {
                         .replace('\\', "/"),
                 )
             });
-            assert_eq!(outcome(result), *expected, "{name}: attempt {attempt}");
+            sylvia_base::testing::assert_same_json(
+                &outcome(result),
+                expected,
+                format!("{name}: attempt {attempt}"),
+            );
         }
         if !case["tree"].as_array().unwrap().is_empty() {
-            assert_eq!(tree(&root), case["tree"], "{name}: the storage tree");
+            sylvia_base::testing::assert_same_json(
+                &tree(&root),
+                &case["tree"],
+                format!("{name}: the storage tree"),
+            );
         }
     }
 }

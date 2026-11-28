@@ -86,13 +86,13 @@ fn versions_parse_and_order_like_python() {
         } else {
             outcome(result, |v| json!(v.text))
         };
-        assert_eq!(got, case["result"], "{value}");
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{value}"));
     }
     for case in rows("version_order") {
         let left = Version::parse(&case[0]).unwrap();
         let right = Version::parse(&case[1]).unwrap();
         let got = json!([case[0], case[1], left < right, left == right, left <= right, left > right]);
-        assert_eq!(&got, case);
+        sylvia_base::testing::assert_same_json(&got, case, concat!(file!(), ":", line!()));
     }
 }
 
@@ -100,7 +100,7 @@ fn versions_parse_and_order_like_python() {
 fn base64_decodes_like_binascii_strict_mode() {
     for case in rows("base64") {
         let got = b64decode_strict(case["text"].as_str().unwrap()).map(hex::encode);
-        assert_eq!(json!(got), case["bytes"], "{}", case["text"]);
+        sylvia_base::testing::assert_same_json(&json!(got), &case["bytes"], format!("{}", case["text"]));
     }
 }
 
@@ -110,11 +110,11 @@ fn urls_split_and_unquote_like_python() {
         let got = urlsplit(case["url"].as_str().unwrap())
             .ok()
             .map(|split| json!([split.scheme, split.netloc, split.path, split.query, split.fragment]));
-        assert_eq!(json!(got), case["split"], "{}", case["url"]);
+        sylvia_base::testing::assert_same_json(&json!(got), &case["split"], format!("{}", case["url"]));
     }
     for case in rows("unquote") {
         let got = unquote_strict(case["text"].as_str().unwrap()).ok();
-        assert_eq!(json!(got), case["result"], "{}", case["text"]);
+        sylvia_base::testing::assert_same_json(&json!(got), &case["result"], format!("{}", case["text"]));
     }
 }
 
@@ -122,16 +122,20 @@ fn urls_split_and_unquote_like_python() {
 fn release_locations_are_checked_like_python() {
     for case in rows("release_url") {
         let got = outcome(release_url(&case["url"], "0.4.2", case["distribution"].as_str()), J::String);
-        assert_eq!(got, case["result"], "{} {}", case["url"], case["distribution"]);
+        sylvia_base::testing::assert_same_json(
+            &got,
+            &case["result"],
+            format!("{} {}", case["url"], case["distribution"]),
+        );
     }
     for case in rows("official_request") {
         let got = outcome(official_request(case["url"].as_str().unwrap()), |()| J::Null);
-        assert_eq!(got, case["result"], "{}", case["url"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["url"]));
     }
     for case in rows("redirects") {
         // Python's `redirect_request` returns the next request (`is None` is false) once allowed.
         let got = outcome(check_redirect(case["url"].as_str().unwrap()), |()| json!(false));
-        assert_eq!(got, case["result"], "{}", case["url"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["url"]));
     }
     for case in rows("final_location") {
         let result = check_final_location(case["url"].as_str().unwrap());
@@ -143,14 +147,18 @@ fn release_locations_are_checked_like_python() {
                 J::Null
             }
         };
-        assert_eq!(got, case["trusted"], "{}", case["url"]);
+        sylvia_base::testing::assert_same_json(&got, &case["trusted"], format!("{}", case["url"]));
     }
 }
 
 #[test]
 fn payload_paths_are_checked_like_python() {
     for case in rows("payload_path") {
-        assert_eq!(outcome(payload_path(&case["path"]), J::String), case["result"], "{}", case["path"]);
+        sylvia_base::testing::assert_same_json(
+            &outcome(payload_path(&case["path"]), J::String),
+            &case["result"],
+            format!("{}", case["path"]),
+        );
     }
 }
 
@@ -168,7 +176,7 @@ fn signatures_verify_like_openssl() {
         let message = hex::decode(case["message"].as_str().unwrap()).unwrap();
         let signature = hex::decode(case["signature"].as_str().unwrap()).unwrap();
         let got = outcome(ring.verify(key_id, &message, &signature), |()| J::Null);
-        assert_eq!(got, case["result"], "{}", case["name"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["name"]));
     }
 }
 
@@ -198,7 +206,7 @@ fn manifests_are_accepted_and_refused_like_python() {
             parse_manifest(&raw, context)
         };
         let expected = declared_difference(name).unwrap_or_else(|| case["result"].clone());
-        assert_eq!(outcome(result, summary), expected, "{name}");
+        sylvia_base::testing::assert_same_json(&outcome(result, summary), &expected, name.to_string());
     }
 }
 
@@ -215,8 +223,12 @@ fn metadata_reads_like_python() {
         let got = outcome(metadata_bytes(&scripted, url, &cancel), |raw| {
             json!(hex::encode(sha2::Sha256::digest(raw)))
         });
-        assert_eq!(got, case["result"], "{}", case["name"]);
-        assert_eq!(json!(*scripted.reads.lock().unwrap()), case["reads"], "{}", case["name"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["name"]));
+        sylvia_base::testing::assert_same_json(
+            &json!(*scripted.reads.lock().unwrap()),
+            &case["reads"],
+            format!("{}", case["name"]),
+        );
     }
 }
 
@@ -238,8 +250,12 @@ fn discovery_selects_like_python() {
         } else {
             outcome(discover(&scripted, &cancel, context), |found| found.map_or(J::Null, summary))
         };
-        assert_eq!(got, case["result"], "{}", case["name"]);
-        assert_eq!(json!(*scripted.opened.lock().unwrap()), case["opened"], "{}", case["name"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["name"]));
+        sylvia_base::testing::assert_same_json(
+            &json!(*scripted.opened.lock().unwrap()),
+            &case["opened"],
+            format!("{}", case["name"]),
+        );
     }
 }
 
@@ -269,8 +285,8 @@ fn downloads_stage_like_python() {
             progress.push(json!([received, total.map(|total| total as u64)]));
         });
         let got = outcome(result, |path| json!(path.file_name().unwrap().to_string_lossy()));
-        assert_eq!(got, case["result"], "{name}");
-        assert_eq!(json!(progress), case["progress"], "{name}");
+        sylvia_base::testing::assert_same_json(&got, &case["result"], name.to_string());
+        sylvia_base::testing::assert_same_json(&json!(progress), &case["progress"], name.to_string());
         let mut files = serde_json::Map::new();
         let mut entries: Vec<_> =
             std::fs::read_dir(&stage).unwrap().map(|entry| entry.unwrap().path()).collect();
@@ -281,7 +297,7 @@ fn downloads_stage_like_python() {
                 json!(hex::encode(sha2::Sha256::digest(std::fs::read(&entry).unwrap()))),
             );
         }
-        assert_eq!(J::Object(files), case["files"], "{name}");
-        assert_eq!(json!(*scripted.reads.lock().unwrap()), case["reads"], "{name}");
+        sylvia_base::testing::assert_same_json(&J::Object(files), &case["files"], name.to_string());
+        sylvia_base::testing::assert_same_json(&json!(*scripted.reads.lock().unwrap()), &case["reads"], name);
     }
 }

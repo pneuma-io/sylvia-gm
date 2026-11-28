@@ -8,7 +8,7 @@ flips its status in the owner's command table. Handlers live in
 `crates/sylvia-owner/src/commands/<topic>.rs` and call service operations exported by the
 lane that owns the service; see "Command handlers" in `README.md`.
 
-Ported: 80 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `switch_session_reasoning`, `switch_session_speed`, `steer_session`, `session_context`, `session_history_page`, `interrupt_stream`, `disconnect_stream`, `stream_heartbeat`, `narration_attempt_status`, `reconnect_stream`, `submit_session_input`, `switch_session_model`, `start_dm_session`, `manual_retry_session`, `stop_agent_session`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
+Ported: 86 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_creation_catalog`, `campaign_party_options`, `create_guided_campaign_draft`, `advance_guided_campaign_draft`, `start_guided_campaign`, `finalize_campaign_construction`, `rename_campaign`, `archive_campaign`, `restore_archived_campaign`, `trash_campaign`, `restore_trashed_campaign`, `purge_campaign`, `export_campaign`, `export_campaign_file`, `recover_campaign`, `recover_campaign_file`, `export_package_candidate`, `export_package_candidate_file`, `install_package`, `install_package_file`, `catalog`, `backup_database`, `open_provider_setup`, `admin_full_audit_status`, `admin_full_audit_record`, `export_admin_full_audit`, `set_admin_full_audit`, `builder_chat_index`, `rename_builder_chat`, `delete_builder_chat`, `create_builder_chat`, `resume_agent_session`, `switch_session_reasoning`, `switch_session_speed`, `steer_session`, `session_context`, `session_history_page`, `interrupt_stream`, `disconnect_stream`, `stream_heartbeat`, `narration_attempt_status`, `reconnect_stream`, `submit_session_input`, `switch_session_model`, `start_dm_session`, `manual_retry_session`, `stop_agent_session`, `package_candidates`, `inspect_package_candidate`, `package_candidate_text`, `compare_package_candidates`, `snapshot`, `display_snapshot`, `provider_settings`, `claude_connection`, `model_choices`, `save_provider_settings`, `remove_provider_settings`, `set_default_model`, `set_chat_defaults`, `detect_local_providers`, `discover_provider_models`, `validate_provider_model`, `chatgpt_connection`, the eight run-loop commands for display-load cancellation, desktop drafts, local reports and faults and `renderer`, and the eleven `desktop_update_*` methods).
 
 ## Run-loop methods
 
@@ -47,8 +47,8 @@ Ported: 80 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `delete_builder_chat` | `builder.handle_delete_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |
 | `archive_builder_chat` | `builder.handle_archive_builder_chat` | yes | no | |
 | `restore_builder_chat` | `builder.handle_archive_builder_chat` | yes | no | |
-| `snapshot` | `campaigns.handle_snapshot` | no | no | |
-| `display_snapshot` | `campaigns.handle_display_snapshot` | yes | no | |
+| `snapshot` | `campaigns.handle_snapshot` | no | yes | `campaign-snapshots` |
+| `display_snapshot` | `campaigns.handle_display_snapshot` | yes | yes | `campaign-snapshots`, `startup` |
 | `player_projection` | `campaigns.handle_player_projection` | yes | no | |
 | `player_projection_page` | `campaigns.handle_player_projection_page` | yes | no | |
 | `campaign_panels` | `actions.handle_campaign_panels` | yes | no | |
@@ -64,13 +64,13 @@ Ported: 80 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `append_campaign_sequel` | `campaigns.handle_append_campaign_sequel` | yes | no | |
 | `campaign_sequel_context` | `campaigns.handle_append_campaign_sequel` | yes | no | |
 | `preview_campaign_sequel` | `campaigns.handle_append_campaign_sequel` | yes | no | |
-| `package_candidates` | `packages.handle_package_candidates` | yes | no | |
+| `package_candidates` | `packages.handle_package_candidates` | yes | yes | `package-reads`, `startup` |
 | `campaign_rules_update_options` | `campaigns.handle_campaign_rules_update_options` | yes | no | |
 | `preview_campaign_rules_update` | `campaigns.handle_preview_campaign_rules_update` | yes | no | |
 | `adopt_campaign_rules_update` | `campaigns.handle_adopt_campaign_rules_update` | yes | no | |
-| `inspect_package_candidate` | `packages.handle_inspect_package_candidate` | yes | no | |
-| `package_candidate_text` | `packages.handle_package_candidate_text` | yes | no | |
-| `compare_package_candidates` | `packages.handle_compare_package_candidates` | yes | no | |
+| `inspect_package_candidate` | `packages.handle_inspect_package_candidate` | yes | yes | `package-reads` |
+| `package_candidate_text` | `packages.handle_package_candidate_text` | yes | yes | `package-reads` |
+| `compare_package_candidates` | `packages.handle_compare_package_candidates` | yes | yes | `package-reads` |
 | `campaign_party_options` | `campaigns.handle_campaign_party_options` | yes | yes | `srd-mechanics-turn` (step 2), over lane 1's `selection_vectors` |
 | `model_choices` | `providers.handle_model_choices` | yes | yes | `startup` |
 | `provider_settings` | `providers.handle_provider_settings` | yes | yes | `startup` |

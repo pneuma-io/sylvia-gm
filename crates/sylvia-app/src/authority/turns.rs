@@ -6,6 +6,7 @@ use sylvia_store::{StoreHandle, StoreResult};
 
 /// `AuthorityOwner.current_open_turn(campaign_id)`: the exact currently open TURN, if any.
 pub async fn current_open_turn(store: &StoreHandle, campaign_id: &str) -> StoreResult<Option<String>> {
+    let _operation = store.operation()?;
     validate_authority_identity(campaign_id, "Campaign identity", false)?;
     let campaign_id = campaign_id.to_owned();
     store.call(move |store| store.current_open_turn(&campaign_id)).await
@@ -17,6 +18,7 @@ pub async fn current_open_turn(store: &StoreHandle, campaign_id: &str) -> StoreR
 /// Declared reduction until the mechanics-choice family lands, as for the lifecycle operations:
 /// `_reject_pending_mechanics_choice` asks only whether a pending row exists.
 pub async fn open_turn(store: &StoreHandle, campaign_id: &str, turn_id: &str) -> StoreResult<()> {
+    let _operation = store.operation()?;
     validate_authority_identity(campaign_id, "Campaign identity", false)?;
     validate_authority_identity(turn_id, "TURN identity", false)?;
     let _work = super::guided::campaign_work(store, campaign_id).await?;
@@ -34,6 +36,7 @@ pub async fn open_turn(store: &StoreHandle, campaign_id: &str, turn_id: &str) ->
 /// `AuthorityOwner.complete_turn(campaign_id, turn_id)`: the campaign's work, then the store's
 /// `complete_turn`.
 pub async fn complete_turn(store: &StoreHandle, campaign_id: &str, turn_id: &str) -> StoreResult<()> {
+    let _operation = store.operation()?;
     let _work = super::guided::campaign_work(store, campaign_id).await?;
     let (campaign_id, turn_id) = (campaign_id.to_owned(), turn_id.to_owned());
     store.call(move |store| store.complete_turn(&campaign_id, &turn_id)).await

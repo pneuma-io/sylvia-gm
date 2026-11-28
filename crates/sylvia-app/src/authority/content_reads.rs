@@ -45,6 +45,7 @@ pub async fn ruleset_gm_operating_guide(
     store: &StoreHandle,
     campaign_id: &str,
 ) -> StoreResult<Option<String>> {
+    let _operation = store.operation()?;
     let id = campaign_id.to_owned();
     store
         .call(move |store| {
@@ -120,6 +121,7 @@ pub async fn catalog(
     campaign_id: &str,
     include_unexposed: bool,
 ) -> StoreResult<Vec<CatalogTool>> {
+    let _operation = store.operation()?;
     // `_ensure_campaign_not_transitioning`, under the owner's work registry.
     store.lanes().work.ensure_not_transitioning(campaign_id)?;
     let id = campaign_id.to_owned();
@@ -584,6 +586,7 @@ fn knowledge_catalog(store: &AuthorityStore, campaign_id: &str, plan: &JsonMap) 
 /// `AuthorityOwner.campaign_knowledge_catalog(session_id)`: the merged private facts and the
 /// private Setting reference index of the DM session's campaign.
 pub async fn campaign_knowledge_catalog(store: &StoreHandle, session_id: &str) -> StoreResult<JsonMap> {
+    let _operation = store.operation()?;
     let id = session_id.to_owned();
     store
         .call(move |store| {
@@ -602,6 +605,7 @@ pub async fn campaign_knowledge_catalog_for_plan(
     campaign_id: &str,
     plan: &JsonMap,
 ) -> StoreResult<JsonMap> {
+    let _operation = store.operation()?;
     let (id, plan) = (campaign_id.to_owned(), plan.clone());
     store.call(move |store| knowledge_catalog(store, &id, &plan)).await
 }
@@ -646,6 +650,7 @@ pub fn decision_scope_declaration(
 /// `AuthorityOwner.model_context_owner(campaign_id)`: the GM's native history owner, when the
 /// campaign's package opts into isolated participants.
 pub async fn model_context_owner(store: &StoreHandle, campaign_id: &str) -> StoreResult<Option<JsonMap>> {
+    let _operation = store.operation()?;
     let id = campaign_id.to_owned();
     store
         .call(move |store| {
