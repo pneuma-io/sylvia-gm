@@ -569,10 +569,15 @@ impl AuthorityStore {
 
 /// `f"interruption-{uuid.uuid4()}"`: a new interruption identity.
 pub fn new_interruption_id() -> StoreResult<String> {
+    Ok(format!("interruption-{}", uuid4()?))
+}
+
+/// `str(uuid.uuid4())`: a random version 4 UUID in its hyphenated form.
+pub fn uuid4() -> StoreResult<String> {
     let mut bytes = [0u8; 16];
     getrandom::getrandom(&mut bytes).map_err(|error| StoreError::Other(error.to_string()))?;
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
     let hex = hex::encode(bytes);
-    Ok(format!("interruption-{}-{}-{}-{}-{}", &hex[..8], &hex[8..12], &hex[12..16], &hex[16..20], &hex[20..]))
+    Ok(format!("{}-{}-{}-{}-{}", &hex[..8], &hex[8..12], &hex[12..16], &hex[16..20], &hex[20..]))
 }

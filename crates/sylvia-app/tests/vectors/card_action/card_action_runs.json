@@ -326,6 +326,58 @@
     "code": "command_rejected",
     "message": "The saved card action is unavailable"
    }
+  },
+  {
+   "name": "a choice source on the card's action, previewed",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-choice",
+    "expected_revision": 2,
+    "source": {
+     "kind": "mechanics_choice",
+     "action_id": "move",
+     "choice_id": "c",
+     "choice_sequence": 0,
+     "option_id": "o",
+     "resolution_id": "r"
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": true
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "KeyError",
+    "code": null,
+    "message": "'button_index'"
+   }
+  },
+  {
+   "name": "a choice source on the card's action",
+   "request": {
+    "campaign_id": "campaign",
+    "session_id": "gm",
+    "operation_id": "card-choice",
+    "expected_revision": 2,
+    "source": {
+     "kind": "mechanics_choice",
+     "action_id": "move",
+     "choice_id": "c",
+     "choice_sequence": 0,
+     "option_id": "o",
+     "resolution_id": "r"
+    },
+    "selection": null,
+    "confirmation": null,
+    "preview_only": false
+   },
+   "holding_session": null,
+   "outcome": {
+    "error": "KeyError",
+    "code": null,
+    "message": "'button_index'"
+   }
   }
  ]
 }

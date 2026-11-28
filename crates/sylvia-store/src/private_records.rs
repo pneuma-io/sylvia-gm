@@ -139,11 +139,11 @@ pub fn encode(rows: &[Vec<Value>], session_ids: &HashSet<String>) -> StoreResult
 }
 
 /// `decode(data, session_ids=...)`: the member's rows, read back as `json.loads` reads each
-/// `bytes` line. A UTF-8 byte order mark is skipped, as `json.loads(bytes)` does; a line in
-/// UTF-16 or UTF-32, which `json.loads(bytes)` would also detect, is refused here
-/// (`docs/rust-port/differences.md`).
+/// `bytes` line: decoded by its leading bytes (UTF-8, with or without its byte order mark,
+/// UTF-16 or UTF-32), as `json.loads(bytes)` decodes. Empty data is no rows. A lone surrogate,
+/// which a Python string can hold, is refused (`docs/rust-port/differences.md` row 3).
 pub fn decode(data: &[u8], session_ids: &HashSet<String>) -> StoreResult<Vec<JsonMap>> {
-    if data.len() > MAX_BYTES || !data.ends_with(b"\n") {
+    if data.len() > MAX_BYTES || (!data.is_empty() && !data.ends_with(b"\n")) {
         return Err(reject());
     }
     let mut rows = Vec::new();
@@ -151,10 +151,9 @@ pub fn decode(data: &[u8], session_ids: &HashSet<String>) -> StoreResult<Vec<Jso
         if line.len() > MAX_ROW_BYTES || rows.len() >= MAX_ROWS {
             return Err(reject());
         }
-        let line = line.strip_prefix(b"\xef\xbb\xbf".as_slice()).unwrap_or(line);
-        let Ok(text) = std::str::from_utf8(line) else { return Err(reject()) };
+        let Ok((text, false)) = pyjson::decode_detected(line) else { return Err(reject()) };
         let policy = HookPolicy { refuse_duplicates: true, refuse_constants: false };
-        match pyjson::loads_hooked(text, policy) {
+        match pyjson::loads_hooked(&text, policy) {
             Ok(read) if matches!(read.value, Json::Object(_)) => rows.push(read.value),
             _ => return Err(reject()),
         }

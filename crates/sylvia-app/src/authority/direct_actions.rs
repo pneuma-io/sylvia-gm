@@ -365,7 +365,12 @@ fn resolve_card_control(
         .iter()
         .find(|action| sylvia_domain::pyops::py_eq(&Json::from(action.action_id.as_str()), &source_action));
     let card = original.and_then(|action| action.result.get("result_card"));
-    let index = source.get("button_index").and_then(Json::as_i64).unwrap_or(-1);
+    // `source["button_index"]`: a mechanics-choice source reaches here without one, and Python's
+    // `KeyError` escapes uncaught, before the card's checks.
+    let Some(index) = source.get("button_index") else {
+        return Err(DomainError::uncaught("KeyError", "'button_index'").into());
+    };
+    let index = index.as_i64().unwrap_or(-1);
     let Some(Json::Object(card)) = card else { return Err(unavailable().into()) };
     let version_ok =
         matches!(card.get("version"), Some(Json::Number(n)) if n.is_i64() && n.as_i64() == Some(1));
