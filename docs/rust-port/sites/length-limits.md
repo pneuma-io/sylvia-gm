@@ -70,7 +70,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `builder/_package_materializer.py:185` | `_read_payloads` | len() against a limit | `if len(value) > _PAYLOAD_BYTE_LIMIT or total_bytes > _PAYLOAD_BYTE_LIMIT:` |  `sylvia-app` package_materializer_vectors |
 | `builder/_package_materializer.py:227` | `materialize_ruleset_draft` | len() against a limit | `if len(source_bytes) > _DESCRIPTOR_BYTE_LIMIT:` |  `sylvia-app` package_materializer_vectors |
 | `builder/_package_record_edits.py:34` | `_read_record` | len() against a limit | `if len(raw) > _RECORD_BYTE_LIMIT:` |  `sylvia-app` package_record_edit_vectors |
-| `builder/_package_snapshots.py:101` | `_source_selection` | len() against a limit | `if len(raw) > 65536:` | |
+| `builder/_package_snapshots.py:101` | `_source_selection` | len() against a limit | `if len(raw) > 65536:` | yes |
 | `builder/_plan_snapshot_materializer.py:168` | `_removed_paths` | len() against a limit | `or len(value) > _REMOVAL_COUNT_LIMIT` | |
 | `campaign/rift.py:81` | `validate_rift_party_handoff` | len() against a limit | `or len(companions) > RIFT_RULESET_COMPANION_MAXIMUM` |  `sylvia-app` rift_vectors |
 | `campaign/rift.py:406` | `materialize_rift_selection` | len() against a limit | `if len(companion_ids) > RIFT_RULESET_COMPANION_MAXIMUM or len(set(companion_ids)) != len(` |  `sylvia-app` rift_vectors |

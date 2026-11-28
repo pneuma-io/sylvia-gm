@@ -67,8 +67,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/reusable_plans.py:483` | `load_reusable_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256( canonical_json_bytes(validated.payload) + validated.readable_markdown.encode("utf-8") + (b"" if contribution is No...` |  `sylvia-app` reusable_plan_vectors |
 | `builder/_package_materializer.py:340` | `ruleset_install_id` | hashlib.sha256 | `digest = hashlib.sha256(f"{session_id}\0{closure}".encode()).hexdigest()` |  `sylvia-app` package_materializer_vectors |
 | `builder/_ruleset_source.py:613` | `compile_ruleset_source` | hashlib.sha256 | `source_sha = hashlib.sha256(source_bytes).hexdigest()` |  `sylvia-app` ruleset_source_vectors |
-| `builder/_setting_materializer.py:36` | `_world_draft` | hashlib.sha256 | `source_sha = hashlib.sha256( canonical_json_bytes( {path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())} ) ).hexdigest()` | |
-| `builder/_setting_materializer.py:38` | `_world_draft` | hashlib.sha256 | `{path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())}` | |
+| `builder/_setting_materializer.py:36` | `_world_draft` | hashlib.sha256 | `source_sha = hashlib.sha256( canonical_json_bytes( {path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())} ) ).hexdigest()` | yes |
+| `builder/_setting_materializer.py:38` | `_world_draft` | hashlib.sha256 | `{path: hashlib.sha256(value).hexdigest() for path, value in sorted(files.items())}` | yes |
 | `builder/_workspace_files.py:38` | `content_version` | hashlib.sha256 | `return hashlib.sha256(content).hexdigest()` | |
 | `domain/campaign_plan.py:751` | `validate_campaign_plan` | hashlib.sha256 | `content_sha256 = hashlib.sha256(encoded).hexdigest()` | `sylvia-domain` campaign_plan_vectors |
 | `domain/campaign_sequel.py:24` | `digest` | hashlib.sha256 | `return hashlib.sha256(canonical_json_bytes(value)).hexdigest()` | `sylvia-domain` domain_records_vectors |

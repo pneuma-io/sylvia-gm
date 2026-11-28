@@ -260,7 +260,7 @@ fn payloads_from(files_root: &Path) -> Result<Payloads, Option<DomainError>> {
 }
 
 /// `_read_payloads(files_root)`.
-fn read_payloads(files_root: &Path) -> DomainResult<Payloads> {
+pub(crate) fn read_payloads(files_root: &Path) -> DomainResult<Payloads> {
     payloads_from(files_root).map_err(|error| {
         error.unwrap_or_else(|| rejected("Builder ruleset payload is invalid", "builder_payload_invalid"))
     })
