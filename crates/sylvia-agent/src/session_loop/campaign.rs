@@ -13,13 +13,15 @@
 //! - **The Builder run and compaction** (T5b): `run_builder` drives a Builder chat's provider
 //!   with provisional prose, private records and its terminal; `run_compaction` runs `/compact`,
 //!   admitting only working-context checkpoints.
-//! - **Still `rust_port_pending`:** `retry` (T6).
+//! - **Retry** (T6a): `retry` runs the owner's `manual_retry` with the loop's narrator: a
+//!   narration-only Retry goes to `for_retry`, one that still needs tools runs the turn's provider
+//!   again from its basis. A failed Retry records its own terminal.
 
 use super::{
     ProviderControl, ProviderEvent, SessionEvents, SessionFailure, SessionInputKind, SessionProvider,
     SessionProviderError, SessionProviderInput, SessionRunRequest, SessionRunResult, SessionStopResult,
 };
-use crate::provider_session::reads::{NarrationAttemptStart, TurnOwner};
+use crate::provider_session::reads::{ManualRetryCall, NarrationAttemptStart, RetryRefusal, TurnOwner};
 use crate::provider_turn::TurnFailure;
 use crate::stateless_mcp::{self, AuthorityFailure};
 use serde_json::{json, Value as Json};
@@ -34,7 +36,6 @@ use sylvia_domain::authority::{
 use sylvia_domain::provider_records::ProviderPrivateRecord;
 use sylvia_domain::pyops::py_str;
 use sylvia_domain::session::{SessionContext, SessionMessage, SessionMessageKind, SessionRecord};
-use sylvia_provider::factory::PORT_PENDING;
 use sylvia_provider::BoxFuture;
 
 /// `NarrationStarted` / `ProviderWorkStarted`: `(campaign_id, attempt_id, cancel)`.
@@ -159,11 +160,6 @@ pub struct CampaignSessionLoop {
     ids: Arc<dyn Fn() -> String + Send + Sync>,
 }
 
-/// The method `CampaignSessionLoop` does not answer yet.
-fn pending(method: &str) -> CodedError {
-    CodedError::new(PORT_PENDING, format!("The Rust owner does not run agent/_session_loop.py {method} yet."))
-}
-
 /// `mapping[key]` on a saved record without it: Python's `KeyError`, an internal fault.
 fn key_error(key: &str) -> CodedError {
     CodedError::new("internal_error", format!("'{key}'")).with_error_type("KeyError")
@@ -180,10 +176,6 @@ fn type_error(message: &str) -> CodedError {
 /// `_active_run(session_id)` with no live run: Python's refusal.
 fn no_active_run() -> CodedError {
     rejected("Agent session has no active provider work")
-}
-
-fn pending_run(method: &str) -> SessionFailure {
-    SessionFailure::Turn(TurnFailure::Coded(pending(method)))
 }
 
 fn failure(error: CodedError) -> SessionFailure {
@@ -341,6 +333,26 @@ fn cancelled_during_shutdown() -> SessionFailure {
     failure(rejected("Agent session provider work was cancelled during owner shutdown"))
 }
 
+/// The identities an attempt's records carry: from a run's request, or a Retry's.
+#[derive(Clone, Copy)]
+struct AttemptIds<'a> {
+    session_id: &'a str,
+    attempt_id: &'a str,
+    basis_message_id: &'a str,
+    turn_id: &'a str,
+}
+
+impl SessionRunRequest {
+    fn ids(&self) -> AttemptIds<'_> {
+        AttemptIds {
+            session_id: &self.session_id,
+            attempt_id: &self.attempt_id,
+            basis_message_id: &self.message_id,
+            turn_id: &self.turn_id,
+        }
+    }
+}
+
 /// Clears the run's reservation (`_pending`, `_stop_requested`) when `run` ends.
 struct Reservation<'a> {
     state: &'a Mutex<LoopState>,
@@ -450,7 +462,12 @@ impl DmEvents<'_> {
                             .complete_narration_attempt(&active.campaign_id, &active.attempt_id)
                             .await
                             .map_err(owner_failure)?;
-                        self.run.record_gm_turn_activity(request).await?;
+                        self.run
+                            .record_gm_turn_activity(
+                                request.ids(),
+                                request.input_kind == SessionInputKind::CampaignStart,
+                            )
+                            .await?;
                         let canonical =
                             self.run.canonical_since(&active.campaign_id, self.initial_high_water).await?;
                         owner
@@ -471,7 +488,7 @@ impl DmEvents<'_> {
                             .bind_narration_action(&active.campaign_id, &active.attempt_id, &action_id)
                             .await
                             .map_err(owner_failure)?;
-                        self.run.record_mechanics_activity(request, source_order, &action_id).await
+                        self.run.record_mechanics_activity(request.ids(), source_order, &action_id).await
                     }
                 }
             }
@@ -820,6 +837,324 @@ impl SessionEvents for CompactionEvents<'_> {
     }
 }
 
+/// What `retry`'s failure path reads of the attempt it got to.
+#[derive(Default)]
+struct RetryProgress {
+    campaign_id: Option<String>,
+    basis: Option<SessionMessage>,
+    initial_high_water: i64,
+    narration_started: bool,
+}
+
+/// `_terminal_recovery_kind(context, failed_attempt_id)`: the one persisted terminal phase, if
+/// exactly one terminal names the attempt.
+fn terminal_recovery_kind(context: &SessionContext, failed_attempt_id: &str) -> Option<String> {
+    let terminals: Vec<&SessionMessage> = context
+        .messages
+        .iter()
+        .filter(|message| {
+            message.kind() == SessionMessageKind::Evidence
+                && content_is(message, "kind", "session_attempt_terminal")
+                && content_is(message, "attempt_id", failed_attempt_id)
+        })
+        .collect();
+    if terminals.len() != 1 {
+        return None;
+    }
+    terminals[0]
+        .content()
+        .get("recovery_kind")
+        .and_then(Json::as_str)
+        .filter(|kind| !kind.is_empty())
+        .map(str::to_owned)
+}
+
+/// `retry`'s `run_retry` and `observe_retry_failure`: the narrator the owner's `manual_retry`
+/// runs. A narration-only Retry goes to `for_retry`'s narrator; one that still needs tools runs
+/// the tool-capable provider from the basis.
+struct LoopRetry<'a> {
+    run: &'a CampaignSessionLoop,
+    session_id: &'a str,
+    campaign_id: &'a str,
+    retry_id: &'a str,
+    context: &'a SessionContext,
+    basis: &'a SessionMessage,
+    provider_factory: Option<ProviderFactory>,
+    narrator: Arc<dyn RetryNarrator>,
+    control: Arc<ProviderControl>,
+    /// `retry_failure_cancelled`: whether cancellation caused the narrator's failure.
+    failure_cancelled: &'a Mutex<Option<bool>>,
+}
+
+impl crate::provider_session::reads::LoopRetryNarration for LoopRetry<'_> {
+    fn narrate<'a>(
+        &'a mut self,
+        input: RetryNarrationInput,
+        stream: &'a mut dyn NarrationStream,
+    ) -> BoxFuture<'a, Result<(), SessionFailure>> {
+        Box::pin(async move {
+            let outcome = self.run_retry(input, stream).await;
+            if outcome.is_err() {
+                *self.failure_cancelled.lock().unwrap_or_else(PoisonError::into_inner) =
+                    Some(self.control.cancelled());
+            }
+            outcome
+        })
+    }
+}
+
+impl LoopRetry<'_> {
+    /// `run_retry(retry_input, stream)`.
+    async fn run_retry(
+        &self,
+        input: RetryNarrationInput,
+        stream: &mut dyn NarrationStream,
+    ) -> Result<(), SessionFailure> {
+        let owner = self.run.owner.as_ref();
+        let basis = self.basis;
+        if basis.kind() == SessionMessageKind::Evidence && content_is(basis, "kind", "player_action_response")
+        {
+            let content = object(vec![
+                ("kind", json!("player_action_response_retry")),
+                ("basis_message_id", json!(basis.message_id())),
+                ("attempt_id", json!(self.retry_id)),
+            ]);
+            owner
+                .append_agent_message(
+                    self.session_id,
+                    &format!("player-response-retry-{}", self.retry_id),
+                    SessionMessageKind::Evidence,
+                    &content,
+                )
+                .await
+                .map_err(failure)?;
+        }
+        let recovery_kind = terminal_recovery_kind(self.context, &input.failed_attempt_id);
+        let checkpoint = recovery_kind.as_deref() == Some("campaign_file_checkpoint");
+        let uncommitted = input.action_receipt.is_none() && basis.kind() == SessionMessageKind::User;
+        let post_mechanics =
+            recovery_kind.as_deref() == Some("post_mechanics_narration") && input.action_receipt.is_some();
+        if !uncommitted && !checkpoint && !post_mechanics {
+            return self.narrator.narrate(input, stream).await;
+        }
+        let Some(factory) = self.provider_factory.clone() else {
+            if checkpoint {
+                return Err(failure(rejected(
+                    "Campaign File checkpoint Retry requires the tool-capable provider",
+                )));
+            }
+            return self.narrator.narrate(input, stream).await;
+        };
+        let messages = &self.context.messages;
+        let retry_messages: Vec<SessionMessage> = if checkpoint {
+            messages.clone()
+        } else {
+            // `context.messages.index(basis_message)`: the first equal message.
+            let index = messages.iter().position(|message| message == basis).ok_or_else(|| {
+                failure(
+                    CodedError::new("internal_error", "SessionMessage is not in list")
+                        .with_error_type("ValueError"),
+                )
+            })?;
+            let mut kept: Vec<SessionMessage> = messages[..=index].to_vec();
+            kept.extend(
+                messages[index + 1..]
+                    .iter()
+                    .filter(|message| {
+                        message.kind() == SessionMessageKind::Evidence
+                            && (content_is(message, "kind", "gm_system_contract")
+                                || (matches!(
+                                    message.content().get("kind").and_then(Json::as_str),
+                                    Some("provider_tool_calls" | "provider_tool_results")
+                                ) && content_is(message, "basis_message_id", basis.message_id())))
+                    })
+                    .cloned(),
+            );
+            kept
+        };
+        let retry_context =
+            SessionContext { session: self.context.session.clone(), messages: retry_messages };
+        let mut provider_input = SessionProviderInput::new(
+            self.context.session.clone(),
+            retry_context,
+            Vec::new(),
+            Arc::clone(&self.control),
+        );
+        provider_input.basis_message_id = Some(basis.message_id().to_owned());
+        provider_input.recovery_kind = recovery_kind;
+        provider_input.retry_action_receipt = input.action_receipt.clone();
+        let ids = AttemptIds {
+            session_id: self.session_id,
+            attempt_id: self.retry_id,
+            basis_message_id: basis.message_id(),
+            turn_id: &input.turn_id,
+        };
+        self.run.install_callbacks(&mut provider_input, self.campaign_id, ids);
+        let provider = factory(&input.turn_id);
+        self.control.admit(|| ()).map_err(failure)?;
+        let fields = provider_input.session.fields();
+        let mut events = RetryEvents {
+            run: self.run,
+            ids,
+            campaign_id: self.campaign_id,
+            control: &self.control,
+            stream,
+            provider_id: fields.provider_id.clone(),
+            model_id: fields.model_id.clone(),
+            source_order: 0,
+            ended: false,
+        };
+        let ran = provider.run(provider_input, &mut events).await;
+        if events.ended {
+            // An awaited choice ends the Retry: the provider was stopped there.
+            return Ok(());
+        }
+        ran.map_err(|error| error.error)
+    }
+}
+
+/// `run_retry`'s provider event loop: prose goes to the Retry's stream, mechanics and evidence
+/// to the owner, as the DM run takes them.
+struct RetryEvents<'a> {
+    run: &'a CampaignSessionLoop,
+    ids: AttemptIds<'a>,
+    campaign_id: &'a str,
+    control: &'a ProviderControl,
+    stream: &'a mut dyn NarrationStream,
+    provider_id: String,
+    model_id: String,
+    source_order: i64,
+    /// A mechanic awaiting a choice ended the Retry with its prompt.
+    ended: bool,
+}
+
+impl RetryEvents<'_> {
+    async fn handle(&mut self, event: ProviderEvent, source_order: i64) -> Result<(), SessionFailure> {
+        let owner = self.run.owner.as_ref();
+        let ids = self.ids;
+        self.control.progress.observe();
+        if self.control.cancelled() {
+            return Err(failure(rejected("Agent session provider work was cancelled")));
+        }
+        match event {
+            ProviderEvent::PrivateReasoning { text, response_id } => {
+                self.private_record(text, response_id, "thinking", source_order).await
+            }
+            ProviderEvent::PrivateContinuation { text, response_id } => {
+                self.private_record(text, Some(response_id), "continuation", source_order).await
+            }
+            ProviderEvent::SafeThink { text } => {
+                self.stream.emit(ProseChannel::SafeThink, &text, None).await.map_err(failure)
+            }
+            ProviderEvent::Talk { text, response_blocks, .. } => {
+                self.stream.emit(ProseChannel::Talk, &text, response_blocks).await.map_err(failure)
+            }
+            ProviderEvent::Action { command, feedback } => {
+                owner.flush_narration(self.campaign_id, ids.attempt_id).await.map_err(owner_failure)?;
+                let receipt = match stateless_mcp::execute::execute_action(
+                    owner,
+                    &command,
+                    self.run.ids.as_ref(),
+                )
+                .await
+                {
+                    Ok(receipt) => receipt,
+                    Err(AuthorityFailure::Domain(error)) if error.mechanics().is_some() => {
+                        let Some(feedback) = feedback else {
+                            return Err(owner_failure(AuthorityFailure::Domain(error)));
+                        };
+                        let details = error.mechanics().expect("checked above");
+                        let rejection = crate::session_loop::mechanics_rejection_feedback(
+                            error.code().unwrap_or_default(),
+                            error.message(),
+                            details,
+                        );
+                        feedback.set_rejection(Some(rejection));
+                        return Ok(());
+                    }
+                    Err(error) => return Err(owner_failure(error)),
+                };
+                match receipt {
+                    // A Retry can succeed by presenting an uncommitted player choice.
+                    ActionExecution::AwaitingChoice(receipt) => {
+                        self.stream
+                            .emit(ProseChannel::Talk, &receipt.choice.prompt, None)
+                            .await
+                            .map_err(failure)?;
+                        self.ended = true;
+                        Ok(())
+                    }
+                    ActionExecution::Receipt(receipt) => {
+                        owner
+                            .bind_narration_action(self.campaign_id, ids.attempt_id, &receipt.action_id)
+                            .await
+                            .map_err(owner_failure)?;
+                        self.run.record_mechanics_activity(ids, source_order, &receipt.action_id).await
+                    }
+                }
+            }
+            ProviderEvent::Evidence { message_id, payload } => {
+                let mut content = payload;
+                let activity = object(vec![
+                    ("attempt_id", json!(ids.attempt_id)),
+                    ("basis_message_id", json!(ids.basis_message_id)),
+                    ("source_order", json!(source_order)),
+                ]);
+                content.insert("activity".into(), Json::Object(activity));
+                owner
+                    .append_agent_message(ids.session_id, &message_id, SessionMessageKind::Evidence, &content)
+                    .await
+                    .map_err(failure)?;
+                Ok(())
+            }
+            ProviderEvent::ProseComplete => Err(failure(type_error("Unknown provider event"))),
+        }
+    }
+
+    async fn private_record(
+        &mut self,
+        text: String,
+        response_id: Option<String>,
+        kind: &str,
+        source_order: i64,
+    ) -> Result<(), SessionFailure> {
+        if text.is_empty() {
+            return Ok(());
+        }
+        let ids = self.ids;
+        let record = ProviderPrivateRecord {
+            session_id: ids.session_id.to_owned(),
+            attempt_id: ids.attempt_id.to_owned(),
+            response_id: response_id.filter(|id| !id.is_empty()).unwrap_or_else(|| ids.attempt_id.to_owned()),
+            turn_id: ids.turn_id.to_owned(),
+            basis_message_id: ids.basis_message_id.to_owned(),
+            source_order,
+            provider_id: self.provider_id.clone(),
+            model_id: self.model_id.clone(),
+            kind: kind.to_owned(),
+            payload: text,
+        };
+        self.run.owner.append_private_provider_record(&record).await.map_err(owner_failure)
+    }
+}
+
+impl SessionEvents for RetryEvents<'_> {
+    fn emit(&mut self, event: ProviderEvent) -> BoxFuture<'_, Result<(), SessionProviderError>> {
+        Box::pin(async move {
+            let source_order = self.source_order;
+            self.source_order += 1;
+            match self.handle(event, source_order).await {
+                Ok(()) if self.ended => Err(SessionProviderError {
+                    error: failure(rejected("The Retry ended at a choice")),
+                    loop_reason: None,
+                }),
+                Ok(()) => Ok(()),
+                Err(error) => Err(SessionProviderError { error, loop_reason: None }),
+            }
+        })
+    }
+}
+
 impl CampaignSessionLoop {
     /// `CampaignSessionLoop(owner, ...)`.
     pub fn new(owner: Arc<dyn TurnOwner>, hooks: LoopHooks) -> Self {
@@ -994,21 +1329,16 @@ impl CampaignSessionLoop {
             let receipt = owner.saved_action_receipt(&campaign_id, action_id).await.map_err(owner_failure)?;
             provider_input.retry_action_receipt = Some(receipt);
         }
-        self.install_callbacks(&mut provider_input, &campaign_id, &request);
+        self.install_callbacks(&mut provider_input, &campaign_id, request.ids());
         self.run_dm_provider(&request, provider, provider_input, initial_high_water, redirection.as_ref())
             .await
     }
 
     /// The provider input's catalog supplier, knowledge searcher, reference reader and
     /// narrative writer, over the stateless MCP client.
-    fn install_callbacks(
-        &self,
-        input: &mut SessionProviderInput,
-        campaign_id: &str,
-        request: &SessionRunRequest,
-    ) {
+    fn install_callbacks(&self, input: &mut SessionProviderInput, campaign_id: &str, ids: AttemptIds<'_>) {
         let (owner, campaign, session) =
-            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+            (Arc::clone(&self.owner), campaign_id.to_owned(), ids.session_id.to_owned());
         input.catalog_supplier = Some(Arc::new(move |catalog_request_id: String| {
             let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
             Box::pin(async move {
@@ -1024,7 +1354,7 @@ impl CampaignSessionLoop {
             })
         }));
         let (owner, campaign, session) =
-            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+            (Arc::clone(&self.owner), campaign_id.to_owned(), ids.session_id.to_owned());
         input.knowledge_searcher =
             Some(Arc::new(move |query: String, sources: Option<Vec<String>>, limit, offset| {
                 let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
@@ -1043,7 +1373,7 @@ impl CampaignSessionLoop {
                 })
             }));
         let (owner, campaign, session) =
-            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
+            (Arc::clone(&self.owner), campaign_id.to_owned(), ids.session_id.to_owned());
         input.reference_reader = Some(Arc::new(move |source: String, path: String| {
             let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
             Box::pin(async move {
@@ -1059,8 +1389,8 @@ impl CampaignSessionLoop {
             })
         }));
         let (owner, campaign, session) =
-            (Arc::clone(&self.owner), campaign_id.to_owned(), request.session_id.clone());
-        let (basis, turn_id) = (request.message_id.clone(), request.turn_id.clone());
+            (Arc::clone(&self.owner), campaign_id.to_owned(), ids.session_id.to_owned());
+        let (basis, turn_id) = (ids.basis_message_id.to_owned(), ids.turn_id.to_owned());
         input.narrative_writer = Some(Arc::new(move |parameters: JsonMap| {
             let (owner, campaign, session) = (Arc::clone(&owner), campaign.clone(), session.clone());
             let (basis, turn_id) = (basis.clone(), turn_id.clone());
@@ -1270,7 +1600,8 @@ impl CampaignSessionLoop {
             .complete_narration_attempt(&active.campaign_id, &active.attempt_id)
             .await
             .map_err(owner_failure)?;
-        self.record_gm_turn_activity(request).await?;
+        self.record_gm_turn_activity(request.ids(), request.input_kind == SessionInputKind::CampaignStart)
+            .await?;
         let canonical = self.canonical_since(&active.campaign_id, initial_high_water).await?;
         owner
             .append_session_canonical_references(&request.session_id, &canonical)
@@ -1428,29 +1759,32 @@ impl CampaignSessionLoop {
     }
 
     /// `_record_gm_turn_activity(...)`: one spoiler-safe card for a completed GM turn.
-    async fn record_gm_turn_activity(&self, request: &SessionRunRequest) -> Result<(), SessionFailure> {
+    async fn record_gm_turn_activity(
+        &self,
+        ids: AttemptIds<'_>,
+        opening: bool,
+    ) -> Result<(), SessionFailure> {
         let owner = self.owner.as_ref();
         owner
-            .finish_private_provider_attempt(&request.session_id, &request.attempt_id, true)
+            .finish_private_provider_attempt(ids.session_id, ids.attempt_id, true)
             .await
             .map_err(owner_failure)?;
-        let session = owner.session_context(&request.session_id).await.map_err(failure)?.session;
+        let session = owner.session_context(ids.session_id).await.map_err(failure)?.session;
         if session.role() != WriterRole::Dm {
             return Ok(());
         }
-        let opening = request.input_kind == SessionInputKind::CampaignStart;
-        let timing = self.finish_activity(&request.session_id, &request.attempt_id, "completed", None)?;
+        let timing = self.finish_activity(ids.session_id, ids.attempt_id, "completed", None)?;
         let content = object(vec![
             ("kind", json!("gm_turn_activity")),
             ("activity", json!(if opening { "campaign_opened" } else { "turn_completed" })),
             ("activity_timing", Json::Object(timing)),
-            ("attempt_id", json!(request.attempt_id)),
-            ("basis_message_id", json!(request.message_id)),
-            ("turn_id", json!(request.turn_id)),
+            ("attempt_id", json!(ids.attempt_id)),
+            ("basis_message_id", json!(ids.basis_message_id)),
+            ("turn_id", json!(ids.turn_id)),
         ]);
-        let message_id = format!("gm-activity-{}", request.attempt_id);
+        let message_id = format!("gm-activity-{}", ids.attempt_id);
         owner
-            .append_agent_message(&request.session_id, &message_id, SessionMessageKind::Evidence, &content)
+            .append_agent_message(ids.session_id, &message_id, SessionMessageKind::Evidence, &content)
             .await
             .map_err(failure)?;
         Ok(())
@@ -1459,13 +1793,13 @@ impl CampaignSessionLoop {
     /// `_record_mechanics_activity(...)`: execution-time correlation beside canonical mechanics.
     async fn record_mechanics_activity(
         &self,
-        request: &SessionRunRequest,
+        ids: AttemptIds<'_>,
         source_order: i64,
         action_id: &str,
     ) -> Result<(), SessionFailure> {
         let activity = object(vec![
-            ("attempt_id", json!(request.attempt_id)),
-            ("basis_message_id", json!(request.message_id)),
+            ("attempt_id", json!(ids.attempt_id)),
+            ("basis_message_id", json!(ids.basis_message_id)),
             ("source_order", json!(source_order)),
         ]);
         let content = object(vec![
@@ -1473,9 +1807,9 @@ impl CampaignSessionLoop {
             ("action_id", json!(action_id)),
             ("activity", Json::Object(activity)),
         ]);
-        let message_id = format!("mechanics-activity-{}-{action_id}", request.attempt_id);
+        let message_id = format!("mechanics-activity-{}-{action_id}", ids.attempt_id);
         self.owner
-            .append_agent_message(&request.session_id, &message_id, SessionMessageKind::Evidence, &content)
+            .append_agent_message(ids.session_id, &message_id, SessionMessageKind::Evidence, &content)
             .await
             .map_err(failure)?;
         Ok(())
@@ -1788,13 +2122,241 @@ impl CampaignSessionLoop {
         outcome
     }
 
-    /// `retry(session_id, ...)`: one manual narration retry.
+    /// `retry(session_id, retry_id=..., narrator=..., provider_factory=..., interruption_id=...,
+    /// cancel=..., control=...)`: one manual Retry of an interrupted turn, through the owner's
+    /// `manual_retry`.
     pub async fn retry(
         &self,
-        _session_id: &str,
-        _request: RetryRequest,
+        session_id: &str,
+        request: RetryRequest,
     ) -> Result<ManualRetryResult, SessionFailure> {
-        Err(pending_run("CampaignSessionLoop.retry"))
+        {
+            let mut state = self.state();
+            if state.active.contains_key(session_id) || state.pending.contains(session_id) {
+                return Err(failure(rejected("Agent session already has active provider work")));
+            }
+            state.pending.insert(session_id.to_owned());
+        }
+        let retry_id = request.retry_id.clone();
+        let active_control = request.control.clone().unwrap_or_else(|| Arc::new(ProviderControl::new()));
+        let failure_cancelled: Mutex<Option<bool>> = Mutex::new(None);
+        let mut progress = RetryProgress::default();
+        let outcome = self
+            .retry_with_session_work(session_id, &request, &active_control, &failure_cancelled, &mut progress)
+            .await;
+        let outcome = match outcome {
+            Ok(result) => Ok(result),
+            Err(error) => {
+                let cancelled = *failure_cancelled.lock().unwrap_or_else(PoisonError::into_inner);
+                Err(self
+                    .retry_failed(session_id, &retry_id, error, cancelled, &active_control, &progress)
+                    .await)
+            }
+        };
+        // `finally`.
+        if progress.narration_started {
+            if let (Some(finished), Some(campaign_id)) =
+                (&self.hooks.on_narration_finished, &progress.campaign_id)
+            {
+                finished(campaign_id, &retry_id);
+            }
+        }
+        {
+            let mut state = self.state();
+            state.active.remove(session_id);
+            state.pending.remove(session_id);
+            state.stop_requested.remove(session_id);
+        }
+        outcome
+    }
+
+    /// `retry`'s `with self._owner.agent_session_work(session_id) as context:` body.
+    async fn retry_with_session_work(
+        &self,
+        session_id: &str,
+        request: &RetryRequest,
+        active_control: &Arc<ProviderControl>,
+        failure_cancelled: &Mutex<Option<bool>>,
+        progress: &mut RetryProgress,
+    ) -> Result<ManualRetryResult, SessionFailure> {
+        let owner = self.owner.as_ref();
+        let retry_id = request.retry_id.as_str();
+        let held = owner.agent_session_work(session_id).await.map_err(owner_failure)?;
+        let context = held.context.clone();
+        let interruption_id = match &request.interruption_id {
+            Some(id) => id.clone(),
+            None => match self.state().last_interruption.get(session_id) {
+                Some(interruption) => interruption.interruption_id.clone(),
+                None => return Err(failure(rejected("Agent session has no retryable interruption"))),
+            },
+        };
+        let Some(campaign_id) = context.session.campaign_id().map(str::to_owned) else {
+            return Err(failure(rejected("DM sessions require campaign authority")));
+        };
+        progress.campaign_id = Some(campaign_id.clone());
+        let snapshot = owner.snapshot(&campaign_id).await.map_err(failure)?;
+        progress.initial_high_water = snapshot.events.last().map_or(0, |event| event.sequence);
+        let interruption =
+            owner.narration_interruption(&campaign_id, &interruption_id).await.map_err(owner_failure)?;
+        let basis = resolve_interruption_basis(&context, &interruption).map_err(failure)?;
+        progress.basis = Some(basis.clone());
+        let active = Arc::new(ActiveRun {
+            campaign_id: campaign_id.clone(),
+            attempt_id: retry_id.to_owned(),
+            control: Arc::clone(active_control),
+            basis_message_id: Some(basis.message_id().to_owned()),
+            provisional: Mutex::default(),
+        });
+        let narration_started = Mutex::new(false);
+        let admit = {
+            let (active, cancel, campaign) =
+                (Arc::clone(&active), Arc::clone(&request.cancel), campaign_id.clone());
+            let narration_started = &narration_started;
+            let session = session_id.to_owned();
+            let retry = retry_id.to_owned();
+            Box::new(move || -> BoxFuture<'_, Result<(), SessionFailure>> {
+                Box::pin(async move {
+                    // `admit_attempt()`.
+                    let stopped = {
+                        let mut state = self.state();
+                        if state.stop_requested.contains(&session) {
+                            true
+                        } else {
+                            state.active.insert(session.clone(), Arc::clone(&active));
+                            state.pending.remove(&session);
+                            if let Some(started) = &self.hooks.on_narration_started {
+                                started(&campaign, &retry, Arc::clone(&cancel));
+                            }
+                            *narration_started.lock().unwrap_or_else(PoisonError::into_inner) = true;
+                            false
+                        }
+                    };
+                    if stopped {
+                        let interruption =
+                            self.owner.interrupt_narration(&campaign, &retry).await.map_err(owner_failure)?;
+                        self.state().last_interruption.insert(session.clone(), interruption);
+                        return Err(failure(rejected(
+                            "Agent session was stopped before Retry provider admission",
+                        )));
+                    }
+                    Ok(())
+                })
+            }) as crate::provider_session::reads::AttemptStarted<'_>
+        };
+        let narrator = Box::new(LoopRetry {
+            run: self,
+            session_id,
+            campaign_id: &campaign_id,
+            retry_id,
+            context: &context,
+            basis: &basis,
+            provider_factory: request.provider_factory.clone(),
+            narrator: Arc::clone(&request.narrator),
+            control: Arc::clone(active_control),
+            failure_cancelled,
+        });
+        let call = ManualRetryCall {
+            campaign_id: campaign_id.clone(),
+            interruption_id: interruption_id.clone(),
+            retry_id: retry_id.to_owned(),
+            cancel: Arc::clone(&request.cancel),
+        };
+        let outcome = owner.manual_retry(call, admit, narrator).await;
+        progress.narration_started = *narration_started.lock().unwrap_or_else(PoisonError::into_inner);
+        let result = match outcome {
+            Ok(result) => result,
+            Err(RetryRefusal::Owner(error)) => return Err(owner_failure(error)),
+            Err(RetryRefusal::Narrator(error)) => return Err(error),
+        };
+        if !result.replayed {
+            let ids = AttemptIds {
+                session_id,
+                attempt_id: retry_id,
+                basis_message_id: basis.message_id(),
+                turn_id: &interruption.turn_id,
+            };
+            self.record_gm_turn_activity(ids, content_is(&basis, "kind", "campaign_start")).await?;
+        }
+        // A Retry can commit a first mechanic as well as narration: keep the whole new interval.
+        let canonical = if result.replayed {
+            result.canonical.clone()
+        } else {
+            self.canonical_since(&campaign_id, progress.initial_high_water).await?
+        };
+        owner.append_session_canonical_references(session_id, &canonical).await.map_err(owner_failure)?;
+        drop(held);
+        Ok(result)
+    }
+
+    /// `retry`'s `except BaseException` branch: the failed Retry's terminal and its committed
+    /// results, then the error raised again (or the error its own cleanup raised).
+    async fn retry_failed(
+        &self,
+        session_id: &str,
+        retry_id: &str,
+        error: SessionFailure,
+        failure_cancelled: Option<bool>,
+        active_control: &ProviderControl,
+        progress: &RetryProgress,
+    ) -> SessionFailure {
+        let owner = self.owner.as_ref();
+        let stop_was_requested = self.state().stop_requested.contains(session_id);
+        let was_cancelled = failure_cancelled.unwrap_or(stop_was_requested);
+        let category = failure_category(&error, was_cancelled);
+        let terminal_status = if category == "user_cancelled" { "stopped" } else { "failed" };
+        let mut timing = match self.finish_activity(session_id, retry_id, terminal_status, None) {
+            Ok(timing) => timing,
+            Err(error) => return error,
+        };
+        if timing.is_empty() {
+            // Stop can win before this Retry is registered as the active run.
+            timing = match active_control.progress.finish(terminal_status) {
+                Ok(timing) => timing,
+                Err(error) => return failure(error),
+            };
+        }
+        let Some(campaign_id) = &progress.campaign_id else { return error };
+        let _ = owner.finish_private_provider_attempt(session_id, retry_id, false).await;
+        let interruption = match owner.retryable_interruption(campaign_id, retry_id).await {
+            Ok(interruption) => interruption,
+            Err(owner_error) => return owner_failure(owner_error),
+        };
+        let Some(interruption) = interruption else { return error };
+        self.state().last_interruption.insert(session_id.to_owned(), interruption.clone());
+        if let Some(basis) = &progress.basis {
+            let context = match owner.session_context(session_id).await {
+                Ok(context) => context,
+                Err(owner_error) => return failure(owner_error),
+            };
+            let content = object(vec![
+                ("kind", json!("session_attempt_terminal")),
+                ("input_id", basis.content().get("input_id").cloned().unwrap_or(Json::Null)),
+                ("attempt_id", json!(retry_id)),
+                ("message_id", json!(basis.message_id())),
+                ("turn_id", json!(interruption.turn_id)),
+                ("status", json!("interrupted")),
+                ("failure_category", json!(category)),
+                ("activity_timing", Json::Object(timing)),
+                ("recovery_kind", json!(recovery_kind(&context, basis, &interruption))),
+                ("committed_action_id", json!(interruption.last_action_id)),
+                ("retryable", json!(interruption.retryable)),
+            ]);
+            let terminal_id = format!("terminal-{retry_id}");
+            if let Err(owner_error) = owner
+                .append_agent_message(session_id, &terminal_id, SessionMessageKind::Evidence, &content)
+                .await
+            {
+                return failure(owner_error);
+            }
+        }
+        let canonical = match self.canonical_since(campaign_id, progress.initial_high_water).await {
+            Ok(canonical) => canonical,
+            Err(owner_error) => return owner_error,
+        };
+        if let Err(owner_error) = owner.append_session_canonical_references(session_id, &canonical).await {
+            return owner_failure(owner_error);
+        }
+        error
     }
 
     /// `steer(session_id, text, message_id=...)`: persist the run's completed provisional

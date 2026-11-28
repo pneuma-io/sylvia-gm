@@ -831,6 +831,27 @@ impl TurnOwner for Recorded {
     ) -> BoxFuture<'a, Result<SessionMessage, AuthorityFailure>> {
         loop_call("append_live_steering_message")
     }
+    fn manual_retry<'a>(
+        &'a self,
+        _call: sylvia_agent::provider_session::reads::ManualRetryCall,
+        _on_attempt_started: sylvia_agent::provider_session::reads::AttemptStarted<'a>,
+        _narrator: Box<dyn sylvia_agent::provider_session::reads::LoopRetryNarration + 'a>,
+    ) -> BoxFuture<
+        'a,
+        Result<
+            sylvia_domain::authority::ManualRetryResult,
+            sylvia_agent::provider_session::reads::RetryRefusal,
+        >,
+    > {
+        Box::pin(async { panic!("no recorded phase reaches the session loop's manual_retry") })
+    }
+    fn retryable_interruption<'a>(
+        &'a self,
+        _campaign_id: &'a str,
+        _failed_attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<Option<NarrationInterruption>, AuthorityFailure>> {
+        loop_call("retryable_interruption")
+    }
     fn stop_agent_session<'a>(
         &'a self,
         _session_id: &'a str,

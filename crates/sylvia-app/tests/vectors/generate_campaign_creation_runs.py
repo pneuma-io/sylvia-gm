@@ -13,7 +13,8 @@ The steps: confirmation reads (absent, invalid, a confirmation, an operation of 
 confirmation's identity and Builder session refusals; a No Ruleset confirmation, its replay and
 a conflicting replay; one on the `plain` Ruleset's candidate with a Builder session; a reused
 Builder session; initial state (owned, duplicated, unsafe); the prepared-start fence (a rejected
-identity refused, a confirmed one not rejected, a start held across its confirmation); then begin
+identity refused, a confirmed one not rejected, a start held across its confirmation, a
+start rejecting its own identity while it holds the fence); then begin
 and completion with completion's refusals, its replay and a conflicting replay. Each step records
 its answer or failure; `campaign_creation/final.sqlite3.gz` is the database afterwards.
 `uuid.uuid4` is a counter here; `tests/campaign_creation.rs` compares campaign and lock
@@ -93,6 +94,8 @@ STEPS: list[dict[str, object]] = [
     {"op": "start", "operation_id": "fenced"},
     {"op": "reject", "operation_id": "hollow"},
     {"op": "start_and_confirm", "confirm": confirm("held", name="Held Road", turn_id="turn-held")},
+    {"op": "start_and_reject", "operation_id": "held-rejected"},
+    confirm("held-rejected"),
     {"op": "confirmation", "operation_id": "held"},
     complete("c-early", "plain", 0, PLAN),
     {"op": "begin", "operation_id": "b-plain", "campaign": "plain", "expected_revision": 0,
@@ -145,6 +148,9 @@ def run(owner: AuthorityOwner, step: dict[str, object], campaigns: dict[str, str
         elif op == "start":
             with owner.ready_campaign_start_work(str(step["operation_id"])):
                 value = None
+        elif op == "start_and_reject":
+            with owner.ready_campaign_start_work(str(step["operation_id"])):
+                value = owner.reject_uncreated_ready_campaign(str(step["operation_id"]))
         elif op == "start_and_confirm":
             inner = step["confirm"]
             with owner.ready_campaign_start_work(str(inner["operation_id"])):  # type: ignore[index]
