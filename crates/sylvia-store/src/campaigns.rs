@@ -100,11 +100,27 @@ pub(crate) fn parse_canonical(text: &str) -> StoreResult<Json> {
     Ok(parse_canonical_json_bytes(text.as_bytes(), DEFAULT_LABEL, JsonShapeLimits::NONE)?)
 }
 
+/// `_manifest_from_json`: `manifest_from_record` of the parsed text, reused by its exact text
+/// (`lru_cache(maxsize=64)`, [`crate::manifest_reuse`]).
+pub(crate) fn manifest_from_json(text: &str) -> StoreResult<std::sync::Arc<PackageManifest>> {
+    crate::manifest_reuse::manifests()
+        .get_or_parse(text, |text| Ok(manifest_from_record(&parse_canonical(text)?, None)?))
+}
+
 /// `_manifest_from_identity`: the exact published manifest, parsed as `manifest_from_record`.
 pub(crate) fn manifest_from_identity(
     connection: &Connection,
     identity: (&str, &str, &str),
 ) -> StoreResult<PackageManifest> {
+    let shared = shared_manifest_from_identity(connection, identity)?;
+    Ok(PackageManifest::clone(&shared))
+}
+
+/// [`manifest_from_identity`] without copying the kept parse.
+pub(crate) fn shared_manifest_from_identity(
+    connection: &Connection,
+    identity: (&str, &str, &str),
+) -> StoreResult<std::sync::Arc<PackageManifest>> {
     let row: Option<(Value, Value)> = connection
         .query_row(
             "SELECT canonical_json, status FROM package_manifests \
@@ -115,7 +131,7 @@ pub(crate) fn manifest_from_identity(
         .optional()?;
     match row {
         Some((canonical, status)) if py_str(&status) == "published" => {
-            Ok(manifest_from_record(&parse_canonical(&py_str(&canonical))?, None)?)
+            manifest_from_json(&py_str(&canonical))
         }
         _ => Err(rejected("Exact package manifest is unavailable", "package_unavailable")),
     }
@@ -140,7 +156,8 @@ pub(crate) fn package_lock_from_memberships(
             .optional()?
             .is_some();
         let (dependencies, capabilities) = if published {
-            let manifest = manifest_from_identity(connection, (&identity.0, &identity.1, &identity.2))?;
+            let manifest =
+                shared_manifest_from_identity(connection, (&identity.0, &identity.1, &identity.2))?;
             let dependencies = manifest
                 .dependencies
                 .iter()
