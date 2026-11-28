@@ -200,6 +200,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "trash_campaign" => commands::campaigns::handle_trash_campaign(context, params).await,
         "purge_campaign" => commands::campaigns::handle_purge_campaign(context, params).await,
+        "export_campaign_plan_file" => {
+            commands::campaigns::handle_export_campaign_plan_file(context, params).await
+        }
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
         }
