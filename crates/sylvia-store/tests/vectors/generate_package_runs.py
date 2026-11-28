@@ -35,6 +35,7 @@ import sys
 import tempfile
 import uuid
 import zipfile
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -220,8 +221,18 @@ RUNS: list[dict[str, object]] = [
 ]
 
 
+def ordered(value: object) -> object:
+    """Plain JSON in Python's own key order; `_dump` would sort every mapping."""
+    if isinstance(value, Mapping):
+        return {str(key): ordered(item) for key, item in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+        return [ordered(item) for item in value]
+    return value
+
+
 def plain(value: object) -> object:
-    return json.loads(a._dump(value))
+    a._dump(value)  # canonical JSON still refuses what it refuses
+    return ordered(value)
 
 
 def candidate_json(item: object) -> dict[str, object]:

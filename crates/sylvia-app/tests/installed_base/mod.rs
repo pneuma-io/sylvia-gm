@@ -228,7 +228,7 @@ pub fn changed_tables_differ(database: &Path, base: &Path, recorded: &JsonMap) -
             Some(rows) => sort(rows.as_array().unwrap().clone()),
             None => base_rows.get(table).cloned().unwrap_or_default(),
         };
-        if *rows != want {
+        if sylvia_base::testing::json_difference(&Json::Array(rows.clone()), &Json::Array(want)).is_some() {
             failures.push(format!("the final {table} rows differ from Python's"));
         }
     }

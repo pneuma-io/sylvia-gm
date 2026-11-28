@@ -6,6 +6,7 @@ mod common;
 
 use rusqlite::{Connection, OpenFlags};
 use std::path::{Path, PathBuf};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{Json, JsonMap};
 use sylvia_store::{AuthorityStore, StoreError};
 
@@ -112,8 +113,12 @@ fn every_backup_scenario_ends_as_it_does_in_python() {
                     .filter(|sibling| sibling.as_str() != target.file_name().unwrap().to_string_lossy())
                     .collect();
                 siblings.sort();
-                assert_eq!(serde_json::to_value(siblings).unwrap(), want["siblings"], "{name}: no leftovers");
-                assert_eq!(copy_state(&target), want["copy"], "{name}: copy");
+                assert_same_json(
+                    &serde_json::to_value(siblings).unwrap(),
+                    &want["siblings"],
+                    format!("{name}: no leftovers"),
+                );
+                assert_same_json(&copy_state(&target), &want["copy"], format!("{name}: copy"));
             }
             Err(StoreError::Backup(failure)) => {
                 let coded = failure.to_coded();

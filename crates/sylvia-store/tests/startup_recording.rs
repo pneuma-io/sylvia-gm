@@ -5,6 +5,7 @@
 mod common;
 
 use rusqlite::{Connection, OpenFlags};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{Json, JsonMap};
 use sylvia_store::{AuthorityStore, StoreHandle};
 
@@ -72,9 +73,13 @@ fn a_fresh_rust_database_matches_both_startup_recordings() {
         let want_schema = database["schema"].as_array().unwrap();
         assert_eq!(schema.len(), want_schema.len(), "{platform}: schema entries");
         for (got, want) in schema.iter().zip(want_schema) {
-            assert_eq!(got, want, "{platform}: schema entry");
+            assert_same_json(got, want, format!("{platform}: schema entry"));
         }
-        assert_eq!(&Json::Object(pragmas.clone()), &database["pragmas"], "{platform}: pragmas");
+        assert_same_json(
+            &Json::Object(pragmas.clone()),
+            &database["pragmas"],
+            format!("{platform}: pragmas"),
+        );
         assert_eq!(
             migrations, database["tables"]["schema_migrations"]["rows"],
             "{platform}: schema_migrations"

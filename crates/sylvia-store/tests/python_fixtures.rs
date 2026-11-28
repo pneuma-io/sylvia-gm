@@ -6,6 +6,7 @@ mod common;
 use flate2::read::GzDecoder;
 use std::io::Read;
 use std::path::Path;
+use sylvia_base::testing::{assert_same_json, json_difference};
 use sylvia_base::Json;
 use sylvia_store::{AuthorityStore, StoreResult};
 
@@ -35,12 +36,12 @@ fn compare(label: &str, expected: &Json, folder: &Path, result: StoreResult<()>,
         (None, Ok(())) => {
             let got = common::state(folder);
             let want = &expected["state"];
-            if got["schema"] != want["schema"] {
+            if json_difference(&got["schema"], &want["schema"]).is_some() {
                 let connection = rusqlite::Connection::open(folder.join("authority.sqlite3")).unwrap();
                 let rows = common::schema_rows(&connection);
                 let want_rows = schemas[want["schema"].as_str().unwrap()].as_array().unwrap();
                 for (index, row) in rows.iter().enumerate() {
-                    if want_rows.get(index) != Some(row) {
+                    if want_rows.get(index).is_none_or(|want| json_difference(row, want).is_some()) {
                         panic!(
                             "{label}: schema row {index} differs\n rust:   {row}\n python: {:?}",
                             want_rows.get(index)
@@ -49,7 +50,7 @@ fn compare(label: &str, expected: &Json, folder: &Path, result: StoreResult<()>,
                 }
                 panic!("{label}: schema has {} rows, Python {}", rows.len(), want_rows.len());
             }
-            assert_eq!(&got, want, "{label}");
+            assert_same_json(&got, want, label);
         }
     }
 }
@@ -90,7 +91,7 @@ fn every_python_fixture_opens_and_advances_as_in_python() {
     for (name, entry) in fixtures {
         // The fixture bytes are what the generator recorded as `made`.
         let made = place(name, "made");
-        assert_eq!(common::state(&made), entry["made"], "{name}: fixture bytes");
+        assert_same_json(&common::state(&made), &entry["made"], format!("{name}: fixture bytes"));
 
         let opened = place(name, "open");
         compare(&format!("{name} open"), &entry["open"], &opened, open(&opened), schemas);
@@ -125,7 +126,7 @@ fn databases_written_by_linux_python_sqlite_3_45_1_open_with_the_bundled_library
         assert_eq!(written_by(&fixture_bytes(&linux)), 3_045_001, "{linux} was written by SQLite 3.45.1");
 
         let made = place(&linux, "made");
-        assert_eq!(common::state(&made), entry["made"], "{linux}: fixture bytes");
+        assert_same_json(&common::state(&made), &entry["made"], format!("{linux}: fixture bytes"));
         let opened = place(&linux, "open");
         compare(&format!("{linux} open"), &entry["open"], &opened, open(&opened), schemas);
         let advanced = place(&linux, "campaign");

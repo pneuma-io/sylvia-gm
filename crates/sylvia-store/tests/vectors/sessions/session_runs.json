@@ -306,8 +306,8 @@
       "message_id": "m1",
       "kind": "talk",
       "content": {
-       "count": 1,
-       "text": "Hello."
+       "text": "Hello.",
+       "count": 1
       },
       "canonical_sequence": null
      }
@@ -385,8 +385,8 @@
       "message_id": "m5",
       "kind": "evidence",
       "content": {
-       "attempt_id": "a1",
-       "kind": "session_attempt_terminal"
+       "kind": "session_attempt_terminal",
+       "attempt_id": "a1"
       },
       "canonical_sequence": null
      }
