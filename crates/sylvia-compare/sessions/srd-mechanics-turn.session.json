@@ -116,7 +116,9 @@
       {"pattern": "\"label\":\"D20 results\",\"value\":\\[[0-9]+\\]", "with": "\"label\":\"D20 results\",\"value\":[<roll>]"},
       {"pattern": "\"roll\":[0-9]+,\"total\":[0-9]+", "with": "\"roll\":<roll>,\"total\":<roll>"}
     ],
-    "ignore_pointers": ["/model_requests/2/headers/16/1"],
-    "volatile_files": ["^diagnostics/"]
+    "ignore_pointers": ["/model_requests/2/headers/4/1"],
+    "volatile_files": ["^diagnostics/"],
+    "ignore_headers_row_8": ["User-Agent", "Accept-Encoding", "Connection", "X-Stainless-*"],
+    "header_name_case_row_40": true
   }
 }

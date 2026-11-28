@@ -994,7 +994,13 @@ pub async fn handle_submit_session_input(
             None,
             &sylvia_provider::config::env::Environment::current(),
         )?
-        .with_record_warning(Arc::clone(&ctx.record_provider_warning)),
+        .with_record_warning(Arc::clone(&ctx.record_provider_warning))
+        // The GM turn's owner (the loop's `OwnerReads`) and the opening preflight's ranker.
+        .with_turn_owner(
+            Arc::new(crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone()))
+                as Arc<dyn sylvia_agent::provider_session::reads::TurnOwner>,
+            Arc::new(crate::preflight::rank_references),
+        ),
     );
     let outcome = async {
         let attempt_id = super::campaigns::required(params, "attempt_id")?;
@@ -1119,7 +1125,13 @@ fn dm_adapter(
             None,
             &sylvia_provider::config::env::Environment::current(),
         )?
-        .with_record_warning(Arc::clone(&ctx.record_provider_warning)),
+        .with_record_warning(Arc::clone(&ctx.record_provider_warning))
+        // The GM turn's owner (the loop's `OwnerReads`) and the opening preflight's ranker.
+        .with_turn_owner(
+            Arc::new(crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone()))
+                as Arc<dyn sylvia_agent::provider_session::reads::TurnOwner>,
+            Arc::new(crate::preflight::rank_references),
+        ),
     ))
 }
 
@@ -1306,7 +1318,13 @@ pub async fn handle_manual_retry_session(
             knowledge,
             &sylvia_provider::config::env::Environment::current(),
         )?
-        .with_record_warning(Arc::clone(&ctx.record_provider_warning)),
+        .with_record_warning(Arc::clone(&ctx.record_provider_warning))
+        // The GM turn's owner (the loop's `OwnerReads`) and the opening preflight's ranker.
+        .with_turn_owner(
+            Arc::new(crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone()))
+                as Arc<dyn sylvia_agent::provider_session::reads::TurnOwner>,
+            Arc::new(crate::preflight::rank_references),
+        ),
     );
     let catalog = match &fields.campaign_id {
         Some(campaign_id) => reads.catalog(campaign_id).await?,
