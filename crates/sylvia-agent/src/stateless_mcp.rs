@@ -347,7 +347,7 @@ pub async fn call_action_sequence_tool(
                 player_control_origin(
                     &source,
                     expected_revision.as_i64().unwrap_or_default(),
-                    selection.as_object(),
+                    &selection,
                     Some(session_id),
                 )?;
             }

@@ -12,6 +12,7 @@ use sylvia_app::tactical_grid::{
     coordinate_actor_reference, project_coordinate_map, project_tactical_grid,
     resolve_tactical_action_parameters, StatePaths,
 };
+use sylvia_base::testing::json_difference;
 
 const VECTORS: &str = include_str!("vectors/tactical_surface_vectors.json");
 
@@ -108,28 +109,6 @@ fn run(case: &Json, documents: &Json) -> Json {
     }
 }
 
-/// The first path where two JSON values differ, with both sides there.
-fn first_difference(expected: &Json, actual: &Json, path: &str) -> Option<String> {
-    match (expected, actual) {
-        (Json::Object(left), Json::Object(right)) => {
-            let left_keys: Vec<&String> = left.keys().collect();
-            let right_keys: Vec<&String> = right.keys().collect();
-            if left_keys != right_keys {
-                return Some(format!("{path}: keys {left_keys:?} != {right_keys:?}"));
-            }
-            left.iter()
-                .find_map(|(key, value)| first_difference(value, &right[key], &format!("{path}.{key}")))
-        }
-        (Json::Array(left), Json::Array(right)) if left.len() == right.len() => left
-            .iter()
-            .zip(right)
-            .enumerate()
-            .find_map(|(index, (l, r))| first_difference(l, r, &format!("{path}[{index}]"))),
-        _ if expected == actual => None,
-        _ => Some(format!("{path}: expected {expected}, got {actual}")),
-    }
-}
-
 #[test]
 fn tactical_surfaces_match_python() {
     let vectors: Json = serde_json::from_str(VECTORS).unwrap();
@@ -143,8 +122,7 @@ fn tactical_surfaces_match_python() {
     let mut failures = Vec::new();
     for case in cases {
         let actual = run(case, documents);
-        if actual != case["expected"] {
-            let at = first_difference(&case["expected"], &actual, "$").unwrap_or_default();
+        if let Some(at) = json_difference(&actual, &case["expected"]) {
             failures.push(format!("{}: {at}", case["label"]));
         }
     }

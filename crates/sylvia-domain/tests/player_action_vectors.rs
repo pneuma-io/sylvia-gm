@@ -4,6 +4,7 @@
 
 use serde_json::json;
 use sylvia_base::pyjson;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::Json;
 use sylvia_domain::player_actions::{
     player_control_origin, valid_player_action_consequence, PLAYER_ACTION_ORIGIN,
@@ -15,7 +16,11 @@ fn vectors() -> Json {
 
 #[test]
 fn origin_kind_matches_python() {
-    assert_eq!(vectors()["PLAYER_ACTION_ORIGIN"], json!(PLAYER_ACTION_ORIGIN));
+    assert_same_json(
+        &json!(PLAYER_ACTION_ORIGIN),
+        &vectors()["PLAYER_ACTION_ORIGIN"],
+        "PLAYER_ACTION_ORIGIN",
+    );
 }
 
 #[test]
@@ -24,14 +29,14 @@ fn control_origins_match_python() {
     let cases = vectors["origins"].as_array().unwrap();
     assert!(cases.len() > 400);
     for case in cases {
-        let selection = case["selection"].as_object();
+        let selection = &case["selection"];
         let session_id = case["session_id"].as_str();
         let revision = case["expected_revision"].as_i64().unwrap();
         let actual = match player_control_origin(&case["source"], revision, selection, session_id) {
             Ok(origin) => json!({"ok": origin, "keys": origin.keys().collect::<Vec<_>>()}),
             Err(error) => json!({"raise": error.python_class(), "message": error.message()}),
         };
-        assert_eq!(actual, case["result"], "source {}", case["source"]);
+        assert_same_json(&actual, &case["result"], format!("source {}", case["source"]));
     }
 }
 
@@ -45,11 +50,10 @@ fn consequences_match_python() {
     for case in cases {
         let payload = case["payload"].as_object().unwrap();
         let expected = case["expected_revision"].as_i64().unwrap();
-        assert_eq!(
-            json!(valid_player_action_consequence(payload, expected)),
-            case["valid"],
-            "payload {} at revision {expected}",
-            case["payload"]
+        assert_same_json(
+            &json!(valid_player_action_consequence(payload, expected)),
+            &case["valid"],
+            format!("payload {} at revision {expected}", case["payload"]),
         );
     }
 }

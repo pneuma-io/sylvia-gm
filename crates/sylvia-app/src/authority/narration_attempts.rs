@@ -18,9 +18,8 @@
 //! - an attempt's `cancel` runs with the data lock released (still inside the region), since
 //!   Python's lock is reentrant and a cancel handle that read the narration state would otherwise
 //!   deadlock;
-//! - until lane 2's `action_sequences::last_attempt_commit` lands, the interrupted attempt's last
-//!   queued action ([`last_attempt_commit`]) is read as none, which is what Python finds without
-//!   saved action sequences (no Rust owner writes them yet).
+//! - the interrupted attempt's last queued action ([`last_attempt_commit`]) is lane 2's
+//!   `action_sequences::last_attempt_commit`, on the store, which is all it reads.
 
 use super::actions::ActionError;
 use super::narration::{CancelHandle, NarrationAttempt, NarrationState};
@@ -561,14 +560,17 @@ pub async fn interrupt_narration(
     expire_locked(store, &key).await
 }
 
-/// `action_sequences.last_attempt_commit(owner, campaign_id, attempt_id)`, lane 2's, read as none
-/// until it lands (see the module notes).
+/// `action_sequences.last_attempt_commit(owner, campaign_id, attempt_id)`: the latest action a
+/// queue bound to this attempt committed (lane 2's, on the store).
 async fn last_attempt_commit(
-    _store: &StoreHandle,
-    _campaign_id: &str,
-    _attempt_id: &str,
+    store: &StoreHandle,
+    campaign_id: &str,
+    attempt_id: &str,
 ) -> Result<Option<String>, ActionError> {
-    Ok(None)
+    let (campaign, attempt) = (campaign_id.to_owned(), attempt_id.to_owned());
+    Ok(store
+        .call(move |store| crate::action_sequences::last_attempt_commit_in_store(store, &campaign, &attempt))
+        .await?)
 }
 
 /// `_expire_narration_locked(attempt)`: end the attempt and its work, save its interruption and

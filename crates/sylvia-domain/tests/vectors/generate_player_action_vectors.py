@@ -10,7 +10,8 @@ retired with the Python source.
 `origins` records `player_control_origin(source, expected_revision=..., selection=...,
 session_id=...)` for every control kind and for malformed sources (wrong keys, identities that
 are blank, padded or not text, indexes and sequences at and past their bounds, booleans and
-floats where an `int` is required). An accepted origin records its key order too.
+floats where an `int` is required), with selections of every JSON shape (`selection or {}`
+keeps a truthy list or text as it is). An accepted origin records its key order too.
 
 `consequences` records `valid_player_action_consequence(owned_payload(payload),
 expected_revision=...)` for the markers the owner writes and for every single-key change to
@@ -49,6 +50,8 @@ SOURCES = [
      "resolution_id": "r"},
 ]
 SELECTIONS = [None, {}, {"target": "goblin", "n": 2}]
+# `selection or {}` keeps any truthy value as it is, a list or text included.
+ORIGIN_SELECTIONS = SELECTIONS + [["goblin", 2], [], "x", "", 0, 2.5, True, False]
 SESSIONS = [None, "session-1"]
 POLICIES = [{"confirmation": "none", "response": "on_request"},
             {"confirmation": "required", "response": "automatic"}]
@@ -76,7 +79,7 @@ def origin_cases() -> list[dict]:
         sources.append({**base, "extra": 1})
     cases = []
     for index, source in enumerate(sources):
-        selection = SELECTIONS[index % len(SELECTIONS)]
+        selection = ORIGIN_SELECTIONS[index % len(ORIGIN_SELECTIONS)]
         session_id = SESSIONS[index % len(SESSIONS)]
         revision = index % 4
         cases.append({

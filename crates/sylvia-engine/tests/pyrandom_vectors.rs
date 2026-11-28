@@ -4,6 +4,7 @@
 
 use serde_json::Value;
 use sylvia_base::pyjson;
+use sylvia_base::testing::json_difference;
 use sylvia_engine::pyrandom::{seed_from_basis, PyRandom};
 use sylvia_engine::PyError;
 
@@ -91,7 +92,7 @@ fn every_seed_reproduces_the_python_script() {
         assert_eq!(seed["results"].as_array().unwrap().len(), script.len());
         for (index, (op, expected)) in script.iter().zip(seed["results"].as_array().unwrap()).enumerate() {
             let actual = run(&mut rng, op);
-            if &actual != expected {
+            if json_difference(&actual, expected).is_some() {
                 failures.push(format!(
                     "seed {seed_id} op {index} {op}: python {expected}, rust {actual}",
                     seed_id = seed.get("hex").or(seed.get("value")).unwrap()
