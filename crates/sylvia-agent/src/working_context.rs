@@ -6,8 +6,8 @@
 //! unmodified source history for `read_session_history`. The context ledger's hooks
 //! ([`LedgerHooks`]) are plumbed here but unset in the legacy assembly.
 //!
-//! `compact_saved_messages` (the explicit Compact request) comes with the session loop's
-//! `run_compaction`.
+//! `compact_saved_messages` (the explicit Compact request) and the `/compact` command's
+//! `compact_provider` run under the session loop's `run_compaction`.
 
 use serde_json::json;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -1441,5 +1441,131 @@ impl WorkingContextProvider {
             return Ok(Retry { projected, attempt: attempt + 1, stripped: true });
         }
         Err(error)
+    }
+}
+
+/// `compact_provider(provider_input)`'s message list: the saved history as the provider is sent it
+/// (`_provider_history` for a Builder chat, `adapter._messages(...)` for a DM session).
+pub type CompactMessages = Arc<
+    dyn Fn(
+            crate::session_loop::SessionProviderInput,
+        ) -> BoxFuture<'static, sylvia_base::CodedResult<Vec<JsonMap>>>
+        + Send
+        + Sync,
+>;
+
+/// The `/compact` command's session provider (`interfaces/commands/sessions.py`'s
+/// `compact_provider`): the saved messages, then [`compact_saved_messages`].
+struct CompactProvider {
+    provider: Arc<dyn Provider>,
+    messages: CompactMessages,
+}
+
+impl crate::session_loop::SessionProvider for CompactProvider {
+    fn run<'a>(
+        &'a self,
+        input: crate::session_loop::SessionProviderInput,
+        events: &'a mut dyn crate::session_loop::SessionEvents,
+    ) -> BoxFuture<'a, Result<(), crate::session_loop::SessionProviderError>> {
+        Box::pin(async move {
+            let messages = (self.messages)(input.clone()).await?;
+            compact_saved_messages(
+                Arc::clone(&self.provider),
+                &input.history,
+                &messages,
+                &input.control,
+                events,
+            )
+            .await
+        })
+    }
+}
+
+/// `compact_provider`: the session provider `run_compaction` runs for `/compact`.
+pub fn compact_provider(
+    provider: Arc<dyn Provider>,
+    messages: CompactMessages,
+) -> Arc<dyn crate::session_loop::SessionProvider> {
+    Arc::new(CompactProvider { provider, messages })
+}
+
+/// `compact_saved_messages(provider, context, messages, control)`: the same checkpoint generator
+/// as a turn's, for an explicit, action-free Compact request. Each checkpoint is emitted as
+/// tool evidence, then accepted.
+pub async fn compact_saved_messages(
+    provider: Arc<dyn Provider>,
+    context: &sylvia_domain::session::SessionContext,
+    messages: &[JsonMap],
+    control: &Arc<crate::session_loop::ProviderControl>,
+    events: &mut dyn crate::session_loop::SessionEvents,
+) -> Result<(), crate::session_loop::SessionProviderError> {
+    use crate::session_loop::ProviderEvent;
+    use sylvia_base::CodedError;
+
+    let bridge = Arc::new(CheckpointBridge::new());
+    let saving = Arc::clone(&bridge);
+    let mut options = WorkingContextOptions::new(Arc::new(move |payload: JsonMap| {
+        let saving = Arc::clone(&saving);
+        Box::pin(async move { saving.save(payload).await })
+    }));
+    options.records = context.messages.iter().map(|message| message.content().clone()).collect();
+    options.record_owner =
+        messages.first().and_then(|message| message.get("_context_owner")).and_then(Json::as_object).cloned();
+    let (cancelled, progress) = (Arc::clone(control), Arc::clone(control));
+    options.cancelled = Arc::new(move || cancelled.cancelled());
+    options.progress = Arc::new(move |text: Option<&str>| {
+        // `control.set_status_hint`: a progress update cannot fail on a live control.
+        let _ = progress.set_status_hint(text);
+    });
+    options.pin_first_user = context.session.role() == sylvia_domain::authority::WriterRole::Builder;
+    let working = WorkingContextProvider::new(provider, options);
+    control.admit(|| ())?;
+    let refused = || {
+        crate::session_loop::SessionProviderError::from(
+            CodedError::rejected("Context compaction was cancelled; saved work was kept")
+                .with_error_type("CommandRejected"),
+        )
+    };
+    let no_options = JsonMap::new();
+    let prepare = working.prepare(messages, None, true, &no_options);
+    tokio::pin!(prepare);
+    // `while not future.done() or not bridge.pending.empty()`: each queued checkpoint becomes
+    // evidence before it is accepted; a cancelled control refuses at the next poll.
+    loop {
+        if control.cancelled() {
+            return Err(refused());
+        }
+        tokio::select! {
+            biased;
+            write = bridge.next() => {
+                let Some(write) = write else { continue };
+                if write.accepted.is_closed() {
+                    continue;
+                }
+                let id = write.payload.get("checkpoint_id").ok_or_else(|| {
+                    CodedError::new("internal_error", "'checkpoint_id'").with_error_type("KeyError")
+                })?;
+                let message_id = format!("context-{}", sylvia_domain::pyops::py_str(id));
+                events.emit(ProviderEvent::Evidence { message_id, payload: write.payload.clone() }).await?;
+                let _ = write.accepted.send(());
+            }
+            outcome = &mut prepare => {
+                // A save waits for its acceptance, so no checkpoint is left queued once it ends.
+                while let Some(write) = bridge.take() {
+                    if write.accepted.is_closed() {
+                        continue;
+                    }
+                    let id = write.payload.get("checkpoint_id").ok_or_else(|| {
+                        CodedError::new("internal_error", "'checkpoint_id'").with_error_type("KeyError")
+                    })?;
+                    let message_id = format!("context-{}", sylvia_domain::pyops::py_str(id));
+                    events.emit(ProviderEvent::Evidence { message_id, payload: write.payload.clone() }).await?;
+                    let _ = write.accepted.send(());
+                }
+                outcome?;
+                return Ok(());
+            }
+            _ = tokio::time::sleep(std::time::Duration::from_millis(50)) => {}
+        }
     }
 }
