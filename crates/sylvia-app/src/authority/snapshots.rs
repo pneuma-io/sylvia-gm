@@ -99,3 +99,81 @@ fn project_boundary(
     }
     Ok(Some(boundary))
 }
+
+/// What `AuthorityOwner.desktop_snapshot` returns: the complete snapshot, or the display
+/// snapshot when `display_only`.
+#[derive(Debug, Clone, PartialEq)]
+pub enum DesktopSnapshot {
+    Full(CampaignSnapshot),
+    Display(CampaignDisplaySnapshot),
+}
+
+/// `_project_private_tool_inputs`' rewrite of the history: for a package with engine-private
+/// state, every action's parameters become `{}`, and so does every tool call's `parameters`
+/// (`{**payload, "parameters": {}}`: an existing key keeps its place).
+pub(super) fn hide_private_tool_inputs(
+    lock: &PackageLock,
+    private_keys: &BTreeSet<String>,
+    actions: &mut [sylvia_domain::authority::ActionRecord],
+    events: &mut [sylvia_domain::authority::CanonicalEvent],
+) {
+    use sylvia_base::{Json, JsonMap};
+    use sylvia_domain::authority::CanonicalEventType;
+    let private_packages: BTreeSet<String> = lock
+        .entries()
+        .iter()
+        .filter(|entry| private_keys.iter().any(|key| key.starts_with(&format!("{}.", entry.package_id()))))
+        .map(|entry| entry.package_id().to_owned())
+        .collect();
+    for action in actions {
+        if private_packages.contains(&action.package_id) {
+            action.parameters = JsonMap::new();
+        }
+    }
+    for event in events {
+        let private = matches!(event.safe_payload.get("package_id"), Some(Json::String(id)) if private_packages.contains(id));
+        if event.event_type == CanonicalEventType::ToolCall && private {
+            event.safe_payload.insert("parameters".into(), Json::Object(JsonMap::new()));
+        }
+    }
+}
+
+/// `AuthorityOwner.desktop_snapshot(campaign_id, display_only=...)`: the snapshot the desktop
+/// sees, without package-declared engine state (`visibility: engine`), its mutation history or
+/// the tool inputs of a package that has such state.
+pub async fn desktop_snapshot(
+    store: &StoreHandle,
+    campaign_id: &str,
+    display_only: bool,
+) -> StoreResult<DesktopSnapshot> {
+    let campaign_id = campaign_id.to_owned();
+    store
+        .call(move |store| {
+            if display_only {
+                let mut snapshot = store.display_snapshot(&campaign_id, &DisplayQuery::default())?;
+                let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
+                hide_private_tool_inputs(
+                    &snapshot.state.package_lock,
+                    &private_keys,
+                    &mut snapshot.actions,
+                    &mut snapshot.events,
+                );
+                snapshot.state.state.retain(|key, _| !private_keys.contains(key));
+                return Ok(DesktopSnapshot::Display(snapshot));
+            }
+            let mut snapshot = store.snapshot(&campaign_id)?;
+            let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
+            hide_private_tool_inputs(
+                &snapshot.state.package_lock,
+                &private_keys,
+                &mut snapshot.actions,
+                &mut snapshot.events,
+            );
+            snapshot.state.state.retain(|key, _| !private_keys.contains(key));
+            snapshot
+                .mutations
+                .retain(|item| !private_keys.contains(&format!("{}.{}", item.namespace, item.key)));
+            Ok(DesktopSnapshot::Full(snapshot))
+        })
+        .await
+}

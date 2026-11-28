@@ -282,7 +282,11 @@ fn settings(now: &str) {
             pyjson::dumps(&case["results"], Dump::DEFAULT),
             "settings {name}"
         );
-        assert_eq!(json!(*opened.lock().unwrap()), case["opened"], "browser {name}");
+        sylvia_base::testing::assert_same_json(
+            &json!(*opened.lock().unwrap()),
+            &case["opened"],
+            format!("browser {name}"),
+        );
         assert_eq!(
             CHANGES.load(Ordering::SeqCst),
             case["changes"].as_u64().unwrap() as usize,
@@ -295,7 +299,7 @@ fn settings(now: &str) {
             "settings log {name}"
         );
         let config = std::fs::read_to_string(root.join("config.yaml")).ok();
-        assert_eq!(json!(config), case["config"], "config {name}");
+        sylvia_base::testing::assert_same_json(&json!(config), &case["config"], format!("config {name}"));
         let _ = std::fs::remove_dir_all(root.parent().unwrap());
         println!("settings {name} ... ok");
     }

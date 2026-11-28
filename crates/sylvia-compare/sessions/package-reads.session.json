@@ -1,0 +1,259 @@
+{
+  "name": "package-reads",
+  "description": "Reading installed package candidates on a fresh profile: package_candidates with the bundled Riichi and SRD Lite candidates and again after Riichi 0.1.0 is installed from a file; inspect_package_candidate's refusals and both Riichi candidates (manifest facts, private mechanics, procedures, support claims, files); package_candidate_text's missing fields, the export-only check before the candidate is read, an unknown candidate and package, prompts, JSON, notices, a missing file, an unsafe path and a runtime over the text limit; compare_package_candidates' refusals, a candidate with itself, Riichi 0.1.0 with 0.1.1, Riichi with SRD Lite and SRD Lite with itself; then shut down.",
+  "seed_files": [
+    {
+      "path": "imports/riichi-0.1.0.sylvia-gm-package",
+      "copy_from": "rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package"
+    }
+  ],
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "package_candidates",
+      "expect_ok": true,
+      "save": {
+        "riichi": "/result/0/candidate_id",
+        "srd": "/result/1/candidate_id"
+      }
+    },
+    {
+      "method": "install_package_file",
+      "expect_ok": true,
+      "params": {
+        "source_path": "${work}/imports/riichi-0.1.0.sylvia-gm-package",
+        "install_id": "install-riichi-010"
+      },
+      "save": {
+        "riichi_old": "/result/candidate_id"
+      }
+    },
+    {
+      "method": "package_candidates"
+    },
+    {
+      "method": "inspect_package_candidate",
+      "params": {}
+    },
+    {
+      "method": "inspect_package_candidate",
+      "params": {
+        "candidate_id": ""
+      }
+    },
+    {
+      "method": "inspect_package_candidate",
+      "params": {
+        "candidate_id": "candidate-missing"
+      }
+    },
+    {
+      "method": "inspect_package_candidate",
+      "params": {
+        "candidate_id": "${riichi}"
+      }
+    },
+    {
+      "method": "inspect_package_candidate",
+      "params": {
+        "candidate_id": "${riichi_old}"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {}
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "candidate-missing",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "support/data.bin"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "LICENSE.pdf"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "candidate-missing",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "prompts/gm-operating-guide.md"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.not-locked",
+        "path": "prompts/gm-operating-guide.md"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "prompts/gm-operating-guide.md"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "PROMPTS/GM-OPERATING-GUIDE.MD"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "support/gameplay-resolution.json"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "content/content-declarations.json"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-club",
+        "path": "world.md"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "LICENSE"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "docs/Copyright"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "notes.TXT"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "../escape.md"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${riichi}",
+        "package_id": "pneuma.riichi-mahjong",
+        "path": "runtime/ruleset.yaml"
+      }
+    },
+    {
+      "method": "package_candidate_text",
+      "params": {
+        "candidate_id": "${srd}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "path": "runtime/ruleset.yaml"
+      }
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {}
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {
+        "left_candidate_id": "${riichi}"
+      }
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {
+        "left_candidate_id": "${riichi}",
+        "right_candidate_id": "candidate-missing"
+      }
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {
+        "left_candidate_id": "${riichi}",
+        "right_candidate_id": "${riichi}"
+      }
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {
+        "left_candidate_id": "${riichi_old}",
+        "right_candidate_id": "${riichi}"
+      }
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {
+        "left_candidate_id": "${riichi}",
+        "right_candidate_id": "${srd}"
+      }
+    },
+    {
+      "method": "compare_package_candidates",
+      "params": {
+        "left_candidate_id": "${srd}",
+        "right_candidate_id": "${srd}"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}

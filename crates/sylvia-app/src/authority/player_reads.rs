@@ -26,26 +26,12 @@ pub fn project_private_tool_inputs(
     mut snapshot: CampaignSnapshot,
 ) -> StoreResult<CampaignSnapshot> {
     let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
-    let private_packages: BTreeSet<String> = snapshot
-        .state
-        .package_lock
-        .entries()
-        .iter()
-        .filter(|entry| private_keys.iter().any(|key| key.starts_with(&format!("{}.", entry.package_id()))))
-        .map(|entry| entry.package_id().to_owned())
-        .collect();
-    for action in &mut snapshot.actions {
-        if private_packages.contains(&action.package_id) {
-            action.parameters = JsonMap::new();
-        }
-    }
-    for event in &mut snapshot.events {
-        let private = matches!(event.safe_payload.get("package_id"), Some(Json::String(id)) if private_packages.contains(id));
-        if event.event_type == CanonicalEventType::ToolCall && private {
-            // `{**payload, "parameters": {}}`: an existing key keeps its place.
-            event.safe_payload.insert("parameters".into(), Json::Object(JsonMap::new()));
-        }
-    }
+    super::snapshots::hide_private_tool_inputs(
+        &snapshot.state.package_lock,
+        &private_keys,
+        &mut snapshot.actions,
+        &mut snapshot.events,
+    );
     Ok(snapshot)
 }
 

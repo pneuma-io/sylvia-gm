@@ -848,12 +848,19 @@ pub async fn handle_submit_session_input(
         None => super::campaigns::optional_text(params, "turn_id")?
             .unwrap_or_else(|| format!("builder-chat-{session_id}")),
     };
-    if player_action_id.is_some() {
-        return Err(CodedError::new(
-            crate::dispatch::PORT_PENDING,
-            "not yet ported: application/authority.py AuthorityOwner.player_action_response_basis",
+    if let Some(action_id) = &player_action_id {
+        let response_basis = sylvia_app::authority::player_reads::player_action_response_basis(
+            &ctx.store,
+            &session_id,
+            action_id,
+            automatic_response,
         )
-        .into());
+        .await
+        .map_err(super::campaigns::store_error)?;
+        // `response_basis["turn_id"] != turn_id`.
+        if response_basis.get("turn_id") != Some(&Json::String(turn_id.clone())) {
+            return Err(protocol("The saved player action belongs to another turn").into());
+        }
     }
     let path = super::providers::config_path(ctx);
     let session_key = Data::Str(session_id.clone());
@@ -986,7 +993,12 @@ pub async fn handle_submit_session_input(
         );
         request.ooc_text = ooc_text.clone();
         request.campaign_ending_choice = ending.clone();
-        request.input_kind = sylvia_agent::session_loop::SessionInputKind::User;
+        request.input_kind = if player_action_id.is_some() {
+            sylvia_agent::session_loop::SessionInputKind::PlayerActionResponse
+        } else {
+            sylvia_agent::session_loop::SessionInputKind::User
+        };
+        request.player_action_id = player_action_id.clone();
         request.automatic_response = automatic_response;
         request.redirect_interruption_id =
             super::campaigns::optional_text(params, "redirect_interruption_id")?;
@@ -1159,13 +1171,10 @@ pub async fn handle_stop_agent_session(ctx: &DispatchContext, params: &JsonMap) 
         let open_turn = sylvia_app::authority::turns::current_open_turn(&ctx.store, campaign_id)
             .await
             .map_err(super::campaigns::store_error)?;
-        if open_turn.is_some() {
-            // `AuthorityOwner.complete_turn` (the campaign's work, then the store's write) comes
-            // with lane 3's N2; it is reached only once the loop's stop is ported.
-            return Err(CodedError::new(
-                crate::dispatch::PORT_PENDING,
-                "not yet ported: application/authority.py AuthorityOwner.complete_turn",
-            ));
+        if let Some(open_turn) = open_turn {
+            sylvia_app::authority::turns::complete_turn(&ctx.store, campaign_id, &open_turn)
+                .await
+                .map_err(super::campaigns::store_error)?;
         }
     }
     Ok(super::builder::session_record_value(&stopped))

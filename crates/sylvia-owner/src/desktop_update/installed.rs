@@ -51,8 +51,10 @@ pub const UNINSTALL_VALUES: [&str; 6] =
     ["DisplayName", "DisplayVersion", "Publisher", "InstallLocation", "MainBinaryName", "UninstallString"];
 
 /// A registration's values, as UTF-16 code units: Python's `str` from the registry may hold a
-/// lone surrogate, which then simply compares unequal.
-pub type RegistrationRow = BTreeMap<String, Vec<u16>>;
+/// lone surrogate, which then simply compares unequal. In the order they were read, as Python's
+/// `dict` keeps them: the uninstall key's values in [`UNINSTALL_VALUES`] order, then
+/// `ProductLocation`.
+pub type RegistrationRow = indexmap::IndexMap<String, Vec<u16>>;
 
 /// `InstalledRegistration`.
 pub trait Registration: Send + Sync {
@@ -732,10 +734,13 @@ mod tests {
             assert!(imported.status.success(), "{}", String::from_utf8_lossy(&imported.stderr));
             let got =
                 match read_windows_registration(&format!(r"{key}\Uninstall"), &format!(r"{key}\Product")) {
-                    Ok(row) => serde_json::json!({"ok": row}),
+                    // The row in its own order (Python's dict order), each value as its UTF-16 units.
+                    Ok(row) => serde_json::json!({"ok": serde_json::Value::Object(
+                        row.iter().map(|(name, units)| (name.clone(), serde_json::json!(units))).collect()
+                    )}),
                     Err(error) => serde_json::json!({"error": [error.code, error.message]}),
                 };
-            assert_eq!(got, case["result"], "{}", case["name"]);
+            sylvia_base::testing::assert_same_json(&got, &case["result"], &case["name"]);
         }
         assert!(delete_scratch_key(&key), "the scratch key HKCU\\{key} is still there");
     }

@@ -28,6 +28,7 @@ pub mod preflight;
 pub mod preinstall;
 pub mod protocol;
 pub mod providers;
+pub mod ruleset_test_worker;
 pub mod run;
 pub mod services;
 pub mod session_reasoning;

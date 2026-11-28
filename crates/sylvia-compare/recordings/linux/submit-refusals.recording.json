@@ -388,7 +388,7 @@
      "code": "command_rejected",
      "message": "Campaign ending choice is invalid",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -408,7 +408,7 @@
      "code": "command_rejected",
      "message": "Campaign ending choice is invalid",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -429,7 +429,7 @@
      "code": "command_rejected",
      "message": "Campaign ending choice is invalid",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -450,7 +450,7 @@
      "code": "command_rejected",
      "message": "Campaign ending choice is invalid",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -468,7 +468,7 @@
      "code": "command_rejected",
      "message": "builder_start must be a boolean",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -486,7 +486,7 @@
      "code": "command_rejected",
      "message": "player_action_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -504,7 +504,7 @@
      "code": "command_rejected",
      "message": "Automatic response requires its saved player action",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -523,7 +523,7 @@
      "code": "command_rejected",
      "message": "Builder start cannot respond to a gameplay action",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -541,7 +541,7 @@
      "code": "command_rejected",
      "message": "user_text must be text",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -560,7 +560,7 @@
      "code": "command_rejected",
      "message": "ooc_text must be text",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -577,7 +577,7 @@
      "code": "command_rejected",
      "message": "user_text or ooc_text must be nonempty",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -596,7 +596,7 @@
      "code": "command_rejected",
      "message": "user_text or ooc_text must be nonempty",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -615,7 +615,7 @@
      "code": "command_rejected",
      "message": "Action responses do not contain player speech",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -634,7 +634,7 @@
      "code": "command_rejected",
      "message": "Builder start does not accept invented player input",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -652,7 +652,7 @@
      "code": "command_rejected",
      "message": "user_text exceeds the session input limit",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -670,7 +670,7 @@
      "code": "command_rejected",
      "message": "ooc_text exceeds the session input limit",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -688,7 +688,7 @@
      "code": "session_unavailable",
      "message": "Agent session is unavailable",
      "diagnostics": [],
-     "diagnostic_id": "6ee20ea9d99e48e1beb8a127ae020dd8"
+     "diagnostic_id": "2e9b3e56e5c44fb09364fa3447adf3cb"
     }
    }
   },
@@ -708,7 +708,7 @@
      "code": "command_rejected",
      "message": "Question answers cannot be combined with other input",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -728,7 +728,7 @@
      "code": "command_rejected",
      "message": "Question answers cannot be combined with other input",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -747,7 +747,7 @@
      "code": "command_rejected",
      "message": "Question answers require a Builder session",
      "diagnostics": [],
-     "diagnostic_id": "38481a2ac6884aa89e276342251eedf8"
+     "diagnostic_id": "970471939c0247b7973612f21be3bdf3"
     }
    }
   },
@@ -766,7 +766,7 @@
      "code": "command_rejected",
      "message": "Question answers must be a nonempty list",
      "diagnostics": [],
-     "diagnostic_id": "38481a2ac6884aa89e276342251eedf8"
+     "diagnostic_id": "970471939c0247b7973612f21be3bdf3"
     }
    }
   },
@@ -864,7 +864,7 @@
      "code": "command_rejected",
      "message": "Model reference is unavailable or ambiguous; use the configured picker",
      "diagnostics": [],
-     "diagnostic_id": "38481a2ac6884aa89e276342251eedf8"
+     "diagnostic_id": "970471939c0247b7973612f21be3bdf3"
     }
    }
   },
@@ -1025,7 +1025,7 @@
      "code": "command_rejected",
      "message": "ooc_text is available only to DM sessions",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1046,7 +1046,7 @@
      "code": "command_rejected",
      "message": "Ending choices require an idle GM ending without other input",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1069,7 +1069,7 @@
      "code": "command_rejected",
      "message": "Ending choices require an idle GM ending without other input",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1087,7 +1087,7 @@
      "code": "command_rejected",
      "message": "builder_start is available only to Builder sessions",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1106,7 +1106,7 @@
      "code": "command_rejected",
      "message": "ooc_text is available only to DM sessions",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1124,7 +1124,7 @@
      "code": "command_rejected",
      "message": "turn_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1143,7 +1143,7 @@
      "code": "command_rejected",
      "message": "turn_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1162,7 +1162,7 @@
      "code": "command_rejected",
      "message": "turn_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1182,7 +1182,7 @@
      "code": "command_rejected",
      "message": "allow_public_web is available only to Builder sessions",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1202,7 +1202,7 @@
      "code": "command_rejected",
      "message": "allow_public_web must be a boolean",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1221,7 +1221,7 @@
      "code": "command_rejected",
      "message": "attempt_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1241,7 +1241,7 @@
      "code": "command_rejected",
      "message": "message_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
@@ -1263,78 +1263,79 @@
      "code": "command_rejected",
      "message": "redirect_interruption_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "36dee23e17d54574905353ce52e38b43"
+     "diagnostic_id": "c62290b70a574625af2cfe220f47ec2c"
     }
    }
   },
   {
    "id": "s56",
-   "method": "switch_session_model",
-   "params": {},
+   "method": "submit_session_input",
+   "params": {
+    "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
+    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+    "player_action_id": "action-missing"
+   },
    "reply": {
     "id": "s56",
     "ok": false,
     "error": {
      "code": "command_rejected",
-     "message": "session_id must be a nonempty string",
+     "message": "The saved player action is unavailable to this session",
      "diagnostics": [],
-     "diagnostic_id": "51430e16eb054ac0abaabbd843b33e36"
+     "diagnostic_id": "970471939c0247b7973612f21be3bdf3"
     }
    }
   },
   {
    "id": "s57",
-   "method": "switch_session_model",
+   "method": "submit_session_input",
    "params": {
-    "session_id": "session-builder-768e91ab4633cbd158db032c"
+    "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
+    "turn_id": "turn-dm-b09f62ecc70c549a5e1e0115",
+    "player_action_id": "action-missing",
+    "automatic_response": true
    },
    "reply": {
     "id": "s57",
     "ok": false,
     "error": {
      "code": "command_rejected",
-     "message": "Provider identity is invalid",
+     "message": "The saved player action is unavailable to this session",
      "diagnostics": [],
-     "diagnostic_id": "5c6066a1b149485289dec27d710acaea"
+     "diagnostic_id": "970471939c0247b7973612f21be3bdf3"
     }
    }
   },
   {
    "id": "s58",
-   "method": "switch_session_model",
+   "method": "submit_session_input",
    "params": {
     "session_id": "session-builder-768e91ab4633cbd158db032c",
-    "provider_id": "standin",
-    "model_id": "absent/model"
+    "player_action_id": "action-missing"
    },
    "reply": {
     "id": "s58",
     "ok": false,
     "error": {
      "code": "command_rejected",
-     "message": "The selected model is not configured",
+     "message": "Campaign narrative state requires an active DM session",
      "diagnostics": [],
-     "diagnostic_id": "5c6066a1b149485289dec27d710acaea"
+     "diagnostic_id": "970471939c0247b7973612f21be3bdf3"
     }
    }
   },
   {
    "id": "s59",
    "method": "switch_session_model",
-   "params": {
-    "session_id": "session-builder-768e91ab4633cbd158db032c",
-    "provider_id": "standin",
-    "model_id": "standin/standin-narrator",
-    "mode": ""
-   },
+   "params": {},
    "reply": {
     "id": "s59",
     "ok": false,
     "error": {
      "code": "command_rejected",
-     "message": "mode must be a nonempty string",
+     "message": "session_id must be a nonempty string",
      "diagnostics": [],
-     "diagnostic_id": "51430e16eb054ac0abaabbd843b33e36"
+     "diagnostic_id": "72400600cbdd41278b9c54012fe45ff4"
     }
    }
   },
@@ -1342,19 +1343,16 @@
    "id": "s60",
    "method": "switch_session_model",
    "params": {
-    "session_id": "session-builder-768e91ab4633cbd158db032c",
-    "provider_id": "standin",
-    "model_id": "standin/standin-narrator",
-    "mode": "forever"
+    "session_id": "session-builder-768e91ab4633cbd158db032c"
    },
    "reply": {
     "id": "s60",
     "ok": false,
     "error": {
      "code": "command_rejected",
-     "message": "Model switch mode is unsupported",
+     "message": "Provider identity is invalid",
      "diagnostics": [],
-     "diagnostic_id": "51430e16eb054ac0abaabbd843b33e36"
+     "diagnostic_id": "aa9cf3d1871544008a3a03cdf341e0e9"
     }
    }
   },
@@ -1362,18 +1360,18 @@
    "id": "s61",
    "method": "switch_session_model",
    "params": {
-    "session_id": "session-missing",
+    "session_id": "session-builder-768e91ab4633cbd158db032c",
     "provider_id": "standin",
-    "model_id": "standin/standin-narrator"
+    "model_id": "absent/model"
    },
    "reply": {
     "id": "s61",
     "ok": false,
     "error": {
-     "code": "session_unavailable",
-     "message": "Agent session is unavailable",
+     "code": "command_rejected",
+     "message": "The selected model is not configured",
      "diagnostics": [],
-     "diagnostic_id": "4dd0be2573ea40b4b2789ae8bdb931a7"
+     "diagnostic_id": "aa9cf3d1871544008a3a03cdf341e0e9"
     }
    }
   },
@@ -1384,10 +1382,69 @@
     "session_id": "session-builder-768e91ab4633cbd158db032c",
     "provider_id": "standin",
     "model_id": "standin/standin-narrator",
-    "mode": "once"
+    "mode": ""
    },
    "reply": {
     "id": "s62",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "mode must be a nonempty string",
+     "diagnostics": [],
+     "diagnostic_id": "72400600cbdd41278b9c54012fe45ff4"
+    }
+   }
+  },
+  {
+   "id": "s63",
+   "method": "switch_session_model",
+   "params": {
+    "session_id": "session-builder-768e91ab4633cbd158db032c",
+    "provider_id": "standin",
+    "model_id": "standin/standin-narrator",
+    "mode": "forever"
+   },
+   "reply": {
+    "id": "s63",
+    "ok": false,
+    "error": {
+     "code": "command_rejected",
+     "message": "Model switch mode is unsupported",
+     "diagnostics": [],
+     "diagnostic_id": "72400600cbdd41278b9c54012fe45ff4"
+    }
+   }
+  },
+  {
+   "id": "s64",
+   "method": "switch_session_model",
+   "params": {
+    "session_id": "session-missing",
+    "provider_id": "standin",
+    "model_id": "standin/standin-narrator"
+   },
+   "reply": {
+    "id": "s64",
+    "ok": false,
+    "error": {
+     "code": "session_unavailable",
+     "message": "Agent session is unavailable",
+     "diagnostics": [],
+     "diagnostic_id": "073570b92f92480188bf9e1a657b0f43"
+    }
+   }
+  },
+  {
+   "id": "s65",
+   "method": "switch_session_model",
+   "params": {
+    "session_id": "session-builder-768e91ab4633cbd158db032c",
+    "provider_id": "standin",
+    "model_id": "standin/standin-narrator",
+    "mode": "once"
+   },
+   "reply": {
+    "id": "s65",
     "ok": true,
     "result": {
      "status": "staged_once",
@@ -1412,13 +1469,13 @@
    }
   },
   {
-   "id": "s63",
+   "id": "s66",
    "method": "session_context",
    "params": {
     "session_id": "session-builder-768e91ab4633cbd158db032c"
    },
    "reply": {
-    "id": "s63",
+    "id": "s66",
     "ok": true,
     "result": {
      "session": {
@@ -1489,7 +1546,7 @@
    }
   },
   {
-   "id": "s64",
+   "id": "s67",
    "method": "switch_session_model",
    "params": {
     "session_id": "session-builder-768e91ab4633cbd158db032c",
@@ -1497,7 +1554,7 @@
     "model_id": "standin/standin-narrator"
    },
    "reply": {
-    "id": "s64",
+    "id": "s67",
     "ok": true,
     "result": {
      "status": "switched",
@@ -1537,13 +1594,13 @@
    }
   },
   {
-   "id": "s65",
+   "id": "s68",
    "method": "session_context",
    "params": {
     "session_id": "session-builder-768e91ab4633cbd158db032c"
    },
    "reply": {
-    "id": "s65",
+    "id": "s68",
     "ok": true,
     "result": {
      "session": {
@@ -1611,7 +1668,7 @@
    }
   },
   {
-   "id": "s66",
+   "id": "s69",
    "method": "switch_session_model",
    "params": {
     "session_id": "session-dm-b09f62ecc70c549a5e1e0115",
@@ -1620,7 +1677,7 @@
     "mode": "global"
    },
    "reply": {
-    "id": "s66",
+    "id": "s69",
     "ok": true,
     "result": {
      "status": "switched_global",
@@ -1660,11 +1717,11 @@
    }
   },
   {
-   "id": "s67",
+   "id": "s70",
    "method": "provider_settings",
    "params": {},
    "reply": {
-    "id": "s67",
+    "id": "s70",
     "ok": true,
     "result": {
      "presets": [
@@ -2246,11 +2303,11 @@
    }
   },
   {
-   "id": "s68",
+   "id": "s71",
    "method": "shutdown",
    "params": {},
    "reply": {
-    "id": "s68",
+    "id": "s71",
     "ok": true,
     "result": {
      "status": "closed"
@@ -4665,10 +4722,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "721572721bc54ac1a9a003c2c80bd821",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754346.9344015,
-     "last_seen": 1795754346.9344015,
+     "id": "bed4d3a258a94da08407356a36ffee54",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816378.140113,
+     "last_seen": 1795816378.140113,
      "count": 1
     },
     {
@@ -4685,11 +4742,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 22.8,
-     "id": "e8cdc1d41bda48c7bf60e538d18120ed",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754360.9043705,
-     "last_seen": 1795754360.9043705,
+     "duration_ms": 33.7,
+     "id": "949313b679024e31969968b9c6331551",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816394.0894313,
+     "last_seen": 1795816394.0894313,
      "count": 1
     },
     {
@@ -4707,10 +4764,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.1,
-     "id": "9f257c2453db48e7b3bba2f512db886a",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754360.90477,
-     "last_seen": 1795754360.90477,
+     "id": "39ea51e5071a46f09703a1cd293446ab",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816394.0898705,
+     "last_seen": 1795816394.0898705,
      "count": 1
     },
     {
@@ -4727,11 +4784,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 526.3,
-     "id": "bb85a87e950143c395cb69d9bd82f43a",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754361.4311578,
-     "last_seen": 1795754361.4311578,
+     "duration_ms": 612.9,
+     "id": "b7569d0a6df844128cc86ece9039c1e5",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816394.702947,
+     "last_seen": 1795816394.702947,
      "count": 1
     },
     {
@@ -4748,11 +4805,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 13.0,
-     "id": "73915f68ddcc47aa83e4b77737fbeff5",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754361.4430466,
-     "last_seen": 1795754361.4813817,
+     "duration_ms": 30.6,
+     "id": "4d0c2a51e42a49ff87b46bdd2bacd9da",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816394.729069,
+     "last_seen": 1795816394.805294,
      "count": 4
     },
     {
@@ -4769,11 +4826,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 640.3,
-     "id": "314678e57c5645518e0883ed23153dbb",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754362.1219275,
-     "last_seen": 1795754362.1219275,
+     "duration_ms": 1000.0,
+     "id": "67bcce353b0a443ea676ad6006b5a84a",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816395.8055217,
+     "last_seen": 1795816395.8055217,
      "count": 1
     },
     {
@@ -4790,11 +4847,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 908.7,
-     "id": "22862399b7874d7dbdac6ecc3f48df94",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.0308273,
-     "last_seen": 1795754363.0308273,
+     "duration_ms": 1184.7,
+     "id": "d888206813564a8ba60c121325d6de19",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816396.99054,
+     "last_seen": 1795816396.99054,
      "count": 1
     },
     {
@@ -4811,11 +4868,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 2.6,
-     "id": "7b6a3aa4e45a4097910c1af0e57c0773",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.033712,
-     "last_seen": 1795754363.033712,
+     "duration_ms": 5.1,
+     "id": "a6a1c870040b422bb5c0c6a5d871b71c",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816396.9959495,
+     "last_seen": 1795816396.9959495,
      "count": 1
     },
     {
@@ -4832,11 +4889,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 18.2,
-     "id": "85000a9e047a4c05b49eb062ce211e3f",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.0520575,
-     "last_seen": 1795754363.0520575,
+     "duration_ms": 24.2,
+     "id": "0727c41d2e3341e2a8101f94bbfd08cd",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.0203562,
+     "last_seen": 1795816397.0203562,
      "count": 1
     },
     {
@@ -4854,10 +4911,10 @@
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
      "duration_ms": 0.0,
-     "id": "fedf55a846e54e9cbadeb618013e4788",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.052298,
-     "last_seen": 1795754363.0839427,
+     "id": "b2297f89eef84c6eb622e2fa0ec3526e",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.0206137,
+     "last_seen": 1795816397.07234,
      "count": 5
     },
     {
@@ -4874,11 +4931,11 @@
      "severity": "error",
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
-     "duration_ms": 13.6,
-     "id": "36dee23e17d54574905353ce52e38b43",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.066122,
-     "last_seen": 1795754363.1766007,
+     "duration_ms": 20.0,
+     "id": "c62290b70a574625af2cfe220f47ec2c",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.040936,
+     "last_seen": 1795816397.2285428,
      "count": 31
     },
     {
@@ -4895,11 +4952,11 @@
      "severity": "error",
      "error_code": "other_rejection",
      "error_type": "CommandRejected",
-     "duration_ms": 1.9,
-     "id": "6ee20ea9d99e48e1beb8a127ae020dd8",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.07194,
-     "last_seen": 1795754363.07194,
+     "duration_ms": 2.7,
+     "id": "2e9b3e56e5c44fb09364fa3447adf3cb",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.0505188,
+     "last_seen": 1795816397.0505188,
      "count": 1
     },
     {
@@ -4916,12 +4973,12 @@
      "severity": "error",
      "error_code": "command_rejected",
      "error_type": "CommandRejected",
-     "duration_ms": 1.8,
-     "id": "38481a2ac6884aa89e276342251eedf8",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.077016,
-     "last_seen": 1795754363.0838406,
-     "count": 3
+     "duration_ms": 7.3,
+     "id": "970471939c0247b7973612f21be3bdf3",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.0597525,
+     "last_seen": 1795816397.2471824,
+     "count": 6
     },
     {
      "format": 1,
@@ -4937,11 +4994,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 20.6,
-     "id": "5a86d8f118ca419e9fc0b60aae0063de",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.080107,
-     "last_seen": 1795754363.1341429,
+     "duration_ms": 33.6,
+     "id": "ae367a66da1b4379920360b893fb2267",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.0652297,
+     "last_seen": 1795816397.1505206,
      "count": 5
     },
     {
@@ -4958,11 +5015,11 @@
      "severity": "error",
      "error_code": "command_rejected",
      "error_type": "OwnerProtocolError",
-     "duration_ms": 2.6,
-     "id": "51430e16eb054ac0abaabbd843b33e36",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.176772,
-     "last_seen": 1795754363.180941,
+     "duration_ms": 5.6,
+     "id": "72400600cbdd41278b9c54012fe45ff4",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.2474825,
+     "last_seen": 1795816397.2564108,
      "count": 3
     },
     {
@@ -4979,11 +5036,11 @@
      "severity": "error",
      "error_code": "command_rejected",
      "error_type": "ConfigError",
-     "duration_ms": 1.2,
-     "id": "5c6066a1b149485289dec27d710acaea",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.1769562,
-     "last_seen": 1795754363.1782093,
+     "duration_ms": 2.6,
+     "id": "aa9cf3d1871544008a3a03cdf341e0e9",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.2477481,
+     "last_seen": 1795816397.250487,
      "count": 2
     },
     {
@@ -5000,11 +5057,11 @@
      "severity": "error",
      "error_code": "other_rejection",
      "error_type": "CommandRejected",
-     "duration_ms": 2.3,
-     "id": "4dd0be2573ea40b4b2789ae8bdb931a7",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.1833577,
-     "last_seen": 1795754363.1833577,
+     "duration_ms": 5.0,
+     "id": "073570b92f92480188bf9e1a657b0f43",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.2615893,
+     "last_seen": 1795816397.2615893,
      "count": 1
     },
     {
@@ -5021,11 +5078,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 17.3,
-     "id": "da4a7811acb9404fbc887ec585ff85c3",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.1914966,
-     "last_seen": 1795754363.2465,
+     "duration_ms": 24.7,
+     "id": "1b455d9c98e74cc78d6f4def111d7def",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.277958,
+     "last_seen": 1795816397.3563766,
      "count": 3
     },
     {
@@ -5042,11 +5099,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 11.5,
-     "id": "a64f351f149f4d3eb3c4a4b0e2c65218",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.2030914,
-     "last_seen": 1795754363.2307959,
+     "duration_ms": 15.3,
+     "id": "71d5f409730647e0be32dc5db72ba620",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.2935045,
+     "last_seen": 1795816397.3327758,
      "count": 2
     },
     {
@@ -5063,11 +5120,11 @@
      "severity": "info",
      "error_code": "none",
      "error_type": "none",
-     "duration_ms": 3.3,
-     "id": "6c9fa33c1b7f4c68b43b3612c2bd207c",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.2499988,
-     "last_seen": 1795754363.2499988,
+     "duration_ms": 5.8,
+     "id": "8af2f6b410464520bf414e8a4c52fd9f",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.3624518,
+     "last_seen": 1795816397.3624518,
      "count": 1
     },
     {
@@ -5085,10 +5142,10 @@
      "error_code": "none",
      "error_type": "none",
      "duration_ms": 0.0,
-     "id": "ae326c6a9b8e4749a260d93246a5bf85",
-     "session": "b828ea5d254447898d9735549164f644",
-     "first_seen": 1795754363.2503502,
-     "last_seen": 1795754363.2503502,
+     "id": "c92ce4e1d53747e69400f0d5acdf6d1c",
+     "session": "5c1a855156444b7a8dbc837c3355f249",
+     "first_seen": 1795816397.3632975,
+     "last_seen": 1795816397.3632975,
      "count": 1
     }
    ]
