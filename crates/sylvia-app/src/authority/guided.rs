@@ -15,8 +15,8 @@
 //! The binding takes a saved-library Start's participants and initial state, with the rest of
 //! `_validate_campaign_inputs` (lane 1, with lane 3's agreement).
 //!
-//! Not yet ported, so refused (`StoreError::NotPorted`) rather than run differently: finalizing a
-//! construction that is not a guided Interview.
+//! A construction that is not a guided Interview (the prepared and legacy Builder paths) is
+//! finalized one operation at a time by `construction_handoff`.
 //!
 //! Python's owner never gives its `AuthorityOwner` a model capability registry, so guidance is
 //! assessed against the empty one (`EMPTY_MODEL_CAPABILITY_REGISTRY`).
@@ -892,8 +892,39 @@ pub async fn begin_campaign_construction(
         .await
 }
 
+/// `AuthorityOwner._validate_required_plan_state`: a Ruleset's required starting state, checked
+/// with lane 1's `plan_state_admission` against the exact retained manifest of `lock_id` (the
+/// campaign's current lock).
+pub(super) async fn validate_required_plan_state(
+    store: &StoreHandle,
+    lock_id: &str,
+    content: &JsonMap,
+) -> StoreResult<()> {
+    let lock_id = lock_id.to_owned();
+    let manifest = store.call(move |store| primary_manifest_for_lock(&store.connect()?, &lock_id)).await?;
+    let Some(manifest) =
+        manifest.filter(|manifest| manifest.state_schemas.iter().any(|schema| schema.required))
+    else {
+        return Ok(());
+    };
+    let payload = match content.get("campaign_plan") {
+        Some(Json::Object(plan)) => plan.clone(),
+        _ => JsonMap::new(),
+    };
+    match validate_plan_state(&payload, &manifest) {
+        Ok(()) => Ok(()),
+        Err(error) if error.python_class() != "ContentShapeError" => Err(error.into()),
+        Err(error) => Err(sylvia_domain::DomainError::command_rejected_with(
+            "Campaign Plan is missing or violates required Ruleset declarations",
+            "plan_required_state_invalid",
+            error.diagnostics().to_vec(),
+        )
+        .into()),
+    }
+}
+
 /// `AuthorityOwner._model_guidance_for_lock` against the owner's (empty) registry.
-async fn model_guidance_for_lock(
+pub(super) async fn model_guidance_for_lock(
     store: &StoreHandle,
     lock_id: &str,
     model_id: &str,
@@ -1015,32 +1046,7 @@ pub async fn finalize_campaign_construction(
             content
         }
     };
-    // `_validate_required_plan_state`: a Ruleset's required starting state, checked with lane 1's
-    // `plan_state_admission` against the exact retained manifest.
-    {
-        let lock_id = lock.lock_id.clone();
-        let manifest =
-            store.call(move |store| primary_manifest_for_lock(&store.connect()?, &lock_id)).await?;
-        if let Some(manifest) =
-            manifest.filter(|manifest| manifest.state_schemas.iter().any(|schema| schema.required))
-        {
-            let payload = match plan_content.get("campaign_plan") {
-                Some(Json::Object(plan)) => plan.clone(),
-                _ => JsonMap::new(),
-            };
-            if let Err(error) = validate_plan_state(&payload, &manifest) {
-                if error.python_class() != "ContentShapeError" {
-                    return Err(error.into());
-                }
-                return Err(sylvia_domain::DomainError::command_rejected_with(
-                    "Campaign Plan is missing or violates required Ruleset declarations",
-                    "plan_required_state_invalid",
-                    error.diagnostics().to_vec(),
-                )
-                .into());
-            }
-        }
-    }
+    validate_required_plan_state(store, &lock.lock_id, &plan_content).await?;
     let content_sha256 = canonical_sha256(&Json::Object(plan_content.clone()));
     let suffix = digest24(finalize.campaign_id);
     let completion_id = format!("construction-complete-{suffix}");
@@ -1057,7 +1063,18 @@ pub async fn finalize_campaign_construction(
             && message.content().get("kind") == Some(&Json::String("campaign_interview_state".into()))
     });
     if !guided {
-        return Err(StoreError::NotPorted("finalizing a construction that is not a guided Interview"));
+        let settled = super::construction_handoff::Settled {
+            finalize,
+            basis: &basis,
+            lock_id: &lock.lock_id,
+            plan_content: &plan_content,
+            content_sha256: &content_sha256,
+            suffix: &suffix,
+            prepared_selection: super::construction_handoff::names_prepared_campaign(
+                &builder_context.messages,
+            ),
+        };
+        return super::construction_handoff::finalize_prepared(store, &settled).await;
     }
     let guidance =
         model_guidance_for_lock(store, &lock.lock_id, finalize.dm_model_id, finalize.model_guidance_override)

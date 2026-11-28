@@ -6,8 +6,8 @@
 //! The owner handler, `handle_finalize_campaign_construction`, is not ported: before this
 //! commits it runs `_preflight_guided_start`, which needs lane 4's provider session adapter.
 //!
-//! A construction that is not a guided Interview (the prepared and legacy Builder paths) is not
-//! yet ported, and `sylvia_app::authority::guided` refuses it (`StoreError::NotPorted`).
+//! A construction that is not a guided Interview (the prepared and legacy Builder paths) commits
+//! its steps one at a time instead (`plan_handoff`).
 //!
 //! Python's owner never gives its `AuthorityOwner` a model capability registry, so guidance is
 //! assessed against the empty one (`EMPTY_MODEL_CAPABILITY_REGISTRY`), as here. Before
