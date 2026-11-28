@@ -13,7 +13,7 @@ mod repr;
 mod whitespace;
 
 pub use alnum::is_alnum;
-pub use casefold::{casefold, upper};
+pub use casefold::{casefold, casefold_char, upper};
 pub use decode::utf8_decode;
 pub use float_parse::parse_float;
 pub use identifier::isidentifier;

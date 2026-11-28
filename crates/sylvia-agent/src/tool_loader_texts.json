@@ -1,0 +1,51 @@
+{
+  "mechanic_tool": {
+    "type": "function",
+    "function": {
+      "name": "call_mechanic",
+      "description": "Use one game mechanic. name: a mechanic named callable in the latest SYLVIA_GM_CALLABLE_TOOLS record. arguments: an object of the shape its SYLVIA_GM_TOOL_DEFINITIONS entry shows.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The mechanic's exact name."
+          },
+          "arguments": {
+            "type": "object",
+            "description": "The mechanic's arguments."
+          }
+        },
+        "required": [
+          "name",
+          "arguments"
+        ]
+      }
+    }
+  },
+  "reader_tool": {
+    "type": "function",
+    "function": {
+      "name": "read_tool_arguments",
+      "description": "READ-ONLY: return a game mechanic's arguments. Call it before first using a mechanic that SYLVIA_GM_TOOL_DEFINITIONS marks (read its arguments first).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "description": "The mechanic's name as listed."
+          },
+          "value": {
+            "type": "string",
+            "description": "The choice it is for (such as the spell), or \"\"."
+          }
+        },
+        "required": [
+          "tool"
+        ]
+      }
+    }
+  },
+  "definitions_preamble": "SYLVIA_GM_TOOL_DEFINITIONS (application control, not player speech): game mechanics, each used by calling call_mechanic with its name and an arguments object of the shape shown (? marks an optional field). Before using a mechanic marked (read its arguments first), call read_tool_arguments once with tool set to its name and value set to the choice it is for (such as the spell), or \"\"; a call before that is refused with its arguments. Each stays defined for the rest of the session; the latest SYLVIA_GM_CALLABLE_TOOLS record says which can be used now.\n\n",
+  "choices_preamble": "\nCurrent argument choices (the latest record replaces earlier choices; $ is the argument object and [] means each array item). Each entry limits only the field it names: use its allowed_values or available_fields there. A field not listed is not limited by this record (a target field not listed may name any current creature or object). All other schema and engine checks still apply:\n"
+}

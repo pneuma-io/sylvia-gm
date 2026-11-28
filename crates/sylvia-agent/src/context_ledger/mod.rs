@@ -15,6 +15,7 @@
 //! `ledger_texts.json`, exported from the Python values by `generate_ledger_texts.py`.
 
 pub mod state;
+pub mod tools;
 pub mod wire;
 
 use serde_json::Value as Json;

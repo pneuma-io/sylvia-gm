@@ -21,9 +21,30 @@ fn mapped(table: &[(char, &'static str)], text: &str) -> String {
     out
 }
 
-/// `text.casefold()`.
+/// `text.casefold()`. An ASCII character folds to its lowercase (the table's own mapping, which
+/// a test checks), so only other characters are looked up.
 pub fn casefold(text: &str) -> String {
-    mapped(table::CASEFOLD, text)
+    let mut out = String::with_capacity(text.len());
+    for character in text.chars() {
+        if character.is_ascii() {
+            out.push(character.to_ascii_lowercase());
+            continue;
+        }
+        match table::CASEFOLD.binary_search_by_key(&character, |(from, _)| *from) {
+            Ok(index) => out.push_str(table::CASEFOLD[index].1),
+            Err(_) => out.push(character),
+        }
+    }
+    out
+}
+
+/// What `str.casefold()` turns one non-ASCII character into, or `None` when it is unchanged (an
+/// ASCII character folds to its lowercase).
+pub fn casefold_char(character: char) -> Option<&'static str> {
+    table::CASEFOLD
+        .binary_search_by_key(&character, |(from, _)| *from)
+        .ok()
+        .map(|index| table::CASEFOLD[index].1)
 }
 
 /// `text.upper()`.
@@ -40,6 +61,15 @@ mod tests {
         assert!(table::CASEFOLD.windows(2).all(|pair| pair[0].0 < pair[1].0));
         assert!(table::UPPER.windows(2).all(|pair| pair[0].0 < pair[1].0));
         assert_eq!(table::UNICODE_VERSION, "15.0.0");
+    }
+
+    #[test]
+    fn ascii_folds_to_its_lowercase_as_the_table_does() {
+        for code in 0u8..128 {
+            let character = char::from(code);
+            let text = character.to_string();
+            assert_eq!(casefold(&text), mapped(table::CASEFOLD, &text), "{code}");
+        }
     }
 
     #[test]
