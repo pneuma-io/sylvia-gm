@@ -662,8 +662,12 @@ pub async fn execute_action_sequence_call(
         // The service may have persisted a prefix before its reply failed. Recover receipts by
         // reading; never retry execution implicitly.
         state.progress.sequence_execution_stopped.set(true);
-        let sequence_id = state.locals.parameters.get()?.get("sequence_id").cloned().unwrap_or(Json::Null);
-        let saved = owner.action_sequence(input.session.session_id(), &sequence_id).await?;
+        let sequence_id = state.locals.parameters.get()?.get("sequence_id").cloned();
+        let saved = owner
+            .action_sequence(input.session.session_id(), sequence_id.as_ref())
+            .await
+            .map_err(AuthorityFailure::into_coded)?
+            .map_or(Json::Null, Json::Object);
         let result = object(vec![
             ("kind", json!("action_sequence_result")),
             ("operation", json!(tool.name)),

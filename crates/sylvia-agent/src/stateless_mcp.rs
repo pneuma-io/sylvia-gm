@@ -15,6 +15,7 @@ use regex::Regex;
 use serde_json::{json, Value as Json};
 use std::collections::BTreeSet;
 use std::sync::OnceLock;
+use sylvia_app::action_sequences::{ComposeRequest, ExecuteRequest};
 use sylvia_base::pyjson::{self, Dump};
 use sylvia_base::{CodedError, JsonMap};
 pub use sylvia_domain::authority::ModelToolBehavior;
@@ -335,9 +336,10 @@ pub async fn call_action_sequence_tool(
             payload.insert("surfaces".into(), Json::Array(surfaces));
             return Ok(payload);
         }
-        "read_action_sequence" => {
-            owner.action_sequence(session_id, parameters.get("sequence_id").unwrap_or(&Json::Null)).await?
-        }
+        "read_action_sequence" => owner
+            .action_sequence(session_id, parameters.get("sequence_id"))
+            .await?
+            .map_or(Json::Null, Json::Object),
         "compose_action_sequence" => {
             let field = |key: &str| parameters.get(key).cloned().ok_or_else(|| key_error(key));
             let expected_revision = field("expected_revision")?;
@@ -351,24 +353,26 @@ pub async fn call_action_sequence_tool(
                     Some(session_id),
                 )?;
             }
-            let mut arguments = JsonMap::new();
-            arguments.insert("sequence_id".into(), field("sequence_id")?);
-            arguments.insert("expected_revision".into(), expected_revision);
-            arguments.insert(
-                "expected_version".into(),
-                parameters.get("expected_version").cloned().unwrap_or(json!(0)),
-            );
-            arguments.insert("steps".into(), field("steps")?);
-            owner.compose_action_sequence_from_agent(campaign_id, session_id, &arguments).await?
+            let request = ComposeRequest {
+                campaign_id: campaign_id.to_owned(),
+                session_id: session_id.to_owned(),
+                sequence_id: schema_string(field("sequence_id")?)?,
+                expected_revision,
+                steps: field("steps")?,
+                expected_version: parameters.get("expected_version").cloned().unwrap_or(json!(0)),
+            };
+            Json::Object(owner.compose_action_sequence_from_agent(&request).await?)
         }
         _ => {
             let field = |key: &str| parameters.get(key).cloned().ok_or_else(|| key_error(key));
-            let mut arguments = JsonMap::new();
-            arguments.insert("sequence_id".into(), field("sequence_id")?);
-            arguments.insert("expected_version".into(), field("expected_version")?);
-            arguments
-                .insert("confirmation".into(), parameters.get("confirmation").cloned().unwrap_or(Json::Null));
-            owner.execute_action_sequence_from_agent(campaign_id, session_id, &arguments).await?
+            let request = ExecuteRequest {
+                campaign_id: campaign_id.to_owned(),
+                session_id: session_id.to_owned(),
+                sequence_id: schema_string(field("sequence_id")?)?,
+                expected_version: field("expected_version")?,
+                confirmation: parameters.get("confirmation").cloned().map(schema_string).transpose()?,
+            };
+            Json::Object(owner.execute_action_sequence_from_agent(&request).await?)
         }
     };
     let mut payload = JsonMap::new();
@@ -376,6 +380,15 @@ pub async fn call_action_sequence_tool(
     payload.insert("operation".into(), json!(name));
     payload.insert("result".into(), result);
     Ok(payload)
+}
+
+/// A parameter the tool's input schema has already admitted as a string. Python passes it on as
+/// it is; the schema check above makes any other type unreachable here.
+fn schema_string(value: Json) -> Result<String, AuthorityFailure> {
+    match value {
+        Json::String(text) => Ok(text),
+        _ => Err(CodedError::new("internal_error", "").with_error_type("AssertionError").into()),
+    }
 }
 
 /// An exception an owner operation raised, in its Python class. A domain error keeps a

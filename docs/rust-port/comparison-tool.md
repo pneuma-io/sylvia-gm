@@ -132,6 +132,7 @@ header. A session adds its own under `rules`:
   recording is written, so a protected credential never reaches the repository. The work
   folder still holds the raw data; never commit a work folder.
 - `volatile_files`: files that must exist but whose content is not compared.
+- `optional_files`: files left out of the comparison entirely, present or not. Only for a file no reader ever opens: Python's diagnostics writer stages each snapshot in `diagnostics/runtime.pending.jsonl` and replaces the real file atomically, and an owner that exits mid-write leaves the replacement behind in some runs (`action-queue`).
 - Files are listed by path. After the rules are applied they are ordered again by the
   normalised path, so an aliased identifier in a path (a new campaign's folder) cannot reorder
   them between runs.
@@ -280,6 +281,7 @@ mid-body need control of the socket.
 | `account-connections` | The Claude Code connection on an empty folder, offline: its status before Sylvia's copy is installed, the refused actions and options, sign-in, model registration and sign-out refused until the copy exists, and cancel; then the ChatGPT connection's refused actions (unknown, a number, none), refused before any Codex runtime is looked for | recorded on Windows and Linux; reproduces on a second run |
 | `compact` | `/compact` on a No Ruleset campaign's DM session after its opening and one player turn: the working-context checkpoint written from the saved history, and the request and terminal evidence around it | recorded on Windows and Linux; reproduces on a second run |
 | `opening-retry` | A GM opening that fails (the campaign's name carries the stand-in's `[fail-opening]` marker), the Retry offer and history, then a Manual Retry of the opening, its replay and the read-backs | recorded on Windows and Linux; reproduces on a second run |
+| `action-queue` | The SRD Lite campaign from the bundled A Debt in Iron plan opened by the GM, then one player turn in which the GM, through the stand-in's call markers, reads the action queue (none yet), composes an empty queue, executes it with its confirmation, reads it back and executes it again without one: the agent's three queue operations inside the turn's own campaign work | recorded on Windows and Linux; reproduces on a second run |
 
 `srd-mechanics-turn` declares more rules than the others, because a mechanic is random on
 every Python run:

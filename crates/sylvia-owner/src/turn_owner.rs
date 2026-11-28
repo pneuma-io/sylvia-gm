@@ -14,11 +14,13 @@ use sylvia_agent::session_loop::campaign::NarrationStream;
 use sylvia_agent::session_loop::SessionFailure;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_app::action_sequences::{self, ComposeRequest, ExecuteRequest};
 use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::actor_decisions as authority_actor_decisions;
 use sylvia_app::authority::narration_attempts::{self as narration, NarrationStart};
 use sylvia_app::authority::narration_attempts::{RetryNarration, RetryStream};
+use sylvia_app::authority::sequence_owner::AuthoritySequences;
 use sylvia_app::authority::{campaign_file, content_reads, knowledge, player_reads, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ModelDecisionBoundary;
@@ -91,6 +93,19 @@ fn authority_failure(error: ActionError) -> AuthorityFailure {
     }
 }
 
+/// The owner identity a GM turn's commands carry; reads built without one are a fault.
+fn missing_owner() -> AuthorityFailure {
+    CodedError::new("internal_error", "The GM turn's owner reads were built without the owner's identity.")
+        .with_error_type("RuntimeError")
+        .into()
+}
+
+impl OwnerReads {
+    fn turn_owner_id(&self) -> Result<&str, AuthorityFailure> {
+        self.owner_id().ok_or_else(missing_owner)
+    }
+}
+
 /// An `AuthorityOwner` method lane 3 has not ported yet.
 fn pending(method: &str) -> CodedError {
     CodedError::new(
@@ -135,30 +150,44 @@ impl TurnOwner for OwnerReads {
         Box::pin(async { Err(pending("campaign_panels")) })
     }
 
+    // Lane 2's `action_sequences` over lane 3's `AuthoritySequences` (#514), one per call.
     fn action_sequence<'a>(
         &'a self,
-        _session_id: &'a str,
-        _sequence_id: &'a Json,
-    ) -> BoxFuture<'a, CodedResult<Json>> {
-        Box::pin(async { Err(pending("action_sequence")) })
+        session_id: &'a str,
+        sequence_id: Option<&'a Json>,
+    ) -> BoxFuture<'a, Result<Option<JsonMap>, AuthorityFailure>> {
+        Box::pin(async move {
+            let owner = AuthoritySequences::new(self.store(), self.turn_owner_id()?);
+            // `content.get("sequence_id") == sequence_id`: a saved identity is validated text, so
+            // a value that is not text (one the model sent with a call that was refused) finds
+            // none. The empty identity stands for it: no saved identity is ever empty.
+            let wanted = match sequence_id {
+                None | Some(Json::Null) => None,
+                Some(Json::String(identity)) => Some(identity.as_str()),
+                Some(_) => Some(""),
+            };
+            action_sequences::action_sequence(&owner, session_id, wanted).await.map_err(authority_failure)
+        })
     }
 
     fn compose_action_sequence_from_agent<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _session_id: &'a str,
-        _arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<Json>> {
-        Box::pin(async { Err(pending("_compose_action_sequence_from_agent")) })
+        request: &'a ComposeRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        Box::pin(async move {
+            let owner = AuthoritySequences::new(self.store(), self.turn_owner_id()?);
+            action_sequences::compose_action_sequence(&owner, request, true).await.map_err(authority_failure)
+        })
     }
 
     fn execute_action_sequence_from_agent<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _session_id: &'a str,
-        _arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<Json>> {
-        Box::pin(async { Err(pending("_execute_action_sequence_from_agent")) })
+        request: &'a ExecuteRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        Box::pin(async move {
+            let owner = AuthoritySequences::new(self.store(), self.turn_owner_id()?);
+            action_sequences::execute_action_sequence(&owner, request, true).await.map_err(authority_failure)
+        })
     }
 
     fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()> {
@@ -271,14 +300,7 @@ impl TurnOwner for OwnerReads {
         command: &'a ActionCommand,
     ) -> BoxFuture<'a, Result<ActionExecution, AuthorityFailure>> {
         Box::pin(async move {
-            let Some(owner_id) = self.owner_id() else {
-                return Err(CodedError::new(
-                    "internal_error",
-                    "The GM turn's owner reads were built without the owner's identity.",
-                )
-                .with_error_type("RuntimeError")
-                .into());
-            };
+            let owner_id = self.turn_owner_id()?;
             actions::execute_action(self.store(), owner_id, command).await.map_err(|error| match error {
                 ActionError::Domain(error) => AuthorityFailure::Domain(error),
                 ActionError::Store(error) => AuthorityFailure::Coded(store_error(error)),
@@ -307,14 +329,7 @@ impl TurnOwner for OwnerReads {
         turn_id: Option<&'a str>,
     ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
         Box::pin(async move {
-            let Some(owner_id) = self.owner_id() else {
-                return Err(CodedError::new(
-                    "internal_error",
-                    "The GM turn's owner reads were built without the owner's identity.",
-                )
-                .with_error_type("RuntimeError")
-                .into());
-            };
+            let owner_id = self.turn_owner_id()?;
             let update = campaign_file::CampaignFileUpdate {
                 session_id: session_id.to_owned(),
                 update_id: update_id.to_owned(),
