@@ -349,7 +349,10 @@ impl TurnOwner for OwnerReads {
         })
     }
 
-    fn builder_session_work<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
+    fn builder_session_work<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
         Box::pin(async move {
             let held = self.store().builder_session_work(session_id).await.map_err(store_failure)?;
             let context = held.context.clone();

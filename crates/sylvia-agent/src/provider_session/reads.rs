@@ -262,7 +262,10 @@ pub trait TurnOwner: OpeningReads {
     ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>>;
 
     /// `builder_session_work(session_id)`: a Builder session's context under its held work.
-    fn builder_session_work<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>>;
+    fn builder_session_work<'a>(
+        &'a self,
+        session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>>;
 
     /// `campaign_ending_choice_text(session_id, message_id, choice)`.
     fn campaign_ending_choice_text<'a>(

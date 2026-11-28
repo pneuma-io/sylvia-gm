@@ -954,14 +954,59 @@ pub async fn handle_submit_session_input(
                 }
             }
         }
+        // `compact_provider`: a Builder chat's saved history as its provider is sent it, or the
+        // DM request a bare adapter (the owner and provider only) assembles.
+        let messages: sylvia_agent::working_context::CompactMessages = if role == WriterRole::Builder {
+            Arc::new(|input: sylvia_agent::session_loop::SessionProviderInput| {
+                Box::pin(
+                    async move { sylvia_agent::builder::history::provider_history(&input.history, None) },
+                )
+            })
+        } else {
+            // Built when the provider runs, inside `run_compaction`, as Python builds it.
+            let (store, owner_id, adapter_provider) =
+                (ctx.store.clone(), ctx.owner_id.clone(), Arc::clone(&provider));
+            Arc::new(move |input: sylvia_agent::session_loop::SessionProviderInput| {
+                let reads = crate::owner_reads::OwnerReads::for_owner(store.clone(), owner_id.clone());
+                let (provider, owner_id) = (Arc::clone(&adapter_provider), owner_id.clone());
+                Box::pin(async move {
+                    let adapter = sylvia_agent::provider_session::context::ProviderSessionAdapter::new(
+                        Arc::new(reads) as Arc<dyn sylvia_agent::provider_session::reads::OpeningReads>,
+                        provider,
+                        &owner_id,
+                        None,
+                        120.0,
+                        None,
+                        None,
+                        None,
+                        &sylvia_provider::config::env::Environment::current(),
+                    )?;
+                    let messages =
+                        adapter.messages_with(&input, &crate::preflight::rank_references, None).await?;
+                    Ok(messages.into_iter().map(|tagged| tagged.message).collect())
+                })
+            })
+        };
+        let compact = sylvia_agent::working_context::compact_provider(Arc::clone(&provider), messages);
         // `run_compaction(session_id, attempt_id, compact_provider)`, then `consume_pending_once`.
         let outcome = match super::campaigns::required(params, "attempt_id") {
             Err(error) => Err(Failure::from(error)),
-            Ok(_attempt_id) => Err(CodedError::new(
-                crate::dispatch::PORT_PENDING,
-                "not yet ported: agent/_working_context.py compact_saved_messages (the /compact provider)",
-            )
-            .into()),
+            Ok(attempt_id) => match campaign_loop(ctx) {
+                Err(error) => Err(Failure::from(error)),
+                Ok(session_loop) => {
+                    match session_loop.run_compaction(&session_id, &attempt_id, compact).await {
+                        Ok(()) => {
+                            let mut reply = JsonMap::new();
+                            reply.insert("session_id".into(), Json::from(session_id.as_str()));
+                            reply.insert("status".into(), Json::from("context_compacted"));
+                            reply.insert("messages".into(), Json::Array(Vec::new()));
+                            reply.insert("interruption".into(), Json::Null);
+                            Ok(Json::Object(reply))
+                        }
+                        Err(error) => session_run_reply(Err(error)),
+                    }
+                }
+            },
         };
         consume_pending_once()?;
         return outcome;

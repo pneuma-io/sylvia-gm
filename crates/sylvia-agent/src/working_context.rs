@@ -1447,7 +1447,9 @@ impl WorkingContextProvider {
 /// `compact_provider(provider_input)`'s message list: the saved history as the provider is sent it
 /// (`_provider_history` for a Builder chat, `adapter._messages(...)` for a DM session).
 pub type CompactMessages = Arc<
-    dyn Fn(crate::session_loop::SessionProviderInput) -> BoxFuture<'static, sylvia_base::CodedResult<Vec<JsonMap>>>
+    dyn Fn(
+            crate::session_loop::SessionProviderInput,
+        ) -> BoxFuture<'static, sylvia_base::CodedResult<Vec<JsonMap>>>
         + Send
         + Sync,
 >;
@@ -1467,7 +1469,14 @@ impl crate::session_loop::SessionProvider for CompactProvider {
     ) -> BoxFuture<'a, Result<(), crate::session_loop::SessionProviderError>> {
         Box::pin(async move {
             let messages = (self.messages)(input.clone()).await?;
-            compact_saved_messages(Arc::clone(&self.provider), &input.history, &messages, &input.control, events).await
+            compact_saved_messages(
+                Arc::clone(&self.provider),
+                &input.history,
+                &messages,
+                &input.control,
+                events,
+            )
+            .await
         })
     }
 }

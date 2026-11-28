@@ -638,7 +638,8 @@ impl BuilderEvents<'_> {
             .await
             .map_err(owner_failure)?;
         let timing_status = if status == "interrupted" { "failed" } else { status };
-        let timing = self.run.finish_activity(&request.session_id, &request.attempt_id, timing_status, None)?;
+        let timing =
+            self.run.finish_activity(&request.session_id, &request.attempt_id, timing_status, None)?;
         let mut content = object(vec![
             ("kind", json!("builder_attempt_terminal")),
             ("attempt_id", json!(request.attempt_id)),
@@ -659,7 +660,10 @@ impl BuilderEvents<'_> {
     async fn handle(&mut self, event: ProviderEvent, source_order: i64) -> Result<(), SessionFailure> {
         let (request, active) = (self.request, self.active);
         active.control.progress.observe();
-        let private = matches!(event, ProviderEvent::PrivateReasoning { .. } | ProviderEvent::PrivateContinuation { .. });
+        let private = matches!(
+            event,
+            ProviderEvent::PrivateReasoning { .. } | ProviderEvent::PrivateContinuation { .. }
+        );
         if active.control.cancelled() && !private && !matches!(event, ProviderEvent::Evidence { .. }) {
             // Stop fences prose; completed tool receipts and their native continuation still
             // describe effects that already happened.
@@ -670,10 +674,14 @@ impl BuilderEvents<'_> {
                 self.private_record(text, response_id, "thinking", source_order).await
             }
             ProviderEvent::PrivateContinuation { text, response_id } => {
-                self.private_record(text.clone(), Some(response_id.clone()), "continuation", source_order).await?;
+                self.private_record(text.clone(), Some(response_id.clone()), "continuation", source_order)
+                    .await?;
                 if !text.is_empty() && !response_id.is_empty() {
                     let native = sylvia_base::pyjson::loads(&text).map_err(|error| {
-                        failure(CodedError::new("internal_error", error.to_string()).with_error_type("JSONDecodeError"))
+                        failure(
+                            CodedError::new("internal_error", error.to_string())
+                                .with_error_type("JSONDecodeError"),
+                        )
                     })?;
                     let has = |key: &str| native.as_object().is_some_and(|native| native.contains_key(key));
                     let requirement = object(vec![
@@ -709,7 +717,8 @@ impl BuilderEvents<'_> {
                     self.flush_provisional().await?;
                 }
                 // `native_requirements.get(str(response_id))`.
-                let response_id = payload.get("provider_response_id").map_or_else(|| "None".to_owned(), py_str);
+                let response_id =
+                    payload.get("provider_response_id").map_or_else(|| "None".to_owned(), py_str);
                 let requirement = self.native_requirements.get(&response_id).cloned();
                 let mut content = payload;
                 if let Some(requirement) = requirement {
@@ -724,13 +733,20 @@ impl BuilderEvents<'_> {
                 let message = self
                     .run
                     .owner
-                    .append_agent_message(&request.session_id, &message_id, SessionMessageKind::Evidence, &content)
+                    .append_agent_message(
+                        &request.session_id,
+                        &message_id,
+                        SessionMessageKind::Evidence,
+                        &content,
+                    )
                     .await
                     .map_err(failure)?;
                 self.appended.push(message);
                 Ok(())
             }
-            ProviderEvent::Action { .. } => Err(failure(rejected("Builder provider cannot emit gameplay session events"))),
+            ProviderEvent::Action { .. } => {
+                Err(failure(rejected("Builder provider cannot emit gameplay session events")))
+            }
         }
     }
 
@@ -749,7 +765,9 @@ impl BuilderEvents<'_> {
         let record = ProviderPrivateRecord {
             session_id: request.session_id.clone(),
             attempt_id: request.attempt_id.clone(),
-            response_id: response_id.filter(|id| !id.is_empty()).unwrap_or_else(|| request.attempt_id.clone()),
+            response_id: response_id
+                .filter(|id| !id.is_empty())
+                .unwrap_or_else(|| request.attempt_id.clone()),
             turn_id: request.turn_id.clone(),
             basis_message_id: request.message_id.clone(),
             source_order,
@@ -767,7 +785,9 @@ impl SessionEvents for BuilderEvents<'_> {
         Box::pin(async move {
             let source_order = self.source_order;
             self.source_order += 1;
-            self.handle(event, source_order).await.map_err(|error| SessionProviderError { error, loop_reason: None })
+            self.handle(event, source_order)
+                .await
+                .map_err(|error| SessionProviderError { error, loop_reason: None })
         })
     }
 }
@@ -1508,14 +1528,19 @@ impl CampaignSessionLoop {
                 if context.messages.iter().any(|message| {
                     message.kind() == SessionMessageKind::User || content_is(message, "kind", "builder_start")
                 }) {
-                    return Err(failure(rejected("Builder chat has already started; send a message to continue")));
+                    return Err(failure(rejected(
+                        "Builder chat has already started; send a message to continue",
+                    )));
                 }
                 let content =
                     object(vec![("kind", json!("builder_start")), ("attempt_id", json!(request.attempt_id))]);
                 (SessionMessageKind::Evidence, content)
             }
             SessionInputKind::User => {
-                let mut content = object(vec![("text", json!(request.user_text)), ("attempt_id", json!(request.attempt_id))]);
+                let mut content = object(vec![
+                    ("text", json!(request.user_text)),
+                    ("attempt_id", json!(request.attempt_id)),
+                ]);
                 if let Some(answers) = &request.builder_question_answers {
                     let answers = Json::Array(answers.iter().cloned().map(Json::Object).collect());
                     content = crate::builder::question_answers::builder_question_answer_content(
@@ -1535,8 +1560,12 @@ impl CampaignSessionLoop {
             .await
             .map_err(failure)?;
         let history = owner.session_context(&request.session_id).await.map_err(failure)?;
-        let provider_input =
-            SessionProviderInput::new(context.session.clone(), history, Vec::new(), Arc::new(ProviderControl::new()));
+        let provider_input = SessionProviderInput::new(
+            context.session.clone(),
+            history,
+            Vec::new(),
+            Arc::new(ProviderControl::new()),
+        );
         // Builder provider work is attached to the durable session, even when that session
         // belongs to a campaign: the frontend streams, stops and reconnects by session id.
         let active = Arc::new(ActiveRun {
@@ -1591,11 +1620,17 @@ impl CampaignSessionLoop {
                 Err(SessionFailure::Turn(TurnFailure::Coded(error)))
                     if active.control.cancelled() && owner_closed(&error) =>
                 {
-                    return Err(SessionProviderError { error: cancelled_during_shutdown(), loop_reason: None });
+                    return Err(SessionProviderError {
+                        error: cancelled_during_shutdown(),
+                        loop_reason: None,
+                    });
                 }
                 Err(error) => return Err(SessionProviderError { error, loop_reason: None }),
             }
-            events.record_terminal("completed", None).await.map_err(|error| SessionProviderError { error, loop_reason: None })?;
+            events
+                .record_terminal("completed", None)
+                .await
+                .map_err(|error| SessionProviderError { error, loop_reason: None })?;
             Ok(std::mem::take(&mut events.appended))
         }
         .await;
@@ -1684,9 +1719,17 @@ impl CampaignSessionLoop {
                 state.active.insert(session_id.to_owned(), Arc::clone(&active));
                 state.pending.remove(session_id);
             }
-            let request = object(vec![("kind", json!("context_compaction_requested")), ("attempt_id", json!(attempt_id))]);
+            let request = object(vec![
+                ("kind", json!("context_compaction_requested")),
+                ("attempt_id", json!(attempt_id)),
+            ]);
             owner
-                .append_agent_message(session_id, &format!("compact-request-{attempt_id}"), SessionMessageKind::Evidence, &request)
+                .append_agent_message(
+                    session_id,
+                    &format!("compact-request-{attempt_id}"),
+                    SessionMessageKind::Evidence,
+                    &request,
+                )
                 .await
                 .map_err(failure)?;
             let mut status = "interrupted";
@@ -1719,7 +1762,12 @@ impl CampaignSessionLoop {
                 ("status", json!(status)),
             ]);
             owner
-                .append_agent_message(session_id, &format!("compact-terminal-{attempt_id}"), SessionMessageKind::Evidence, &terminal)
+                .append_agent_message(
+                    session_id,
+                    &format!("compact-terminal-{attempt_id}"),
+                    SessionMessageKind::Evidence,
+                    &terminal,
+                )
                 .await
                 .map_err(failure)?;
             drop(held);
