@@ -7,6 +7,7 @@
 use serde_json::{json, Value};
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::pyjson::{self, float_repr};
+use sylvia_base::testing::json_difference;
 use sylvia_engine::expr::{parse_expression, Literal, Node, UnaryOp};
 
 fn vectors() -> Value {
@@ -48,7 +49,7 @@ fn check_case(case: &Value) -> Option<String> {
             let tree = dump(node);
             match case.get("ast_sha256").and_then(Value::as_str) {
                 Some(digest) => sha256_hex(pyjson::canonical_bytes(&tree))[..16] == *digest,
-                None => tree == case["ast"],
+                None => json_difference(&tree, &case["ast"]).is_none(),
             }
         }
         (Err(error), Some(expected)) => {

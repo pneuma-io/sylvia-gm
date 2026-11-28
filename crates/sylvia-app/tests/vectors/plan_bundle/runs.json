@@ -1,0 +1,2421 @@
+{
+ "python": "3.12",
+ "plan_sha256": "e1c9fc94c38c32d3f7dd3e22dca138ffbe3c02a4e41df44346e062111da3d6e8",
+ "runs": [
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "relay.sylvia-gm-plan",
+    "install_id": "plan-a"
+   },
+   "outcome": {
+    "ok": {
+     "kind": "campaign_plan",
+     "id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "title": "The Silent Relay",
+     "summary": "Find the lost signal.",
+     "content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+     "reusable": true,
+     "ruleset": {
+      "content_sha256": "6abdc32cb79412b2eeb27df395db1221d6b42c44e3362f056559c10060bfbb0f",
+      "id": "sylvia-gm.conformance.signal-static",
+      "version": "0.1.0"
+     },
+     "campaign_setting": {
+      "content_sha256": "9aa5fb9b24973627b37efaec6c96ade9dc65e456b164467b5b0e41b0051c2862",
+      "id": "local.relay-island",
+      "version": "1.0.0"
+     },
+     "starting_party": {
+      "custom_companions": {
+       "maximum": 0,
+       "minimum": 0
+      },
+      "player_character": {
+       "mode": "compatible"
+      },
+      "required_companions": []
+     },
+     "interview_contribution": null
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "relay-copy.sylvia-gm-plan",
+    "install_id": "plan-b"
+   },
+   "outcome": {
+    "ok": {
+     "kind": "campaign_plan",
+     "id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "title": "The Silent Relay",
+     "summary": "Find the lost signal.",
+     "content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+     "reusable": true,
+     "ruleset": {
+      "content_sha256": "6abdc32cb79412b2eeb27df395db1221d6b42c44e3362f056559c10060bfbb0f",
+      "id": "sylvia-gm.conformance.signal-static",
+      "version": "0.1.0"
+     },
+     "campaign_setting": {
+      "content_sha256": "9aa5fb9b24973627b37efaec6c96ade9dc65e456b164467b5b0e41b0051c2862",
+      "id": "local.relay-island",
+      "version": "1.0.0"
+     },
+     "starting_party": {
+      "custom_companions": {
+       "maximum": 0,
+       "minimum": 0
+      },
+      "player_character": {
+       "mode": "compatible"
+      },
+      "required_companions": []
+     },
+     "interview_contribution": null
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "relay.sylvia-gm-plan"
+   },
+   "outcome": {
+    "ok": {
+     "kind": "campaign_plan",
+     "id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "title": "The Silent Relay",
+     "summary": "Find the lost signal.",
+     "content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+     "reusable": true,
+     "ruleset": {
+      "content_sha256": "6abdc32cb79412b2eeb27df395db1221d6b42c44e3362f056559c10060bfbb0f",
+      "id": "sylvia-gm.conformance.signal-static",
+      "version": "0.1.0"
+     },
+     "campaign_setting": {
+      "content_sha256": "9aa5fb9b24973627b37efaec6c96ade9dc65e456b164467b5b0e41b0051c2862",
+      "id": "local.relay-island",
+      "version": "1.0.0"
+     },
+     "starting_party": {
+      "custom_companions": {
+       "maximum": 0,
+       "minimum": 0
+      },
+      "player_character": {
+       "mode": "compatible"
+      },
+      "required_companions": []
+     },
+     "interview_contribution": null
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "RELAY-UPPER.SYLVIA-GM-PLAN",
+    "install_id": "plan-c"
+   },
+   "outcome": {
+    "ok": {
+     "kind": "campaign_plan",
+     "id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "title": "The Silent Relay",
+     "summary": "Find the lost signal.",
+     "content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+     "reusable": true,
+     "ruleset": {
+      "content_sha256": "6abdc32cb79412b2eeb27df395db1221d6b42c44e3362f056559c10060bfbb0f",
+      "id": "sylvia-gm.conformance.signal-static",
+      "version": "0.1.0"
+     },
+     "campaign_setting": {
+      "content_sha256": "9aa5fb9b24973627b37efaec6c96ade9dc65e456b164467b5b0e41b0051c2862",
+      "id": "local.relay-island",
+      "version": "1.0.0"
+     },
+     "starting_party": {
+      "custom_companions": {
+       "maximum": 0,
+       "minimum": 0
+      },
+      "player_character": {
+       "mode": "compatible"
+      },
+      "required_companions": []
+     },
+     "interview_contribution": null
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "junk.sylvia-gm-plan",
+    "install_id": "plan-junk"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Content archive could not be admitted. Check its format and content, then export a new copy using Store or Deflate ZIP compression."
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "extra-member.sylvia-gm-plan",
+    "install_id": "plan-extra"
+   },
+   "outcome": {
+    "ok": {
+     "status": "repairable",
+     "repair_id": "<repair>",
+     "file_name": "extra-member.sylvia-gm-plan",
+     "message": "Campaign Plan archive members are invalid",
+     "validation_errors": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Campaign Plan archive members are invalid",
+       "file": "extra-member.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "extra-member.sylvia-gm-plan",
+    "install_id": "plan-extra"
+   },
+   "outcome": {
+    "ok": {
+     "status": "repairable",
+     "repair_id": "<repair>",
+     "file_name": "extra-member.sylvia-gm-plan",
+     "message": "Campaign Plan archive members are invalid",
+     "validation_errors": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Campaign Plan archive members are invalid",
+       "file": "extra-member.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "extra-member.sylvia-gm-plan",
+    "install_id": "plan-extra"
+   },
+   "tamper": true,
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "The failed import receipt changed; select the file again"
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "extra-member.sylvia-gm-plan"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Content archive could not be admitted. Check its format and content, then export a new copy using Store or Deflate ZIP compression."
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "no-snapshot.sylvia-gm-plan",
+    "install_id": "plan-no-snapshot"
+   },
+   "outcome": {
+    "ok": {
+     "status": "repairable",
+     "repair_id": "<repair>",
+     "file_name": "no-snapshot.sylvia-gm-plan",
+     "message": "Campaign Plan archive members are invalid",
+     "validation_errors": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Campaign Plan archive members are invalid",
+       "file": "no-snapshot.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "old-format.sylvia-gm-plan",
+    "install_id": "plan-old"
+   },
+   "outcome": {
+    "ok": {
+     "status": "repairable",
+     "repair_id": "<repair>",
+     "file_name": "old-format.sylvia-gm-plan",
+     "message": "Content fields do not match the declared format",
+     "validation_errors": [
+      {
+       "code": "content_const_invalid",
+       "phase": "content",
+       "message": "Correct this field to satisfy the definition's const constraint.",
+       "file": "record.json",
+       "path": "$.format_version",
+       "guidance": "Read the portable_plan_bundle_record content definition and correct this field."
+      }
+     ]
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "broken-plan.sylvia-gm-plan",
+    "install_id": "plan-broken"
+   },
+   "outcome": {
+    "ok": {
+     "status": "repairable",
+     "repair_id": "<repair>",
+     "file_name": "broken-plan.sylvia-gm-plan",
+     "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+     "validation_errors": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "file": "broken-plan.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "bzip2.sylvia-gm-plan",
+    "install_id": "plan-bzip2"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Content archive could not be admitted. Check its format and content, then export a new copy using Store or Deflate ZIP compression."
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "junk-snapshot.sylvia-gm-plan",
+    "install_id": "plan-junk-snapshot"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Content archive could not be admitted. Check its format and content, then export a new copy using Store or Deflate ZIP compression."
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "riichi.sylvia-gm-package",
+    "install_id": "riichi"
+   },
+   "outcome": {
+    "ok": {
+     "candidate_id": "candidate-riichi",
+     "install_id": "riichi",
+     "status": "validated",
+     "closure_sha256": "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "package_lock": {
+      "entries": [
+       {
+        "package_id": "pneuma.riichi-mahjong",
+        "version": "0.1.0",
+        "sha256": "1b64b8056386d32eacb7f6055fc9171f95b4cd1c0f5fb79d44adb92bfe9c402d",
+        "role": "primary",
+        "load_order": 0,
+        "dependencies": [],
+        "capabilities": [
+         "pneuma.riichi-mahjong.guidance",
+         "pneuma.riichi-mahjong.play"
+        ]
+       },
+       {
+        "package_id": "pneuma.riichi-club",
+        "version": "0.1.0",
+        "sha256": "e5c2572ef19d29092f51c8e96aec546db59c706b9a51f3a3b48bc58e6956e666",
+        "role": "dependency",
+        "load_order": 1,
+        "dependencies": [
+         {
+          "package_id": "pneuma.riichi-mahjong",
+          "version": "0.1.0",
+          "sha256": "1b64b8056386d32eacb7f6055fc9171f95b4cd1c0f5fb79d44adb92bfe9c402d",
+          "kind": "ruleset_snapshot",
+          "namespace": "ruleset_snapshot"
+         }
+        ],
+        "capabilities": []
+       }
+      ]
+     },
+     "validation_report": {
+      "code": "validated",
+      "label": "Package candidate validated"
+     }
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "riichi.sylvia-gm-package",
+    "install_id": "riichi"
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Install identity is already terminal"
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "riichi.sylvia-gm-package"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Content archive could not be admitted. Check its format and content, then export a new copy using Store or Deflate ZIP compression."
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "damaged-riichi.sylvia-gm-package",
+    "install_id": "riichi-damaged"
+   },
+   "outcome": {
+    "ok": {
+     "status": "repairable",
+     "repair_id": "<repair>",
+     "file_name": "damaged-riichi.sylvia-gm-package",
+     "message": "Package archive admission failed",
+     "validation_errors": [
+      {
+       "code": "archive_invalid",
+       "phase": "archive",
+       "message": "Indexed package file size does not match",
+       "file": "manifest.json"
+      }
+     ]
+    }
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "damaged-riichi.sylvia-gm-package",
+       "kind": "package",
+       "message": "Package archive admission failed",
+       "source_path": "damaged-riichi.sylvia-gm-package",
+       "source_sha256": "771d2a39cd4776a45d7346f2e3682328322fc7551302d2f0f670ef9f67e994a3",
+       "validation_errors": [
+        {
+         "code": "archive_invalid",
+         "file": "manifest.json",
+         "message": "Indexed package file size does not match",
+         "phase": "archive"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "junk.sylvia-gm-package",
+    "install_id": "riichi-junk"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "archive_invalid",
+    "message": "Package archive admission failed"
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "damaged-riichi.sylvia-gm-package",
+       "kind": "package",
+       "message": "Package archive admission failed",
+       "source_path": "damaged-riichi.sylvia-gm-package",
+       "source_sha256": "771d2a39cd4776a45d7346f2e3682328322fc7551302d2f0f670ef9f67e994a3",
+       "validation_errors": [
+        {
+         "code": "archive_invalid",
+         "file": "manifest.json",
+         "message": "Indexed package file size does not match",
+         "phase": "archive"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "missing.sylvia-gm-package",
+    "install_id": "riichi-missing"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Selected package file is unavailable"
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "damaged-riichi.sylvia-gm-package",
+       "kind": "package",
+       "message": "Package archive admission failed",
+       "source_path": "damaged-riichi.sylvia-gm-package",
+       "source_sha256": "771d2a39cd4776a45d7346f2e3682328322fc7551302d2f0f670ef9f67e994a3",
+       "validation_errors": [
+        {
+         "code": "archive_invalid",
+         "file": "manifest.json",
+         "message": "Indexed package file size does not match",
+         "phase": "archive"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  },
+  {
+   "op": "install_package_file",
+   "params": {
+    "source": "folder.sylvia-gm-package",
+    "install_id": "riichi-folder"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Selected package file is unavailable"
+   },
+   "tree": [
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "campaign-plans/campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b/setting.sylvia-gm-package",
+     "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25"
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "broken-plan.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "source_path": "broken-plan.sylvia-gm-plan",
+       "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "broken-plan.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "damaged-riichi.sylvia-gm-package",
+       "kind": "package",
+       "message": "Package archive admission failed",
+       "source_path": "damaged-riichi.sylvia-gm-package",
+       "source_sha256": "771d2a39cd4776a45d7346f2e3682328322fc7551302d2f0f670ef9f67e994a3",
+       "validation_errors": [
+        {
+         "code": "archive_invalid",
+         "file": "manifest.json",
+         "message": "Indexed package file size does not match",
+         "phase": "archive"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "extra-member.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "extra-member.sylvia-gm-plan",
+       "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "extra-member.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": false
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "no-snapshot.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Campaign Plan archive members are invalid",
+       "source_path": "no-snapshot.sylvia-gm-plan",
+       "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+       "validation_errors": [
+        {
+         "code": "import_format_invalid",
+         "file": "no-snapshot.sylvia-gm-plan",
+         "guidance": "Repair the staged copy, then check it again before publishing.",
+         "message": "Campaign Plan archive members are invalid",
+         "phase": "import"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ],
+    [
+     "import-repair-sources/<repair>.json",
+     {
+      "receipt": {
+       "file_name": "old-format.sylvia-gm-plan",
+       "kind": "plan",
+       "message": "Content fields do not match the declared format",
+       "source_path": "old-format.sylvia-gm-plan",
+       "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+       "validation_errors": [
+        {
+         "code": "content_const_invalid",
+         "file": "record.json",
+         "guidance": "Read the portable_plan_bundle_record content definition and correct this field.",
+         "message": "Correct this field to satisfy the definition's const constraint.",
+         "path": "$.format_version",
+         "phase": "content"
+        }
+       ]
+      },
+      "canonical": true
+     }
+    ]
+   ],
+   "candidates": [
+    [
+     "candidate-plan-snapshot-327b648ab60910dacfe92b2d10f7adbc",
+     "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "validated"
+    ],
+    [
+     "candidate-riichi",
+     "4b0a97f0122e0ea7c961c772ddca208c88139603ccc4a525948ea2e67b079388",
+     "validated"
+    ]
+   ]
+  }
+ ],
+ "exports": [
+  {
+   "artifact_id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+   "expected_content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+   "outcome": {
+    "ok": {
+     "artifact_id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+     "byte_count": 8972,
+     "archive_sha256": "e1c9fc94c38c32d3f7dd3e22dca138ffbe3c02a4e41df44346e062111da3d6e8"
+    },
+    "archive_sha256": "e1c9fc94c38c32d3f7dd3e22dca138ffbe3c02a4e41df44346e062111da3d6e8"
+   }
+  },
+  {
+   "artifact_id": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+   "expected_content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "The selected Campaign Plan changed; refresh its library entry"
+   }
+  },
+  {
+   "artifact_id": "campaign-plan-reusable-000000000000000000000000-0000000000000000",
+   "expected_content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "The selected Campaign Plan is unavailable"
+   }
+  },
+  {
+   "artifact_id": "not-a-plan",
+   "expected_content_sha256": "1715e60f7c23000b3199ca74be263b1e39851c95dc929741853a5330d0bb3715",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "The selected Campaign Plan is unavailable"
+   }
+  }
+ ],
+ "inspections": [
+  {
+   "source": "broken-plan.sylvia-gm-plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "source_sha256": "c15e9f4c2d1d0ad198eb379be0026ad9e5e65ec2f64cbfbf8332d05102e5058f",
+     "file_name": "broken-plan.sylvia-gm-plan",
+     "identity": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "diagnostics": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Expecting property name enclosed in double quotes: line 1 column 2 (char 1)",
+       "file": "broken-plan.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "source": "bzip2.sylvia-gm-plan",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Unsupported ZIP compression; re-save the archive using Store or Deflate"
+   }
+  },
+  {
+   "source": "damaged-riichi.sylvia-gm-package",
+   "outcome": {
+    "ok": {
+     "kind": "package",
+     "source_sha256": "771d2a39cd4776a45d7346f2e3682328322fc7551302d2f0f670ef9f67e994a3",
+     "file_name": "damaged-riichi.sylvia-gm-package",
+     "identity": null,
+     "diagnostics": [
+      {
+       "code": "archive_invalid",
+       "phase": "archive",
+       "message": "Indexed package file size does not match",
+       "file": "manifest.json"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "source": "extra-member.sylvia-gm-plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+     "file_name": "extra-member.sylvia-gm-plan",
+     "identity": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "diagnostics": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Campaign Plan archive members are invalid",
+       "file": "extra-member.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "source": "folder.sylvia-gm-package",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Repair source must be one regular file"
+   }
+  },
+  {
+   "source": "junk-snapshot.sylvia-gm-plan",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Archive ZIP directory is invalid"
+   }
+  },
+  {
+   "source": "junk.sylvia-gm-package",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Archive ZIP directory is invalid"
+   }
+  },
+  {
+   "source": "junk.sylvia-gm-plan",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Archive ZIP directory is invalid"
+   }
+  },
+  {
+   "source": "no-snapshot.sylvia-gm-plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "source_sha256": "d4323bf56fe8074e036cb1d7a78da6b03d167501b909c7dbefc5fe1a68f6fc2f",
+     "file_name": "no-snapshot.sylvia-gm-plan",
+     "identity": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "diagnostics": [
+      {
+       "code": "import_format_invalid",
+       "phase": "import",
+       "message": "Campaign Plan archive members are invalid",
+       "file": "no-snapshot.sylvia-gm-plan",
+       "guidance": "Repair the staged copy, then check it again before publishing."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "source": "old-format.sylvia-gm-plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "source_sha256": "808bab9784536af584f3575c35941fff88f2ee633b05caa0e7b19cae4944890f",
+     "file_name": "old-format.sylvia-gm-plan",
+     "identity": "campaign-plan-reusable-96fb4cddff50510ed47eb715-1715e60f7c23000b",
+     "diagnostics": [
+      {
+       "code": "content_const_invalid",
+       "phase": "content",
+       "message": "Correct this field to satisfy the definition's const constraint.",
+       "file": "record.json",
+       "path": "$.format_version",
+       "guidance": "Read the portable_plan_bundle_record content definition and correct this field."
+      }
+     ]
+    }
+   }
+  },
+  {
+   "source": "relay-copy.sylvia-gm-plan",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Selected content is already valid and does not need format repair"
+   }
+  },
+  {
+   "source": "RELAY-UPPER.SYLVIA-GM-PLAN",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Selected content is already valid and does not need format repair"
+   }
+  },
+  {
+   "source": "relay.sylvia-gm-plan",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Selected content is already valid and does not need format repair"
+   }
+  },
+  {
+   "source": "riichi.sylvia-gm-package",
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Selected content is already valid and does not need format repair"
+   }
+  }
+ ]
+}

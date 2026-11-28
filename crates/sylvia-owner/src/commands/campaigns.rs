@@ -756,6 +756,95 @@ fn campaign_plan_payload(storage_root: &std::path::Path, campaign_id: &str) -> C
     }
 }
 
+/// `handle_confirm_new_campaign`: a new campaign with its owner-assigned Builder session (the
+/// Builder chat's effort and speed settled first, saved only when this is not a replay), from
+/// no packages or one installed candidate's exact lock (`_candidate_package_lock`).
+pub async fn handle_confirm_new_campaign(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    if params.contains_key("builder_session_id") {
+        return Err(protocol("builder_session_id is owner-assigned"));
+    }
+    let operation_id = required(params, "operation_id")?;
+    let builder_session_id =
+        format!("session-builder-{}", &sylvia_base::hash::sha256_hex(operation_id.as_bytes())[..24]);
+    let (candidate_id, package_lock) = match params.get("candidate_id") {
+        None | Some(Json::Null) => (
+            None,
+            sylvia_domain::authority::PackageLock::new(Vec::new())
+                .map_err(|error| sylvia_base::CodedError::new("internal_error", error.to_string()))?,
+        ),
+        Some(Json::String(id)) if !id.is_empty() => {
+            let owned = id.clone();
+            let _operation = super::operation(ctx)?;
+            let candidate =
+                ctx.store.call(move |store| store.package_candidate(&owned)).await.map_err(store_error)?;
+            (Some(id.clone()), candidate.package_lock().clone())
+        }
+        Some(_) => return Err(protocol("candidate_id must be a nonempty string or null")),
+    };
+    let provider_id = required(params, "provider_id")?;
+    let model_id = required(params, "model_id")?;
+    let start = crate::chat_start::chat_start_for(ctx, "builder", &provider_id, &model_id, params).await?;
+    let replayed = crate::chat_start::session_exists(ctx, &builder_session_id).await?;
+    let display_name = required(params, "display_name")?;
+    let turn_id = required(params, "turn_id")?;
+    // `_optional_text(params, "builder_skill") or "BUILD CAMPAIGN PLAN"`.
+    let skill = optional_text(params, "builder_skill")?.unwrap_or_else(|| "BUILD CAMPAIGN PLAN".to_owned());
+    let request = sylvia_app::authority::campaign_creation::ConfirmRequest {
+        operation_id: &operation_id,
+        display_name: &display_name,
+        package_lock: &package_lock,
+        turn_id: &turn_id,
+        package_candidate_id: candidate_id.as_deref(),
+        builder_session_id: Some(&builder_session_id),
+        builder_provider_id: Some(&provider_id),
+        builder_model_id: Some(&model_id),
+        builder_selected_skill: &skill,
+        participants: &[],
+        initial_state: &[],
+    };
+    let confirmation =
+        sylvia_app::authority::campaign_creation::confirm_new_campaign(&ctx.store, &request, None)
+            .await
+            .map_err(store_error)?;
+    if !replayed {
+        crate::chat_start::apply_chat_start(ctx, &builder_session_id, &start).await?;
+    }
+    let mut reply = JsonMap::new();
+    reply.insert("campaign_id".into(), confirmation.campaign_id.into());
+    reply.insert("resulting_revision".into(), confirmation.resulting_revision.into());
+    reply.insert("builder_session_id".into(), builder_session_id.into());
+    Ok(Json::Object(reply))
+}
+
+/// `handle_complete_campaign_construction`: `canonical_plan` must be an object, then the
+/// lane's construction completes (`CampaignConstructionCompleted`, field by field).
+pub async fn handle_complete_campaign_construction(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> CodedResult<Json> {
+    let Some(Json::Object(canonical_plan)) = params.get("canonical_plan") else {
+        return Err(protocol("canonical_plan must be an object"));
+    };
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let completed = sylvia_app::authority::campaign_creation::complete_campaign_construction(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        expected_revision,
+        &Json::Object(canonical_plan.clone()),
+    )
+    .await
+    .map_err(store_error)?;
+    let mut reply = JsonMap::new();
+    reply.insert("campaign_id".into(), completed.campaign_id.into());
+    reply.insert("lane".into(), completed.lane.into());
+    reply.insert("canonical_representation_sha256".into(), completed.canonical_representation_sha256.into());
+    reply.insert("resulting_revision".into(), completed.resulting_revision.into());
+    Ok(Json::Object(reply))
+}
+
 /// `next(...)` over an empty iterable: Python's `StopIteration` escapes the handler.
 fn stop_iteration() -> sylvia_base::CodedError {
     sylvia_base::CodedError::new("internal_error", "").with_error_type("StopIteration")

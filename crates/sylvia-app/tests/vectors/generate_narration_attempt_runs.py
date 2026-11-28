@@ -89,6 +89,11 @@ def blocks(text: str) -> list[dict[str, object]]:
     return [{"kind": "narration", "text": text}]
 
 
+# lane 2's queued-commit case: the owner markers and the saved queue, as the sequence code writes them.
+MARKER5 = "{\"kind\":\"sylvia_player_action\",\"origin\":{\"control\":\"panel\",\"expected_revision\":4,\"panel_action_id\":\"move\",\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{\"actor\":\"operator\"},\"session_id\":\"gm\",\"surface_id\":\"operations.map\"}}"
+MARKER6 = "{\"kind\":\"sylvia_player_action\",\"origin\":{\"control\":\"panel\",\"expected_revision\":5,\"panel_action_id\":\"move\",\"policy\":{\"confirmation\":\"none\",\"response\":\"on_request\"},\"selection\":{\"actor\":\"operator\"},\"session_id\":\"gm\",\"surface_id\":\"operations.map\"}}"
+QUEUE = "{\"campaign_id\":\"campaign\",\"kind\":\"action_sequence\",\"narration_attempt_id\":\"aq\",\"narration_basis_message_id\":\"basis-aq\",\"sequence_id\":\"queued\",\"session_id\":\"gm\",\"status\":\"completed\",\"steps\":[{\"execution\":{\"campaign_id\":\"campaign\",\"expected_revision\":4,\"operation_id\":\"act5\",\"selection\":{\"actor\":\"operator\"},\"session_id\":\"gm\",\"source\":{\"action_id\":\"move\",\"kind\":\"panel\",\"surface_id\":\"operations.map\"}},\"operation_id\":\"act5\",\"status\":\"committed\",\"step_id\":\"walk\"},{\"execution\":{\"campaign_id\":\"campaign\",\"expected_revision\":5,\"operation_id\":\"act6\",\"selection\":{\"actor\":\"operator\"},\"session_id\":\"gm\",\"source\":{\"action_id\":\"move\",\"kind\":\"panel\",\"surface_id\":\"operations.map\"}},\"operation_id\":\"act6\",\"status\":\"committed\",\"step_id\":\"walk-on\"}],\"version\":3}"
+
 PHASES: list[dict[str, object]] = [
     {"grace": None, "steps": [
         {"op": "status", "attempt": "a0"},
@@ -219,6 +224,22 @@ PHASES: list[dict[str, object]] = [
         {"op": "interrupt", "attempt": "r3"},
         {"op": "retryable", "failed": "a5"},
         {"op": "retryable", "failed": "r3"},
+        # A queue bound to the live attempt `aq` committed act5 and act6 (their saved markers and the
+        # queue are written directly: no Rust owner composes queues yet). The attempt is then bound
+        # to the older act4, so its interruption names act6, the latest queued commit, only if
+        # `last_attempt_commit` reads the queue.
+        {"op": "start", "attempt": "aq"},
+        move("act5", 4, 8),
+        move("act6", 5, 9),
+        {"op": "sql", "query": "INSERT INTO consequences (campaign_id, action_id, ordinal, payload_json) "
+                               "VALUES ('campaign', 'act5', 1000, '" + MARKER5 + "'), "
+                               "('campaign', 'act6', 1000, '" + MARKER6 + "')"},
+        {"op": "sql", "query": "INSERT INTO agent_session_messages (session_id, sequence, message_id, kind, "
+                               "content_json, canonical_sequence) SELECT 'gm', COALESCE(MAX(sequence), 0) + 1, "
+                               "'sequence-queued-3', 'evidence', '" + QUEUE + "', NULL "
+                               "FROM agent_session_messages WHERE session_id = 'gm'"},
+        {"op": "bind", "attempt": "aq", "action": "act4"},
+        {"op": "interrupt", "attempt": "aq"},
         {"op": "interruptions"},
     ]},
 ]

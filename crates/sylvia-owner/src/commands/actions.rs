@@ -149,3 +149,39 @@ pub async fn handle_retryable_interruption(ctx: &DispatchContext, params: &JsonM
     .map_err(action_error)?;
     Ok(interruption.as_ref().map_or(Json::Null, crate::owner_json::interruption_value))
 }
+
+/// `handle_execute_player_action`, for `execute_player_action` and `preview_player_action`: a
+/// player's direct action from a saved result card's control, through lane 3's
+/// `direct_actions::player_action` (`preview_only` for the preview).
+pub async fn handle_execute_player_action(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_app::authority::direct_actions::{player_action, PlayerActionAnswer, PlayerActionRequest};
+    let source = params.get("source").cloned().unwrap_or(Json::Null);
+    let selection = params.get("selection").cloned().unwrap_or(Json::Null);
+    if !source.is_object() || !(selection.is_null() || selection.is_object()) {
+        return Err(protocol("Player control source and selection must be objects"));
+    }
+    let campaign_id = required(params, "campaign_id")?;
+    let session_id = required(params, "session_id")?;
+    let operation_id = required(params, "operation_id")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let confirmation = super::campaigns::optional_text(params, "confirmation")?;
+    let request = PlayerActionRequest {
+        campaign_id,
+        source,
+        operation_id,
+        expected_revision,
+        selection,
+        session_id: Some(session_id),
+        confirmation,
+        preview_only: ctx.method == "preview_player_action",
+    };
+    match player_action(&ctx.store, &ctx.owner_id, &request).await.map_err(action_error)? {
+        PlayerActionAnswer::Receipt(receipt) => {
+            crate::owner_json::receipt_value(&MechanicsExecutionReceipt::Action(receipt))
+        }
+        PlayerActionAnswer::AwaitingChoice(receipt) => {
+            crate::owner_json::receipt_value(&MechanicsExecutionReceipt::AwaitingChoice(receipt))
+        }
+        PlayerActionAnswer::Preview(preview) => crate::owner_json::json_value(&Json::Object(preview)),
+    }
+}

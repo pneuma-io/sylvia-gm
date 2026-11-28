@@ -2,6 +2,7 @@
 
 use super::campaigns::{required, required_artifact_id, resolve_strict, store_error};
 use crate::dispatch::DispatchContext;
+use sylvia_app::import_repair_sessions::{caught_as, domain_caught_as, CaughtAs};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 
 /// An exception Python's handler does not catch: the owner's internal-error reply, with its class.
@@ -85,16 +86,11 @@ pub async fn handle_export_package_candidate(ctx: &DispatchContext, params: &Jso
 const MAX_PACKAGE_BYTES: u64 = 48 * 1024 * 1024;
 
 /// `plan_bundle.PLAN_BUNDLE_BYTE_LIMIT`: its members' limits plus 64 KiB.
-const PLAN_BUNDLE_BYTE_LIMIT: u64 = 68_419_584;
+const PLAN_BUNDLE_BYTE_LIMIT: u64 = sylvia_app::plan_bundle::PLAN_BUNDLE_BYTE_LIMIT as u64;
 
 /// `OwnerProtocolError(message)`.
 fn protocol(message: &str) -> CodedError {
     CodedError::rejected(message).with_error_type("OwnerProtocolError")
-}
-
-/// A branch whose Python function the port has not reached: `rust_port_pending`, naming it.
-fn port_pending(what: &str) -> CodedError {
-    CodedError::new(crate::dispatch::PORT_PENDING, format!("not yet ported: {what}"))
 }
 
 /// `_json_value(PackageCandidate)`: the dataclass fields in declaration order, the lock as
@@ -152,12 +148,114 @@ fn expand_user(text: &str) -> std::path::PathBuf {
     std::path::PathBuf::from(text)
 }
 
-/// `handle_install_package_file`: the selected file, checked and size-bounded, installed under
-/// `install_id`. A `.sylvia-gm-plan` bundle and the import-repair offer after a failed install
-/// answer `rust_port_pending` until lane 1 ports `plan_bundle.import_plan_bundle` and
-/// `import_repair_sessions.offer_import_repair`.
+/// The message Python's handler gives a source it cannot read (`except OSError`).
+const UNAVAILABLE: &str = "Selected package file is unavailable";
+
+/// The message Python's handler gives a source it cannot admit
+/// (`except (ValueError, zipfile.BadZipFile)`).
+const NOT_ADMITTED: &str = "Content archive could not be admitted. Check its format and content, \
+                            then export a new copy using Store or Deflate ZIP compression.";
+
+/// A failed install or Plan import, as the handler's `except` clauses sort it.
+enum Failed {
+    /// What the Plan import raised, in Python's class.
+    Domain(sylvia_domain::DomainError),
+    /// What the package install raised.
+    Store(sylvia_store::StoreError),
+}
+
+impl Failed {
+    /// The `except` clause that catches it. A store refusal carries Python's class; any other
+    /// store failure (`sqlite3.Error`, a fault) is caught by none of them.
+    fn caught_as(&self) -> CaughtAs {
+        match self {
+            Failed::Domain(error) => domain_caught_as(error),
+            Failed::Store(sylvia_store::StoreError::Coded(error)) => {
+                caught_as(error.error_type.unwrap_or("CommandRejected"))
+            }
+            Failed::Store(sylvia_store::StoreError::Backup(_)) => CaughtAs::Authority,
+            Failed::Store(_) => CaughtAs::Other,
+        }
+    }
+
+    /// `except (AuthorityError, ValueError)`: the failures an import repair is offered for.
+    fn repairable(&self) -> bool {
+        matches!(self.caught_as(), CaughtAs::Authority | CaughtAs::Value)
+    }
+
+    /// `str(error)` and `error.diagnostics`, for the repair receipt.
+    fn message_and_diagnostics(&self) -> (String, Vec<Json>) {
+        match self {
+            Failed::Domain(error) => (
+                error.message().to_owned(),
+                error.diagnostics().iter().map(|item| Json::Object(item.as_payload())).collect(),
+            ),
+            Failed::Store(sylvia_store::StoreError::Coded(error)) => {
+                (error.message.clone(), error.diagnostics.clone())
+            }
+            Failed::Store(error) => (error.to_string(), Vec::new()),
+        }
+    }
+
+    /// The outer handler's answer once no repair is offered: a `ValueError` or `BadZipFile` is
+    /// "could not be admitted", an `OSError` is "unavailable", and an `AuthorityError` or
+    /// anything else keeps its own reply.
+    fn reply(self) -> CodedError {
+        let bad_zip = matches!(&self, Failed::Domain(error) if error.python_class() == "BadZipFile");
+        match self.caught_as() {
+            CaughtAs::Value => return CodedError::rejected(NOT_ADMITTED),
+            CaughtAs::Os => return CodedError::rejected(UNAVAILABLE),
+            _ if bad_zip => return CodedError::rejected(NOT_ADMITTED),
+            _ => {}
+        }
+        match self {
+            Failed::Domain(error) => store_error(sylvia_store::StoreError::from(error)),
+            Failed::Store(error) => store_error(error),
+        }
+    }
+}
+
+/// `_install_plan_snapshot(owner, snapshot, expected_closure)` (`owner_process.py`): install a
+/// validated Plan's inherited bytes once across repeated imports.
+fn install_plan_snapshot(
+    store: &sylvia_store::AuthorityStore,
+    snapshot: &[u8],
+    expected_closure: &str,
+) -> sylvia_domain::DomainResult<()> {
+    let install_id = format!("plan-snapshot-{}", &sylvia_base::hash::sha256_hex(snapshot)[..32]);
+    let to_domain = |error: sylvia_store::StoreError| match error.rejection() {
+        Some(coded) => sylvia_domain::DomainError::Rejected {
+            error_type: coded.error_type.unwrap_or("CommandRejected"),
+            code: coded.code,
+            message: coded.message,
+            diagnostics: Vec::new(),
+            mechanics: None,
+        },
+        None => sylvia_domain::DomainError::uncaught("RuntimeError", error.to_string()),
+    };
+    let candidate = match store.package_candidate(&format!("candidate-{install_id}")) {
+        Ok(candidate) => candidate,
+        Err(sylvia_store::StoreError::Coded(error)) if error.code == "candidate_unavailable" => {
+            sylvia_app::package_library::install_package_archive(store, snapshot, &install_id)
+                .map_err(to_domain)?
+        }
+        Err(error) => return Err(to_domain(error)),
+    };
+    if candidate.closure_sha256() != expected_closure {
+        return Err(sylvia_domain::DomainError::authority(
+            "IdempotencyConflict",
+            "Imported Plan package snapshot does not match its saved closure",
+        ));
+    }
+    Ok(())
+}
+
+/// `handle_install_package_file`: the selected file, checked and size-bounded, then installed
+/// under `install_id`, or imported as a `.sylvia-gm-plan` bundle with its package snapshot. A
+/// refused install or import is offered as an import repair when its source is a safely
+/// readable archive (`import_repair_sessions.offer_import_repair`).
 pub async fn handle_install_package_file(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
-    let unavailable = || CodedError::rejected("Selected package file is unavailable");
+    let unavailable = || CodedError::rejected(UNAVAILABLE);
     let source = sylvia_provider::codex_rpc::python_resolve(&expand_user(&required(params, "source_path")?));
     // `source.is_file()` is false for anything it cannot stat.
     if !source.is_file() {
@@ -170,29 +268,70 @@ pub async fn handle_install_package_file(ctx: &DispatchContext, params: &JsonMap
     if size > maximum {
         return Err(CodedError::rejected("Package archive exceeds the desktop import limit"));
     }
-    if is_plan {
-        // `source.open("rb")`, then `import_plan_bundle(...)`.
-        std::fs::File::open(&source).map_err(|_| unavailable())?;
-        return Err(port_pending("plan_bundle.import_plan_bundle"));
-    }
     let archive = std::fs::read(&source).map_err(|_| unavailable())?;
-    // A missing `install_id` is an `OwnerProtocolError` (a `ValueError`) inside the install's
-    // `try`; the repair offer reads it again, and that second error reaches the outer
-    // `except ValueError`.
-    let Ok(install_id) = required(params, "install_id") else {
-        return Err(CodedError::rejected(
-            "Content archive could not be admitted. Check its format and content, \
-             then export a new copy using Store or Deflate ZIP compression.",
-        ));
+    let outcome = if is_plan {
+        // `import_plan_bundle(ctx.storage_root, stream, install_snapshot=...)`; the snapshot
+        // install reads and writes the store, so it holds the owner's operation guard.
+        let _operation = super::operation(ctx)?;
+        let (storage_root, bundled) = (ctx.storage_root.clone(), std::sync::Arc::clone(&ctx.bundled));
+        ctx.store
+            .call(move |store| {
+                let mut install =
+                    |snapshot: &[u8], expected: &str| install_plan_snapshot(store, snapshot, expected);
+                Ok(sylvia_app::plan_bundle::import_plan_bundle(
+                    &storage_root,
+                    &archive,
+                    &mut install,
+                    &bundled,
+                ))
+            })
+            .await
+            .map_err(store_error)?
+            .map(|plan| Json::Object(plan.catalog_payload()))
+            .map_err(Failed::Domain)
+    } else {
+        // A missing `install_id` is an `OwnerProtocolError` (a `ValueError`) inside the
+        // install's `try`; the repair offer reads it again, and that second error reaches the
+        // outer `except ValueError`.
+        let Ok(install_id) = required(params, "install_id") else {
+            return Err(CodedError::rejected(NOT_ADMITTED));
+        };
+        install(ctx, archive, install_id).await.map_err(Failed::Store)
     };
-    match install(ctx, archive, install_id).await {
-        Ok(candidate) => Ok(candidate),
-        // `except (AuthorityError, ValueError)`: Python offers an import repair first, and only
-        // a source it cannot inspect re-raises the error.
-        Err(sylvia_store::StoreError::Coded(_) | sylvia_store::StoreError::Other(_)) => {
-            Err(port_pending("import_repair_sessions.offer_import_repair"))
-        }
-        Err(error) => Err(store_error(error)),
+    let failed = match outcome {
+        Ok(reply) => return Ok(reply),
+        Err(failed) => failed,
+    };
+    if !failed.repairable() {
+        return Err(failed.reply());
+    }
+    // `offer_import_repair(ctx.storage_root, source, install_id=_required_text(...), error=...)`.
+    let Ok(install_id) = required(params, "install_id") else {
+        return Err(CodedError::rejected(NOT_ADMITTED));
+    };
+    let (message, diagnostics) = failed.message_and_diagnostics();
+    let (storage_root, bundled, offered_source) =
+        (ctx.storage_root.clone(), std::sync::Arc::clone(&ctx.bundled), source.clone());
+    let offer = tokio::task::spawn_blocking(move || {
+        let error =
+            sylvia_app::import_repair_sessions::FailedImport { message: &message, diagnostics: &diagnostics };
+        sylvia_app::import_repair_sessions::offer_import_repair(
+            &storage_root,
+            &offered_source,
+            &install_id,
+            error,
+            &bundled,
+        )
+    })
+    .await
+    .map_err(|error| CodedError::new("internal_error", error.to_string()))?;
+    match offer {
+        Ok(Some(repair)) => Ok(Json::Object(repair)),
+        // No repair: Python re-raises the install's own failure.
+        Ok(None) => Err(failed.reply()),
+        // The offer itself failed: a `ValueError` or `BadZipFile` from it reaches the outer
+        // handler too.
+        Err(error) => Err(Failed::Domain(error).reply()),
     }
 }
 
@@ -330,71 +469,238 @@ mod tests {
         );
     }
 
-    /// The two branches lane 1 has not ported answer `rust_port_pending`, naming the Python
-    /// function: a `.sylvia-gm-plan` file, and the import-repair offer after a failed file
-    /// install (here the same install identity again). The `package-install` session covers
-    /// everything Python and Rust both answer.
+    /// The generator's `tree`: every file under the storage root but the database, each as its
+    /// SHA-256 by path, then each import-repair receipt as its JSON (the selected path made
+    /// relative to `files`), by that path.
+    fn storage_tree(storage: &std::path::Path, files: &std::path::Path) -> Json {
+        fn walk(folder: &std::path::Path, found: &mut Vec<std::path::PathBuf>) {
+            for entry in std::fs::read_dir(folder).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    walk(&path, found);
+                } else {
+                    found.push(path);
+                }
+            }
+        }
+        let mut found = Vec::new();
+        walk(storage, &mut found);
+        let mut entries: Vec<(Vec<String>, Json)> = Vec::new();
+        let mut receipts: Vec<(String, Json)> = Vec::new();
+        for path in found {
+            let parts: Vec<String> = path
+                .strip_prefix(storage)
+                .unwrap()
+                .components()
+                .map(|part| part.as_os_str().to_string_lossy().into_owned())
+                .collect();
+            let relative = parts.join("/");
+            if relative.starts_with("authority.sqlite3") {
+                continue;
+            }
+            let data = std::fs::read(&path).unwrap();
+            if relative.starts_with("import-repair-sources/") {
+                let mut receipt: Json = serde_json::from_slice(&data).unwrap();
+                let canonical = sylvia_domain::package_library::canonical_json_bytes(&receipt) == data;
+                let source = std::path::PathBuf::from(receipt["source_path"].as_str().unwrap());
+                let named = source.strip_prefix(files).unwrap().to_string_lossy().replace('\\', "/");
+                receipt["source_path"] = named.clone().into();
+                receipts.push((
+                    named,
+                    serde_json::json!(["import-repair-sources/<repair>.json", {"receipt": receipt, "canonical": canonical}]),
+                ));
+            } else {
+                entries.push((parts, serde_json::json!([relative, sylvia_base::hash::sha256_hex(&data)])));
+            }
+        }
+        entries.sort_by(|left, right| left.0.cmp(&right.0));
+        receipts.sort_by(|left, right| left.0.cmp(&right.0));
+        Json::Array(
+            entries
+                .into_iter()
+                .map(|(_, entry)| entry)
+                .chain(receipts.into_iter().map(|(_, entry)| entry))
+                .collect(),
+        )
+    }
+
+    /// Python's `{"error": type(error).__name__, "code": getattr(error, "code", None), ...}` for
+    /// an error a library function raises: a `ValueError` carries no code.
+    fn domain_failure(error: &sylvia_domain::DomainError) -> Json {
+        let code =
+            if error.is_value_error() { Json::Null } else { error.code().map_or(Json::Null, Json::from) };
+        serde_json::json!({"error": error.python_class(), "code": code, "message": error.message()})
+    }
+
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    async fn plan_bundles_and_repair_offers_answer_port_pending() {
-        let folder = std::env::temp_dir().join(format!("sgp-pending-{}", std::process::id()));
+    async fn plan_bundles_and_repair_offers_answer_as_pythons_handler_does() {
+        // `generate_plan_bundle_runs.py`: Python's `handle_install_package_file` on an empty
+        // owner for each selected file (Plans, damaged Plans, packages, repair offers), then
+        // `export_plan_bundle` and `inspect_repair_source`.
+        let vectors = workspace("crates/sylvia-app/tests/vectors/plan_bundle");
+        let record: Json =
+            serde_json::from_str(&std::fs::read_to_string(vectors.join("runs.json")).unwrap()).unwrap();
+        let plan = std::fs::read(vectors.join("relay.sylvia-gm-plan")).unwrap();
+        assert_eq!(sylvia_base::hash::sha256_hex(&plan), record["plan_sha256"]);
+        // A short root keeps the Plan library's paths under `MAX_PATH`.
+        let folder = std::env::temp_dir().join(format!("sgpb-{}", std::process::id()));
         if let Err(error) = std::fs::remove_dir_all(&folder) {
             assert_eq!(
                 error.kind(),
                 std::io::ErrorKind::NotFound,
-                "cannot clear the old work folder {}: {error}",
+                "cannot clear {}: {error}",
                 folder.display()
             );
         }
-        std::fs::create_dir_all(&folder).unwrap();
-        let database = folder.join("authority.sqlite3");
+        let (storage, files) = (folder.join("storage"), folder.join("files"));
+        std::fs::create_dir_all(&storage).unwrap();
+        std::fs::create_dir_all(&files).unwrap();
+        let files = sylvia_provider::codex_rpc::python_resolve(&files);
+        for entry in std::fs::read_dir(vectors.join("selected")).unwrap() {
+            let path = entry.unwrap().path();
+            std::fs::copy(&path, files.join(path.file_name().unwrap())).unwrap();
+        }
+        std::fs::copy(
+            workspace("rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package"),
+            files.join("riichi.sylvia-gm-package"),
+        )
+        .unwrap();
+        std::fs::create_dir(files.join("folder.sylvia-gm-package")).unwrap();
+        let database = storage.join("authority.sqlite3");
         let (store, thread) = sylvia_store::StoreHandle::spawn(move || {
             sylvia_store::AuthorityStore::open_for_application_owner(&database, None)
         })
         .unwrap();
+        let bundled = std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
+            sylvia_app::bundled_packages::BundledSources::from_repository_root(&crate::util::source_root()),
+        ));
         let context = crate::dispatch::DispatchContext {
-            owner_id: "package-install-test".into(),
-            storage_root: folder.clone(),
+            owner_id: "plan-bundle-test".into(),
+            storage_root: storage.clone(),
             handshake_verified: true,
-            method: String::new(),
+            method: "install_package_file".into(),
             gm_system_prompt: None,
             store,
             providers: None,
             session_loop: None,
             campaign_loop: None,
-            bundled: std::sync::Arc::new(sylvia_app::bundled_packages::BundledPackages::new(
-                sylvia_app::bundled_packages::BundledSources::from_repository_root(
-                    &crate::util::source_root(),
-                ),
-            )),
+            bundled: std::sync::Arc::clone(&bundled),
             record_provider_warning: std::sync::Arc::new(|_: &str| {}),
         };
-        let plan = folder.join("starter.sylvia-gm-plan");
-        std::fs::write(&plan, b"not read before the pending answer").unwrap();
-        let archive = folder.join("riichi.sylvia-gm-package");
-        std::fs::copy(workspace("rulesets/riichi-mahjong/riichi-mahjong-0.1.0.sylvia-gm-package"), &archive)
-            .unwrap();
-        let params = |path: &std::path::Path| {
-            let mut params = JsonMap::new();
-            params.insert("source_path".into(), path.to_string_lossy().into_owned().into());
-            params.insert("install_id".into(), "install-riichi".into());
-            params
-        };
-        let pending = |result: CodedResult<Json>| match result {
-            Err(error) if error.code == crate::dispatch::PORT_PENDING => error.message,
-            other => panic!("expected rust_port_pending, got {other:?}"),
-        };
-        assert_eq!(
-            pending(handle_install_package_file(&context, &params(&plan)).await),
-            "not yet ported: plan_bundle.import_plan_bundle"
-        );
-        let installed = handle_install_package_file(&context, &params(&archive)).await.unwrap();
-        assert_eq!(installed["candidate_id"], "candidate-install-riichi");
-        assert_eq!(
-            pending(handle_install_package_file(&context, &params(&archive)).await),
-            "not yet ported: import_repair_sessions.offer_import_repair"
-        );
+        let mut failures = Vec::new();
+        for (index, run) in record["runs"].as_array().unwrap().iter().enumerate() {
+            let mut params = run["params"].as_object().unwrap().clone();
+            let name = params.remove("source").unwrap();
+            let source = files.join(name.as_str().unwrap());
+            params.insert("source_path".into(), source.to_string_lossy().into_owned().into());
+            if run.get("tamper").is_some() {
+                for receipt in std::fs::read_dir(storage.join("import-repair-sources")).unwrap() {
+                    let path = receipt.unwrap().path();
+                    let mut data = std::fs::read(&path).unwrap();
+                    data.push(b' ');
+                    std::fs::write(&path, data).unwrap();
+                }
+            }
+            let got = match crate::dispatch::dispatch(&context, "install_package_file", &params).await {
+                Ok(mut value) => {
+                    if value.get("status").and_then(Json::as_str) == Some("repairable") {
+                        // `sha256(canonical([install_id, source_sha256, str(source)]))`.
+                        let digest = sylvia_base::hash::sha256_hex(std::fs::read(&source).unwrap());
+                        let expected = sylvia_base::hash::sha256_hex(
+                            sylvia_domain::package_library::canonical_json_bytes(&serde_json::json!([
+                                params["install_id"],
+                                digest,
+                                source.to_string_lossy()
+                            ])),
+                        );
+                        assert_eq!(value["repair_id"], expected.as_str(), "#{index} repair identity");
+                        value["repair_id"] = "<repair>".into();
+                    }
+                    serde_json::json!({ "ok": value })
+                }
+                Err(crate::dispatch::Failure::Rejected(error)) => {
+                    let code = if error.error_type == Some("OwnerProtocolError") {
+                        Json::Null
+                    } else {
+                        Json::from(error.code)
+                    };
+                    serde_json::json!({
+                        "error": error.error_type.unwrap_or("CommandRejected"),
+                        "code": code,
+                        "message": error.message,
+                    })
+                }
+                Err(other) => serde_json::json!({ "other": format!("{other:?}") }),
+            };
+            let label = format!("#{index} {name}");
+            if let Some(difference) = sylvia_base::testing::json_difference(&got, &run["outcome"]) {
+                failures.push(format!("{label}: {difference}"));
+            }
+            if let Some(difference) =
+                sylvia_base::testing::json_difference(&storage_tree(&storage, &files), &run["tree"])
+            {
+                failures.push(format!("{label} storage: {difference}"));
+            }
+            let mut candidates: Vec<(String, String, String)> = context
+                .store
+                .call(|store| store.package_candidates())
+                .await
+                .unwrap()
+                .iter()
+                .map(|item| {
+                    (
+                        item.candidate_id().to_owned(),
+                        item.closure_sha256().to_owned(),
+                        item.status().as_str().to_owned(),
+                    )
+                })
+                .collect();
+            candidates.sort();
+            let candidates = Json::Array(
+                candidates
+                    .into_iter()
+                    .map(|(id, closure, status)| serde_json::json!([id, closure, status]))
+                    .collect(),
+            );
+            if let Some(difference) = sylvia_base::testing::json_difference(&candidates, &run["candidates"]) {
+                failures.push(format!("{label} candidates: {difference}"));
+            }
+        }
+        for (index, export) in record["exports"].as_array().unwrap().iter().enumerate() {
+            let got = match sylvia_app::plan_bundle::export_plan_bundle(
+                &storage,
+                export["artifact_id"].as_str().unwrap(),
+                export["expected_content_sha256"].as_str().unwrap(),
+                &bundled,
+            ) {
+                Ok((archive, receipt)) => {
+                    serde_json::json!({"ok": receipt, "archive_sha256": sylvia_base::hash::sha256_hex(&archive)})
+                }
+                Err(error) => domain_failure(&error),
+            };
+            if let Some(difference) = sylvia_base::testing::json_difference(&got, &export["outcome"]) {
+                failures.push(format!("export #{index}: {difference}"));
+            }
+        }
+        for inspection in record["inspections"].as_array().unwrap() {
+            let name = inspection["source"].as_str().unwrap();
+            let got = match sylvia_app::import_repair::inspect_repair_source(&files.join(name), &bundled) {
+                Ok(found) => serde_json::json!({"ok": {
+                    "kind": found.kind.as_str(),
+                    "source_sha256": found.source_sha256,
+                    "file_name": found.file_name,
+                    "identity": found.identity,
+                    "diagnostics": found.diagnostics.iter().map(|item| Json::Object(item.as_payload())).collect::<Vec<_>>(),
+                }}),
+                Err(error) => domain_failure(&error),
+            };
+            if let Some(difference) = sylvia_base::testing::json_difference(&got, &inspection["outcome"]) {
+                failures.push(format!("inspect {name}: {difference}"));
+            }
+        }
         drop(context);
         tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
         let _ = std::fs::remove_dir_all(folder);
+        assert!(failures.is_empty(), "{} Plan bundle steps differ:\n{}", failures.len(), failures.join("\n"));
     }
 }

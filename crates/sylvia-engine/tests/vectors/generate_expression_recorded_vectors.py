@@ -8,6 +8,8 @@ Run with the snapshot's own interpreter, from the repository root:
 pytest with `record_evaluations_plugin.py` (beside this file), which records every top-level
 expression evaluation: the text, each root value the evaluation read, and the result or
 exception. Distinct evaluations are kept, sorted, with the root values in one shared table.
+Every object keeps Python's own key order (results are compared key-order exact), so the
+same value in two key orders is two table entries.
 Deterministic (the plugin seeds the dice and the shuffle before each test) and checked in, one
 file per platform (`.windows.json`, `.linux.json`), each recorded on that platform's reference
 interpreter, because float `**` uses the platform C library's `pow`. Pytest's base
@@ -57,7 +59,7 @@ def main() -> int:
         record = json.loads(line)
         roots = {}
         for name, value in record.pop("roots").items():
-            key = json.dumps(value, sort_keys=True, ensure_ascii=False)
+            key = json.dumps(value, ensure_ascii=False)
             if key not in index_of:
                 index_of[key] = len(values)
                 values.append(value)
@@ -66,7 +68,7 @@ def main() -> int:
         cases.append(record)
     document = {"python": sys.version.split()[0], "platform": PLATFORM, "tests": TESTS, "values": values,
                 "cases": cases}
-    OUTPUT.write_bytes((json.dumps(document, ensure_ascii=True, sort_keys=True) + "\n").encode("ascii"))
+    OUTPUT.write_bytes((json.dumps(document, ensure_ascii=True) + "\n").encode("ascii"))
     print(f"{len(cases)} evaluations, {len(values)} distinct root values -> {OUTPUT}")
     return 0
 

@@ -9,6 +9,7 @@ use sylvia_app::player_actions::{
     resolve_inventory_action_parameters, resolve_party_action_parameters, retain_player_action_origin,
     validate_player_control,
 };
+use sylvia_base::testing::{assert_same_json, json_difference};
 use sylvia_domain::authority::MechanicOutcome;
 use sylvia_domain::error::{DomainError, DomainResult};
 
@@ -78,7 +79,7 @@ fn player_action_bindings_match_python() {
     let mut failures = Vec::new();
     for case in cases {
         let actual = run(case);
-        if actual != case["expected"] {
+        if json_difference(&actual, &case["expected"]).is_some() {
             failures.push(format!("{}: expected {}, got {}", case["label"], case["expected"], actual));
         }
     }
@@ -99,5 +100,5 @@ fn retained_origin_is_the_owner_marker() {
         sylvia_domain::player_actions::PLAYER_ACTION_ORIGIN,
         kept.consequences[0]["kind"].as_str().unwrap(),
     );
-    assert_eq!(kept.consequences[0]["origin"], origin);
+    assert_same_json(&kept.consequences[0]["origin"], &origin, "the retained origin");
 }
