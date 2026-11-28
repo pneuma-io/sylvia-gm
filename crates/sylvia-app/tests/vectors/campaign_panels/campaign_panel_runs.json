@@ -1,0 +1,1971 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "scenarios": [
+  {
+   "name": "coordinate",
+   "runs": [
+    {
+     "step": {
+      "op": "panels"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": null,
+       "surfaces": [
+        {
+         "id": "operations.map",
+         "title": "Operations floor",
+         "icon": "\u25a6",
+         "renderer": "tactical_grid",
+         "source": {
+          "fields": {
+           "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           }
+          },
+          "kind": "object"
+         },
+         "group": null,
+         "order": 0,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "bindings": {
+            "actor": "actor",
+            "destination": "destination"
+           },
+           "id": "move",
+           "intent": "move_unit",
+           "label": "Move",
+           "params": {
+            "mode": "careful"
+           },
+           "available": true,
+           "actor_parameter": "actor",
+           "response_policy": "on_request",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "map_revision": 7,
+          "map": {
+           "id": "training-floor",
+           "revision": 7,
+           "bounds": {
+            "min": [
+             0,
+             0,
+             0
+            ],
+            "max": [
+             8,
+             6,
+             3
+            ]
+           },
+           "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+             0,
+             0
+            ]
+           },
+           "layers": [
+            {
+             "id": "floor",
+             "min_elevation": 0,
+             "max_elevation": 3
+            }
+           ]
+          },
+          "geometry": [
+           {
+            "id": "door-a",
+            "map_id": "training-floor",
+            "volume": {
+             "kind": "box",
+             "min": [
+              3,
+              2,
+              0
+             ],
+             "max": [
+              3.2,
+              3,
+              2.2
+             ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+             "active": false,
+             "movement": "passable",
+             "visibility": "clear"
+            },
+            "display": {
+             "label": "Security door",
+             "kind": "door",
+             "state": "closed"
+            }
+           }
+          ],
+          "entities": [
+           {
+            "id": "operator",
+            "map_id": "training-floor",
+            "position": [
+             1.5,
+             2.5,
+             0
+            ],
+            "footprint": {
+             "kind": "box",
+             "half_extents": [
+              0.4,
+              0.4
+             ]
+            },
+            "height": 1.8,
+            "facing": [
+             1,
+             0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+             "label": "Operator",
+             "kind": "unit",
+             "stance": "standing",
+             "side": "blue"
+            }
+           }
+          ],
+          "zones": [
+           {
+            "id": "objective-zone",
+            "map_id": "training-floor",
+            "shape": {
+             "kind": "box",
+             "min": [
+              6,
+              4,
+              0
+             ],
+             "max": [
+              8,
+              6,
+              2
+             ]
+            },
+            "display": {
+             "label": "Extraction",
+             "kind": "objective"
+            }
+           }
+          ],
+          "terrain": [
+           {
+            "cell": [
+             2,
+             2
+            ],
+            "layer_id": "floor",
+            "cost": 2
+           }
+          ],
+          "objectives": [],
+          "selection": {},
+          "preview": {
+           "authoritative": false,
+           "label": "Preview only \u2014 the owner resolves the committed action",
+           "map_revision": 7,
+           "path_cost": null,
+           "los": null,
+           "exposure": null,
+           "crossed_zones": []
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "response",
+   "runs": [
+    {
+     "step": {
+      "op": "panels"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 1,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": {
+        "action_id": "move",
+        "pending_count": 1,
+        "session_id": "gm",
+        "turn_id": "turn",
+        "automatic": true,
+        "available": true
+       },
+       "surfaces": [
+        {
+         "id": "operations.map",
+         "title": "Operations floor",
+         "icon": "\u25a6",
+         "renderer": "tactical_grid",
+         "source": {
+          "fields": {
+           "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           }
+          },
+          "kind": "object"
+         },
+         "group": null,
+         "order": 0,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "bindings": {
+            "actor": "actor",
+            "destination": "destination"
+           },
+           "id": "move",
+           "intent": "move_unit",
+           "label": "Move",
+           "params": {
+            "mode": "careful"
+           },
+           "available": true,
+           "actor_parameter": "actor",
+           "response_policy": "automatic",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "map_revision": 7,
+          "map": {
+           "id": "training-floor",
+           "revision": 7,
+           "bounds": {
+            "min": [
+             0,
+             0,
+             0
+            ],
+            "max": [
+             8,
+             6,
+             3
+            ]
+           },
+           "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+             0,
+             0
+            ]
+           },
+           "layers": [
+            {
+             "id": "floor",
+             "min_elevation": 0,
+             "max_elevation": 3
+            }
+           ]
+          },
+          "geometry": [
+           {
+            "id": "door-a",
+            "map_id": "training-floor",
+            "volume": {
+             "kind": "box",
+             "min": [
+              3,
+              2,
+              0
+             ],
+             "max": [
+              3.2,
+              3,
+              2.2
+             ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+             "active": false,
+             "movement": "passable",
+             "visibility": "clear"
+            },
+            "display": {
+             "label": "Security door",
+             "kind": "door",
+             "state": "closed"
+            }
+           }
+          ],
+          "entities": [
+           {
+            "id": "operator",
+            "map_id": "training-floor",
+            "position": [
+             1.5,
+             2.5,
+             0
+            ],
+            "footprint": {
+             "kind": "box",
+             "half_extents": [
+              0.4,
+              0.4
+             ]
+            },
+            "height": 1.8,
+            "facing": [
+             1,
+             0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+             "label": "Operator",
+             "kind": "unit",
+             "stance": "standing",
+             "side": "blue"
+            }
+           }
+          ],
+          "zones": [
+           {
+            "id": "objective-zone",
+            "map_id": "training-floor",
+            "shape": {
+             "kind": "box",
+             "min": [
+              6,
+              4,
+              0
+             ],
+             "max": [
+              8,
+              6,
+              2
+             ]
+            },
+            "display": {
+             "label": "Extraction",
+             "kind": "objective"
+            }
+           }
+          ],
+          "terrain": [
+           {
+            "cell": [
+             2,
+             2
+            ],
+            "layer_id": "floor",
+            "cost": 2
+           }
+          ],
+          "objectives": [],
+          "selection": {},
+          "preview": {
+           "authoritative": false,
+           "label": "Preview only \u2014 the owner resolves the committed action",
+           "map_revision": 7,
+           "path_cost": 3,
+           "los": true,
+           "exposure": 1,
+           "crossed_zones": []
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": 0
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 1,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": {
+        "action_id": "move",
+        "pending_count": 1,
+        "session_id": "gm",
+        "turn_id": "turn",
+        "automatic": true,
+        "available": true
+       },
+       "surfaces": [
+        {
+         "id": "operations.map",
+         "title": "Operations floor",
+         "icon": "\u25a6",
+         "renderer": "tactical_grid",
+         "source": {
+          "fields": {
+           "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           }
+          },
+          "kind": "object"
+         },
+         "group": null,
+         "order": 0,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "bindings": {
+            "actor": "actor",
+            "destination": "destination"
+           },
+           "id": "move",
+           "intent": "move_unit",
+           "label": "Move",
+           "params": {
+            "mode": "careful"
+           },
+           "available": true,
+           "actor_parameter": "actor",
+           "response_policy": "automatic",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "map_revision": 7,
+          "map": {
+           "id": "training-floor",
+           "revision": 7,
+           "bounds": {
+            "min": [
+             0,
+             0,
+             0
+            ],
+            "max": [
+             8,
+             6,
+             3
+            ]
+           },
+           "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+             0,
+             0
+            ]
+           },
+           "layers": [
+            {
+             "id": "floor",
+             "min_elevation": 0,
+             "max_elevation": 3
+            }
+           ]
+          },
+          "geometry": [
+           {
+            "id": "door-a",
+            "map_id": "training-floor",
+            "volume": {
+             "kind": "box",
+             "min": [
+              3,
+              2,
+              0
+             ],
+             "max": [
+              3.2,
+              3,
+              2.2
+             ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+             "active": false,
+             "movement": "passable",
+             "visibility": "clear"
+            },
+            "display": {
+             "label": "Security door",
+             "kind": "door",
+             "state": "closed"
+            }
+           }
+          ],
+          "entities": [
+           {
+            "id": "operator",
+            "map_id": "training-floor",
+            "position": [
+             1.5,
+             2.5,
+             0
+            ],
+            "footprint": {
+             "kind": "box",
+             "half_extents": [
+              0.4,
+              0.4
+             ]
+            },
+            "height": 1.8,
+            "facing": [
+             1,
+             0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+             "label": "Operator",
+             "kind": "unit",
+             "stance": "standing",
+             "side": "blue"
+            }
+           }
+          ],
+          "zones": [
+           {
+            "id": "objective-zone",
+            "map_id": "training-floor",
+            "shape": {
+             "kind": "box",
+             "min": [
+              6,
+              4,
+              0
+             ],
+             "max": [
+              8,
+              6,
+              2
+             ]
+            },
+            "display": {
+             "label": "Extraction",
+             "kind": "objective"
+            }
+           }
+          ],
+          "terrain": [
+           {
+            "cell": [
+             2,
+             2
+            ],
+            "layer_id": "floor",
+            "cost": 2
+           }
+          ],
+          "objectives": [],
+          "selection": {},
+          "preview": {
+           "authoritative": false,
+           "label": "Preview only \u2014 the owner resolves the committed action",
+           "map_revision": 7,
+           "path_cost": 3,
+           "los": true,
+           "exposure": 1,
+           "crossed_zones": []
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": 1
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 1,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": {
+        "action_id": "move",
+        "pending_count": 1,
+        "session_id": "gm",
+        "turn_id": "turn",
+        "automatic": true,
+        "available": true
+       },
+       "surfaces": [
+        {
+         "id": "operations.map",
+         "title": "Operations floor",
+         "icon": "\u25a6",
+         "renderer": "tactical_grid",
+         "source": {
+          "fields": {
+           "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           }
+          },
+          "kind": "object"
+         },
+         "group": null,
+         "order": 0,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "bindings": {
+            "actor": "actor",
+            "destination": "destination"
+           },
+           "id": "move",
+           "intent": "move_unit",
+           "label": "Move",
+           "params": {
+            "mode": "careful"
+           },
+           "available": true,
+           "actor_parameter": "actor",
+           "response_policy": "automatic",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "map_revision": 7,
+          "map": {
+           "id": "training-floor",
+           "revision": 7,
+           "bounds": {
+            "min": [
+             0,
+             0,
+             0
+            ],
+            "max": [
+             8,
+             6,
+             3
+            ]
+           },
+           "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+             0,
+             0
+            ]
+           },
+           "layers": [
+            {
+             "id": "floor",
+             "min_elevation": 0,
+             "max_elevation": 3
+            }
+           ]
+          },
+          "geometry": [
+           {
+            "id": "door-a",
+            "map_id": "training-floor",
+            "volume": {
+             "kind": "box",
+             "min": [
+              3,
+              2,
+              0
+             ],
+             "max": [
+              3.2,
+              3,
+              2.2
+             ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+             "active": false,
+             "movement": "passable",
+             "visibility": "clear"
+            },
+            "display": {
+             "label": "Security door",
+             "kind": "door",
+             "state": "closed"
+            }
+           }
+          ],
+          "entities": [
+           {
+            "id": "operator",
+            "map_id": "training-floor",
+            "position": [
+             1.5,
+             2.5,
+             0
+            ],
+            "footprint": {
+             "kind": "box",
+             "half_extents": [
+              0.4,
+              0.4
+             ]
+            },
+            "height": 1.8,
+            "facing": [
+             1,
+             0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+             "label": "Operator",
+             "kind": "unit",
+             "stance": "standing",
+             "side": "blue"
+            }
+           }
+          ],
+          "zones": [
+           {
+            "id": "objective-zone",
+            "map_id": "training-floor",
+            "shape": {
+             "kind": "box",
+             "min": [
+              6,
+              4,
+              0
+             ],
+             "max": [
+              8,
+              6,
+              2
+             ]
+            },
+            "display": {
+             "label": "Extraction",
+             "kind": "objective"
+            }
+           }
+          ],
+          "terrain": [
+           {
+            "cell": [
+             2,
+             2
+            ],
+            "layer_id": "floor",
+            "cost": 2
+           }
+          ],
+          "objectives": [],
+          "selection": {},
+          "preview": {
+           "authoritative": false,
+           "label": "Preview only \u2014 the owner resolves the committed action",
+           "map_revision": 7,
+           "path_cost": 3,
+           "los": true,
+           "exposure": 1,
+           "crossed_zones": []
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": -1
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Shot presentation revision is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": 99
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Shot presentation revision is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": true
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Shot presentation revision is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": "1"
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Shot presentation revision is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "after": 1.5
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Shot presentation revision is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "holding": "gm"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 1,
+       "direct_actions_available": false,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": {
+        "action_id": "move",
+        "pending_count": 1,
+        "session_id": "gm",
+        "turn_id": "turn",
+        "automatic": true,
+        "available": false
+       },
+       "surfaces": [
+        {
+         "id": "operations.map",
+         "title": "Operations floor",
+         "icon": "\u25a6",
+         "renderer": "tactical_grid",
+         "source": {
+          "fields": {
+           "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           }
+          },
+          "kind": "object"
+         },
+         "group": null,
+         "order": 0,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "bindings": {
+            "actor": "actor",
+            "destination": "destination"
+           },
+           "id": "move",
+           "intent": "move_unit",
+           "label": "Move",
+           "params": {
+            "mode": "careful"
+           },
+           "available": false,
+           "actor_parameter": "actor",
+           "response_policy": "automatic",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "map_revision": 7,
+          "map": {
+           "id": "training-floor",
+           "revision": 7,
+           "bounds": {
+            "min": [
+             0,
+             0,
+             0
+            ],
+            "max": [
+             8,
+             6,
+             3
+            ]
+           },
+           "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+             0,
+             0
+            ]
+           },
+           "layers": [
+            {
+             "id": "floor",
+             "min_elevation": 0,
+             "max_elevation": 3
+            }
+           ]
+          },
+          "geometry": [
+           {
+            "id": "door-a",
+            "map_id": "training-floor",
+            "volume": {
+             "kind": "box",
+             "min": [
+              3,
+              2,
+              0
+             ],
+             "max": [
+              3.2,
+              3,
+              2.2
+             ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+             "active": false,
+             "movement": "passable",
+             "visibility": "clear"
+            },
+            "display": {
+             "label": "Security door",
+             "kind": "door",
+             "state": "closed"
+            }
+           }
+          ],
+          "entities": [
+           {
+            "id": "operator",
+            "map_id": "training-floor",
+            "position": [
+             1.5,
+             2.5,
+             0
+            ],
+            "footprint": {
+             "kind": "box",
+             "half_extents": [
+              0.4,
+              0.4
+             ]
+            },
+            "height": 1.8,
+            "facing": [
+             1,
+             0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+             "label": "Operator",
+             "kind": "unit",
+             "stance": "standing",
+             "side": "blue"
+            }
+           }
+          ],
+          "zones": [
+           {
+            "id": "objective-zone",
+            "map_id": "training-floor",
+            "shape": {
+             "kind": "box",
+             "min": [
+              6,
+              4,
+              0
+             ],
+             "max": [
+              8,
+              6,
+              2
+             ]
+            },
+            "display": {
+             "label": "Extraction",
+             "kind": "objective"
+            }
+           }
+          ],
+          "terrain": [
+           {
+            "cell": [
+             2,
+             2
+            ],
+            "layer_id": "floor",
+            "cost": 2
+           }
+          ],
+          "objectives": [],
+          "selection": {},
+          "preview": {
+           "authoritative": false,
+           "label": "Preview only \u2014 the owner resolves the committed action",
+           "map_revision": 7,
+           "path_cost": 3,
+           "los": true,
+           "exposure": 1,
+           "crossed_zones": []
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "campaign": "nowhere"
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Campaign is unavailable: missing or purged"
+     }
+    }
+   ]
+  },
+  {
+   "name": "network",
+   "runs": [
+    {
+     "step": {
+      "op": "panels"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.graph",
+       "layout": null,
+       "player_control": {
+        "available": true,
+        "focused_actor_id": null,
+        "actors": [
+         {
+          "id": "participant-admitted-hex",
+          "name": "Hex"
+         }
+        ]
+       },
+       "response_action": null,
+       "surfaces": [
+        {
+         "id": "operations.network",
+         "title": "Building network",
+         "icon": "\u25c7",
+         "renderer": "network_graph",
+         "source": {
+          "key": "state.network",
+          "kind": "state",
+          "namespace": "synthetic.graph"
+         },
+         "group": "operations",
+         "order": 1,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "id": "discover",
+           "intent": "discover_archive",
+           "label": "Discover archive",
+           "params": {},
+           "available": true,
+           "actor_parameter": null,
+           "response_policy": "on_request",
+           "checks_required": true,
+           "map_preview_enabled": false
+          },
+          {
+           "bindings": {
+            "actor": "actor",
+            "function": "remote_function",
+            "node_id": "node"
+           },
+           "id": "operate",
+           "intent": "operate_function",
+           "label": "Operate function",
+           "params": {
+            "mode": "normal"
+           },
+           "available": true,
+           "actor_parameter": "actor",
+           "response_policy": "on_request",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "graph_id": "building-operations",
+          "graph_revision": 4,
+          "groups": [
+           {
+            "id": "operations",
+            "label": "Operations"
+           }
+          ],
+          "nodes": [
+           {
+            "id": "camera",
+            "label": "Loading-bay camera",
+            "kind": "camera",
+            "functions": [],
+            "group_id": "operations",
+            "status": "online"
+           },
+           {
+            "id": "lobby_terminal",
+            "label": "Lobby terminal",
+            "kind": "access_terminal",
+            "functions": [
+             {
+              "id": "unlock_door",
+              "label": "Unlock security door",
+              "enabled": true,
+              "state": "available"
+             }
+            ],
+            "group_id": "operations",
+            "status": "online",
+            "access": "local session",
+            "control": "operator",
+            "detection": "quiet"
+           }
+          ],
+          "links": [
+           {
+            "id": "terminal_camera",
+            "source": "lobby_terminal",
+            "target": "camera",
+            "direction": "bidirectional",
+            "label": "Operations LAN",
+            "kind": "ethernet",
+            "status": "online"
+           }
+          ],
+          "selection": {
+           "node": "lobby_terminal"
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "gated",
+   "runs": [
+    {
+     "step": {
+      "op": "panels"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": null,
+       "surfaces": [
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "campaign": "open-campaign"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "open-campaign",
+       "revision": 0,
+       "direct_actions_available": true,
+       "ruleset_id": "synthetic.coordinate",
+       "layout": null,
+       "player_control": null,
+       "response_action": null,
+       "surfaces": [
+        {
+         "id": "operations.map",
+         "title": "Operations floor",
+         "icon": "\u25a6",
+         "renderer": "coordinate_map",
+         "source": {
+          "fields": {
+           "enabled": {
+            "key": "state.combat_active",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "objectives": {
+            "key": "state.objectives",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "preview": {
+            "key": "state.preview",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "scene": {
+            "key": "state.spatial_scene",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           },
+           "selection": {
+            "key": "state.selection",
+            "kind": "state",
+            "namespace": "synthetic.coordinate"
+           }
+          },
+          "kind": "object"
+         },
+         "group": null,
+         "order": 0,
+         "default_size": 480,
+         "minimum_size": 320,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "bindings": {
+            "actor": "actor",
+            "destination": "aim_point"
+           },
+           "id": "move",
+           "intent": "move_unit",
+           "label": "Move",
+           "params": {
+            "mode": "careful"
+           },
+           "available": true,
+           "actor_parameter": "actor",
+           "response_policy": "on_request",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "map_revision": 7,
+          "map": {
+           "id": "training-floor",
+           "revision": 7,
+           "bounds": {
+            "min": [
+             0,
+             0,
+             0
+            ],
+            "max": [
+             8,
+             6,
+             3
+            ]
+           },
+           "grid": {
+            "cell_size": 1,
+            "unit": "m",
+            "origin": [
+             0,
+             0
+            ]
+           },
+           "layers": [
+            {
+             "id": "floor",
+             "min_elevation": 0,
+             "max_elevation": 3
+            }
+           ]
+          },
+          "geometry": [
+           {
+            "id": "door-a",
+            "map_id": "training-floor",
+            "volume": {
+             "kind": "box",
+             "min": [
+              3,
+              2,
+              0
+             ],
+             "max": [
+              3.2,
+              3,
+              2.2
+             ]
+            },
+            "active": true,
+            "movement": "blocking",
+            "occupies_cells": true,
+            "visibility": "opaque",
+            "destroyed": {
+             "active": false,
+             "movement": "passable",
+             "visibility": "clear"
+            },
+            "display": {
+             "label": "Security door",
+             "kind": "door",
+             "state": "closed"
+            }
+           }
+          ],
+          "entities": [
+           {
+            "id": "operator",
+            "map_id": "training-floor",
+            "position": [
+             1.5,
+             2.5,
+             0
+            ],
+            "footprint": {
+             "kind": "box",
+             "half_extents": [
+              0.4,
+              0.4
+             ]
+            },
+            "height": 1.8,
+            "facing": [
+             1,
+             0
+            ],
+            "active": true,
+            "movement": "blocking",
+            "visibility": "opaque",
+            "display": {
+             "label": "Operator",
+             "kind": "unit",
+             "stance": "standing",
+             "side": "blue"
+            }
+           }
+          ],
+          "zones": [
+           {
+            "id": "objective-zone",
+            "map_id": "training-floor",
+            "shape": {
+             "kind": "box",
+             "min": [
+              6,
+              4,
+              0
+             ],
+             "max": [
+              8,
+              6,
+              2
+             ]
+            },
+            "display": {
+             "label": "Extraction",
+             "kind": "objective"
+            }
+           }
+          ],
+          "terrain": [
+           {
+            "cell": [
+             2,
+             2
+            ],
+            "layer_id": "floor",
+            "cost": 2
+           }
+          ],
+          "objectives": [],
+          "selection": {},
+          "preview": {
+           "authoritative": false,
+           "label": "Preview only \u2014 the owner resolves the committed action",
+           "map_revision": 7,
+           "path_cost": null,
+           "los": null,
+           "exposure": null,
+           "crossed_zones": []
+          }
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "table",
+   "runs": [
+    {
+     "step": {
+      "op": "panels"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "campaign",
+       "revision": 0,
+       "direct_actions_available": true,
+       "ruleset_id": "example.piece-table",
+       "layout": null,
+       "player_control": null,
+       "response_action": null,
+       "surfaces": [
+        {
+         "id": "console",
+         "title": "console",
+         "icon": "\u25c7",
+         "renderer": "piece_table",
+         "group": null,
+         "order": 0,
+         "default_size": 180,
+         "minimum_size": 96,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [
+          {
+           "id": "run",
+           "intent": "activate",
+           "label": "Activate relay",
+           "params": {},
+           "available": true,
+           "actor_parameter": null,
+           "response_policy": "on_request",
+           "checks_required": true,
+           "map_preview_enabled": false
+          }
+         ],
+         "data": {
+          "format": 1,
+          "title": "Signal console",
+          "status": [
+           {
+            "label": "Cycle",
+            "value": "3"
+           },
+           {
+            "label": "Charge",
+            "value": "8"
+           }
+          ],
+          "areas": [
+           {
+            "id": "public",
+            "label": "Relay",
+            "position": "center",
+            "groups": [
+             {
+              "id": "route",
+              "label": "Route",
+              "pieces": [
+               {
+                "id": "relay-a",
+                "label": "A",
+                "detail": "Online",
+                "emphasis": "accent",
+                "action_id": "run"
+               },
+               {
+                "id": "relay-b",
+                "label": "B",
+                "detail": "Offline",
+                "emphasis": "muted"
+               }
+              ]
+             }
+            ]
+           },
+           {
+            "id": "player",
+            "label": "Operator",
+            "position": "bottom",
+            "groups": [
+             {
+              "id": "programs",
+              "label": "Programs",
+              "concealed": true,
+              "count": 1
+             }
+            ]
+           },
+           {
+            "id": "opponent",
+            "label": "Remote operator",
+            "position": "top",
+            "groups": [
+             {
+              "id": "remote-programs",
+              "label": "Programs",
+              "concealed": true,
+              "count": 1
+             }
+            ]
+           }
+          ]
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "panels",
+      "campaign": "broken-campaign"
+     },
+     "outcome": {
+      "ok": {
+       "campaign_id": "broken-campaign",
+       "revision": 0,
+       "direct_actions_available": true,
+       "ruleset_id": "example.piece-table",
+       "layout": null,
+       "player_control": null,
+       "response_action": null,
+       "surfaces": [
+        {
+         "id": "console",
+         "title": "console",
+         "icon": "\u25c7",
+         "renderer": "piece_table",
+         "group": null,
+         "order": 0,
+         "default_size": 180,
+         "minimum_size": 96,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "unavailable_reason": "The saved table cannot be displayed."
+         }
+        },
+        {
+         "id": "sylvia-inventory",
+         "title": "Inventory",
+         "icon": "\u25a3",
+         "renderer": "generic_inventory",
+         "group": null,
+         "order": 30,
+         "default_size": 220,
+         "minimum_size": 120,
+         "default_placement": "docked",
+         "allowed_placements": [
+          "docked",
+          "floating",
+          "window"
+         ],
+         "actions": [],
+         "data": {
+          "characters": []
+         }
+        }
+       ],
+       "shot_effects": []
+      }
+     }
+    }
+   ]
+  }
+ ]
+}

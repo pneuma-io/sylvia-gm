@@ -2,11 +2,12 @@
 //! writes when the active Ruleset has no inventory of its own (`prepare_inventory_payload`,
 //! with `inventory_holdings`, `_ledger_holdings` and `_holding_records`).
 //!
-//! `generic_inventory_surface` (the player panel) comes with the player-read family.
+//! `generic_inventory_surface` is the player panel `campaign_panels` adds when no Ruleset
+//! surface shows the inventory.
 
 use std::collections::BTreeSet;
 use sylvia_base::{Json, JsonMap};
-use sylvia_domain::authority::{owned_payload, CampaignSnapshot};
+use sylvia_domain::authority::{owned_payload, CampaignSnapshot, CampaignState};
 use sylvia_domain::inventory::{transfer_holding, validate_holdings, HoldingTransfer};
 use sylvia_domain::inventory::{INVENTORY_ENTITY_KIND, INVENTORY_RECORD_ID};
 use sylvia_domain::pyops::{py_eq, py_str};
@@ -47,6 +48,135 @@ fn ledger_holdings(entities: &[JsonMap]) -> DomainResult<Vec<JsonMap>> {
 /// `inventory_holdings(snapshot)`: the latest committed fallback ledger.
 pub fn inventory_holdings(snapshot: &CampaignSnapshot) -> DomainResult<Vec<JsonMap>> {
     ledger_holdings(&snapshot.continuity.facts)
+}
+
+/// `dict[key] = value` on an insertion-ordered mapping: an existing key keeps its place.
+fn assign(map: &mut Vec<(String, String)>, key: String, value: String) {
+    match map.iter_mut().find(|(known, _)| *known == key) {
+        Some(entry) => entry.1 = value,
+        None => map.push((key, value)),
+    }
+}
+
+/// `generic_inventory_surface(snapshot, entities, binding=..., state_target=...)`: one player-safe
+/// inventory surface over the selected authoritative representation (the fallback ledger, or the
+/// Ruleset's own state field when it binds one).
+pub fn generic_inventory_surface(
+    snapshot: &CampaignState,
+    entities: &[JsonMap],
+    binding: Option<&JsonMap>,
+    state_target: Option<&JsonMap>,
+) -> DomainResult<JsonMap> {
+    let text = |item: &JsonMap, key: &str| -> DomainResult<String> {
+        Ok(py_str(item.get(key).ok_or_else(|| key_error(key))?))
+    };
+    let mut visible: Vec<(String, String)> = Vec::new();
+    for item in entities {
+        if item.get("visibility") == Some(&Json::from("player_known"))
+            && !py_eq(item.get("record_id").unwrap_or(&Json::Null), &Json::from(INVENTORY_RECORD_ID))
+        {
+            assign(&mut visible, text(item, "record_id")?, text(item, "name")?);
+        }
+    }
+    let mut characters: Vec<(String, String)> = Vec::new();
+    for participant in &snapshot.participants {
+        let fields = participant.fields();
+        if fields.kind == "player_character" {
+            let name = fields.data.get("name").map_or_else(|| fields.participant_id.clone(), py_str);
+            assign(&mut characters, fields.participant_id.clone(), name);
+        }
+    }
+    if binding.is_none() {
+        for item in entities {
+            let kind = item.get("entity_kind").and_then(Json::as_str);
+            let record = py_str(item.get("record_id").unwrap_or(&Json::Null));
+            if matches!(kind, Some("person" | "character" | "player_character" | "companion" | "npc")) {
+                if let Some((_, name)) = visible.iter().find(|(known, _)| *known == record) {
+                    let name = name.clone();
+                    assign(&mut characters, record, name);
+                }
+            }
+        }
+    }
+    for (identity, name) in &characters {
+        assign(&mut visible, identity.clone(), name.clone());
+    }
+    let visible_map: JsonMap =
+        visible.iter().map(|(key, value)| (key.clone(), Json::from(value.as_str()))).collect();
+    let holdings: Vec<Json> = ledger_holdings(entities)?.into_iter().map(Json::Object).collect();
+    let mut projections = Vec::new();
+    for (identity, name) in &characters {
+        let items = match (binding, state_target) {
+            (None, _) => player_inventory_items(&holdings, &visible_map, identity)?,
+            (Some(binding), state_target) => {
+                let Some(target) = state_target else {
+                    return Err(DomainError::uncaught("AssertionError", ""));
+                };
+                let key = format!("{}.{}", text(target, "namespace")?, text(target, "key")?);
+                let state = snapshot.state.get(&key).cloned().unwrap_or_else(|| Json::Object(JsonMap::new()));
+                let Json::Object(state) = state else {
+                    return Err(rejected("Ruleset inventory state is malformed"));
+                };
+                let character_state = match state.get(identity.as_str()) {
+                    None => JsonMap::new(),
+                    Some(Json::Object(map)) => map.clone(),
+                    Some(_) => return Err(rejected("Ruleset inventory state is malformed")),
+                };
+                let field = text(binding, "field")?;
+                let values = character_state.get(&field).cloned().unwrap_or_else(|| Json::Array(Vec::new()));
+                let format = binding.get("format").ok_or_else(|| key_error("format"))?;
+                if format == "holdings" {
+                    let records: Vec<Json> =
+                        holding_records(Some(&values))?.into_iter().map(Json::Object).collect();
+                    player_inventory_items(&records, &visible_map, identity)?
+                } else {
+                    let Json::Array(values) = values else {
+                        return Err(rejected("Ruleset inventory list is malformed"));
+                    };
+                    if values.iter().any(|value| !value.is_string()) {
+                        return Err(rejected("Ruleset inventory list is malformed"));
+                    }
+                    values
+                        .iter()
+                        .map(|value| {
+                            serde_json::json!({
+                                "item_id": value, "name": value, "quantity": 1, "kind": "item",
+                                "holder": name, "owner": "Unspecified", "carried": true, "owned": false,
+                            })
+                        })
+                        .collect()
+                }
+            }
+        };
+        projections.push(serde_json::json!({"id": identity, "name": name, "items": items}));
+    }
+    owned_payload(&serde_json::json!({
+        "id": "sylvia-inventory",
+        "title": "Inventory",
+        "icon": "\u{25a3}",
+        "renderer": "generic_inventory",
+        "group": null,
+        "order": 30,
+        "default_size": 220,
+        "minimum_size": 120,
+        "default_placement": "docked",
+        "allowed_placements": ["docked", "floating", "window"],
+        "actions": [],
+        "data": {"characters": projections},
+    }))
+}
+
+/// `player_inventory(holdings, visible_entities=..., character_id=...)["items"]`.
+fn player_inventory_items(
+    holdings: &[Json],
+    visible: &JsonMap,
+    character_id: &str,
+) -> DomainResult<Vec<Json>> {
+    let inventory = sylvia_domain::inventory::player_inventory(holdings, visible, character_id)?;
+    match inventory.get("items") {
+        Some(Json::Array(items)) => Ok(items.clone()),
+        _ => Err(key_error("items")),
+    }
 }
 
 fn key_error(key: &str) -> DomainError {

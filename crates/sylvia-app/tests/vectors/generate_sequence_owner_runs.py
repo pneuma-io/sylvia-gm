@@ -17,8 +17,8 @@ move shows `tests/test_result_card_actions.py`'s card, with one saved move. The 
 - `last_attempt_commit` for that attempt, the attempt's interruption (its last action), and a
   read for a session that does not exist.
 
-A coordinate-map step (one whose selection carries `map_revision`) rebinds through
-`campaign_panels`, which the authority has not ported yet; it is not a step here. Each step
+- a queue of two coordinate-map moves (each selection carries `map_revision`, so execution rebinds
+  it through `campaign_panels`): composed, executed and read. Each step
 records its answer or failure; `final.sqlite3.gz` is the database after the last. `uuid.uuid4`
 is a counter here; the test compares interruption identities by order of appearance. Reference
 tooling only.
@@ -69,6 +69,11 @@ def card(identity: str) -> dict[str, object]:
             "selection": None}
 
 
+def map_step(identity: str, destination: list[int]) -> dict[str, object]:
+    return {"step_id": identity, "source": {"kind": "panel", "surface_id": "operations.map", "action_id": "move"},
+            "selection": {"actor": "operator", "destination": destination, "map_revision": 7}}
+
+
 STEPS: list[dict[str, object]] = [
     {"op": "read", "session": GM, "sequence": None},
     {"op": "compose", "sequence": "q1", "version": 0, "steps": [card("c1"), card("c2")]},
@@ -86,6 +91,9 @@ STEPS: list[dict[str, object]] = [
     {"op": "last_attempt_commit", "attempt": "n1"},
     {"op": "interrupt", "attempt": "n1"},
     {"op": "read", "session": "nobody", "sequence": None},
+    {"op": "compose", "sequence": "q3", "version": 0, "steps": [map_step("m1", [4, 4]), map_step("m2", [3, 3])]},
+    {"op": "execute", "sequence": "q3", "version": "last"},
+    {"op": "read", "session": GM, "sequence": "q3"},
 ]
 
 
