@@ -370,10 +370,10 @@ mod tests {
             text(&store.call(|store| store.campaign_index_entries()).await.map_err(coded))
         );
         // The audit sink and the flag read the handle's one shared state.
-        assert!(!reads.admin_full_audit_enabled());
+        assert!(!reads.admin_full_audit_enabled().unwrap());
         store.narration().set_admin_full_audit(true);
         reads.record_admin_full_audit(serde_json::json!({"kind": "defect"})).unwrap();
-        assert!(reads.admin_full_audit_enabled());
+        assert!(reads.admin_full_audit_enabled().unwrap());
         assert_eq!(store.narration().inspector_traces(), vec![serde_json::json!({"kind": "defect"})]);
         drop((reads, store));
         tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
