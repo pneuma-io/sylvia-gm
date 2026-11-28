@@ -283,8 +283,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_runner.py:2063` | `AgentRunner._build_chapter_history_text` | len() against a limit | `if len(content) > 800:` | retired (B2b: DM_SESSION or the non-streaming turn) |
 | `agent/_stateless_mcp.py:943` | `_campaign_file_updates` | len() against a limit | `if len(raw_items) > 64:` | |
 | `agent/_stateless_mcp.py:1005` | `_campaign_file_updates` | len() against a limit | `if len(updates) > 64:` | |
-| `agent/_tool_loader.py:258` | `_summary` | len() against a limit | `if len(description) <= SUMMARY_LIMIT:` | |
-| `agent/_tool_loader.py:275` | `definitions_record` | len() against a limit | `if len(text) <= INLINE_LIMIT:` | |
+| `agent/_tool_loader.py:258` | `_summary` | len() against a limit | `if len(description) <= SUMMARY_LIMIT:` | `sylvia-agent` ledger_tools_vectors |
+| `agent/_tool_loader.py:275` | `definitions_record` | len() against a limit | `if len(text) <= INLINE_LIMIT:` | `sylvia-agent` ledger_tools_vectors |
 | `agent/_working_context.py:118` | `_valid_checkpoint` | len() against a limit | `and 0 < len(record["summary"]) <= _SUMMARY_LIMIT` | `sylvia-agent` working_context_vectors |
 | `application/character_chat.py:133` | `_decode` | len() against a limit | `if not isinstance(raw_messages, list) or len(raw_messages) > MAX_MESSAGES:` | |
 | `application/character_chat.py:202` | `_read` | len() against a limit | `if len(data) > MAX_FILE_BYTES:` | |

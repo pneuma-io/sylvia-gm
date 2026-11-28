@@ -82,9 +82,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_character_profile_tools.py:142` | `character_profile_tools.execute` | Dump::DEFAULT.ascii(false) | `if len(json.dumps(value, ensure_ascii=False).encode()) > 65536:` | `sylvia-agent` character_tool_vectors (the 64 KiB section limit) |
 | `agent/_character_profile_tools.py:193` | `character_profile_tools.execute` | Dump::INDENT2.ascii(false) | `content = json.dumps(dict(source.profile), ensure_ascii=False, indent=2) + "\n"` | `sylvia-agent` character_tool_vectors (the profile file written) |
 | `agent/_context_ledger.py:487` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` ledger_state_vectors |
-| `agent/_context_ledger.py:1220` | `_tools_fingerprint` | Dump::WIRE.ascii(false) | `return _sha(json.dumps(list(tools or []), ensure_ascii=False, separators=(",", ":")))` | |
-| `agent/_fixed_tool_projection.py:52` | `argument_choices_record` | Dump::CANONICAL | `+ json.dumps(choices, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
-| `agent/_fixed_tool_projection.py:106` | `compact_schema.dump` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
+| `agent/_context_ledger.py:1220` | `_tools_fingerprint` | Dump::WIRE.ascii(false) | `return _sha(json.dumps(list(tools or []), ensure_ascii=False, separators=(",", ":")))` | `sylvia-agent` ledger_tools_vectors |
+| `agent/_fixed_tool_projection.py:52` | `argument_choices_record` | Dump::CANONICAL | `+ json.dumps(choices, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` ledger_tools_vectors |
+| `agent/_fixed_tool_projection.py:106` | `compact_schema.dump` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` ledger_tools_vectors |
 | `agent/_history.py:38` | `save_history` | Dump::DEFAULT.ascii(false) | `f.write(json.dumps(msg, ensure_ascii=False) + "\n")` | |
 | `agent/_inference_identity.py:17` | `inference_context_id` | Dump::WIRE.sorted(true) | `encoded = json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()` | |
 | `agent/_library_source_copy_tool.py:74` | `library_source_copy_tool.copy` | Dump::INDENT2.ascii(false) | `content = json.dumps(json.loads(content), ensure_ascii=False, indent=2) + "\n"` | `sylvia-agent` source_tool_vectors (an editable record copied) |
@@ -139,8 +139,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_stateless_mcp.py:2095` | `build_stateless_mcp_server.call_tool` | Dump::WIRE.sorted(true) | `text=json.dumps(action_payload, sort_keys=True, separators=(",", ":"))` || not produced: the client reads only the structured result (T3m-2) |
 | `agent/_stateless_mcp.py:2347` | `StatelessMcpMechanics.commit_campaign_file` | Dump::CANONICAL | `identity_payload = json.dumps( { "campaign_id": campaign_id, "session_id": session_id, "basis_message_id": basis_message_id, "turn_id": resolved_tu...` || `sylvia-agent` campaign_file_vectors (the update id) |
 | `agent/_stateless_mcp.py:2485` | `StatelessMcpMechanics.commit_narrative_state` | Dump::CANONICAL | `identity_payload = json.dumps( { "campaign_id": campaign_id, "session_id": session_id, "basis_message_id": basis_message_id, "turn_id": resolved_tu...` || not ported: `commit_narrative_state` has no caller (T3m-3) |
-| `agent/_tool_loader.py:96` | `_literal` | Dump::DEFAULT.ascii(false) | `return json.dumps(value, ensure_ascii=False)` | |
-| `agent/_tool_loader.py:373` | `_compact_json` | Dump::WIRE.ascii(false) | `return json.dumps(value, ensure_ascii=False, separators=(",", ":"))` | |
+| `agent/_tool_loader.py:96` | `_literal` | Dump::DEFAULT.ascii(false) | `return json.dumps(value, ensure_ascii=False)` | `sylvia-agent` ledger_tools_vectors |
+| `agent/_tool_loader.py:373` | `_compact_json` | Dump::WIRE.ascii(false) | `return json.dumps(value, ensure_ascii=False, separators=(",", ":"))` | `sylvia-agent` ledger_tools_vectors |
 | `agent/_working_context.py:69` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` working_context_vectors |
 | `application/character_chat.py:176` | `_encode` | indent=1.ascii(false) | `return json.dumps( { "format_id": FORMAT_ID, "format_version": FORMAT_VERSION, "chat_id": chat.chat_id, "character": { "artifact_id": chat.artifact...` | |
 | `config/_credential_protection.py:251` | `protect_credentials` | Dump::DEFAULT.ascii(false) | `payload = json.dumps( {"api_key": api_key, "headers": dict(headers)}, ensure_ascii=False ).encode()` | |
