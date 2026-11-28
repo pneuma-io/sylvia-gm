@@ -51,6 +51,7 @@ pub mod reasoning;
 pub mod recovery;
 pub mod recovery_graph;
 pub mod recovery_staging;
+pub mod reentry;
 pub mod safe_file;
 pub mod schema;
 pub mod sequel;

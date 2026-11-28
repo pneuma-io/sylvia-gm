@@ -1,0 +1,813 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "runs": [
+  {
+   "step": {
+    "op": "read",
+    "session": "gm",
+    "sequence": null
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "compose",
+    "sequence": "q1",
+    "version": 0,
+    "steps": [
+     {
+      "step_id": "c1",
+      "source": {
+       "kind": "result_card",
+       "action_id": "move",
+       "button_index": 0
+      },
+      "selection": null
+     },
+     {
+      "step_id": "c2",
+      "source": {
+       "kind": "result_card",
+       "action_id": "move",
+       "button_index": 0
+      },
+      "selection": null
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "kind": "action_sequence",
+     "campaign_id": "campaign",
+     "session_id": "gm",
+     "sequence_id": "q1",
+     "version": 1,
+     "status": "ready",
+     "expected_revision": 1,
+     "event_watermark": 6,
+     "scope": null,
+     "turn_id": "turn",
+     "steps": [
+      {
+       "step_id": "c1",
+       "source": {
+        "kind": "result_card",
+        "action_id": "move",
+        "button_index": 0
+       },
+       "selection": null,
+       "label": "Continue to the next position",
+       "status": "pending",
+       "operation_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+       "receipt": null,
+       "error": null,
+       "warning": null,
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "tool": "move_unit",
+       "response_policy": "on_request",
+       "actor": null,
+       "actor_name": null,
+       "preview": null
+      },
+      {
+       "step_id": "c2",
+       "source": {
+        "kind": "result_card",
+        "action_id": "move",
+        "button_index": 0
+       },
+       "selection": null,
+       "label": "Continue to the next position",
+       "status": "pending",
+       "operation_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+       "receipt": null,
+       "error": null,
+       "warning": null,
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "tool": "move_unit",
+       "response_policy": "on_request",
+       "actor": null,
+       "actor_name": null,
+       "preview": null
+      }
+     ],
+     "error": null,
+     "pause_reason": null,
+     "confirmation": "ecce464514ba5cc3798088f537a6c492510f5bbbdbdf8f6195f07e8f7f10ded4",
+     "committed_action_ids": []
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "compose",
+    "sequence": "q1",
+    "version": 0,
+    "steps": [
+     {
+      "step_id": "c1",
+      "source": {
+       "kind": "result_card",
+       "action_id": "move",
+       "button_index": 0
+      },
+      "selection": null
+     }
+    ]
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Action sequence version changed"
+   }
+  },
+  {
+   "step": {
+    "op": "read",
+    "session": "gm",
+    "sequence": "q1"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "error": null,
+     "event_watermark": 6,
+     "expected_revision": 1,
+     "kind": "action_sequence",
+     "pause_reason": null,
+     "scope": null,
+     "sequence_id": "q1",
+     "session_id": "gm",
+     "status": "ready",
+     "steps": [
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "label": "Continue to the next position",
+       "operation_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": null,
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "pending",
+       "step_id": "c1",
+       "tool": "move_unit",
+       "warning": null
+      },
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "label": "Continue to the next position",
+       "operation_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": null,
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "pending",
+       "step_id": "c2",
+       "tool": "move_unit",
+       "warning": null
+      }
+     ],
+     "turn_id": "turn",
+     "version": 1,
+     "confirmation": "ecce464514ba5cc3798088f537a6c492510f5bbbdbdf8f6195f07e8f7f10ded4",
+     "committed_action_ids": []
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "sequence": "q1",
+    "version": 9
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Action sequence version changed"
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "sequence": "q1",
+    "version": "last"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "error": null,
+     "event_watermark": 17,
+     "expected_revision": 3,
+     "kind": "action_sequence",
+     "pause_reason": null,
+     "scope": null,
+     "sequence_id": "q1",
+     "session_id": "gm",
+     "status": "completed",
+     "steps": [
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "label": "Continue to the next position",
+       "operation_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+        "status": "committed",
+        "result": {
+         "status": "committed",
+         "tool": "move_unit",
+         "context": {},
+         "narrative_hooks": {},
+         "narrative_directives": [],
+         "logs": [],
+         "result_card": {
+          "version": 1,
+          "summary": [
+           {
+            "label": "Destination",
+            "value": [
+             5,
+             4
+            ],
+            "emphasis": false
+           }
+          ],
+          "details": [],
+          "title": "Movement",
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "tool": "move_unit",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            }
+           }
+          ]
+         }
+        },
+        "resulting_revision": 2
+       },
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "committed",
+       "step_id": "c1",
+       "tool": "move_unit",
+       "warning": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "source": {
+         "action_id": "move",
+         "button_index": 0,
+         "kind": "result_card"
+        },
+        "operation_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+        "expected_revision": 1,
+        "selection": null,
+        "session_id": "gm",
+        "confirmation": "4b99cf9ab3683908251e005d5b657bb3f13ef2e8753b6d0dc1712a9c42ad49ae"
+       }
+      },
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "label": "Continue to the next position",
+       "operation_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+        "status": "committed",
+        "result": {
+         "status": "committed",
+         "tool": "move_unit",
+         "context": {},
+         "narrative_hooks": {},
+         "narrative_directives": [],
+         "logs": [],
+         "result_card": {
+          "version": 1,
+          "summary": [
+           {
+            "label": "Destination",
+            "value": [
+             5,
+             4
+            ],
+            "emphasis": false
+           }
+          ],
+          "details": [],
+          "title": "Movement",
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "tool": "move_unit",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            }
+           }
+          ]
+         }
+        },
+        "resulting_revision": 3
+       },
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "committed",
+       "step_id": "c2",
+       "tool": "move_unit",
+       "warning": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "source": {
+         "action_id": "move",
+         "button_index": 0,
+         "kind": "result_card"
+        },
+        "operation_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+        "expected_revision": 2,
+        "selection": null,
+        "session_id": "gm",
+        "confirmation": "35bfb401aedb6e60cef1dc6da787b27d7a708d3ff1f43d324b3f1d491e1d7602"
+       }
+      }
+     ],
+     "turn_id": "turn",
+     "version": 6,
+     "submission_version": 1,
+     "submission_confirmation": "ecce464514ba5cc3798088f537a6c492510f5bbbdbdf8f6195f07e8f7f10ded4",
+     "confirmation": "da271525f2fe02e83ed1a8adc1c26c39a77c01ee0a7cb937fde1501d4a169149",
+     "committed_action_ids": [
+      "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+      "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "read",
+    "session": "gm",
+    "sequence": "q1"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "error": null,
+     "event_watermark": 17,
+     "expected_revision": 3,
+     "kind": "action_sequence",
+     "pause_reason": null,
+     "scope": null,
+     "sequence_id": "q1",
+     "session_id": "gm",
+     "status": "completed",
+     "steps": [
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "confirmation": "4b99cf9ab3683908251e005d5b657bb3f13ef2e8753b6d0dc1712a9c42ad49ae",
+        "expected_revision": 1,
+        "operation_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+        "selection": null,
+        "session_id": "gm",
+        "source": {
+         "action_id": "move",
+         "button_index": 0,
+         "kind": "result_card"
+        }
+       },
+       "label": "Continue to the next position",
+       "operation_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+        "result": {
+         "context": {},
+         "logs": [],
+         "narrative_directives": [],
+         "narrative_hooks": {},
+         "result_card": {
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            },
+            "tool": "move_unit"
+           }
+          ],
+          "details": [],
+          "summary": [
+           {
+            "emphasis": false,
+            "label": "Destination",
+            "value": [
+             5,
+             4
+            ]
+           }
+          ],
+          "title": "Movement",
+          "version": 1
+         },
+         "status": "committed",
+         "tool": "move_unit"
+        },
+        "resulting_revision": 2,
+        "status": "committed"
+       },
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "committed",
+       "step_id": "c1",
+       "tool": "move_unit",
+       "warning": null
+      },
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "confirmation": "35bfb401aedb6e60cef1dc6da787b27d7a708d3ff1f43d324b3f1d491e1d7602",
+        "expected_revision": 2,
+        "operation_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+        "selection": null,
+        "session_id": "gm",
+        "source": {
+         "action_id": "move",
+         "button_index": 0,
+         "kind": "result_card"
+        }
+       },
+       "label": "Continue to the next position",
+       "operation_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02",
+        "result": {
+         "context": {},
+         "logs": [],
+         "narrative_directives": [],
+         "narrative_hooks": {},
+         "result_card": {
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            },
+            "tool": "move_unit"
+           }
+          ],
+          "details": [],
+          "summary": [
+           {
+            "emphasis": false,
+            "label": "Destination",
+            "value": [
+             5,
+             4
+            ]
+           }
+          ],
+          "title": "Movement",
+          "version": 1
+         },
+         "status": "committed",
+         "tool": "move_unit"
+        },
+        "resulting_revision": 3,
+        "status": "committed"
+       },
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "committed",
+       "step_id": "c2",
+       "tool": "move_unit",
+       "warning": null
+      }
+     ],
+     "submission_confirmation": "ecce464514ba5cc3798088f537a6c492510f5bbbdbdf8f6195f07e8f7f10ded4",
+     "submission_version": 1,
+     "turn_id": "turn",
+     "version": 6,
+     "confirmation": "da271525f2fe02e83ed1a8adc1c26c39a77c01ee0a7cb937fde1501d4a169149",
+     "committed_action_ids": [
+      "sequence-89819a652adac26b3126f572a004e4729eace1c063fcc7cf9add9ed0a695e1cd",
+      "sequence-31bf1814fc0bbbd1dc8cb04e2dc769bd0b32edd26ff31b12b1e34d057954ce02"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "compose",
+    "sequence": "q2",
+    "version": 0,
+    "steps": [
+     {
+      "step_id": "a1",
+      "source": {
+       "kind": "result_card",
+       "action_id": "move",
+       "button_index": 0
+      },
+      "selection": null
+     }
+    ],
+    "agent": true
+   },
+   "outcome": {
+    "ok": {
+     "kind": "action_sequence",
+     "campaign_id": "campaign",
+     "session_id": "gm",
+     "sequence_id": "q2",
+     "version": 1,
+     "status": "ready",
+     "expected_revision": 3,
+     "event_watermark": 17,
+     "scope": null,
+     "turn_id": "turn",
+     "steps": [
+      {
+       "step_id": "a1",
+       "source": {
+        "kind": "result_card",
+        "action_id": "move",
+        "button_index": 0
+       },
+       "selection": null,
+       "label": "Continue to the next position",
+       "status": "pending",
+       "operation_id": "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba",
+       "receipt": null,
+       "error": null,
+       "warning": null,
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "tool": "move_unit",
+       "response_policy": "on_request",
+       "actor": null,
+       "actor_name": null,
+       "preview": null
+      }
+     ],
+     "error": null,
+     "pause_reason": null,
+     "confirmation": "48ef95bbe8d47335302442e8be9b5883a5e5671ee2118e1d6f83c00f180fb66c",
+     "committed_action_ids": []
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "sequence": "q2",
+    "version": "last",
+    "agent": true
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Agent sequence execution requires active campaign work"
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "attempt": "n1"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "append",
+    "message": "input-n1",
+    "content": {
+     "text": "Move again.",
+     "attempt_id": "n1",
+     "canonical_start_sequence": 0
+    }
+   },
+   "outcome": {
+    "ok": 14
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "sequence": "q2",
+    "version": "last",
+    "agent": true,
+    "holding": "gm"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "error": null,
+     "event_watermark": 22,
+     "expected_revision": 4,
+     "kind": "action_sequence",
+     "pause_reason": null,
+     "scope": null,
+     "sequence_id": "q2",
+     "session_id": "gm",
+     "status": "completed",
+     "steps": [
+      {
+       "actor": null,
+       "actor_name": null,
+       "error": null,
+       "label": "Continue to the next position",
+       "operation_id": "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba",
+        "status": "committed",
+        "result": {
+         "status": "committed",
+         "tool": "move_unit",
+         "context": {},
+         "narrative_hooks": {},
+         "narrative_directives": [],
+         "logs": [],
+         "result_card": {
+          "version": 1,
+          "summary": [
+           {
+            "label": "Destination",
+            "value": [
+             5,
+             4
+            ],
+            "emphasis": false
+           }
+          ],
+          "details": [],
+          "title": "Movement",
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "tool": "move_unit",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            }
+           }
+          ]
+         }
+        },
+        "resulting_revision": 4
+       },
+       "response_policy": "on_request",
+       "selection": null,
+       "source": {
+        "action_id": "move",
+        "button_index": 0,
+        "kind": "result_card"
+       },
+       "status": "committed",
+       "step_id": "a1",
+       "tool": "move_unit",
+       "warning": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "source": {
+         "action_id": "move",
+         "button_index": 0,
+         "kind": "result_card"
+        },
+        "operation_id": "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba",
+        "expected_revision": 3,
+        "selection": null,
+        "session_id": "gm",
+        "confirmation": "12fea475ba17fd9baefb4f8eeae9d601a8e60963723878a34ae4f66078be63bb"
+       }
+      }
+     ],
+     "turn_id": "turn",
+     "version": 4,
+     "submission_version": 1,
+     "submission_confirmation": "48ef95bbe8d47335302442e8be9b5883a5e5671ee2118e1d6f83c00f180fb66c",
+     "narration_basis_message_id": "input-n1",
+     "narration_attempt_id": "n1",
+     "confirmation": "463504ba518fc909e6fa295df7cc5c8837b7c554ce37512ce0a8461fb0a7e919",
+     "committed_action_ids": [
+      "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "last_attempt_commit",
+    "attempt": "n1"
+   },
+   "outcome": {
+    "ok": "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba"
+   }
+  },
+  {
+   "step": {
+    "op": "interrupt",
+    "attempt": "n1"
+   },
+   "outcome": {
+    "ok": {
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000008",
+     "last_action_id": "sequence-009cf936882e77155a6bf976314ce15833e707af523dcd2f2a851f471fc400ba",
+     "failed_attempt_id": "n1"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "read",
+    "session": "nobody",
+    "sequence": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  }
+ ]
+}

@@ -304,9 +304,20 @@ pub async fn bind_narration_action(
     action_id: &str,
 ) -> Result<(), ActionError> {
     let _operation = store.operation()?;
+    let _region = store.narration().region().await;
+    bind_in_region(store, campaign_id, attempt_id, action_id).await
+}
+
+/// [`bind_narration_action`] for a caller that already holds the narration region (Python's
+/// `_narration_lock` is an `RLock`, which a sequence's `_execute` holds when it binds).
+pub(super) async fn bind_in_region(
+    store: &StoreHandle,
+    campaign_id: &str,
+    attempt_id: &str,
+    action_id: &str,
+) -> Result<(), ActionError> {
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
-    let _region = narration.region().await;
     let turn_id = live_attempt(narration, &key, |attempt| Ok(attempt.turn_id.clone()))?;
     let (campaign, action) = (campaign_id.to_owned(), action_id.to_owned());
     let action_turn = store

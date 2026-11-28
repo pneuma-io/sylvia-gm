@@ -21,28 +21,9 @@ use sylvia_domain::DomainError;
 use sylvia_store::mechanics_choices::awaiting_receipt;
 use sylvia_store::{AuthorityStore, StoreError, StoreHandle};
 
-/// `player_action(campaign_id=..., source=..., operation_id=..., expected_revision=...,
-/// selection=..., session_id=..., confirmation=..., preview_only=...)`'s arguments.
-#[derive(Debug, Clone, PartialEq)]
-pub struct PlayerActionRequest {
-    pub campaign_id: String,
-    pub source: Json,
-    pub operation_id: String,
-    pub expected_revision: i64,
-    /// The client's selection as sent: any JSON, `Null` for Python's `None`.
-    pub selection: Json,
-    pub session_id: Option<String>,
-    pub confirmation: Option<String>,
-    pub preview_only: bool,
-}
-
-/// What a player action answers: a receipt, an awaiting choice, or (previewing) the proposal.
-#[derive(Debug, Clone, PartialEq)]
-pub enum PlayerActionAnswer {
-    Receipt(ActionReceipt),
-    AwaitingChoice(sylvia_domain::authority::AwaitingChoiceReceipt),
-    Preview(JsonMap),
-}
+/// `player_action(...)`'s arguments and answer, and a resolved control, are lane 2's shared
+/// types (`action_sequences`), which a sequence's owner calls use too.
+pub use crate::action_sequences::{PlayerActionAnswer, PlayerActionRequest, ResolvedControl};
 
 fn rejected(message: &str) -> DomainError {
     DomainError::command_rejected(message)
@@ -50,14 +31,6 @@ fn rejected(message: &str) -> DomainError {
 
 fn rejected_with(message: &str, code: &str) -> DomainError {
     DomainError::command_rejected_with(message, code, Vec::new())
-}
-
-/// The resolved control: `(tool, parameters, label, actor_parameter)`.
-struct Control {
-    tool: super::content_reads::CatalogTool,
-    parameters: JsonMap,
-    label: String,
-    actor_parameter: Option<String>,
 }
 
 /// `AuthorityOwner.player_action(**request)`: the direct-action work, then the action.
@@ -153,7 +126,13 @@ enum Prepared {
     Answer(PlayerActionAnswer),
     /// The control to execute, its confirmation token, its policy values, the open TURN and the
     /// campaign's writer.
-    Control { control: Box<Control>, token: String, policy: JsonMap, turn_id: String, writer: WriterRole },
+    Control {
+        control: Box<ResolvedControl>,
+        token: String,
+        policy: JsonMap,
+        turn_id: String,
+        writer: WriterRole,
+    },
 }
 
 /// A failure on the store thread: Python's exception unchanged, or a store failure.
@@ -349,12 +328,12 @@ fn prepare(
 
 /// `_resolve_card_control(snapshot, source, selection)`: an immutable saved button, validated
 /// against the current package.
-fn resolve_card_control(
+pub(super) fn resolve_card_control(
     store: &AuthorityStore,
     snapshot: &CampaignSnapshot,
     source: &Json,
     selection: &Json,
-) -> Result<Control, Failure> {
+) -> Result<ResolvedControl, Failure> {
     if sylvia_domain::pyops::py_truthy(selection) {
         return Err(rejected("Result-card actions do not accept replacement parameters").into());
     }
@@ -399,7 +378,7 @@ fn resolve_card_control(
         Some(label) => sylvia_domain::pyops::py_str(label),
     };
     let actor_parameter = tool.player_controls.actor_parameter.clone();
-    Ok(Control {
+    Ok(ResolvedControl {
         tool,
         parameters: owned_payload(&Json::Object(parameters.clone()))?,
         label,
@@ -526,13 +505,13 @@ fn segment_failure(error: crate::tactical_grid::TacticalGridError) -> Failure {
 /// `_resolve_panel_control(snapshot, source, selection, known_map=...)`: a current panel
 /// declaration, binding only its advertised selection fields.
 #[allow(clippy::too_many_lines)]
-fn resolve_panel_control(
+pub(super) fn resolve_panel_control(
     store: &AuthorityStore,
     snapshot: &CampaignSnapshot,
     source: &Json,
     selection: &Json,
     known_map: bool,
-) -> Result<Control, Failure> {
+) -> Result<ResolvedControl, Failure> {
     use std::collections::BTreeSet;
     let campaign_id = snapshot.state.campaign_id.as_str();
     let surface_id = source.get("surface_id").cloned().unwrap_or(Json::Null);
@@ -677,13 +656,13 @@ fn resolve_panel_control(
     };
     let label = sylvia_domain::pyops::py_str(action.get("label").unwrap_or(&panel_action_id));
     let actor_parameter = tool.player_controls.actor_parameter.clone().or(binding_actor);
-    Ok(Control { tool, parameters, label, actor_parameter })
+    Ok(ResolvedControl { tool, parameters, label, actor_parameter })
 }
 
 /// `_player_action_preview(tool, parameters, snapshot, source, selection)`: display-only paths
 /// bound to the known geometry (a panel's segment preview), then the package's own preview;
 /// commitment keeps the full-scene parameters.
-fn player_action_preview(
+pub(super) fn player_action_preview(
     store: &AuthorityStore,
     tool: &super::content_reads::CatalogTool,
     parameters: &JsonMap,
@@ -782,7 +761,7 @@ fn player_action_preview(
 
 /// `_append_player_action_references(session_id, receipt)`: the direct action's public call and
 /// result placed in its initiating session.
-async fn append_references(
+pub(super) async fn append_references(
     store: &StoreHandle,
     session_id: Option<&str>,
     receipt: &ActionReceipt,
