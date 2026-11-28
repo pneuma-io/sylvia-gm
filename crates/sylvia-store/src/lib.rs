@@ -16,6 +16,7 @@ pub mod backup;
 pub mod builder_launch_migration;
 pub mod builder_sources;
 pub mod campaign_archive;
+pub mod campaign_confirmation;
 pub mod campaigns;
 pub mod catalog_reads;
 pub mod continuity;

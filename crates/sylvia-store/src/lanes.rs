@@ -168,6 +168,8 @@ pub struct OwnerLanes {
     pub sessions: LaneRegistry,
     /// `AuthorityOwner`'s campaign work counts and reservations ([`crate::work`]).
     pub work: crate::work::CampaignWork,
+    /// `AuthorityOwner._ready_campaign_lock` and `_rejected_ready_campaign_operations`.
+    pub ready_campaigns: crate::campaign_confirmation::ReadyCampaignFence,
 }
 
 /// `f"builder-chat:{session_id}"`: the owner lane of a standalone Builder chat.

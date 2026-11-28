@@ -40,6 +40,10 @@ fn failure(error: ActionError) -> Json {
         ActionError::Domain(DomainError::Rejected { error_type, code, message, .. }) => {
             json!({"error": error_type, "code": code, "message": message})
         }
+        // An exception Python's owner does not catch: no code of its own.
+        ActionError::Domain(DomainError::Uncaught { error_type, message }) => {
+            json!({"error": error_type, "code": null, "message": message})
+        }
         other => {
             let coded = other.into_coded();
             json!({"error": coded.error_type.unwrap_or("CommandRejected"), "code": coded.code, "message": coded.message})
@@ -107,7 +111,7 @@ async fn card_clicks_answer_and_store_as_pythons_owner() {
         serde_json::from_str(&std::fs::read_to_string(vectors.join("card_action_runs.json")).unwrap())
             .unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 10);
+    assert_eq!(runs.len(), 12);
     let owner_id = record["owner_id"].as_str().unwrap().to_owned();
     let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join("card-action");
     if let Err(error) = std::fs::remove_dir_all(&folder) {
