@@ -1,6 +1,12 @@
 //! Bounded package reads for read-only application queries (lane 1's library sources):
 //! `SQLiteAuthorityStore.package_file_paths` and `package_file_bytes`, and `AuthorityOwner`'s
 //! `package_file_paths`, `package_text_file`, `package_record` and `package_label`.
+//!
+//! Python opens a connection for each `package_file_bytes` call. Opening one costs about as much
+//! as reading a small file, so a caller reading many files in one store call (the knowledge
+//! search reads every text file of its packages) reads them through one [`PackageFileReader`].
+//! The answers are the same: each read is its own autocommit statement, and an installed
+//! package's files and blobs never change.
 
 use crate::campaigns::{named_rows, parse_canonical};
 use crate::error::{value_error, StoreError, StoreResult};
@@ -8,6 +14,7 @@ use crate::handle::StoreHandle;
 use crate::packages::{exact_manifest, verify_blob};
 use crate::pytext::{py_int, py_str};
 use crate::store::AuthorityStore;
+use rusqlite::Connection;
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::owned_payload;
 
@@ -66,28 +73,12 @@ impl AuthorityStore {
         if maximum_bytes < 0 {
             return Err(value_error("Package file byte limit cannot be negative"));
         }
-        let connection = self.connect()?;
-        let Some(row) = named_rows(
-            &connection,
-            "SELECT byte_count, blob_sha256 FROM package_manifest_files \
-             WHERE package_id = ? AND version = ? AND content_sha256 = ? AND portable_path = ?",
-            &[&package_id, &version, &sha256, &portable_path],
-        )?
-        .1
-        .into_iter()
-        .next() else {
-            return Ok(None);
-        };
-        let byte_count =
-            py_int(&row[0]).ok_or_else(|| value_error("invalid literal for int() with base 10"))?;
-        if byte_count > maximum_bytes {
-            return Err(rejected("Package file exceeds its consumer byte limit", "package_file_oversized"));
-        }
-        let value = verify_blob(&connection, &py_str(&row[1]))?.concat();
-        if value.len() as i64 != byte_count {
-            return Err(rejected("Exact package blob is corrupt", "package_corrupt"));
-        }
-        Ok(Some(value))
+        self.package_file_reader()?.file_bytes(package_id, version, sha256, portable_path, maximum_bytes)
+    }
+
+    /// One connection for several [`AuthorityStore::package_file_bytes`] reads.
+    pub fn package_file_reader(&self) -> StoreResult<PackageFileReader<'_>> {
+        Ok(PackageFileReader { connection: self.connect()?, _store: self })
     }
 
     /// `AuthorityOwner.package_text_file`: one exact package file as UTF-8 (pass
@@ -140,6 +131,57 @@ impl AuthorityStore {
             Some(label) => Ok(json_text(label)),
             None => Err(StoreError::Other("'label'".into())),
         }
+    }
+}
+
+/// One connection for several exact package file reads, from
+/// [`AuthorityStore::package_file_reader`] (see the module note).
+pub struct PackageFileReader<'a> {
+    connection: Connection,
+    _store: &'a AuthorityStore,
+}
+
+impl PackageFileReader<'_> {
+    /// [`AuthorityStore::package_file_bytes`] on this reader's connection.
+    pub fn file_bytes(
+        &self,
+        package_id: &str,
+        version: &str,
+        sha256: &str,
+        portable_path: &str,
+        maximum_bytes: i64,
+    ) -> StoreResult<Option<Vec<u8>>> {
+        if maximum_bytes < 0 {
+            return Err(value_error("Package file byte limit cannot be negative"));
+        }
+        let Some(row) = named_rows(
+            &self.connection,
+            "SELECT byte_count, blob_sha256 FROM package_manifest_files \
+             WHERE package_id = ? AND version = ? AND content_sha256 = ? AND portable_path = ?",
+            &[&package_id, &version, &sha256, &portable_path],
+        )?
+        .1
+        .into_iter()
+        .next() else {
+            return Ok(None);
+        };
+        let byte_count =
+            py_int(&row[0]).ok_or_else(|| value_error("invalid literal for int() with base 10"))?;
+        if byte_count > maximum_bytes {
+            return Err(rejected("Package file exceeds its consumer byte limit", "package_file_oversized"));
+        }
+        let value = {
+            let mut chunks = verify_blob(&self.connection, &py_str(&row[1]))?;
+            if chunks.len() == 1 {
+                chunks.pop().expect("one chunk")
+            } else {
+                chunks.concat()
+            }
+        };
+        if value.len() as i64 != byte_count {
+            return Err(rejected("Exact package blob is corrupt", "package_corrupt"));
+        }
+        Ok(Some(value))
     }
 }
 

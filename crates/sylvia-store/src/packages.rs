@@ -51,6 +51,16 @@ fn sha(bytes: &[u8]) -> String {
     sha256_hex(bytes)
 }
 
+/// `_sha(b"".join(chunks))`, hashed chunk by chunk with no joined copy.
+fn chunks_sha(chunks: &[Vec<u8>]) -> String {
+    use sha2::{Digest, Sha256};
+    let mut digest = Sha256::new();
+    for chunk in chunks {
+        digest.update(chunk);
+    }
+    format!("{:x}", digest.finalize())
+}
+
 fn idempotency_conflict(message: &str) -> StoreError {
     StoreError::Coded(crate::error::authority_coded("IdempotencyConflict", message))
 }
@@ -686,7 +696,7 @@ pub fn verify_blob(connection: &Connection, blob_sha256: &str) -> StoreResult<Ve
     };
     if chunks.len() as i64 != int(&chunk_count)?
         || chunks.iter().map(Vec::len).sum::<usize>() as i64 != int(&byte_count)?
-        || sha(&chunks.concat()) != blob_sha256
+        || chunks_sha(&chunks) != blob_sha256
     {
         return Err(rejected("Exact package blob is corrupt", "package_corrupt"));
     }
