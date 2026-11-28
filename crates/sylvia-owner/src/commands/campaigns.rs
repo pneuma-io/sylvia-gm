@@ -401,6 +401,7 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
                 .map_err(|error| sylvia_base::CodedError::new("internal_error", error.to_string()))?,
             Json::String(id) if !id.is_empty() => {
                 let id = id.clone();
+                let _operation = super::operation(ctx)?;
                 let candidate =
                     ctx.store.call(move |store| store.package_candidate(&id)).await.map_err(store_error)?;
                 candidate.package_lock().clone()
@@ -755,6 +756,62 @@ fn campaign_plan_payload(storage_root: &std::path::Path, campaign_id: &str) -> C
     }
 }
 
+/// `next(...)` over an empty iterable: Python's `StopIteration` escapes the handler.
+fn stop_iteration() -> sylvia_base::CodedError {
+    sylvia_base::CodedError::new("internal_error", "").with_error_type("StopIteration")
+}
+
+/// `handle_begin_campaign_construction`: begin a lane's construction, then record its brief
+/// (`{kind: campaign_construction_brief, lane, input}`) as evidence in the campaign's Builder
+/// session, under a message id from the operation.
+pub async fn handle_begin_campaign_construction(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> CodedResult<Json> {
+    let Some(Json::Object(construction_input)) = params.get("canonical_input") else {
+        return Err(protocol("canonical_input must be an object"));
+    };
+    let operation_id = required(params, "operation_id")?;
+    let campaign_id = required(params, "campaign_id")?;
+    let lane = required(params, "lane")?;
+    let expected_revision = required_nonnegative_int(params, "expected_revision")?;
+    let begun = sylvia_app::authority::guided::begin_campaign_construction(
+        &ctx.store,
+        &operation_id,
+        &campaign_id,
+        &lane,
+        expected_revision,
+        &Json::Object(construction_input.clone()),
+    )
+    .await
+    .map_err(store_error)?;
+    let operation = super::operation(ctx)?;
+    let entries = ctx.store.call(|store| store.campaign_index_entries()).await.map_err(store_error)?;
+    drop(operation);
+    let campaign =
+        entries.iter().find(|entry| entry.campaign_id == campaign_id).ok_or_else(stop_iteration)?;
+    let builder_session =
+        campaign.sessions.iter().find(|session| session.role == "builder").ok_or_else(stop_iteration)?;
+    let mut content = JsonMap::new();
+    content.insert("kind".into(), "campaign_construction_brief".into());
+    content.insert("lane".into(), lane.clone().into());
+    content.insert("input".into(), Json::Object(construction_input.clone()));
+    ctx.store
+        .append_agent_message(
+            &builder_session.session_id,
+            &format!("construction-brief-{}", &sylvia_base::hash::sha256_hex(operation_id.as_bytes())[..24]),
+            sylvia_domain::session::SessionMessageKind::Evidence,
+            &content,
+        )
+        .await
+        .map_err(store_error)?;
+    let mut reply = JsonMap::new();
+    reply.insert("campaign_id".into(), begun.campaign_id.into());
+    reply.insert("lane".into(), begun.lane.into());
+    reply.insert("resulting_revision".into(), begun.resulting_revision.into());
+    Ok(Json::Object(reply))
+}
+
 /// `handle_finalize_campaign_construction`: the guided Interview's Campaign Plan finalized and
 /// handed to the Game Master, after the Game Master's effort and speed are settled and the
 /// mandatory opening request is measured (lane 4's `preflight_guided_start`), then the DM TURN
@@ -1096,6 +1153,7 @@ fn campaign_entry_value(entry: &sylvia_store::authority::CampaignIndexEntry) -> 
 /// `handle_campaign_index`: `ctx.bus.campaign_index()`, the application owner's campaign rail,
 /// as `_json_value` writes it. Parameters are not read.
 pub async fn handle_campaign_index(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let _operation = super::operation(ctx)?;
     let entries = ctx.store.call(|store| store.campaign_index_entries()).await.map_err(store_error)?;
     Ok(Json::Array(entries.iter().map(campaign_entry_value).collect()))
 }
@@ -1171,7 +1229,9 @@ pub async fn handle_backup_database(ctx: &DispatchContext, params: &JsonMap) -> 
     std::fs::create_dir_all(&backups).map_err(|error| {
         sylvia_base::CodedError::new("internal_error", error.to_string()).with_error_type("OSError")
     })?;
+    let operation = super::operation(ctx)?;
     ctx.store.call(move |store| store.backup_database(&target)).await.map_err(store_error)?;
+    drop(operation);
     let mut reply = JsonMap::new();
     reply.insert("backup_id".into(), backup_id.into());
     reply.insert("status".into(), "created".into());

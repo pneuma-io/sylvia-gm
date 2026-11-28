@@ -1,0 +1,1015 @@
+{
+  "name": "action-commands",
+  "description": "The direct action and TURN commands on an SRD Lite campaign (stand-in model, no turn run): execute_action's argument refusals in Python's order, its authority refusals (unknown campaign, stale revision, unknown tool or package, another TURN, the player writer, invalid parameters), a d20_test check, its replay and both idempotency conflicts; resolve_mechanics_choice with no pending choice; retryable_interruption with no interruption; open_turn and complete_turn (refusals, completing the GM's TURN twice, opening another, acting in it, completing it); begin_campaign_construction's refusals; then the display snapshot and shut down.",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "elapsed_ms",
+      "quiet_ms",
+      "rows/payload_hash",
+      "_d20_test/results",
+      "_d20_test/total",
+      "d20_test/results",
+      "d20_test/total",
+      "context/_adjusted_total",
+      "narration_facts/adjusted_total",
+      "equation/roll",
+      "equation/total",
+      "details/value",
+      "diagnostic_id"
+    ],
+    "alias": [
+      {
+        "name": "inference",
+        "pattern": "inference-[0-9a-f]{32}",
+        "keys": [
+          "message_id",
+          "inference_id"
+        ]
+      },
+      {
+        "name": "action",
+        "pattern": "action-[0-9a-f]{32}",
+        "keys": [
+          "action_id",
+          "message_id",
+          "content"
+        ]
+      },
+      {
+        "name": "provider-call",
+        "pattern": "provider-[0-9a-f]{32}",
+        "keys": [
+          "idempotency_key"
+        ]
+      }
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      },
+      {
+        "pattern": "\"(_?adjusted_total)\":[0-9]+",
+        "with": "\"$1\":<roll>"
+      },
+      {
+        "pattern": "\"results\":\\[[0-9]+\\],\"sides\":20,\"total\":[0-9]+",
+        "with": "\"results\":[<roll>],\"sides\":20,\"total\":<roll>"
+      },
+      {
+        "pattern": "\"label\":\"D20 results\",\"value\":\\[[0-9]+\\]",
+        "with": "\"label\":\"D20 results\",\"value\":[<roll>]"
+      },
+      {
+        "pattern": "\"roll\":[0-9]+,\"total\":[0-9]+",
+        "with": "\"roll\":<roll>,\"total\":<roll>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "configured_context_window": 1000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "campaign_party_options",
+      "expect_ok": true,
+      "params": {
+        "ruleset_selection": "sylvia.srd-lite.bg3",
+        "setting_id": "pneuma.severed-lands",
+        "plan_id": "a-debt-in-iron"
+      },
+      "save": {
+        "player_character_id": "/result/player_archetypes/0/id"
+      }
+    },
+    {
+      "method": "create_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-draft",
+        "display_name": "Debt in Iron",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "campaign_id": "/result/campaign_id",
+        "builder_session_id": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-ruleset",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 0,
+        "current_step": "ruleset",
+        "visible_answer": "SRD Lite",
+        "answer": {
+          "candidate_id": "sylvia.srd-lite.bg3"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-setting",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 1,
+        "current_step": "setting",
+        "visible_answer": "The Severed Lands",
+        "answer": {
+          "setting_id": "pneuma.severed-lands"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-plan",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 2,
+        "current_step": "plan",
+        "visible_answer": "A Debt in Iron",
+        "answer": {
+          "plan_id": "a-debt-in-iron"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-name",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 3,
+        "current_step": "name",
+        "visible_answer": "Debt in Iron",
+        "answer": {
+          "display_name": "Debt in Iron"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-participants",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 4,
+        "current_step": "participants",
+        "visible_answer": "Tavin Bell",
+        "answer": {
+          "archetype_id": "${player_character_id}",
+          "companion_ids": []
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-boundaries",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 5,
+        "current_step": "boundaries_preferences",
+        "visible_answer": "None; Mystery",
+        "answer": {
+          "boundaries": "None",
+          "preferences": "Mystery"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-requests",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 6,
+        "current_step": "specific_requests",
+        "visible_answer": "No additional requests",
+        "answer": {
+          "no_additional_requests": true,
+          "requests": ""
+        }
+      }
+    },
+    {
+      "method": "start_guided_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "iron-start",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "display_name": "Debt in Iron",
+        "candidate_id": "sylvia.srd-lite.bg3",
+        "setting_id": "pneuma.severed-lands",
+        "plan_id": "a-debt-in-iron",
+        "player_character_id": "${player_character_id}",
+        "companion_ids": [],
+        "premise": ""
+      }
+    },
+    {
+      "method": "finalize_campaign_construction",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "dm_provider_id": "${provider_id}",
+        "dm_model_id": "${model_id}",
+        "model_guidance_override": true
+      },
+      "save": {
+        "session_id": "/result/handoff/dm_session_id",
+        "turn_id": "/result/dm_turn_id"
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true,
+      "save": {
+        "revision": "/result/0/revision"
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {}
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "parameters": [
+          1
+        ]
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "parameters": null
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1"
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1"
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "gm",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": -1,
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "4",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        },
+        "session_id": ""
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "campaign-missing",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": 0,
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "no_such_tool",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "pneuma.not-locked",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "turn-other",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "player",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "actor": "participant-ea75078be7d24b5219d86dea"
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true,
+      "save": {
+        "revision": "/result/0/revision"
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-2",
+        "idempotency_key": "key-check-1",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "idempotency_key": "key-check-2",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "resolve_mechanics_choice",
+      "params": {}
+    },
+    {
+      "method": "resolve_mechanics_choice",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "resolution_id": "resolution-1",
+        "expected_revision": "${revision}",
+        "choice_id": "choice-1",
+        "option_id": "option-1",
+        "choice_sequence": "first"
+      }
+    },
+    {
+      "method": "resolve_mechanics_choice",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-1",
+        "resolution_id": "resolution-1",
+        "expected_revision": "${revision}",
+        "choice_id": "choice-1",
+        "option_id": "option-1"
+      }
+    },
+    {
+      "method": "resolve_mechanics_choice",
+      "params": {
+        "campaign_id": "campaign-missing",
+        "action_id": "action-check-1",
+        "resolution_id": "resolution-1",
+        "expected_revision": 0,
+        "choice_id": "choice-1",
+        "option_id": "option-1",
+        "choice_sequence": 1,
+        "session_id": "${session_id}"
+      }
+    },
+    {
+      "method": "retryable_interruption",
+      "params": {}
+    },
+    {
+      "method": "retryable_interruption",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "retryable_interruption",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "failed_attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "retryable_interruption",
+      "params": {
+        "campaign_id": "campaign-missing",
+        "failed_attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "retryable_interruption",
+      "params": {
+        "campaign_id": "Bad Id!",
+        "failed_attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {}
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "campaign-missing",
+        "turn_id": "turn-next"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "turn-next"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "${turn_id}"
+      }
+    },
+    {
+      "method": "complete_turn",
+      "params": {}
+    },
+    {
+      "method": "complete_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "turn-next"
+      }
+    },
+    {
+      "method": "complete_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "${turn_id}"
+      }
+    },
+    {
+      "method": "complete_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "${turn_id}"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "turn-next"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "turn-next"
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true,
+      "save": {
+        "revision": "/result/0/revision"
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-3",
+        "idempotency_key": "key-check-3",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "${turn_id}",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "execute_action",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "action_id": "action-check-4",
+        "idempotency_key": "key-check-4",
+        "writer": "dm",
+        "expected_revision": "${revision}",
+        "turn_id": "turn-next",
+        "package_id": "sylvia.srd-lite.bg3",
+        "tool_name": "d20_test",
+        "parameters": {
+          "kind": "ability_check",
+          "actor": "participant-ea75078be7d24b5219d86dea",
+          "actor_state": "participant-ea75078be7d24b5219d86dea",
+          "ability": "intelligence",
+          "skill": "investigation",
+          "proficiency_factor": "none",
+          "forego_save": false,
+          "target_number": 1,
+          "circumstantial_modifier": 0
+        }
+      }
+    },
+    {
+      "method": "complete_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "turn-next"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "Bad Turn!"
+      }
+    },
+    {
+      "method": "open_turn",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "turn_id": "turn xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {}
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": []
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {}
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {},
+        "operation_id": "construction-1",
+        "campaign_id": "${campaign_id}",
+        "lane": "guided"
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {},
+        "operation_id": "construction-1",
+        "campaign_id": "${campaign_id}",
+        "lane": "guided",
+        "expected_revision": "${revision}"
+      }
+    },
+    {
+      "method": "begin_campaign_construction",
+      "params": {
+        "canonical_input": {},
+        "operation_id": "construction-1",
+        "campaign_id": "campaign-missing",
+        "lane": "guided",
+        "expected_revision": 0
+      }
+    },
+    {
+      "method": "display_snapshot",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}

@@ -17,6 +17,7 @@ use sylvia_provider::config::Data;
 /// active again.
 pub async fn handle_resume_agent_session(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let session_id = super::campaigns::required(params, "session_id")?;
+    let _operation = super::operation(ctx)?;
     let record = ctx
         .store
         .call(move |store| store.resume_agent_session(&session_id))
@@ -223,6 +224,7 @@ pub async fn handle_session_context(ctx: &DispatchContext, params: &JsonMap) -> 
         };
         let limit = params.get("limit").map_or(50, |value| page_integer(value, 0));
         let id = session_id.clone();
+        let _operation = super::operation(ctx)?;
         let page = ctx
             .store
             .call(move |store| store.session_history_page(&id, before, limit))
@@ -521,6 +523,7 @@ async fn update_session_model(
     provider_id: &str,
     model_id: &str,
 ) -> CodedResult<sylvia_domain::session::SessionRecord> {
+    let _operation = super::operation(ctx)?;
     let _work = ctx.store.session_campaign_work(session_id).await.map_err(super::campaigns::store_error)?;
     let _lane = ctx.store.lanes().sessions.acquire(session_id).await;
     let (session, provider, model) = (session_id.to_owned(), provider_id.to_owned(), model_id.to_owned());
@@ -664,17 +667,23 @@ async fn admitted_dm_campaign_plan(
     let suffix = &sylvia_base::hash::sha256_hex(campaign_id.as_bytes())[..24];
     let (plan_id, handoff_id) = (format!("campaign-plan-{suffix}"), format!("builder-dm-handoff-{suffix}"));
     let admitted = || CodedError::rejected("DM session requires an admitted Builder campaign plan");
+    // `owner.campaign_plan`, `owner.builder_dm_handoff` and `owner.campaign_adventures`: each
+    // its own operation.
+    let operation = super::operation(ctx)?;
     let plan = ctx
         .store
         .call(move |store| store.campaign_plan_hit(&plan_id))
         .await
         .map_err(super::campaigns::store_error)?;
+    drop(operation);
     let Some(plan) = plan else { return Err(admitted()) };
+    let operation = super::operation(ctx)?;
     let handoff = ctx
         .store
         .call(move |store| store.handoff_hit(&handoff_id))
         .await
         .map_err(super::campaigns::store_error)?;
+    drop(operation);
     let Some(handoff) = handoff else { return Err(admitted()) };
     let (plan_fields, handoff_fields) = (plan.fields(), handoff.fields());
     if plan_fields.campaign_id != campaign_id
@@ -685,11 +694,13 @@ async fn admitted_dm_campaign_plan(
         return Err(CodedError::rejected("DM session does not match the admitted campaign plan"));
     }
     let id = campaign_id.to_owned();
+    let operation = super::operation(ctx)?;
     let adventures = ctx
         .store
         .call(move |store| store.campaign_adventures(&id))
         .await
         .map_err(super::campaigns::store_error)?;
+    drop(operation);
     if adventures.first().is_none_or(|first| first.fields().plan_id != plan_fields.plan_id) {
         return Err(CodedError::rejected("Current adventure is not descended from the admitted handoff"));
     }
@@ -895,7 +906,11 @@ pub async fn handle_submit_session_input(
         }
     };
     let reads = crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
-    if ctx.store.narration().admin_full_audit_enabled() {
+    let full_audit = {
+        let _operation = super::operation(ctx)?;
+        ctx.store.narration().admin_full_audit_enabled()
+    };
+    if full_audit {
         let sink_reads = reads.clone();
         provider = Arc::new(sylvia_provider::admin_audit::AdminAuditedProvider::new(
             provider,
@@ -1049,7 +1064,11 @@ fn session_provider_from(
     gm_mode: bool,
 ) -> CodedResult<Arc<dyn sylvia_provider::provider::Provider>> {
     let fields = session.fields();
-    if ctx.store.narration().admin_full_audit_enabled() {
+    let full_audit = {
+        let _operation = super::operation(ctx)?;
+        ctx.store.narration().admin_full_audit_enabled()
+    };
+    if full_audit {
         let reads = crate::owner_reads::OwnerReads::for_owner(ctx.store.clone(), ctx.owner_id.clone());
         provider = Arc::new(sylvia_provider::admin_audit::AdminAuditedProvider::new(
             provider,

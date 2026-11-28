@@ -34,6 +34,7 @@ pub(crate) fn builder_chat_value(chat: &BuilderChatRecord) -> Json {
 /// `handle_builder_chat_index`: `application_owner.builder_chat_index()`, which is
 /// `_operation()` around the store's read. Parameters are not read.
 pub async fn handle_builder_chat_index(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let _operation = super::operation(ctx)?;
     let chats =
         ctx.store.call(|store| store.builder_chat_index()).await.map_err(super::campaigns::store_error)?;
     Ok(Json::Array(chats.iter().map(builder_chat_value).collect()))

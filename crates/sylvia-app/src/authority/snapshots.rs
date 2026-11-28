@@ -148,6 +148,7 @@ pub async fn desktop_snapshot(
     campaign_id: &str,
     display_only: bool,
 ) -> StoreResult<DesktopSnapshot> {
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store
         .call(move |store| {
