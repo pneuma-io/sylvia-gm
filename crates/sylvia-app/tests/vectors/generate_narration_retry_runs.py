@@ -14,7 +14,9 @@ passes through the narrator unchanged. Each step records its answer or failure a
 attempt's cancel count after it; `narration_retry/final.sqlite3.gz` is the database after the
 last. Interruption identities come from `uuid.uuid4`, a counter here; `tests/narration_retry.rs`
 compares both owners' by order of first appearance. A step argument `{"interruption": n}` is the
-n-th interruption identity returned so far. Reference tooling only.
+n-th interruption identity returned so far, and `{"interruption": "last"}` the latest. A Retry
+step with `stopped_before_admission` has an `on_attempt_started` that does what the session
+loop's `admit_attempt` does when Stop came first: it interrupts the Retry, then refuses. Reference tooling only.
 """
 
 from __future__ import annotations
@@ -40,6 +42,7 @@ uuid.uuid4 = lambda: uuid.UUID(int=next(_counter), version=4)  # noqa: E731
 
 from sylvia_gm.application.authority import AuthorityOwner  # noqa: E402
 from sylvia_gm.domain.authority import ProseChannel  # noqa: E402
+from sylvia_gm.domain.errors import CommandRejected  # noqa: E402
 from sylvia_gm.domain.session import SessionMessageKind  # noqa: E402
 from tests.test_player_actions import _create, _move  # noqa: E402
 
@@ -128,6 +131,12 @@ STEPS: list[dict[str, object]] = [
     {"op": "retry", "interruption": {"interruption": 3}, "retry": "c1", "script": [talk("Left, then.")]},
     {"op": "redirect", "session": "gm", "message": "redirect-resolved", "interruption": {"interruption": 0},
      "content": {"text": "Again.", "turn_id": "turn", "attempt_id": "c9"}},
+    {"op": "start", "attempt": "a6"},
+    {"op": "interrupt", "attempt": "a6"},
+    {"op": "retry", "interruption": {"interruption": "last"}, "retry": "r7", "script": [talk("Never said.")],
+     "stopped_before_admission": True},
+    {"op": "status", "attempt": "r7"},
+    {"op": "retryable", "failed": "r7"},
     {"op": "interruptions"},
 ]
 
@@ -148,6 +157,8 @@ def main() -> None:
         def resolve(value: object) -> object:
             if isinstance(value, Mapping) and set(value) == {"interruption"} and isinstance(value["interruption"], int):
                 return interruptions[value["interruption"]]
+            if isinstance(value, Mapping) and value == {"interruption": "last"}:
+                return interruptions[-1]
             if isinstance(value, Mapping):
                 return {key: resolve(item) for key, item in value.items()}
             if isinstance(value, list):
@@ -219,10 +230,17 @@ def run(owner: AuthorityOwner, step: dict[str, object], cancels: dict[str, list[
                     channel, token, blocks = item["emit"]
                     stream.emit(ProseChannel(channel), token, response_blocks=blocks)
 
+            def admitted() -> None:
+                started.append(1)
+                if step.get("stopped_before_admission"):
+                    # `_session_loop.admit_attempt` when Stop came before the Retry's admission.
+                    owner.interrupt_narration(CAMPAIGN, str(step["retry"]))
+                    raise CommandRejected("Agent session was stopped before Retry provider admission")
+
             value = owner.manual_retry(campaign_id=CAMPAIGN, interruption_id=str(step["interruption"]),
                                        retry_id=str(step["retry"]), narrator=narrator,
                                        cancel=counter(str(step["retry"])),
-                                       on_attempt_started=lambda: started.append(1))
+                                       on_attempt_started=admitted)
             return {"ok": plain(value), "started": len(started)}, value
         else:
             raise AssertionError(op)
