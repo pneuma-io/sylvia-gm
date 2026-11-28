@@ -153,13 +153,13 @@ fn is_reparse_point(path: &Path) -> DomainResult<bool> {
 }
 
 #[cfg(windows)]
-fn reparse_attribute(metadata: &std::fs::Metadata) -> bool {
+pub(crate) fn reparse_attribute(metadata: &std::fs::Metadata) -> bool {
     use std::os::windows::fs::MetadataExt;
     metadata.file_attributes() & REPARSE_POINT != 0
 }
 
 #[cfg(not(windows))]
-fn reparse_attribute(_metadata: &std::fs::Metadata) -> bool {
+pub(crate) fn reparse_attribute(_metadata: &std::fs::Metadata) -> bool {
     false
 }
 

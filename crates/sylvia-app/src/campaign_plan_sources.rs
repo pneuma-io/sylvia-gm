@@ -2,7 +2,8 @@
 //! authoring and local Plan validation.
 //!
 //! The owner reads are [`LibraryOwner`]'s (`AuthorityStore` implements it). Python's
-//! `read_setting` closure is [`CampaignPlanToolAuthority::read_setting`], which keeps the owner.
+//! `read_setting` closure is [`CampaignPlanToolAuthority::read_setting`], which keeps the owner,
+//! or, for `check_plan_draft`'s authority, the checked archive's Setting files.
 
 use crate::bundled_packages::BundledPackages;
 use crate::library_sources::LibraryOwner;
@@ -11,13 +12,14 @@ use crate::plan_state_admission::validate_starting_declarations;
 use crate::setting_character_requirements::{
     parse_setting_character_requirements, CHARACTER_REQUIREMENTS_PATH,
 };
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{PackageLock, PackageRole};
 use sylvia_domain::campaign_plan::{
     validate_campaign_plan, CampaignPlanExpectations, PackageBinding, ValidatedCampaignPlan,
 };
 use sylvia_domain::error::{DomainError, DomainResult};
+use sylvia_domain::package_archive::{AdmittedPackageArchive, ArchiveFile};
 use sylvia_domain::package_library::{
     campaign_setting_entries, closure_sha256, parse_campaign_setting_knowledge_bytes, PackageCandidate,
     ParticipantArtifactDeclaration, CAMPAIGN_SETTING_KNOWLEDGE_PATH,
@@ -39,17 +41,43 @@ pub struct CampaignPlanToolAuthority<'a, O: LibraryOwner> {
     pub participant_schemas: Vec<Json>,
     pub setting_character_schema: Option<JsonMap>,
     pub state_schemas: Vec<Json>,
-    owner: &'a O,
+    reader: SettingReader<'a, O>,
 }
+
+/// Where `read_setting` reads: the owner's installed Setting, or one admitted archive's Setting
+/// files by path.
+enum SettingReader<'a, O> {
+    Owner(&'a O),
+    Archive(&'a AdmittedPackageArchive, BTreeMap<String, &'a ArchiveFile>),
+}
+
+/// `check_plan_draft`'s `read_setting`: a file of at most 256 KiB, decoded as UTF-8.
+const ARCHIVE_SETTING_LIMIT: i64 = 256 * 1024;
 
 impl<O: LibraryOwner> CampaignPlanToolAuthority<'_, O> {
     /// `read_setting(path)`: one Setting source file, refused outside its paths.
     pub fn read_setting(&self, path: &str) -> Result<String, O::Error> {
+        let owner = match &self.reader {
+            SettingReader::Owner(owner) => owner,
+            SettingReader::Archive(admitted, files) => {
+                let Some(archive_file) =
+                    files.get(path).filter(|item| item.file.byte_count() <= ARCHIVE_SETTING_LIMIT)
+                else {
+                    return Err(
+                        DomainError::value("Required Character File is unavailable or oversized").into()
+                    );
+                };
+                let bytes = admitted.read_file(archive_file)?;
+                return Ok(
+                    sylvia_base::pystr::utf8_decode(&bytes).map_err(crate::reusable_plans::unicode_error)?
+                );
+            }
+        };
         if !self.setting_paths.contains(path) {
             return Err(DomainError::value("Campaign Setting source path is unavailable").into());
         }
         let setting = &self.setting;
-        self.owner.package_text_file(
+        owner.package_text_file(
             &setting.package_id,
             &setting.version,
             &setting.content_sha256,
@@ -107,6 +135,44 @@ impl<O: LibraryOwner> CampaignPlanToolAuthority<'_, O> {
             )?;
         }
         Ok(validated)
+    }
+}
+
+impl<'a, O: LibraryOwner> CampaignPlanToolAuthority<'a, O> {
+    /// `check_plan_draft`'s `CampaignPlanToolAuthority(ruleset=..., setting=..., closure_sha256=...,
+    /// setting_paths=frozenset(setting_files), read_setting=read_setting,
+    /// setting_character_schema=...)`: the Setting files of one admitted archive, with no
+    /// knowledge, participant or state schemas.
+    pub fn from_archive(
+        ruleset: PackageBinding,
+        setting: PackageBinding,
+        closure_sha256: String,
+        admitted: &'a AdmittedPackageArchive,
+    ) -> Result<Self, O::Error> {
+        let identity =
+            (setting.package_id.as_str(), setting.version.as_str(), setting.content_sha256.as_str());
+        let files: BTreeMap<String, &ArchiveFile> = admitted
+            .files
+            .iter()
+            .filter(|item| admitted.manifests[item.manifest].identity() == identity)
+            .map(|item| (item.file.path().to_owned(), item))
+            .collect();
+        let mut sources: Self = CampaignPlanToolAuthority {
+            ruleset,
+            setting,
+            closure_sha256,
+            setting_paths: files.keys().cloned().collect(),
+            setting_knowledge_ids: BTreeSet::new(),
+            participant_schemas: Vec::new(),
+            setting_character_schema: None,
+            state_schemas: Vec::new(),
+            reader: SettingReader::Archive(admitted, files),
+        };
+        if sources.setting_paths.contains(CHARACTER_REQUIREMENTS_PATH) {
+            let text = sources.read_setting(CHARACTER_REQUIREMENTS_PATH)?;
+            sources.setting_character_schema = Some(parse_setting_character_requirements(&text)?);
+        }
+        Ok(sources)
     }
 }
 
@@ -180,7 +246,7 @@ pub fn campaign_plan_sources<'a, O: LibraryOwner>(
         participant_schemas: list("participant_artifacts"),
         setting_character_schema: None,
         state_schemas: list("state_schemas"),
-        owner,
+        reader: SettingReader::Owner(owner),
     };
     if sources.setting_paths.contains(CHARACTER_REQUIREMENTS_PATH) {
         let text = sources.read_setting(CHARACTER_REQUIREMENTS_PATH)?;
