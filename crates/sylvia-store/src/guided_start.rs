@@ -755,6 +755,7 @@ impl StoreHandle {
         kind: SessionMessageKind,
         content: &JsonMap,
     ) -> StoreResult<SessionMessage> {
+        let _operation = self.operation()?;
         let _work = self.session_campaign_work(session_id).await?;
         let _session = self.lanes().sessions.acquire(session_id).await;
         let (session_id, message_id, content) =

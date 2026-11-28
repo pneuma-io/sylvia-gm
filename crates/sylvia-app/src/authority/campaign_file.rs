@@ -94,6 +94,7 @@ pub async fn update_campaign_file(
     owner_id: &str,
     update: &CampaignFileUpdate,
 ) -> Result<JsonMap, ActionError> {
+    let _operation = store.operation()?;
     let _work = store.session_campaign_work(&update.session_id).await?;
     let (owned, work, owner) = (update.clone(), store.lanes().work.clone(), owner_id.to_owned());
     let stage = store.call(move |store| Ok(prepare(store, &work, &owner, &owned))).await?;

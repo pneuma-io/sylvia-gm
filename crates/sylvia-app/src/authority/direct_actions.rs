@@ -66,6 +66,7 @@ pub async fn player_action(
     owner_id: &str,
     request: &PlayerActionRequest,
 ) -> Result<PlayerActionAnswer, ActionError> {
+    let _operation = store.operation()?;
     let owned = request.campaign_id.clone();
     let _work = store
         .lanes()

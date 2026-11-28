@@ -43,6 +43,18 @@ pub async fn canonical_replay(
     campaign_id: &str,
     acknowledged_sequence: i64,
 ) -> StoreResult<CanonicalReplay> {
+    let _operation = store.operation()?;
+    canonical_replay_in_operation(store, narration, campaign_id, acknowledged_sequence).await
+}
+
+/// `_canonical_replay(campaign_id, acknowledged_sequence)`: the replay for an operation that
+/// already holds the owner's operation guard (`reconnect_narration`).
+pub(super) async fn canonical_replay_in_operation(
+    store: &StoreHandle,
+    narration: &NarrationState,
+    campaign_id: &str,
+    acknowledged_sequence: i64,
+) -> StoreResult<CanonicalReplay> {
     if acknowledged_sequence < 0 {
         return Err(sylvia_store::error::value_error("Acknowledged canonical sequence cannot be negative"));
     }
@@ -142,6 +154,7 @@ fn player_response_reservations(
 /// `AuthorityOwner.player_action_context(campaign_id)`: the saved outcomes since the last
 /// ordinary GM narration that no saved response has answered yet.
 pub async fn player_action_context(store: &StoreHandle, campaign_id: &str) -> StoreResult<Vec<JsonMap>> {
+    let _operation = store.operation()?;
     let id = campaign_id.to_owned();
     store.call(move |store| player_action_context_on(store, &id)).await
 }
@@ -192,6 +205,7 @@ pub async fn player_action_response_basis(
     action_id: &str,
     automatic: bool,
 ) -> StoreResult<JsonMap> {
+    let _operation = store.operation()?;
     let (session_id, action_id) = (session_id.to_owned(), action_id.to_owned());
     store
         .call(move |store| {
@@ -242,6 +256,7 @@ pub async fn player_action_response_context(
     campaign_id: &str,
     basis: &JsonMap,
 ) -> StoreResult<Vec<JsonMap>> {
+    let _operation = store.operation()?;
     let (id, basis) = (campaign_id.to_owned(), Arc::new(basis.clone()));
     store
         .call(move |store| {
@@ -263,6 +278,7 @@ pub async fn action_sequence_response_results(
     session_id: &str,
     basis_message_id: Option<&str>,
 ) -> StoreResult<Vec<JsonMap>> {
+    let _operation = store.operation()?;
     let (session_id, basis) = (session_id.to_owned(), basis_message_id.map(str::to_owned));
     store.call(move |store| action_sequences::response_results(store, &session_id, basis.as_deref())).await
 }

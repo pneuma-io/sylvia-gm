@@ -20,6 +20,7 @@ pub async fn export_campaign(
     target: &Path,
     include_thinking: bool,
 ) -> StoreResult<CampaignExportResult> {
+    let _operation = store.operation()?;
     validate_authority_identity(operation_id, "Operation id", false)?;
     validate_authority_identity(campaign_id, "Campaign id", false)?;
     let (campaign_id, target) = (campaign_id.to_owned(), target.to_path_buf());
@@ -39,6 +40,7 @@ pub async fn recover_campaign(
     recovery_id: &str,
     source: &Path,
 ) -> StoreResult<CampaignRecoveryResult> {
+    let _operation = store.operation()?;
     validate_authority_identity(recovery_id, "Recovery identity", false)?;
     let staged = Arc::new(stage_campaign_archive_blocking(source.to_path_buf()).await?);
     let (id, lookup) = (recovery_id.to_owned(), Arc::clone(&staged));
@@ -61,6 +63,7 @@ pub async fn export_package_candidate(
     candidate_id: &str,
     target: &mut (dyn std::io::Write + Send),
 ) -> StoreResult<sylvia_base::JsonMap> {
+    let _operation = store.operation()?;
     let id = candidate_id.to_owned();
     let (candidate, drafts) = store.call(move |store| export_drafts(store, &id)).await?;
     write_export(candidate_id, &candidate, &drafts, target)

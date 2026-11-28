@@ -50,6 +50,7 @@ pub async fn purge_campaign(
     mut prepare_external: Option<ExternalPurgeStep<'_>>,
     mut rollback_external: Option<ExternalPurgeStep<'_>>,
 ) -> StoreResult<CampaignPurgeResult> {
+    let _operation = store.operation()?;
     let identities_valid = validate_authority_identity(operation_id, "Campaign operation identity", false)
         .is_ok()
         && validate_authority_identity(campaign_id, "Campaign identity", false).is_ok()
@@ -158,6 +159,7 @@ pub async fn rename_campaign(
     display_name: &str,
     expected_revision: i64,
 ) -> StoreResult<CampaignLifecycleResult> {
+    let _operation = store.operation()?;
     lifecycle_operation(
         store,
         operation_id,
@@ -178,6 +180,7 @@ pub async fn archive_campaign(
     expected_revision: i64,
     designated_session_id: Option<&str>,
 ) -> StoreResult<CampaignLifecycleResult> {
+    let _operation = store.operation()?;
     lifecycle_operation(
         store,
         operation_id,
@@ -198,6 +201,7 @@ pub async fn restore_archived_campaign(
     expected_revision: i64,
     session_id: Option<&str>,
 ) -> StoreResult<CampaignLifecycleResult> {
+    let _operation = store.operation()?;
     lifecycle_operation(
         store,
         operation_id,
@@ -217,6 +221,7 @@ pub async fn restore_trashed_campaign(
     campaign_id: &str,
     expected_revision: i64,
 ) -> StoreResult<CampaignLifecycleResult> {
+    let _operation = store.operation()?;
     lifecycle_operation(store, operation_id, "restore_campaign", campaign_id, expected_revision, None, None)
         .await
 }
@@ -229,6 +234,7 @@ pub async fn trash_campaign(
     expected_revision: i64,
     designated_session_id: Option<&str>,
 ) -> StoreResult<CampaignLifecycleResult> {
+    let _operation = store.operation()?;
     lifecycle_operation(
         store,
         operation_id,
