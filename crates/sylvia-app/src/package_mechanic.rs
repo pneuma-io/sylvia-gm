@@ -291,7 +291,7 @@ pub fn materialize_package_mechanic(
     package_version: &str,
     package_sha256: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl crate::package_runtime::RuntimeBytes + ?Sized),
 ) -> Result<PackageMechanic, PackageRuntimeFailure> {
     if package_id == "wotc.srd.5.2.1" {
         return Err(crate::package_runtime::rejection(
@@ -924,7 +924,7 @@ impl ControlInner {
     fn new(
         package_id: &str,
         declaration: &ToolDeclaration,
-        runtime_bytes: &[u8],
+        runtime_bytes: &(impl crate::package_runtime::RuntimeBytes + ?Sized),
     ) -> Result<Self, PackageRuntimeFailure> {
         let runtime = parse_runtime(package_id, runtime_bytes)?;
         let metadata = crate::package_runtime::tool_metadata_of(&runtime, &declaration.name)?;
@@ -992,7 +992,7 @@ impl PartialEq for PlayerActionPreviewer {
 pub fn materialize_player_action_checker(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl crate::package_runtime::RuntimeBytes + ?Sized),
 ) -> Result<PlayerActionChecker, PackageRuntimeFailure> {
     Ok(PlayerActionChecker(Arc::new(ControlInner::new(package_id, declaration, runtime_bytes)?)))
 }
@@ -1001,7 +1001,7 @@ pub fn materialize_player_action_checker(
 pub fn materialize_player_action_previewer(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl crate::package_runtime::RuntimeBytes + ?Sized),
 ) -> Result<PlayerActionPreviewer, PackageRuntimeFailure> {
     Ok(PlayerActionPreviewer(Arc::new(ControlInner::new(package_id, declaration, runtime_bytes)?)))
 }

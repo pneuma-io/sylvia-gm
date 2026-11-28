@@ -7,6 +7,7 @@ pub mod error;
 pub mod eval;
 pub mod ops;
 pub mod parser;
+pub mod text_cache;
 pub mod token;
 pub mod value;
 

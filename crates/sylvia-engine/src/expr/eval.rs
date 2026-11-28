@@ -12,6 +12,7 @@ use super::compare::{py_order, Order};
 use super::error::ExpressionError;
 use super::ops::{self, PowError};
 use super::parser::{function_whitelist, parse_expression, BinaryOp, Literal, Node, UnaryOp};
+use super::text_cache::TextCache;
 use super::value::{numeric, py_eq, Dict, Method, Numeric, Value};
 use crate::pyerror::{int_range_error, PyError, PyErrorKind};
 use std::cell::Cell;
@@ -152,10 +153,14 @@ pub struct EvalContext<'a> {
     pub required_inputs: bool,
 }
 
-/// `evaluate_expression(expr, context)`: parse (Python caches successful parses; a parse has no
-/// side effects, so Rust need not) and evaluate.
+/// `_evaluation_expression(expression)`: Python's `lru_cache(maxsize=1024)` of successful parses.
+/// An evaluation only reads its tree, so every caller can share one.
+static EVALUATION_EXPRESSIONS: TextCache<Arc<Node>> = TextCache::new(1024);
+
+/// `evaluate_expression(expr, context)`: the cached parse (`_evaluation_expression`), then
+/// evaluate. A parse error is not kept, so it is raised again on every call, as in Python.
 pub fn evaluate_expression(expr: &str, ctx: &EvalContext<'_>) -> EvalResult<Value> {
-    let node = parse_expression(expr)?;
+    let node = EVALUATION_EXPRESSIONS.get_or_try(expr, |text| parse_expression(text).map(Arc::new))?;
     evaluate(&node, ctx)
 }
 
