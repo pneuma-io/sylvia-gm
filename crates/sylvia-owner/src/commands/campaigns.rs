@@ -669,6 +669,166 @@ pub async fn handle_purge_campaign(ctx: &DispatchContext, params: &JsonMap) -> C
     Ok(Json::Object(value))
 }
 
+/// An uncaught `OSError` from a file step.
+fn os_failure(error: &std::io::Error) -> sylvia_base::CodedError {
+    crate::desktop_update::storage::os_error(error)
+}
+
+/// A lane 1 domain failure: Python's `ValueError` or `CommandRejected` as the owner's rejection,
+/// anything else its internal error.
+fn domain_failure(error: sylvia_domain::DomainError) -> sylvia_base::CodedError {
+    error.rejection().unwrap_or_else(|| {
+        sylvia_base::CodedError::new("internal_error", error.message()).with_error_type(error.python_class())
+    })
+}
+
+/// `tempfile.TemporaryDirectory(prefix=".plan-export-", dir=storage_root)`: removed when dropped.
+struct PlanExportFolder(std::path::PathBuf);
+
+impl PlanExportFolder {
+    fn new(storage_root: &std::path::Path) -> std::io::Result<Self> {
+        const CHARACTERS: &[u8] = b"abcdefghijklmnopqrstuvwxyz0123456789_";
+        loop {
+            let mut random = [0u8; 8];
+            getrandom::getrandom(&mut random).expect("the system random source");
+            let name: String =
+                random.iter().map(|byte| CHARACTERS[usize::from(*byte) % CHARACTERS.len()] as char).collect();
+            let path = storage_root.join(format!(".plan-export-{name}"));
+            match std::fs::create_dir(&path) {
+                Ok(()) => return Ok(Self(path)),
+                Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
+                Err(error) => return Err(error),
+            }
+        }
+    }
+}
+
+impl Drop for PlanExportFolder {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_dir_all(&self.0);
+    }
+}
+
+/// `target.open("wb")` then `target.write(data)`: the file is truncated before the export, so a
+/// failed export leaves it empty, as Python's does.
+fn write_plan_target(
+    target: &std::path::Path,
+    export: impl FnOnce() -> sylvia_domain::DomainResult<(Vec<u8>, JsonMap)>,
+) -> CodedResult<JsonMap> {
+    use std::io::Write;
+    let mut stream = std::fs::File::create(target).map_err(|error| os_failure(&error))?;
+    let (bytes, receipt) = export().map_err(domain_failure)?;
+    stream.write_all(&bytes).map_err(|error| os_failure(&error))?;
+    Ok(receipt)
+}
+
+/// `handle_export_campaign_plan_file`: one library or built-in Campaign Plan, by its exact
+/// digest, written as a portable `.sylvia-gm-plan` bundle to `exports/<export_id>`. A reusable
+/// Plan with its own package snapshot exports as saved; any other Plan is first saved, with its
+/// retained sources, into a disposable library under the storage root, then exported from there.
+pub async fn handle_export_campaign_plan_file(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_app::builder_references::OwnerError;
+    use sylvia_app::campaign_plan_sources::validate_retained_campaign_plan;
+    use sylvia_app::plan_bundle::export_plan_bundle;
+    use sylvia_app::plan_snapshot::{retained_plan_snapshot, validate_plan_snapshot};
+    use sylvia_app::reusable_plans::{load_reusable_campaign_plan, save_reusable_campaign_plan};
+    let export_id = required_artifact_id(params, "export_id")?;
+    let plan_id = required(params, "plan_id")?;
+    let expected = required(params, "expected_content_sha256")?;
+    let (storage_root, bundled) = (ctx.storage_root.clone(), std::sync::Arc::clone(&ctx.bundled));
+    let operation = super::operation(ctx)?;
+    let (target, receipt) = ctx
+        .store
+        .call(move |store| -> sylvia_store::StoreResult<CodedResult<(std::path::PathBuf, JsonMap)>> {
+            let catalog =
+                crate::creation_catalog::campaign_creation_catalog(&storage_root, store, &bundled, true)?;
+            let mut selected = catalog.into_iter().find(|item| {
+                item.get("kind").and_then(Json::as_str) == Some("campaign_plan")
+                    && item.get("id").and_then(Json::as_str) == Some(plan_id.as_str())
+            });
+            Ok((|| -> CodedResult<(std::path::PathBuf, JsonMap)> {
+                if selected.is_none() {
+                    // A retained built-in saved reference exports without joining the public
+                    // catalogue; its exact digest still gates the export.
+                    if let Some(retained) = bundled.bundled_plan(&plan_id).map_err(domain_failure)? {
+                        if retained.setup_id.is_some() {
+                            let mut payload = retained.catalog_payload();
+                            payload.shift_remove("reusable");
+                            payload.insert("bundled".into(), true.into());
+                            selected = Some(payload);
+                        }
+                    }
+                }
+                let selected = match selected {
+                    Some(item)
+                        if item.get("content_sha256").and_then(Json::as_str) == Some(expected.as_str()) =>
+                    {
+                        item
+                    }
+                    _ => {
+                        return Err(sylvia_base::CodedError::rejected(
+                            "Selected Campaign Plan changed; refresh its library entry",
+                        ))
+                    }
+                };
+                let exports = storage_root.join("exports");
+                let target = exports.join(format!("{export_id}.sylvia-gm-plan"));
+                std::fs::create_dir_all(&exports).map_err(|error| os_failure(&error))?;
+                let reusable = selected.get("reusable").is_some_and(sylvia_domain::pyops::py_truthy);
+                let saved = if reusable {
+                    let validate = |payload: &Json, text: &str| {
+                        validate_retained_campaign_plan(store, &bundled, payload, text, None)
+                            .map_err(|error| error.as_domain())
+                    };
+                    load_reusable_campaign_plan(&storage_root, &plan_id, Some(&validate), &bundled)
+                } else {
+                    bundled.selected_campaign_plan(&storage_root, &plan_id, None)
+                }
+                .map_err(domain_failure)?;
+                if reusable && saved.package_snapshot.is_some() {
+                    let receipt = write_plan_target(&target, || {
+                        export_plan_bundle(&storage_root, &saved.artifact_id, &saved.content_sha256, &bundled)
+                    })?;
+                    return Ok((target, receipt));
+                }
+                // Capture an older Plan's retained sources without changing its library entry.
+                let snapshot = match &saved.package_snapshot {
+                    Some(snapshot) => snapshot.clone(),
+                    None => {
+                        retained_plan_snapshot(store, &bundled, &Json::Object(saved.plan.payload.clone()))
+                            .map_err(super::campaigns::store_error)?
+                    }
+                };
+                let folder = PlanExportFolder::new(&storage_root).map_err(|error| os_failure(&error))?;
+                let validate = |payload: &Json, text: &str| validate_plan_snapshot(&snapshot, payload, text);
+                let portable = save_reusable_campaign_plan(
+                    &folder.0,
+                    &bundled,
+                    &format!("portable-{plan_id}"),
+                    &Json::Object(saved.plan.payload.clone()),
+                    &saved.plan.readable_markdown,
+                    &validate,
+                    Some(&snapshot),
+                    selected.get("setup_id").and_then(Json::as_str),
+                    saved.interview_contribution.as_ref(),
+                )
+                .map_err(domain_failure)?;
+                let receipt = write_plan_target(&target, || {
+                    export_plan_bundle(&folder.0, &portable.artifact_id, &portable.content_sha256, &bundled)
+                })?;
+                Ok((target, receipt))
+            })())
+        })
+        .await
+        .map_err(store_error)??;
+    drop(operation);
+    let resolved = resolve_strict(&target).map_err(|error| os_failure(&error))?;
+    let mut reply = JsonMap::new();
+    reply.insert("export".into(), Json::Object(receipt));
+    reply.insert("artifact_path".into(), resolved.to_string_lossy().into_owned().into());
+    Ok(Json::Object(reply))
+}
+
 /// `handle_export_campaign`, for both `export_campaign` and `export_campaign_file`: one portable
 /// archive published at `exports/<export_id>.sylvia-gm-campaign` under the storage root. The
 /// file command also answers with the archive's resolved path.

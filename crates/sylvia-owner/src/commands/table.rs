@@ -149,7 +149,7 @@ pub const REGISTRY: &[Command] = &[
     ported("restore_trashed_campaign", "campaigns", true, true),
     ported("purge_campaign", "campaigns", true, true),
     ported("backup_database", "campaigns", false, true),
-    pending("export_campaign_plan_file", "campaigns", false, true),
+    ported("export_campaign_plan_file", "campaigns", false, true),
     ported("export_package_candidate", "packages", false, true),
     ported("export_package_candidate_file", "packages", false, true),
     ported("export_campaign", "campaigns", false, true),

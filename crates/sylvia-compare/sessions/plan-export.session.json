@@ -1,0 +1,121 @@
+{
+  "name": "plan-export",
+  "description": "Exporting Campaign Plans as portable .sylvia-gm-plan bundles on a fresh profile: export_campaign_plan_file's argument refusals in Python's order (the export id, an unsafe or invalid one, the Plan, the digest), a stale digest and an unknown Plan refused before anything is written, then three built-in Plans (Last Cart Through, A Debt in Iron, the Riichi Quick Test) each saved with its retained sources into a disposable library and exported, and one export repeated; the bundles are compared byte for byte; then shut down.",
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "campaign_creation_catalog",
+      "expect_ok": true,
+      "save": {
+        "cart": "/result/3/content_sha256",
+        "iron": "/result/14/content_sha256",
+        "riichi": "/result/18/content_sha256"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {}
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": ""
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "../escape"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "Export One"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart",
+        "plan_id": "last-cart-through"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart",
+        "plan_id": "last-cart-through",
+        "expected_content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart",
+        "plan_id": "no-such-plan",
+        "expected_content_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart",
+        "plan_id": "last-cart-through",
+        "expected_content_sha256": "${riichi}"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart",
+        "plan_id": "last-cart-through",
+        "expected_content_sha256": "${cart}"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-iron",
+        "plan_id": "a-debt-in-iron",
+        "expected_content_sha256": "${iron}"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-riichi",
+        "plan_id": "riichi-quick-test",
+        "expected_content_sha256": "${riichi}"
+      }
+    },
+    {
+      "method": "export_campaign_plan_file",
+      "params": {
+        "export_id": "export-cart",
+        "plan_id": "last-cart-through",
+        "expected_content_sha256": "${cart}"
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}
