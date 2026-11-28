@@ -170,6 +170,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "execute_player_action" | "preview_player_action" => {
             commands::actions::handle_execute_player_action(context, params).await
         }
+        "campaign_panels" => commands::actions::handle_campaign_panels(context, params).await,
         "open_turn" => commands::actions::handle_open_turn(context, params).await,
         "complete_turn" => commands::actions::handle_complete_turn(context, params).await,
         "retryable_interruption" => commands::actions::handle_retryable_interruption(context, params).await,

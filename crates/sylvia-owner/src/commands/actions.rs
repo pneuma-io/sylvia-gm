@@ -185,3 +185,15 @@ pub async fn handle_execute_player_action(ctx: &DispatchContext, params: &JsonMa
         PlayerActionAnswer::Preview(preview) => crate::owner_json::json_value(&Json::Object(preview)),
     }
 }
+
+/// `handle_campaign_panels`: the campaign's package panels (`AuthorityOwner.campaign_panels`).
+/// `after_revision` is read as `_optional_nonnegative_int` first, so a value that is not a
+/// nonnegative integer is refused here, before the owner's own revision check.
+pub async fn handle_campaign_panels(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let campaign_id = required(params, "campaign_id")?;
+    let after_revision = super::sessions::optional_nonnegative_int(params, "after_revision")?.map(Json::from);
+    sylvia_app::authority::campaign_panels::campaign_panels(&ctx.store, &campaign_id, after_revision.as_ref())
+        .await
+        .map(Json::Object)
+        .map_err(action_error)
+}

@@ -1,0 +1,487 @@
+{
+  "name": "campaign-panels",
+  "description": "campaign_panels on the two new campaigns of campaign-snapshots (stand-in model): an SRD Lite campaign with a party and a Riichi Mahjong campaign with its table panel. The refusals in Python's order (a missing or empty campaign id; after_revision a bool, a float, text or negative, refused before the owner; an unknown campaign), then each campaign's panels with no revision, null, 0 and a revision past the current one; then shut down.",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "configured_context_window": 1000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "campaign_party_options",
+      "expect_ok": true,
+      "params": {
+        "ruleset_selection": "sylvia.srd-lite.bg3",
+        "setting_id": "pneuma.severed-lands",
+        "plan_id": "a-debt-in-iron"
+      },
+      "save": {
+        "player_character_id": "/result/player_archetypes/0/id"
+      }
+    },
+    {
+      "method": "create_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-draft",
+        "display_name": "Debt in Iron",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "srd_campaign": "/result/campaign_id",
+        "srd_builder": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-ruleset",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 0,
+        "current_step": "ruleset",
+        "visible_answer": "SRD Lite",
+        "answer": {
+          "candidate_id": "sylvia.srd-lite.bg3"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-setting",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 1,
+        "current_step": "setting",
+        "visible_answer": "The Severed Lands",
+        "answer": {
+          "setting_id": "pneuma.severed-lands"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-plan",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 2,
+        "current_step": "plan",
+        "visible_answer": "A Debt in Iron",
+        "answer": {
+          "plan_id": "a-debt-in-iron"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-name",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 3,
+        "current_step": "name",
+        "visible_answer": "Debt in Iron",
+        "answer": {
+          "display_name": "Debt in Iron"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-participants",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 4,
+        "current_step": "participants",
+        "visible_answer": "Tavin Bell",
+        "answer": {
+          "archetype_id": "${player_character_id}",
+          "companion_ids": []
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-boundaries",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 5,
+        "current_step": "boundaries_preferences",
+        "visible_answer": "None; Mystery",
+        "answer": {
+          "boundaries": "None",
+          "preferences": "Mystery"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-requests",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "expected_construction_revision": 6,
+        "current_step": "specific_requests",
+        "visible_answer": "No additional requests",
+        "answer": {
+          "no_additional_requests": true,
+          "requests": ""
+        }
+      }
+    },
+    {
+      "method": "start_guided_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "iron-start",
+        "campaign_id": "${srd_campaign}",
+        "builder_session_id": "${srd_builder}",
+        "display_name": "Debt in Iron",
+        "candidate_id": "sylvia.srd-lite.bg3",
+        "setting_id": "pneuma.severed-lands",
+        "plan_id": "a-debt-in-iron",
+        "player_character_id": "${player_character_id}",
+        "companion_ids": [],
+        "premise": ""
+      }
+    },
+    {
+      "method": "finalize_campaign_construction",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "dm_provider_id": "${provider_id}",
+        "dm_model_id": "${model_id}",
+        "model_guidance_override": true
+      }
+    },
+    {
+      "method": "campaign_party_options",
+      "expect_ok": true,
+      "params": {
+        "ruleset_selection": "pneuma.riichi-mahjong",
+        "setting_id": "pneuma.riichi-club",
+        "plan_id": "riichi-quick-test"
+      },
+      "save": {
+        "riichi_player": "/result/player_archetypes/0/id"
+      }
+    },
+    {
+      "method": "create_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "table-draft",
+        "display_name": "Lantern Table",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "riichi_campaign": "/result/campaign_id",
+        "riichi_builder": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-ruleset",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 0,
+        "current_step": "ruleset",
+        "visible_answer": "Riichi Mahjong",
+        "answer": {
+          "candidate_id": "pneuma.riichi-mahjong"
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-setting",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 1,
+        "current_step": "setting",
+        "visible_answer": "The Lantern Table",
+        "answer": {
+          "setting_id": "pneuma.riichi-club"
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-plan",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 2,
+        "current_step": "plan",
+        "visible_answer": "Riichi Quick Test",
+        "answer": {
+          "plan_id": "riichi-quick-test"
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-format",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 3,
+        "current_step": "plan_contribution",
+        "visible_answer": "East-only",
+        "answer": {
+          "contribution_id": "riichi-quick-test-format",
+          "answers": {
+            "match_format": "east_only"
+          }
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-name",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 4,
+        "current_step": "name",
+        "visible_answer": "Lantern Table",
+        "answer": {
+          "display_name": "Lantern Table"
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-participants",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 5,
+        "current_step": "participants",
+        "visible_answer": "You",
+        "answer": {
+          "archetype_id": "${riichi_player}",
+          "companion_ids": []
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-boundaries",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 6,
+        "current_step": "boundaries_preferences",
+        "visible_answer": "None; Mystery",
+        "answer": {
+          "boundaries": "None",
+          "preferences": "Mystery"
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "params": {
+        "operation_id": "table-requests",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "expected_construction_revision": 7,
+        "current_step": "specific_requests",
+        "visible_answer": "No additional requests",
+        "answer": {
+          "no_additional_requests": true,
+          "requests": ""
+        }
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "start_guided_campaign",
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "table-start",
+        "campaign_id": "${riichi_campaign}",
+        "builder_session_id": "${riichi_builder}",
+        "display_name": "Lantern Table",
+        "candidate_id": "pneuma.riichi-mahjong",
+        "setting_id": "pneuma.riichi-club",
+        "plan_id": "riichi-quick-test",
+        "player_character_id": "${riichi_player}",
+        "companion_ids": [],
+        "premise": ""
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "finalize_campaign_construction",
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${riichi_campaign}",
+        "dm_provider_id": "${provider_id}",
+        "dm_model_id": "${model_id}",
+        "model_guidance_override": true
+      },
+      "expect_ok": true
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true,
+      "save": {
+        "first_revision": "/result/0/revision",
+        "second_revision": "/result/1/revision"
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {}
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": ""
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "after_revision": true
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "after_revision": 1.5
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "after_revision": "3"
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "after_revision": -1
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "campaign-missing"
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}"
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "after_revision": null
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${srd_campaign}",
+        "after_revision": 0
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${riichi_campaign}"
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${riichi_campaign}",
+        "after_revision": 0
+      }
+    },
+    {
+      "method": "campaign_panels",
+      "params": {
+        "campaign_id": "${riichi_campaign}",
+        "after_revision": 999
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}
