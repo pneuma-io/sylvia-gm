@@ -14,6 +14,7 @@ use sylvia_agent::session_loop::campaign::NarrationStream;
 use sylvia_agent::session_loop::SessionFailure;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_app::action_sequences::{ComposeRequest, ExecuteRequest};
 use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
 use sylvia_app::authority::narration_attempts::{self as narration, NarrationStart};
@@ -135,30 +136,27 @@ impl TurnOwner for OwnerReads {
         Box::pin(async { Err(pending("campaign_panels")) })
     }
 
+    // Lane 2's `action_sequences`, once lane 3's `impl SequenceOwner for StoreHandle` lands.
     fn action_sequence<'a>(
         &'a self,
         _session_id: &'a str,
-        _sequence_id: &'a Json,
-    ) -> BoxFuture<'a, CodedResult<Json>> {
-        Box::pin(async { Err(pending("action_sequence")) })
+        _sequence_id: Option<&'a Json>,
+    ) -> BoxFuture<'a, Result<Option<JsonMap>, AuthorityFailure>> {
+        Box::pin(async { Err(pending("action_sequence").into()) })
     }
 
     fn compose_action_sequence_from_agent<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _session_id: &'a str,
-        _arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<Json>> {
-        Box::pin(async { Err(pending("_compose_action_sequence_from_agent")) })
+        _request: &'a ComposeRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        Box::pin(async { Err(pending("_compose_action_sequence_from_agent").into()) })
     }
 
     fn execute_action_sequence_from_agent<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _session_id: &'a str,
-        _arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<Json>> {
-        Box::pin(async { Err(pending("_execute_action_sequence_from_agent")) })
+        _request: &'a ExecuteRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        Box::pin(async { Err(pending("_execute_action_sequence_from_agent").into()) })
     }
 
     fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()> {

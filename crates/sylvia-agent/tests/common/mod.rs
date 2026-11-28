@@ -541,34 +541,44 @@ impl TurnOwner for Recorded {
     fn action_sequence<'a>(
         &'a self,
         session_id: &'a str,
-        sequence_id: &'a J,
-    ) -> BoxFuture<'a, CodedResult<J>> {
+        sequence_id: Option<&'a J>,
+    ) -> BoxFuture<'a, Result<Option<JsonMap>, AuthorityFailure>> {
         let result = self.next_result("action_sequence", serde_json::json!([session_id, sequence_id]));
-        Box::pin(async move { result })
+        Box::pin(async move {
+            Ok(match result? {
+                J::Null => None,
+                value => Some(map(&value)),
+            })
+        })
     }
     fn compose_action_sequence_from_agent<'a>(
         &'a self,
-        campaign_id: &'a str,
-        session_id: &'a str,
-        arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<J>> {
+        request: &'a sylvia_app::action_sequences::ComposeRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let mut arguments = JsonMap::new();
+        arguments.insert("sequence_id".into(), J::from(request.sequence_id.as_str()));
+        arguments.insert("expected_revision".into(), request.expected_revision.clone());
+        arguments.insert("expected_version".into(), request.expected_version.clone());
+        arguments.insert("steps".into(), request.steps.clone());
         let result = self.next_result(
             "_compose_action_sequence_from_agent",
-            serde_json::json!([campaign_id, session_id, arguments]),
+            serde_json::json!([request.campaign_id, request.session_id, arguments]),
         );
-        Box::pin(async move { result })
+        Box::pin(async move { Ok(map(&result?)) })
     }
     fn execute_action_sequence_from_agent<'a>(
         &'a self,
-        campaign_id: &'a str,
-        session_id: &'a str,
-        arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<J>> {
+        request: &'a sylvia_app::action_sequences::ExecuteRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        let mut arguments = JsonMap::new();
+        arguments.insert("sequence_id".into(), J::from(request.sequence_id.as_str()));
+        arguments.insert("expected_version".into(), request.expected_version.clone());
+        arguments.insert("confirmation".into(), request.confirmation.clone().map_or(J::Null, J::from));
         let result = self.next_result(
             "_execute_action_sequence_from_agent",
-            serde_json::json!([campaign_id, session_id, arguments]),
+            serde_json::json!([request.campaign_id, request.session_id, arguments]),
         );
-        Box::pin(async move { result })
+        Box::pin(async move { Ok(map(&result?)) })
     }
     fn provider_continuation<'a>(
         &'a self,

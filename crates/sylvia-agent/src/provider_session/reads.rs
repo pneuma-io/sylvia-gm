@@ -119,30 +119,28 @@ pub trait TurnOwner: OpeningReads {
     /// `campaign_panels(campaign_id)`: the campaign's current panels and player controls.
     fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>>;
 
-    /// `action_sequence(session_id=..., sequence_id=...)`: a saved action sequence, as read.
+    /// `action_sequence(session_id=..., sequence_id=...)`: the latest saved action sequence (of
+    /// that identity, when one is given), as read; `None` when there is none. `sequence_id` is the
+    /// value Python passes, compared with Python's `==`.
     fn action_sequence<'a>(
         &'a self,
         session_id: &'a str,
-        sequence_id: &'a Json,
-    ) -> BoxFuture<'a, CodedResult<Json>>;
+        sequence_id: Option<&'a Json>,
+    ) -> BoxFuture<'a, Result<Option<JsonMap>, AuthorityFailure>>;
 
     /// `_compose_action_sequence_from_agent(campaign_id=..., session_id=..., sequence_id=...,
     /// expected_revision=..., expected_version=..., steps=...)`.
     fn compose_action_sequence_from_agent<'a>(
         &'a self,
-        campaign_id: &'a str,
-        session_id: &'a str,
-        arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<Json>>;
+        request: &'a sylvia_app::action_sequences::ComposeRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>>;
 
     /// `_execute_action_sequence_from_agent(campaign_id=..., session_id=..., sequence_id=...,
     /// expected_version=..., confirmation=...)`.
     fn execute_action_sequence_from_agent<'a>(
         &'a self,
-        campaign_id: &'a str,
-        session_id: &'a str,
-        arguments: &'a JsonMap,
-    ) -> BoxFuture<'a, CodedResult<Json>>;
+        request: &'a sylvia_app::action_sequences::ExecuteRequest,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>>;
 
     /// `provider_continuation(session_id, response_id, provider_id=..., model_id=...)`: one
     /// selected provider exchange's private continuation, as stored.
