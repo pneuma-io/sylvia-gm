@@ -35,19 +35,19 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` character_profile_vectors |
-| `application/import_repair.py:124` | `_read_selected_source` | hashlib.sha256 | `return hashlib.sha256(data).hexdigest(), data` | |
-| `application/import_repair.py:237` | `inspect_repair_source` | hashlib.sha256 | `_read_safe_zip(snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest())` | |
+| `application/import_repair.py:124` | `_read_selected_source` | hashlib.sha256 | `return hashlib.sha256(data).hexdigest(), data` | yes |
+| `application/import_repair.py:237` | `inspect_repair_source` | hashlib.sha256 | `_read_safe_zip(snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest())` | yes |
 | `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | |
 | `application/import_repair.py:313` | `stage_repair_copy` | hashlib.sha256 | `snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest()` | |
 | `application/import_repair.py:548` | `_plan_result` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(snapshot).hexdigest()` | |
 | `application/import_repair.py:549` | `_plan_result` | hashlib.sha256 | `record["content_sha256"] = hashlib.sha256( canonical_plan + markdown.encode("utf-8") + canonical_contribution + snapshot ).hexdigest()` | |
-| `application/import_repair_sessions.py:44` | `offer_import_repair` | hashlib.sha256 | `repair_id = hashlib.sha256( canonical_json_bytes([install_id, inspection.source_sha256, str(source)]) ).hexdigest()` | |
+| `application/import_repair_sessions.py:44` | `offer_import_repair` | hashlib.sha256 | `repair_id = hashlib.sha256( canonical_json_bytes([install_id, inspection.source_sha256, str(source)]) ).hexdigest()` | yes |
 | `application/import_repair_sessions.py:107` | `start_import_repair_chat` | hashlib.sha256 | `+ hashlib.sha256(canonical_json_bytes([operation_id, repair_id])).hexdigest()[:24]` | |
 | `application/interview_content.py:100` | `resolve_interview_content` | hashlib.sha256 | `install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` | |
 | `application/interview_content.py:129` | `resolve_interview_content` | hashlib.sha256 | `f"{hashlib.sha256(snapshot).hexdigest()[:24]}"` | |
 | `application/interview_content.py:141` | `resolve_interview_content` | hashlib.sha256 | `install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}")` | |
 | `application/package_materialization.py:173` | `materialize_package_archive` | hashlib.sha256 | `"sha256": hashlib.sha256(value).hexdigest(),` |  `sylvia-app` bundled_vectors |
-| `application/plan_bundle.py:77` | `export_plan_bundle` | hashlib.sha256 | `"archive_sha256": hashlib.sha256(data).hexdigest(),` | |
+| `application/plan_bundle.py:77` | `export_plan_bundle` | hashlib.sha256 | `"archive_sha256": hashlib.sha256(data).hexdigest(),` | yes |
 | `application/ready_campaigns.py:83` | `_entries` | hashlib.sha256 | `"content_sha256": hashlib.sha256( canonical_json_bytes( { "campaign": row, "provenance": payload["provenance"], } ) ).hexdigest(),` | |
 | `application/ready_campaigns.py:196` | `resolve_ready_campaign` | hashlib.sha256 | `if hashlib.sha256(source).hexdigest() != member["content_sha256"]:` | |
 | `application/ready_campaigns.py:331` | `start_ready_campaign` | hashlib.sha256 | `suffix = hashlib.sha256(operation_id.encode()).hexdigest()[:24]` | |
