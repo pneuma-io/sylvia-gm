@@ -4,6 +4,7 @@ pub mod actions;
 pub mod actor_decisions;
 pub mod campaign_creation;
 pub mod campaign_file;
+pub mod campaign_panels;
 pub mod construction_handoff;
 pub mod content_reads;
 pub mod direct_actions;

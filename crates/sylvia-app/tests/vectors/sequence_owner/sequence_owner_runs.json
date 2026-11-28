@@ -808,6 +808,543 @@
     "code": "session_unavailable",
     "message": "Agent session is unavailable"
    }
+  },
+  {
+   "step": {
+    "op": "compose",
+    "sequence": "q3",
+    "version": 0,
+    "steps": [
+     {
+      "step_id": "m1",
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        4,
+        4
+       ],
+       "map_revision": 7
+      }
+     },
+     {
+      "step_id": "m2",
+      "source": {
+       "kind": "panel",
+       "surface_id": "operations.map",
+       "action_id": "move"
+      },
+      "selection": {
+       "actor": "operator",
+       "destination": [
+        3,
+        3
+       ],
+       "map_revision": 7
+      }
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "kind": "action_sequence",
+     "campaign_id": "campaign",
+     "session_id": "gm",
+     "sequence_id": "q3",
+     "version": 1,
+     "status": "ready",
+     "expected_revision": 4,
+     "event_watermark": 22,
+     "scope": null,
+     "turn_id": "turn",
+     "steps": [
+      {
+       "step_id": "m1",
+       "source": {
+        "kind": "panel",
+        "surface_id": "operations.map",
+        "action_id": "move"
+       },
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         4,
+         4
+        ],
+        "map_revision": 7
+       },
+       "label": "Move",
+       "status": "pending",
+       "operation_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+       "receipt": null,
+       "error": null,
+       "warning": null,
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "tool": "move_unit",
+       "response_policy": "on_request",
+       "actor": "operator",
+       "actor_name": "operator",
+       "preview": null
+      },
+      {
+       "step_id": "m2",
+       "source": {
+        "kind": "panel",
+        "surface_id": "operations.map",
+        "action_id": "move"
+       },
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         3,
+         3
+        ],
+        "map_revision": 7
+       },
+       "label": "Move",
+       "status": "pending",
+       "operation_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+       "receipt": null,
+       "error": null,
+       "warning": null,
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "tool": "move_unit",
+       "response_policy": "on_request",
+       "actor": "operator",
+       "actor_name": "operator",
+       "preview": null
+      }
+     ],
+     "error": null,
+     "pause_reason": null,
+     "confirmation": "909f905b14da57828d0665dfc2245ef7b7ed1f0e2601f6bede1bc179b8fc8b56",
+     "committed_action_ids": []
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "sequence": "q3",
+    "version": "last"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "error": null,
+     "event_watermark": 34,
+     "expected_revision": 6,
+     "kind": "action_sequence",
+     "pause_reason": null,
+     "scope": null,
+     "sequence_id": "q3",
+     "session_id": "gm",
+     "status": "completed",
+     "steps": [
+      {
+       "actor": "operator",
+       "actor_name": "operator",
+       "error": null,
+       "label": "Move",
+       "operation_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+        "status": "committed",
+        "result": {
+         "status": "committed",
+         "tool": "move_unit",
+         "context": {},
+         "narrative_hooks": {},
+         "narrative_directives": [],
+         "logs": [],
+         "result_card": {
+          "version": 1,
+          "summary": [
+           {
+            "label": "Destination",
+            "value": [
+             4,
+             4
+            ],
+            "emphasis": false
+           }
+          ],
+          "details": [],
+          "title": "Movement",
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "tool": "move_unit",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            }
+           }
+          ]
+         }
+        },
+        "resulting_revision": 5
+       },
+       "response_policy": "on_request",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         4,
+         4
+        ],
+        "map_revision": 7
+       },
+       "source": {
+        "action_id": "move",
+        "kind": "panel",
+        "surface_id": "operations.map"
+       },
+       "status": "committed",
+       "step_id": "m1",
+       "tool": "move_unit",
+       "warning": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "source": {
+         "action_id": "move",
+         "kind": "panel",
+         "surface_id": "operations.map"
+        },
+        "operation_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+        "expected_revision": 4,
+        "selection": {
+         "actor": "operator",
+         "destination": [
+          4,
+          4
+         ],
+         "map_revision": 7
+        },
+        "session_id": "gm",
+        "confirmation": "2fb7e919db995cbdc2d7f742b770f9aec734e9bfbf7cd0b6474ce78f4cf3b504"
+       }
+      },
+      {
+       "actor": "operator",
+       "actor_name": "operator",
+       "error": null,
+       "label": "Move",
+       "operation_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+        "status": "committed",
+        "result": {
+         "status": "committed",
+         "tool": "move_unit",
+         "context": {},
+         "narrative_hooks": {},
+         "narrative_directives": [],
+         "logs": [],
+         "result_card": {
+          "version": 1,
+          "summary": [
+           {
+            "label": "Destination",
+            "value": [
+             3,
+             3
+            ],
+            "emphasis": false
+           }
+          ],
+          "details": [],
+          "title": "Movement",
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "tool": "move_unit",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            }
+           }
+          ]
+         }
+        },
+        "resulting_revision": 6
+       },
+       "response_policy": "on_request",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         3,
+         3
+        ],
+        "map_revision": 7
+       },
+       "source": {
+        "action_id": "move",
+        "kind": "panel",
+        "surface_id": "operations.map"
+       },
+       "status": "committed",
+       "step_id": "m2",
+       "tool": "move_unit",
+       "warning": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "source": {
+         "action_id": "move",
+         "kind": "panel",
+         "surface_id": "operations.map"
+        },
+        "operation_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+        "expected_revision": 5,
+        "selection": {
+         "actor": "operator",
+         "destination": [
+          3,
+          3
+         ],
+         "map_revision": 7
+        },
+        "session_id": "gm",
+        "confirmation": "014356cd53a1a4e991249972d7b64853cd5e3000573332e177ba99048122cb15"
+       }
+      }
+     ],
+     "turn_id": "turn",
+     "version": 6,
+     "submission_version": 1,
+     "submission_confirmation": "909f905b14da57828d0665dfc2245ef7b7ed1f0e2601f6bede1bc179b8fc8b56",
+     "confirmation": "791cf416706d51af032136a8f2aeb15974bfd77f0667012dafbb6656d6275809",
+     "committed_action_ids": [
+      "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+      "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "read",
+    "session": "gm",
+    "sequence": "q3"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "campaign",
+     "error": null,
+     "event_watermark": 34,
+     "expected_revision": 6,
+     "kind": "action_sequence",
+     "pause_reason": null,
+     "scope": null,
+     "sequence_id": "q3",
+     "session_id": "gm",
+     "status": "completed",
+     "steps": [
+      {
+       "actor": "operator",
+       "actor_name": "operator",
+       "error": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "confirmation": "2fb7e919db995cbdc2d7f742b770f9aec734e9bfbf7cd0b6474ce78f4cf3b504",
+        "expected_revision": 4,
+        "operation_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+        "selection": {
+         "actor": "operator",
+         "destination": [
+          4,
+          4
+         ],
+         "map_revision": 7
+        },
+        "session_id": "gm",
+        "source": {
+         "action_id": "move",
+         "kind": "panel",
+         "surface_id": "operations.map"
+        }
+       },
+       "label": "Move",
+       "operation_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+        "result": {
+         "context": {},
+         "logs": [],
+         "narrative_directives": [],
+         "narrative_hooks": {},
+         "result_card": {
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            },
+            "tool": "move_unit"
+           }
+          ],
+          "details": [],
+          "summary": [
+           {
+            "emphasis": false,
+            "label": "Destination",
+            "value": [
+             4,
+             4
+            ]
+           }
+          ],
+          "title": "Movement",
+          "version": 1
+         },
+         "status": "committed",
+         "tool": "move_unit"
+        },
+        "resulting_revision": 5,
+        "status": "committed"
+       },
+       "response_policy": "on_request",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         4,
+         4
+        ],
+        "map_revision": 7
+       },
+       "source": {
+        "action_id": "move",
+        "kind": "panel",
+        "surface_id": "operations.map"
+       },
+       "status": "committed",
+       "step_id": "m1",
+       "tool": "move_unit",
+       "warning": null
+      },
+      {
+       "actor": "operator",
+       "actor_name": "operator",
+       "error": null,
+       "execution": {
+        "campaign_id": "campaign",
+        "confirmation": "014356cd53a1a4e991249972d7b64853cd5e3000573332e177ba99048122cb15",
+        "expected_revision": 5,
+        "operation_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+        "selection": {
+         "actor": "operator",
+         "destination": [
+          3,
+          3
+         ],
+         "map_revision": 7
+        },
+        "session_id": "gm",
+        "source": {
+         "action_id": "move",
+         "kind": "panel",
+         "surface_id": "operations.map"
+        }
+       },
+       "label": "Move",
+       "operation_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+       "package_sha256": "5e0545dfbf1552912150af5174d01c2c11d9129cf297d3042d424094078071b5",
+       "preview": null,
+       "receipt": {
+        "action_id": "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36",
+        "result": {
+         "context": {},
+         "logs": [],
+         "narrative_directives": [],
+         "narrative_hooks": {},
+         "result_card": {
+          "actions": [
+           {
+            "label": "Continue to the next position",
+            "parameters": {
+             "actor": "operator",
+             "destination": [
+              5,
+              4
+             ],
+             "mode": "careful"
+            },
+            "tool": "move_unit"
+           }
+          ],
+          "details": [],
+          "summary": [
+           {
+            "emphasis": false,
+            "label": "Destination",
+            "value": [
+             3,
+             3
+            ]
+           }
+          ],
+          "title": "Movement",
+          "version": 1
+         },
+         "status": "committed",
+         "tool": "move_unit"
+        },
+        "resulting_revision": 6,
+        "status": "committed"
+       },
+       "response_policy": "on_request",
+       "selection": {
+        "actor": "operator",
+        "destination": [
+         3,
+         3
+        ],
+        "map_revision": 7
+       },
+       "source": {
+        "action_id": "move",
+        "kind": "panel",
+        "surface_id": "operations.map"
+       },
+       "status": "committed",
+       "step_id": "m2",
+       "tool": "move_unit",
+       "warning": null
+      }
+     ],
+     "submission_confirmation": "909f905b14da57828d0665dfc2245ef7b7ed1f0e2601f6bede1bc179b8fc8b56",
+     "submission_version": 1,
+     "turn_id": "turn",
+     "version": 6,
+     "confirmation": "791cf416706d51af032136a8f2aeb15974bfd77f0667012dafbb6656d6275809",
+     "committed_action_ids": [
+      "sequence-e7f3bf822c0bd8fbd3372beb6aad3d360f4ef0467972637833394157dc3c8d38",
+      "sequence-a059048a19058ef9dce2496901d947eebaf14abc5202562516fbd0e95dbeba36"
+     ]
+    }
+   }
   }
  ]
 }

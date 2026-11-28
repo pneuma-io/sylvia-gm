@@ -201,7 +201,7 @@ async fn sequences_run_on_the_authority_as_on_pythons_owner() {
         serde_json::from_str(&std::fs::read_to_string(vectors.join("sequence_owner_runs.json")).unwrap())
             .unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 15);
+    assert_eq!(runs.len(), 18);
     let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join("sequence-owner");
     if let Err(error) = std::fs::remove_dir_all(&folder) {
         assert_eq!(error.kind(), std::io::ErrorKind::NotFound, "cannot clear {}: {error}", folder.display());
