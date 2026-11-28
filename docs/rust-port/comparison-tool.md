@@ -131,6 +131,9 @@ header. A session adds its own under `rules`:
   recording is written, so a protected credential never reaches the repository. The work
   folder still holds the raw data; never commit a work folder.
 - `volatile_files`: files that must exist but whose content is not compared.
+- Files are listed by path. After the rules are applied they are ordered again by the
+  normalised path, so an aliased identifier in a path (a new campaign's folder) cannot reorder
+  them between runs.
 - `ignore_pointers`: exact JSON pointers into the recording, for the rare single value. A
   pointer may name an object member or an array item (one header's value is
   `/model_requests/<n>/headers/<i>/1`).
@@ -267,6 +270,7 @@ mid-body need control of the socket.
 | `campaign-construction` | confirm_new_campaign (refusals in Python's order, a confirmation with no packages, its replay and conflict, one with SRD Lite's candidate), begin_campaign_construction's success, replay and conflict, and complete_campaign_construction (refusals, completion, replay, conflict, unknown campaign). Python's confirmation makes uuid4 campaign identities: campaign and lock identities are aliases, and six hash cells over payloads holding them are ignored by exact pointer; those columns are proven byte for byte with fixed identities in `campaign-snapshots` and `action-commands` | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update` | The desktop updater as 0.4.1 ships it (no trusted key): the unavailable state, every refusal, the request and host checks, the reservation, abort and shutdown rules, both update gates, and the startup check with seeded receipts and launch fields | recorded on Windows and Linux; five reproductions on each |
 | `desktop-update-recovery` | The recovery-only owner: an update interrupted mid-apply met by the desktop's update context, its bounded recovery pipe, the refused methods and shutdown, and launches without a reply or with the ordinary refusal | recorded on Windows and Linux; five reproductions on each |
+| `ready-campaigns` | The prepared campaigns: the catalog; each of the four started as a local copy, one start replayed; a changed and an unknown template refused as not created, and the same start again stopped by its fence; a start stopped at the model guidance warning, then continued with the override; editable copies of a prepared party and a changed customization refused; a start without its name; the index and a snapshot. The Plan copies in each campaign folder are compared | recorded on Windows and Linux; reproduces on a second run |
 | `srd-mechanics-turn` | An SRD Lite campaign from the bundled A Debt in Iron plan with its fixed character, the GM opening, and one player turn in which the GM makes a skill check (`[call:d20_test ...]`, not spatial) and then updates the Campaign File; reads | recorded on Windows and Linux; five reproductions on each |
 | `provider-settings` | Provider connections on an empty folder: saving a custom service (identity, headers, sealed key) and a local runtime, the refusals for a mismatched transport, a bad header and an unknown preset, the default model, new-chat defaults with their effort and speed checks, removal, and the resolver reloading after each change | recorded on Windows and Linux; reproduces on a second run |
 | `account-connections` | The Claude Code connection on an empty folder, offline: its status before Sylvia's copy is installed, the refused actions and options, sign-in, model registration and sign-out refused until the copy exists, and cancel; then the ChatGPT connection's refused actions (unknown, a number, none), refused before any Codex runtime is looked for | recorded on Windows and Linux; reproduces on a second run |
@@ -287,6 +291,17 @@ every Python run:
   size of the request that carries them, so that one request's `Content-Length` value is an
   `ignore_pointers` entry; its body is still compared. Everything else about the check must
   match: the outcome, the modifiers, the card and the resulting state.
+
+`ready-campaigns` creates campaigns through `confirm_new_campaign`, whose campaign identity is
+a fresh `uuid4` on every run:
+- **Ids:** the campaign identity, and the identities derived from its digest (the Game Master
+  session, TURN, attempt, handoff, construction, evidence and Plan identities, the lock
+  identities and the initial continuity entries), are aliases. A TURN identity is also an object
+  key in a snapshot's `turns`, so that one pattern is also an alias without keys.
+- **Hashes:** the stored payload, content and canonical-representation digests in database rows
+  hash those identities, so they are ignored. Their formulas are proven by lane 3's
+  `campaign_creation` and `construction_handoff` vectors instead.
+- **Timing:** the start's `timing_ms` values (`resolve_party`, `local_start`) are ignored.
 
 `stop-redirect`, `fail-retry` and `reopen` follow the Stop, Retry and reopen contract fixtures in
 `tests/stop_resume/contract.cjs`, with the session's snake_case parameters where the desktop
