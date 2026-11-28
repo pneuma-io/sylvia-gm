@@ -608,6 +608,36 @@ impl TurnOwner for OwnerReads {
         })
     }
 
+    fn manual_retry<'a>(
+        &'a self,
+        _call: sylvia_agent::provider_session::reads::ManualRetryCall,
+        _on_attempt_started: sylvia_agent::provider_session::reads::AttemptStarted<'a>,
+        _narrator: Box<dyn sylvia_agent::provider_session::reads::LoopRetryNarration + 'a>,
+    ) -> BoxFuture<
+        'a,
+        Result<
+            sylvia_domain::authority::ManualRetryResult,
+            sylvia_agent::provider_session::reads::RetryRefusal,
+        >,
+    > {
+        // Lane 3's `manual_retry` with a fallible, async `on_attempt_started` (their next PR).
+        Box::pin(async {
+            Err(sylvia_agent::provider_session::reads::RetryRefusal::Owner(pending("manual_retry").into()))
+        })
+    }
+
+    fn retryable_interruption<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        failed_attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<Option<NarrationInterruption>, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::retryable_interruption(self.store(), campaign_id, failed_attempt_id)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
     fn stop_agent_session<'a>(
         &'a self,
         session_id: &'a str,

@@ -7,17 +7,17 @@
 //!   are `retry_texts.json`, exported by `generate_retry_texts.py`.
 
 use super::context::ProviderSessionAdapter;
+use super::request::{contains_serialized_tool_call, release_provider_idle_soon};
+use super::tagged::Tagged;
+use super::texts::player_turn_text;
 use crate::provider_turn::turn::turn_events;
 use crate::provider_turn::{TurnEvents, TurnFailure, TurnResult};
+use crate::session_loop::campaign::resolve_retry_basis_message;
 use crate::session_loop::campaign::{NarrationStream, RetryNarrator};
 use crate::session_loop::{
     ProviderControl, ProviderEvent, SessionEvents, SessionFailure, SessionProvider, SessionProviderError,
     SessionProviderInput,
 };
-use super::request::{contains_serialized_tool_call, release_provider_idle_soon};
-use super::tagged::Tagged;
-use super::texts::player_turn_text;
-use crate::session_loop::campaign::resolve_retry_basis_message;
 use serde_json::{json, Value as Json};
 use std::sync::{Arc, OnceLock};
 use sylvia_base::pyjson::{self, Dump};
@@ -107,7 +107,9 @@ impl RetryNarrator for RetryProvider {
 
 fn retry_texts() -> &'static Json {
     static TEXTS: OnceLock<Json> = OnceLock::new();
-    TEXTS.get_or_init(|| serde_json::from_str(include_str!("retry_texts.json")).expect("exported texts are JSON"))
+    TEXTS.get_or_init(|| {
+        serde_json::from_str(include_str!("retry_texts.json")).expect("exported texts are JSON")
+    })
 }
 
 fn retry_text(key: &str) -> &'static str {
@@ -154,10 +156,14 @@ impl RetryProvider {
         let terminal = history.messages.iter().find(|message| {
             message.kind() == SessionMessageKind::Evidence
                 && message.content().get("kind").and_then(Json::as_str) == Some("session_attempt_terminal")
-                && message.content().get("attempt_id").and_then(Json::as_str) == Some(input.failed_attempt_id.as_str())
+                && message.content().get("attempt_id").and_then(Json::as_str)
+                    == Some(input.failed_attempt_id.as_str())
         });
-        let exact_player_action =
-            if basis.kind() == SessionMessageKind::User { player_turn_text(basis.content()) } else { String::new() };
+        let exact_player_action = if basis.kind() == SessionMessageKind::User {
+            player_turn_text(basis.content())
+        } else {
+            String::new()
+        };
         let recovery_kind = if receipt.is_some() {
             "post_mechanics_narration"
         } else if opening {
@@ -191,8 +197,10 @@ impl RetryProvider {
             "action_receipt": action_receipt,
         });
         let adapter = &self.adapter;
-        let mut messages =
-            adapter.messages_with(&self.provider_input, adapter.ranker().map_err(failure)?, None).await.map_err(failure)?;
+        let mut messages = adapter
+            .messages_with(&self.provider_input, adapter.ranker().map_err(failure)?, None)
+            .await
+            .map_err(failure)?;
         let sentence = retry_text(if opening { "retry_control_opening" } else { "retry_control_mechanic" });
         messages.push(system(format!(
             "{}{sentence}{}",
@@ -207,12 +215,17 @@ impl RetryProvider {
         // `_stream_round(messages, [], control=retry_control, provider_input=provider_input)`.
         let mut round_input = self.provider_input.clone();
         round_input.control = Arc::clone(&self.control);
-        let mut round =
-            adapter.stream_round(messages, Vec::new(), &round_input, None, false).await.map_err(SessionFailure::Turn)?;
+        let mut round = adapter
+            .stream_round(messages, Vec::new(), &round_input, None, false)
+            .await
+            .map_err(SessionFailure::Turn)?;
         let mut parts = Vec::new();
         while let Some(chunk) = round.next().await.map_err(SessionFailure::Turn)? {
             if chunk.tool_call_delta.is_some() {
-                return Err(failure(rejected("Narration Retry cannot request package tools", "command_rejected")));
+                return Err(failure(rejected(
+                    "Narration Retry cannot request package tools",
+                    "command_rejected",
+                )));
             }
             if !chunk.content.is_empty() {
                 parts.push(chunk.content);

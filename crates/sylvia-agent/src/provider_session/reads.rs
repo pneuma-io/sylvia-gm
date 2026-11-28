@@ -10,7 +10,7 @@ use std::sync::Arc;
 use sylvia_base::{CodedResult, Json, JsonMap};
 use sylvia_domain::authority::{
     ActionReceipt, CampaignConstructionBasis, CampaignDisplaySnapshot, CampaignSnapshot, CanonicalEvent,
-    CanonicalReplay, ModelDecisionBoundary, NarrationInterruption, ProseChannel,
+    CanonicalReplay, ManualRetryResult, ModelDecisionBoundary, NarrationInterruption, ProseChannel,
 };
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::provider_records::ProviderPrivateRecord;
@@ -414,11 +414,59 @@ pub trait TurnOwner: OpeningReads {
         content: &'a JsonMap,
     ) -> BoxFuture<'a, Result<SessionMessage, AuthorityFailure>>;
 
+    /// `manual_retry(campaign_id=..., interruption_id=..., retry_id=..., narrator=..., cancel=...,
+    /// on_attempt_started=...)`: one manual Retry under the campaign's work. A failure after the
+    /// Retry's attempt started interrupts the still-live attempt before it is returned.
+    fn manual_retry<'a>(
+        &'a self,
+        call: ManualRetryCall,
+        on_attempt_started: AttemptStarted<'a>,
+        narrator: Box<dyn LoopRetryNarration + 'a>,
+    ) -> BoxFuture<'a, Result<ManualRetryResult, RetryRefusal>>;
+
+    /// `retryable_interruption(campaign_id, failed_attempt_id=...)`.
+    fn retryable_interruption<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        failed_attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<Option<NarrationInterruption>, AuthorityFailure>>;
+
     /// `stop_agent_session(session_id)`: the owner's Stop Session.
     fn stop_agent_session<'a>(
         &'a self,
         session_id: &'a str,
     ) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>>;
+}
+
+/// `manual_retry`'s keyword arguments, beside its callbacks.
+pub struct ManualRetryCall {
+    pub campaign_id: String,
+    pub interruption_id: String,
+    pub retry_id: String,
+    /// `cancel`: the Retry's cancel callback.
+    pub cancel: Arc<dyn Fn() + Send + Sync>,
+}
+
+/// `on_attempt_started()`: run once the Retry's attempt started, before its narrator. A failure
+/// is the narrator's failure (Python raises it inside the same `try`).
+pub type AttemptStarted<'a> =
+    Box<dyn FnOnce() -> BoxFuture<'a, Result<(), crate::session_loop::SessionFailure>> + Send + 'a>;
+
+/// `narrator(retry_input, stream)`: the loop's Retry, emitting into the Retry's attempt.
+pub trait LoopRetryNarration: Send {
+    fn narrate<'a>(
+        &'a mut self,
+        input: sylvia_domain::authority::RetryNarrationInput,
+        stream: &'a mut dyn crate::session_loop::campaign::NarrationStream,
+    ) -> BoxFuture<'a, Result<(), crate::session_loop::SessionFailure>>;
+}
+
+/// How `manual_retry` fails: the owner's own refusal (one a token's emit raised included), or
+/// the narrator's error.
+#[derive(Debug)]
+pub enum RetryRefusal {
+    Owner(AuthorityFailure),
+    Narrator(crate::session_loop::SessionFailure),
 }
 
 /// `agent_session_work`'s answer: the session's context, with the held work. The work is
