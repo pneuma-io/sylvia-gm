@@ -315,10 +315,17 @@ fn which_and_codex_lookup() {
 
 // ── Through a real child ─────────────────────────────────────────────────────────────────
 
+/// How long the test waits for each event from the fake runtime. `next_event`'s timeout is its
+/// caller's (Python's `next_event(timeout)` has no default either), so this is a test-only bound:
+/// it ends the wait early when an event arrives, and only fails a run whose child never answers.
+/// The child is this test binary started again, and one case writes an 8 MiB frame, which can
+/// take far longer than usual while other checks load the machine; 20 s was not enough.
+const EVENT_WAIT: Duration = Duration::from_secs(180);
+
 fn events_until_exit(connection: &ClaudeConnection) -> Vec<Value> {
     let mut events = Vec::new();
     loop {
-        match connection.next_event(Duration::from_secs(20)) {
+        match connection.next_event(EVENT_WAIT) {
             Ok(event) => events.push(json!({"event": Json::Object(event)})),
             Err(error) if error.kind.class_name() == "ProviderConnectionError" => {
                 events.push(json!({"exit": true}));
