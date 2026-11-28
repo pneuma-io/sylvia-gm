@@ -13,6 +13,7 @@ pub mod content_definition;
 pub mod evidence;
 pub mod history;
 pub mod mode;
+pub mod plan_tools;
 pub mod prompt;
 pub mod question_answers;
 pub mod ruleset_tests;

@@ -11,6 +11,7 @@ use std::collections::VecDeque;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 use sylvia_agent::builder::character_tools::ParticipantInput;
+use sylvia_agent::builder::plan_tools::{OwnerCheck, PlanAuthoritySource, PlanPublisher};
 use sylvia_agent::builder::source_tools::{
     CampaignContent, LibrarySources, ReferenceSource, SettingPublisher,
 };
@@ -318,9 +319,12 @@ fn builder_turn_matches_python() {
             },
             publish_campaign_setting: has("publish_campaign_setting").then(setting_stand_in),
             check_campaign_setting: has("check_campaign_setting").then(setting_stand_in),
-            campaign_plan_authority: has("campaign_plan_authority"),
-            check_campaign_plan: has("check_campaign_plan"),
-            publish_campaign_plan: has("publish_campaign_plan"),
+            campaign_plan_authority: has("campaign_plan_authority")
+                .then(|| PlanAuthoritySource::Deferred(Arc::new(|| Ok(None)))),
+            check_campaign_plan: has("check_campaign_plan")
+                .then(|| Arc::new(|| Ok(JsonMap::new())) as OwnerCheck),
+            publish_campaign_plan: has("publish_campaign_plan")
+                .then(|| Arc::new(|| Err(sylvia_domain::DomainError::value("unused"))) as PlanPublisher),
             participant_declarations: declarations(&spec["declarations"]),
             setting_character_schema: spec["setting_character_schema"].as_object().cloned(),
             participant_schemas: declarations(&spec["declarations"])

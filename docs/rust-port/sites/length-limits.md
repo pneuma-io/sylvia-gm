@@ -264,10 +264,10 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_builder_session.py:434` | `_builder_reference_tool.inspect_page` | len() against a limit | `if not isinstance(query, str) or len(query) > 120:` | `sylvia-agent` source_tool_vectors (a 121-character query refused) |
 | `agent/_builder_session.py:448` | `_builder_reference_tool.inspect_page` | len() against a limit | `not isinstance(query, str) or not query or len(query) > 120` | `sylvia-agent` source_tool_vectors (empty and missing find queries) |
 | `agent/_builder_session.py:844` | `_campaign_content_tools.discover` | len() against a limit | `if not isinstance(query, str) or len(query) > 160:` | `sylvia-agent` source_tool_vectors (a 161-character query refused) |
-| `agent/_builder_session.py:960` | `_creation_subflow_completion_tool.complete` | len() against a limit | `or len(summary) > 2000` | |
-| `agent/_builder_session.py:962` | `_creation_subflow_completion_tool.complete` | len() against a limit | `or len(conflicts) > 16` | |
-| `agent/_builder_session.py:964` | `_creation_subflow_completion_tool.complete` | len() against a limit | `not isinstance(item, str) or not item.strip() or len(item) > 500` | |
-| `agent/_builder_session.py:1563` | `_campaign_source_tool.inspect` | len() against a limit | `if path is not None or not isinstance(query, str) or len(query) > 120:` | |
+| `agent/_builder_session.py:960` | `_creation_subflow_completion_tool.complete` | len() against a limit | `or len(summary) > 2000` | `sylvia-agent` plan_tool_vectors (2,001 characters refused, 2,000 two-byte ones accepted) |
+| `agent/_builder_session.py:962` | `_creation_subflow_completion_tool.complete` | len() against a limit | `or len(conflicts) > 16` | `sylvia-agent` plan_tool_vectors (17 conflicts refused) |
+| `agent/_builder_session.py:964` | `_creation_subflow_completion_tool.complete` | len() against a limit | `not isinstance(item, str) or not item.strip() or len(item) > 500` | `sylvia-agent` plan_tool_vectors (a 501-character conflict refused) |
+| `agent/_builder_session.py:1563` | `_campaign_source_tool.inspect` | len() against a limit | `if path is not None or not isinstance(query, str) or len(query) > 120:` | `sylvia-agent` plan_tool_vectors (a non-text query refused) |
 | `agent/_builder_title.py:17` | `opening_title` | len() against a limit | `if len(normalized) <= TITLE_LIMIT:` | |
 | `agent/_builder_title.py:47` | `FirstReplyTitle.feed` | len() against a limit | `if 0 < len(title) <= TITLE_LIMIT and not any(c in title for c in "<>"):` | |
 | `agent/_builder_title.py:53` | `FirstReplyTitle.feed` | len() against a limit | `if not final and len(candidate) <= 256:` | |

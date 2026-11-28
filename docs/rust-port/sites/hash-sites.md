@@ -221,8 +221,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_actor_decisions.py:60` | `run_actor_decision` | hashlib.sha256 | `context_id = hashlib.sha256(_json(identity).encode()).hexdigest()` | |
 | `agent/_builder_session.py:613` | `_builder_prompt` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(loaded_skill.text.encode("utf-8")).hexdigest()` | |
 | `agent/_builder_session.py:1298` | `_builder_skill_loader_tool.load` | hashlib.sha256 | `"sha256": hashlib.sha256(loaded.text.encode("utf-8")).hexdigest(),` | |
-| `agent/_builder_session.py:1664` | `_campaign_plan_tool` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(skill.text.encode("utf-8")).hexdigest()` | |
-| `agent/_builder_session.py:1854` | `_campaign_plan_draft_tool.create` | hashlib.sha256 | `plan_suffix = hashlib.sha256( canonical_json_bytes({"premise": premise, "title": title}) ).hexdigest()[:16]` | |
+| `agent/_builder_session.py:1664` | `_campaign_plan_tool` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(skill.text.encode("utf-8")).hexdigest()` | `sylvia-agent` plan_tool_vectors (the tracked skill digest) |
+| `agent/_builder_session.py:1854` | `_campaign_plan_draft_tool.create` | hashlib.sha256 | `plan_suffix = hashlib.sha256( canonical_json_bytes({"premise": premise, "title": title}) ).hexdigest()[:16]` | `sylvia-agent` plan_tool_vectors (the draft's Plan id) |
 | `agent/_content_definition_tool.py:116` | `content_definition_tool.read` | hashlib.sha256 | `"definition_sha256": hashlib.sha256(canonical_json_bytes(definition)).hexdigest()}` | `sylvia-agent` character_tool_vectors (content_definition sections) |
 | `agent/_context_ledger.py:436` | `host_seal` | hashlib.sha256 | `digest = hashlib.sha256(b"sylvia-gm-host-record-seal/v1\x00" + session_id.encode("utf-8"))` | |
 | `agent/_context_ledger.py:491` | `_sha` | hashlib.sha256 | `return hashlib.sha256(text.encode("utf-8")).hexdigest()` | |
