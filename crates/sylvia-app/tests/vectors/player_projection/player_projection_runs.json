@@ -1,0 +1,937 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "scenarios": [
+  {
+   "name": "card",
+   "runs": [
+    {
+     "step": {
+      "op": "projection"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "tool_card",
+        "sequence": 3,
+        "text": null,
+        "safe_payload": {
+         "result": {
+          "context": {},
+          "logs": [],
+          "narrative_directives": [],
+          "narrative_hooks": {},
+          "result_card": {
+           "actions": [
+            {
+             "label": "Continue to the next position",
+             "parameters": {
+              "actor": "operator",
+              "destination": [
+               5,
+               4
+              ],
+              "mode": "careful"
+             },
+             "tool": "move_unit"
+            }
+           ],
+           "details": [],
+           "summary": [
+            {
+             "emphasis": false,
+             "label": "Destination",
+             "value": [
+              4,
+              4
+             ]
+            }
+           ],
+           "title": "Movement",
+           "version": 1
+          },
+          "status": "committed",
+          "tool": "move_unit"
+         },
+         "status": "committed",
+         "tool_name": "move_unit",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           4,
+           4
+          ],
+          "mode": "careful"
+         },
+         "action_id": "move",
+         "result_card_action_availability": [
+          true
+         ],
+         "result_card_action_reasons": [
+          null
+         ]
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": null
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 0
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "tool_card",
+        "sequence": 3,
+        "text": null,
+        "safe_payload": {
+         "result": {
+          "context": {},
+          "logs": [],
+          "narrative_directives": [],
+          "narrative_hooks": {},
+          "result_card": {
+           "actions": [
+            {
+             "label": "Continue to the next position",
+             "parameters": {
+              "actor": "operator",
+              "destination": [
+               5,
+               4
+              ],
+              "mode": "careful"
+             },
+             "tool": "move_unit"
+            }
+           ],
+           "details": [],
+           "summary": [
+            {
+             "emphasis": false,
+             "label": "Destination",
+             "value": [
+              4,
+              4
+             ]
+            }
+           ],
+           "title": "Movement",
+           "version": 1
+          },
+          "status": "committed",
+          "tool": "move_unit"
+         },
+         "status": "committed",
+         "tool_name": "move_unit",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           4,
+           4
+          ],
+          "mode": "careful"
+         },
+         "action_id": "move",
+         "result_card_action_availability": [
+          true
+         ],
+         "result_card_action_reasons": [
+          null
+         ]
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 3
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 99
+     },
+     "outcome": {
+      "ok": []
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": -1
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Player history sequence is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": true
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Player history sequence is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": "3"
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Player history sequence is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 1.5
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Player history sequence is invalid"
+     }
+    },
+    {
+     "step": {
+      "op": "start",
+      "attempt": "n1"
+     },
+     "outcome": {
+      "ok": null
+     }
+    },
+    {
+     "step": {
+      "op": "emit",
+      "attempt": "n1",
+      "channel": "safe_think",
+      "token": "Weighing it."
+     },
+     "outcome": {
+      "ok": null
+     }
+    },
+    {
+     "step": {
+      "op": "emit",
+      "attempt": "n1",
+      "channel": "talk",
+      "token": "The door holds."
+     },
+     "outcome": {
+      "ok": null
+     }
+    },
+    {
+     "step": {
+      "op": "complete",
+      "attempt": "n1"
+     },
+     "outcome": {
+      "ok": 2
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 3
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "think",
+        "sequence": 7,
+        "text": "Weighing it.",
+        "safe_payload": {
+         "text": "Weighing it."
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": 8,
+        "text": "The door holds.",
+        "safe_payload": {
+         "text": "The door holds."
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "start",
+      "attempt": "n2"
+     },
+     "outcome": {
+      "ok": null
+     }
+    },
+    {
+     "step": {
+      "op": "emit",
+      "attempt": "n2",
+      "channel": "talk",
+      "token": "Half a sent"
+     },
+     "outcome": {
+      "ok": null
+     }
+    },
+    {
+     "step": {
+      "op": "projection"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "tool_card",
+        "sequence": 3,
+        "text": null,
+        "safe_payload": {
+         "result": {
+          "context": {},
+          "logs": [],
+          "narrative_directives": [],
+          "narrative_hooks": {},
+          "result_card": {
+           "actions": [
+            {
+             "label": "Continue to the next position",
+             "parameters": {
+              "actor": "operator",
+              "destination": [
+               5,
+               4
+              ],
+              "mode": "careful"
+             },
+             "tool": "move_unit"
+            }
+           ],
+           "details": [],
+           "summary": [
+            {
+             "emphasis": false,
+             "label": "Destination",
+             "value": [
+              4,
+              4
+             ]
+            }
+           ],
+           "title": "Movement",
+           "version": 1
+          },
+          "status": "committed",
+          "tool": "move_unit"
+         },
+         "status": "committed",
+         "tool_name": "move_unit",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           4,
+           4
+          ],
+          "mode": "careful"
+         },
+         "action_id": "move",
+         "result_card_action_availability": [
+          false
+         ],
+         "result_card_action_reasons": [
+          "This action is unavailable"
+         ]
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       },
+       {
+        "kind": "think",
+        "sequence": 7,
+        "text": "Weighing it.",
+        "safe_payload": {
+         "text": "Weighing it."
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": 8,
+        "text": "The door holds.",
+        "safe_payload": {
+         "text": "The door holds."
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": null,
+        "text": "Half a sent",
+        "safe_payload": {
+         "text": "Half a sent"
+        },
+        "collapsed_by_default": false,
+        "provisional": true,
+        "action_id": null,
+        "attempt_id": "n2"
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "interrupt",
+      "attempt": "n2"
+     },
+     "outcome": {
+      "ok": "n2"
+     }
+    },
+    {
+     "step": {
+      "op": "projection"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "tool_card",
+        "sequence": 3,
+        "text": null,
+        "safe_payload": {
+         "result": {
+          "context": {},
+          "logs": [],
+          "narrative_directives": [],
+          "narrative_hooks": {},
+          "result_card": {
+           "actions": [
+            {
+             "label": "Continue to the next position",
+             "parameters": {
+              "actor": "operator",
+              "destination": [
+               5,
+               4
+              ],
+              "mode": "careful"
+             },
+             "tool": "move_unit"
+            }
+           ],
+           "details": [],
+           "summary": [
+            {
+             "emphasis": false,
+             "label": "Destination",
+             "value": [
+              4,
+              4
+             ]
+            }
+           ],
+           "title": "Movement",
+           "version": 1
+          },
+          "status": "committed",
+          "tool": "move_unit"
+         },
+         "status": "committed",
+         "tool_name": "move_unit",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           4,
+           4
+          ],
+          "mode": "careful"
+         },
+         "action_id": "move",
+         "result_card_action_availability": [
+          true
+         ],
+         "result_card_action_reasons": [
+          null
+         ]
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       },
+       {
+        "kind": "think",
+        "sequence": 7,
+        "text": "Weighing it.",
+        "safe_payload": {
+         "text": "Weighing it."
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": 8,
+        "text": "The door holds.",
+        "safe_payload": {
+         "text": "The door holds."
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "retry",
+        "sequence": null,
+        "text": "Narration interrupted\u2014Retry",
+        "safe_payload": {
+         "interruption_id": "interruption-00000000-0000-4000-8000-000000000008",
+         "failed_attempt_id": "n2",
+         "resolving_retry_id": null,
+         "can_redirect": false,
+         "saved_changes": false
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n2"
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "append",
+      "session": "gm",
+      "message": "stop-n2",
+      "kind": "evidence",
+      "content": {
+       "kind": "session_attempt_terminal",
+       "attempt_id": "n2",
+       "failure_category": "user_cancelled"
+      }
+     },
+     "outcome": {
+      "ok": 3
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 5
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "think",
+        "sequence": 7,
+        "text": "Weighing it.",
+        "safe_payload": {
+         "text": "Weighing it."
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": 8,
+        "text": "The door holds.",
+        "safe_payload": {
+         "text": "The door holds."
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "retry",
+        "sequence": null,
+        "text": "Narration interrupted\u2014Retry",
+        "safe_payload": {
+         "interruption_id": "interruption-00000000-0000-4000-8000-000000000008",
+         "failed_attempt_id": "n2",
+         "resolving_retry_id": null,
+         "can_redirect": true,
+         "saved_changes": false
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n2"
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "append",
+      "session": "gm",
+      "message": "input-n2",
+      "kind": "user",
+      "content": {
+       "text": "Open it.",
+       "attempt_id": "n2",
+       "canonical_start_sequence": 0
+      }
+     },
+     "outcome": {
+      "ok": 4
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 5
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "think",
+        "sequence": 7,
+        "text": "Weighing it.",
+        "safe_payload": {
+         "text": "Weighing it."
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": 8,
+        "text": "The door holds.",
+        "safe_payload": {
+         "text": "The door holds."
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "retry",
+        "sequence": null,
+        "text": "Narration interrupted\u2014Retry",
+        "safe_payload": {
+         "interruption_id": "interruption-00000000-0000-4000-8000-000000000008",
+         "failed_attempt_id": "n2",
+         "resolving_retry_id": null,
+         "can_redirect": true,
+         "saved_changes": true
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n2"
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "projection_of",
+      "campaign": "nowhere"
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "command_rejected",
+      "message": "Campaign is unavailable: missing or purged"
+     }
+    },
+    {
+     "step": {
+      "op": "stop",
+      "session": "gm"
+     },
+     "outcome": {
+      "ok": {
+       "session_id": "gm",
+       "status": "stopped"
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "stop",
+      "session": "gm"
+     },
+     "outcome": {
+      "ok": {
+       "session_id": "gm",
+       "status": "stopped"
+      }
+     }
+    },
+    {
+     "step": {
+      "op": "stop",
+      "session": "nobody"
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "session_unavailable",
+      "message": "Agent session is unavailable"
+     }
+    },
+    {
+     "step": {
+      "op": "projection"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "tool_card",
+        "sequence": 3,
+        "text": null,
+        "safe_payload": {
+         "result": {
+          "context": {},
+          "logs": [],
+          "narrative_directives": [],
+          "narrative_hooks": {},
+          "result_card": {
+           "actions": [
+            {
+             "label": "Continue to the next position",
+             "parameters": {
+              "actor": "operator",
+              "destination": [
+               5,
+               4
+              ],
+              "mode": "careful"
+             },
+             "tool": "move_unit"
+            }
+           ],
+           "details": [],
+           "summary": [
+            {
+             "emphasis": false,
+             "label": "Destination",
+             "value": [
+              4,
+              4
+             ]
+            }
+           ],
+           "title": "Movement",
+           "version": 1
+          },
+          "status": "committed",
+          "tool": "move_unit"
+         },
+         "status": "committed",
+         "tool_name": "move_unit",
+         "parameters": {
+          "actor": "operator",
+          "destination": [
+           4,
+           4
+          ],
+          "mode": "careful"
+         },
+         "action_id": "move",
+         "result_card_action_availability": [
+          true
+         ],
+         "result_card_action_reasons": [
+          null
+         ]
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       },
+       {
+        "kind": "think",
+        "sequence": 7,
+        "text": "Weighing it.",
+        "safe_payload": {
+         "text": "Weighing it."
+        },
+        "collapsed_by_default": true,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "talk",
+        "sequence": 8,
+        "text": "The door holds.",
+        "safe_payload": {
+         "text": "The door holds."
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n1"
+       },
+       {
+        "kind": "retry",
+        "sequence": null,
+        "text": "Narration interrupted\u2014Retry",
+        "safe_payload": {
+         "interruption_id": "interruption-00000000-0000-4000-8000-000000000008",
+         "failed_attempt_id": "n2",
+         "resolving_retry_id": null,
+         "can_redirect": true,
+         "saved_changes": true
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": null,
+        "attempt_id": "n2"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "choice",
+   "runs": [
+    {
+     "step": {
+      "op": "projection"
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "mechanics_choice",
+        "sequence": null,
+        "text": null,
+        "safe_payload": {
+         "action_id": "move",
+         "basis_revision": 0,
+         "turn_id": "turn",
+         "choice_id": "route",
+         "prompt": "Choose a route",
+         "options": [
+          {
+           "option_id": "north",
+           "label": "North"
+          },
+          {
+           "option_id": "south",
+           "label": "South"
+          }
+         ]
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "page",
+      "after": 1
+     },
+     "outcome": {
+      "ok": [
+       {
+        "kind": "mechanics_choice",
+        "sequence": null,
+        "text": null,
+        "safe_payload": {
+         "action_id": "move",
+         "basis_revision": 0,
+         "turn_id": "turn",
+         "choice_id": "route",
+         "prompt": "Choose a route",
+         "options": [
+          {
+           "option_id": "north",
+           "label": "North"
+          },
+          {
+           "option_id": "south",
+           "label": "South"
+          }
+         ]
+        },
+        "collapsed_by_default": false,
+        "provisional": false,
+        "action_id": "move",
+        "attempt_id": null
+       }
+      ]
+     }
+    },
+    {
+     "step": {
+      "op": "stop",
+      "session": "gm"
+     },
+     "outcome": {
+      "error": "CommandRejected",
+      "code": "mechanics_choice_pending",
+      "message": "Campaign is awaiting a mechanics choice"
+     }
+    }
+   ]
+  }
+ ]
+}

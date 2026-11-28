@@ -10,6 +10,7 @@ pub mod lifecycle;
 pub mod narration;
 pub mod narration_attempts;
 pub mod owner_close;
+pub mod player_projection;
 pub mod player_reads;
 pub mod portable;
 pub mod snapshots;

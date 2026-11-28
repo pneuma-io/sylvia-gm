@@ -25,28 +25,42 @@ pub fn project_private_tool_inputs(
     store: &AuthorityStore,
     mut snapshot: CampaignSnapshot,
 ) -> StoreResult<CampaignSnapshot> {
-    let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
-    let private_packages: BTreeSet<String> = snapshot
-        .state
-        .package_lock
+    project_private_records(
+        store,
+        &snapshot.state.package_lock,
+        &mut snapshot.actions,
+        &mut snapshot.events,
+    )?;
+    Ok(snapshot)
+}
+
+/// `_project_private_tool_inputs` on a snapshot's or a display snapshot's actions and events.
+pub(super) fn project_private_records(
+    store: &AuthorityStore,
+    lock: &sylvia_domain::authority::PackageLock,
+    actions: &mut [sylvia_domain::authority::ActionRecord],
+    events: &mut [sylvia_domain::authority::CanonicalEvent],
+) -> StoreResult<()> {
+    let private_keys = engine_private_keys(store, lock)?;
+    let private_packages: BTreeSet<String> = lock
         .entries()
         .iter()
         .filter(|entry| private_keys.iter().any(|key| key.starts_with(&format!("{}.", entry.package_id()))))
         .map(|entry| entry.package_id().to_owned())
         .collect();
-    for action in &mut snapshot.actions {
+    for action in actions.iter_mut() {
         if private_packages.contains(&action.package_id) {
             action.parameters = JsonMap::new();
         }
     }
-    for event in &mut snapshot.events {
+    for event in events.iter_mut() {
         let private = matches!(event.safe_payload.get("package_id"), Some(Json::String(id)) if private_packages.contains(id));
         if event.event_type == CanonicalEventType::ToolCall && private {
             // `{**payload, "parameters": {}}`: an existing key keeps its place.
             event.safe_payload.insert("parameters".into(), Json::Object(JsonMap::new()));
         }
     }
-    Ok(snapshot)
+    Ok(())
 }
 
 /// `AuthorityOwner.canonical_replay(campaign_id, acknowledged_sequence=...)`: the canonical events
@@ -114,7 +128,7 @@ fn response_action_ids(
 
 /// `_player_response_reservations(campaign_id)`: the actions saved responses already answer, and
 /// the narration attempts that are those responses.
-fn player_response_reservations(
+pub(super) fn player_response_reservations(
     store: &AuthorityStore,
     campaign_id: &str,
 ) -> StoreResult<(BTreeSet<String>, BTreeSet<String>)> {
