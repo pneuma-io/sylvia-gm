@@ -49,7 +49,7 @@ pub const REGISTRY: &[Command] = &[
     pending("character_chat", "character_chat", true, true),
     pending("send_character_chat_message", "character_chat", true, true),
     ported("builder_chat_index", "builder", true, true),
-    pending("start_import_repair", "builder", true, true),
+    ported("start_import_repair", "builder", true, true),
     ported("create_builder_chat", "builder", true, true),
     ported("rename_builder_chat", "builder", true, true),
     ported("delete_builder_chat", "builder", true, true),

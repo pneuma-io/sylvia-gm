@@ -1,0 +1,206 @@
+{
+  "name": "import-repair",
+  "description": "Builder import repair on a fresh profile: a package and a Plan that fail to install, each offered as a repair; start_import_repair's refusals (no default model, a missing, malformed and unknown repair), a package repair chat started with a chosen speed (its draft staged), started again (a replay) and under another operation, the default model chosen, and a Plan repair chat (its snapshot unfolded into the draft); the chat index. The staged drafts are compared.",
+  "standin": true,
+  "seed_files": [
+    {
+      "path": "imports/broken.sylvia-gm-package",
+      "copy_from": "crates/sylvia-app/tests/vectors/import_repair/sources/broken-package.archive"
+    },
+    {
+      "path": "imports/extra-member.sylvia-gm-plan",
+      "copy_from": "crates/sylvia-app/tests/vectors/import_repair/sources/extra-member.sylvia-gm-plan"
+    }
+  ],
+  "steps": [
+    {
+      "method": "install_package_file",
+      "params": {
+        "source_path": "${work}/imports/broken.sylvia-gm-package",
+        "install_id": "broken-package"
+      },
+      "save": {
+        "package_repair": "/result/repair_id"
+      }
+    },
+    {
+      "method": "install_package_file",
+      "params": {
+        "source_path": "${work}/imports/extra-member.sylvia-gm-plan",
+        "install_id": "broken-plan"
+      },
+      "save": {
+        "plan_repair": "/result/repair_id"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "params": {
+        "repair_id": "${package_repair}",
+        "operation_id": "fix-package"
+      }
+    },
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "configured_context_window": 1000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "operation_id": "fix-package"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "repair_id": "not-a-digest",
+        "operation_id": "fix-package"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "repair_id": "0000000000000000000000000000000000000000000000000000000000000000",
+        "operation_id": "fix-package"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "repair_id": "${package_repair}"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "repair_id": "${package_repair}",
+        "operation_id": "fix-package",
+        "speed": "standard"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "repair_id": "${package_repair}",
+        "operation_id": "fix-package"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}",
+        "repair_id": "${package_repair}",
+        "operation_id": "fix-package-again"
+      }
+    },
+    {
+      "method": "set_default_model",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "start_import_repair",
+      "expect_ok": true,
+      "params": {
+        "repair_id": "${plan_repair}",
+        "operation_id": "fix-plan"
+      }
+    },
+    {
+      "method": "builder_chat_index",
+      "expect_ok": true
+    },
+    {
+      "method": "shutdown"
+    }
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "alias": [
+      {
+        "name": "repair",
+        "pattern": "[0-9a-f]{64}",
+        "keys": [
+          "repair_id",
+          "path"
+        ]
+      },
+      {
+        "name": "repair-message",
+        "pattern": "repair-source-[0-9a-f]{24}",
+        "keys": [
+          "message_id"
+        ]
+      },
+      {
+        "name": "chat",
+        "pattern": "session-builder-[0-9a-f]{24}",
+        "keys": [
+          "session_id",
+          "path",
+          "builder_session_id"
+        ]
+      }
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      },
+      {
+        "pattern": "\"source_path\":\"[^\"]*\"",
+        "with": "\"source_path\":\"<selected file>\""
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/",
+      "^import-repair-sources/"
+    ],
+    "ignore_pointers": [
+      "/database/tables/standalone_builder_chats/rows/0/payload_sha256",
+      "/database/tables/standalone_builder_chats/rows/1/payload_sha256",
+      "/database/tables/standalone_builder_chats/rows/2/payload_sha256"
+    ]
+  }
+}
