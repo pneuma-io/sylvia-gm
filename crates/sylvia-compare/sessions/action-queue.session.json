@@ -1,0 +1,346 @@
+{
+  "name": "action-queue",
+  "description": "The SRD Lite campaign from the bundled A Debt in Iron plan, opened by the GM, then one player turn in which the GM, through the stand-in's call markers, reads the action queue (none yet), composes an empty queue, executes it with its confirmation, reads it back, and executes it again without one (refused, then recovered by reading): the three agent queue operations inside the turn's own campaign work. Read the result back, shut down.",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "steps": [
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "configured_context_window": 1000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "campaign_party_options",
+      "expect_ok": true,
+      "params": {
+        "ruleset_selection": "sylvia.srd-lite.bg3",
+        "setting_id": "pneuma.severed-lands",
+        "plan_id": "a-debt-in-iron"
+      },
+      "save": {
+        "player_character_id": "/result/player_archetypes/0/id"
+      }
+    },
+    {
+      "method": "create_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-draft",
+        "display_name": "Debt in Iron",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "campaign_id": "/result/campaign_id",
+        "builder_session_id": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-ruleset",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 0,
+        "current_step": "ruleset",
+        "visible_answer": "SRD Lite",
+        "answer": {
+          "candidate_id": "sylvia.srd-lite.bg3"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-setting",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 1,
+        "current_step": "setting",
+        "visible_answer": "The Severed Lands",
+        "answer": {
+          "setting_id": "pneuma.severed-lands"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-plan",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 2,
+        "current_step": "plan",
+        "visible_answer": "A Debt in Iron",
+        "answer": {
+          "plan_id": "a-debt-in-iron"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-name",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 3,
+        "current_step": "name",
+        "visible_answer": "Debt in Iron",
+        "answer": {
+          "display_name": "Debt in Iron"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-participants",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 4,
+        "current_step": "participants",
+        "visible_answer": "Tavin Bell",
+        "answer": {
+          "archetype_id": "${player_character_id}",
+          "companion_ids": []
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-boundaries",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 5,
+        "current_step": "boundaries_preferences",
+        "visible_answer": "None; Mystery",
+        "answer": {
+          "boundaries": "None",
+          "preferences": "Mystery"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "iron-requests",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 6,
+        "current_step": "specific_requests",
+        "visible_answer": "No additional requests",
+        "answer": {
+          "no_additional_requests": true,
+          "requests": ""
+        }
+      }
+    },
+    {
+      "method": "start_guided_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "iron-start",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "display_name": "Debt in Iron",
+        "candidate_id": "sylvia.srd-lite.bg3",
+        "setting_id": "pneuma.severed-lands",
+        "plan_id": "a-debt-in-iron",
+        "player_character_id": "${player_character_id}",
+        "companion_ids": [],
+        "premise": ""
+      }
+    },
+    {
+      "method": "finalize_campaign_construction",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "dm_provider_id": "${provider_id}",
+        "dm_model_id": "${model_id}",
+        "model_guidance_override": true
+      },
+      "save": {
+        "session_id": "/result/handoff/dm_session_id",
+        "turn_id": "/result/dm_turn_id"
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true
+    },
+    {
+      "method": "start_dm_session",
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "session_id": "${session_id}",
+        "turn_id": "${turn_id}"
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true,
+      "save": {
+        "turn_id": "/result/0/turn_id"
+      }
+    },
+    {
+      "method": "submit_session_input",
+      "timeout_s": 600,
+      "params": {
+        "session_id": "${session_id}",
+        "turn_id": "${turn_id}",
+        "attempt_id": "attempt-queue-1",
+        "message_id": "message-queue-1",
+        "user_text": "Before anything else, line up our plan. [call:read_action_sequence {}] [call:compose_action_sequence {\"sequence_id\":\"queue-1\",\"expected_revision\":4,\"steps\":[]}] [call:execute_action_sequence {\"sequence_id\":\"queue-1\",\"expected_version\":1,\"confirmation\":\"72b523af439b03423aeb5acd42345ba9565fc3d400c788e4db7845ef47d3b172\"}] [call:read_action_sequence {\"sequence_id\":\"queue-1\"}] [call:execute_action_sequence {\"sequence_id\":\"queue-1\",\"expected_version\":1}]",
+        "ooc_text": null,
+        "allow_public_web": false,
+        "builder_start": false,
+        "player_action_id": null,
+        "automatic_response": false,
+        "redirect_interruption_id": null,
+        "campaign_ending_choice": null
+      }
+    },
+    {
+      "method": "player_projection_page",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "after_sequence": 0,
+        "load_id": null
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "before_sequence": null,
+        "limit": 50
+      }
+    },
+    {
+      "method": "display_snapshot",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "campaign_index",
+      "expect_ok": true
+    },
+    {
+      "method": "shutdown"
+    }
+  ],
+  "rules": {
+    "ignore_keys": [
+      "elapsed_ms",
+      "quiet_ms",
+      "rows/payload_hash",
+      "_d20_test/results",
+      "_d20_test/total",
+      "d20_test/results",
+      "d20_test/total",
+      "context/_adjusted_total",
+      "narration_facts/adjusted_total",
+      "equation/roll",
+      "equation/total",
+      "details/value"
+    ],
+    "alias": [
+      {
+        "name": "inference",
+        "pattern": "inference-[0-9a-f]{32}",
+        "keys": [
+          "message_id",
+          "inference_id"
+        ]
+      },
+      {
+        "name": "action",
+        "pattern": "action-[0-9a-f]{32}",
+        "keys": [
+          "action_id",
+          "message_id",
+          "content"
+        ]
+      },
+      {
+        "name": "provider-call",
+        "pattern": "provider-[0-9a-f]{32}",
+        "keys": [
+          "idempotency_key"
+        ]
+      }
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      },
+      {
+        "pattern": "\"(_?adjusted_total)\":[0-9]+",
+        "with": "\"$1\":<roll>"
+      },
+      {
+        "pattern": "\"results\":\\[[0-9]+\\],\"sides\":20,\"total\":[0-9]+",
+        "with": "\"results\":[<roll>],\"sides\":20,\"total\":<roll>"
+      },
+      {
+        "pattern": "\"label\":\"D20 results\",\"value\":\\[[0-9]+\\]",
+        "with": "\"label\":\"D20 results\",\"value\":[<roll>]"
+      },
+      {
+        "pattern": "\"roll\":[0-9]+,\"total\":[0-9]+",
+        "with": "\"roll\":<roll>,\"total\":<roll>"
+      }
+    ],
+    "ignore_pointers": [
+      "/model_requests/2/headers/4/1"
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ],
+    "ignore_headers_row_8": [
+      "User-Agent",
+      "Accept-Encoding",
+      "Connection",
+      "X-Stainless-*"
+    ],
+    "header_name_case_row_40": true
+  }
+}
