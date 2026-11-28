@@ -57,3 +57,5 @@ test-profiles/
 !campaign-settings/**/setting.sylvia-gm-package
 !campaign-plans/**/setting.sylvia-gm-package
 !tests/fixtures/**/*.sylvia-gm-package
+# The import-repair offer's selected package files (generate_plan_bundle_runs.py).
+!crates/sylvia-app/tests/vectors/plan_bundle/selected/*.sylvia-gm-package
