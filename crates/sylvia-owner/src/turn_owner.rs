@@ -16,6 +16,7 @@ use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
+use sylvia_app::authority::actor_decisions as authority_actor_decisions;
 use sylvia_app::authority::narration_attempts::{self as narration, NarrationStart};
 use sylvia_app::authority::narration_attempts::{RetryNarration, RetryStream};
 use sylvia_app::authority::{campaign_file, content_reads, knowledge, player_reads, turn_reads, turns};
@@ -366,27 +367,50 @@ impl TurnOwner for OwnerReads {
     fn actor_decision_request<'a>(
         &'a self,
         campaign_id: &'a str,
-        _turn_id: &'a str,
+        turn_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<ActorDecisionRequest>>> {
         Box::pin(async move {
-            // `AuthorityOwner.actor_decision_request`'s opening: a package that declares no
-            // isolated participant has no actor decision. The rest (the turn checks and the
-            // projection) is T6's, with `run_required_actor_decision`.
-            let _operation = self.store().operation().map_err(store_error)?;
-            let id = campaign_id.to_owned();
-            let isolated = self
-                .store()
-                .call(move |store| {
-                    let snapshot = store.display_snapshot(&id, &DisplayQuery::default())?;
-                    let declared = content_reads::decision_scope_declaration(store, &snapshot.state)?;
-                    Ok(declared.is_some_and(|declared| declared.contains_key("isolated_participant")))
-                })
+            authority_actor_decisions::actor_decision_request(self.store(), campaign_id, turn_id)
                 .await
-                .map_err(store_error)?;
-            if isolated {
-                return Err(pending("actor_decision_request"));
-            }
-            Ok(None)
+                .map_err(|error| authority_failure(error).into_coded())
+        })
+    }
+
+    fn actor_context<'a>(
+        &'a self,
+        session_id: &'a str,
+        context_id: &'a str,
+        provider_id: &'a str,
+        model_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<JsonMap>>> {
+        Box::pin(async move {
+            turn_reads::actor_context(self.store(), session_id, context_id, provider_id, model_id)
+                .await
+                .map_err(store_error)
+        })
+    }
+
+    fn actor_decision_command<'a>(
+        &'a self,
+        request: &'a ActorDecisionRequest,
+        choice_id: &'a str,
+        session_id: &'a str,
+        owner_id: &'a str,
+        provider_id: Option<&'a str>,
+        model_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<ActionCommand, AuthorityFailure>> {
+        Box::pin(async move {
+            authority_actor_decisions::actor_decision_command(
+                self.store(),
+                request,
+                choice_id,
+                session_id,
+                owner_id,
+                provider_id,
+                model_id,
+            )
+            .await
+            .map_err(authority_failure)
         })
     }
 

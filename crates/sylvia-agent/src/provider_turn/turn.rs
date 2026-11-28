@@ -15,6 +15,7 @@
 //! answers `rust_port_pending`. The controls are read from the Python source into
 //! `turn_texts.json` by `generate_turn_texts.py`.
 
+use super::actor::{execute_required_transition, run_required_actor_decision};
 use super::decisions::{
     actor_decision_can_be_requested, buffered_narration_is_settled, campaign_file_must_be_settled,
     campaign_file_needs_narration, held_campaign_file_narration_is_needed,
@@ -29,7 +30,7 @@ use super::round::{prepare_provider_round, prepare_round_catalog, stream_provide
 use super::state::ProviderTurnState;
 use super::tool_batch::{execute_tool_batch, prepare_tool_batch, reconcile_tool_batch};
 use super::tool_checks::retry_rejected_tool_call;
-use super::{TurnEvents, TurnFailure, TurnResult};
+use super::{TurnEvents, TurnResult};
 use crate::provider_session::campaign_file::{
     campaign_file_arguments_establish_changes, validated_raw_response_blocks,
 };
@@ -53,7 +54,6 @@ use sylvia_domain::authority::{
 };
 use sylvia_domain::pyops::{py_eq, py_str, py_type_name};
 use sylvia_domain::session::{SessionMessage, SessionMessageKind};
-use sylvia_provider::factory::PORT_PENDING;
 use sylvia_provider::Provider;
 
 fn texts() -> &'static Json {
@@ -82,14 +82,6 @@ fn system(content: String) -> Tagged {
 /// `message.content.get("kind") == kind` for an evidence message.
 fn evidence_of(message: &SessionMessage, kind: &str) -> bool {
     message.kind() == SessionMessageKind::Evidence && message.content().get("kind") == Some(&json!(kind))
-}
-
-/// A turn that reaches T6's work, not ported yet.
-fn pending(method: &str) -> TurnFailure {
-    TurnFailure::Coded(CodedError::new(
-        PORT_PENDING,
-        format!("The Rust owner does not run agent/_provider_turn_phases.py {method} yet."),
-    ))
 }
 
 /// `retry_empty_completion(...)`: no events.
@@ -714,7 +706,8 @@ async fn provider_events(
     loop {
         prepare_round_catalog(adapter, state, input, turn_id).await?;
         if required_transition_can_run(state)? {
-            return Err(pending("execute_required_transition"));
+            execute_required_transition(adapter, state, input, turn_id, events).await?;
+            continue;
         }
         if actor_decision_can_be_requested(state)? {
             // Read only after required bookkeeping has drained and refreshed.
@@ -723,7 +716,8 @@ async fn provider_events(
             let requested = request.is_some();
             state.locals.actor_request.set(request);
             if requested {
-                return Err(pending("run_required_actor_decision"));
+                run_required_actor_decision(adapter, state, input, turn_id, events).await?;
+                continue;
             }
         }
         prepare_provider_round(adapter, state, input, turn_id).await?;
