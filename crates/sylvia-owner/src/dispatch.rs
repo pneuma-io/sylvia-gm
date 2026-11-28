@@ -173,6 +173,10 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "open_turn" => commands::actions::handle_open_turn(context, params).await,
         "complete_turn" => commands::actions::handle_complete_turn(context, params).await,
         "retryable_interruption" => commands::actions::handle_retryable_interruption(context, params).await,
+        "confirm_new_campaign" => commands::campaigns::handle_confirm_new_campaign(context, params).await,
+        "complete_campaign_construction" => {
+            commands::campaigns::handle_complete_campaign_construction(context, params).await
+        }
         "begin_campaign_construction" => {
             commands::campaigns::handle_begin_campaign_construction(context, params).await
         }
