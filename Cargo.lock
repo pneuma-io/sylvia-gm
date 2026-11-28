@@ -2743,6 +2743,7 @@ dependencies = [
  "sylvia-engine",
  "sylvia-store",
  "tokio",
+ "unicode-normalization",
 ]
 
 [[package]]

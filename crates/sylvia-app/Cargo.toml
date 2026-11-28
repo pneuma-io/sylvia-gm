@@ -16,6 +16,8 @@ sylvia-store.workspace = true
 serde_json.workspace = true
 # Python lookaround in the No Ruleset mechanics patterns (docs/rust-port/sites/regex-sites.md).
 fancy-regex.workspace = true
+# NFC member names in import repair (import_repair.py's unicodedata.normalize). Added by lane 1.
+unicode-normalization.workspace = true
 
 [dev-dependencies]
 # The vector tests' hooks (`vector-hooks`); never a normal dependency's feature.
