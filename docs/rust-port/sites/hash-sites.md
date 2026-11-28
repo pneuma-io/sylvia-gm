@@ -37,12 +37,12 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:124` | `_read_selected_source` | hashlib.sha256 | `return hashlib.sha256(data).hexdigest(), data` | yes |
 | `application/import_repair.py:237` | `inspect_repair_source` | hashlib.sha256 | `_read_safe_zip(snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest())` | yes |
-| `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | |
-| `application/import_repair.py:313` | `stage_repair_copy` | hashlib.sha256 | `snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest()` | |
-| `application/import_repair.py:548` | `_plan_result` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(snapshot).hexdigest()` | |
-| `application/import_repair.py:549` | `_plan_result` | hashlib.sha256 | `record["content_sha256"] = hashlib.sha256( canonical_plan + markdown.encode("utf-8") + canonical_contribution + snapshot ).hexdigest()` | |
+| `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | yes |
+| `application/import_repair.py:313` | `stage_repair_copy` | hashlib.sha256 | `snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest()` | yes |
+| `application/import_repair.py:548` | `_plan_result` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(snapshot).hexdigest()` | yes |
+| `application/import_repair.py:549` | `_plan_result` | hashlib.sha256 | `record["content_sha256"] = hashlib.sha256( canonical_plan + markdown.encode("utf-8") + canonical_contribution + snapshot ).hexdigest()` | yes |
 | `application/import_repair_sessions.py:44` | `offer_import_repair` | hashlib.sha256 | `repair_id = hashlib.sha256( canonical_json_bytes([install_id, inspection.source_sha256, str(source)]) ).hexdigest()` | yes |
-| `application/import_repair_sessions.py:107` | `start_import_repair_chat` | hashlib.sha256 | `+ hashlib.sha256(canonical_json_bytes([operation_id, repair_id])).hexdigest()[:24]` | |
+| `application/import_repair_sessions.py:107` | `start_import_repair_chat` | hashlib.sha256 | `+ hashlib.sha256(canonical_json_bytes([operation_id, repair_id])).hexdigest()[:24]` | yes |
 | `application/interview_content.py:100` | `resolve_interview_content` | hashlib.sha256 | `install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` | |
 | `application/interview_content.py:129` | `resolve_interview_content` | hashlib.sha256 | `f"{hashlib.sha256(snapshot).hexdigest()[:24]}"` | |
 | `application/interview_content.py:141` | `resolve_interview_content` | hashlib.sha256 | `install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}")` | |

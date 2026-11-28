@@ -41,7 +41,7 @@ Ported: 97 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `character_chat` | `character_chat.handle_character_chat` | yes | no | |
 | `send_character_chat_message` | `character_chat.handle_send_character_chat_message` | yes | no | |
 | `builder_chat_index` | `builder.handle_builder_chat_index` | yes | yes | `startup` |
-| `start_import_repair` | `builder.handle_start_import_repair` | yes | no | |
+| `start_import_repair` | `builder.handle_start_import_repair` | yes | yes | `import-repair` |
 | `create_builder_chat` | `builder.handle_create_builder_chat` | yes | yes | `builder-chat-create` |
 | `rename_builder_chat` | `builder.handle_rename_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |
 | `delete_builder_chat` | `builder.handle_delete_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |

@@ -1,0 +1,2702 @@
+{
+ "python": "3.12",
+ "steps": [
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair draft is missing",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "package",
+   "expected": "x",
+   "bound": null,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair source hash is invalid",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "package",
+   "expected": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+   "bound": "1111111111111111111111111111111111111111111111111111111111111111",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair workspace bound source differs",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "package",
+   "expected": "0000000000000000000000000000000000000000000000000000000000000000",
+   "bound": null,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Selected repair source changed",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "plan",
+   "expected": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+   "bound": null,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Selected repair source kind changed",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "missing-package.archive",
+   "kind": "package",
+   "expected": "0000000000000000000000000000000000000000000000000000000000000000",
+   "bound": null,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair source must be one regular file",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "package",
+   "expected": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+   "bound": null,
+   "outcome": {
+    "ok": {
+     "kind": "package",
+     "source_sha256": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+     "draft_root": "repair-draft"
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "e4d080efb2412fbdc6a96ada11f6909797e379936e671524f367d66fdf07c606"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "CommandRejected",
+    "message": "Package manifest fields are invalid",
+    "diagnostics": [
+     {
+      "code": "content_field_invalid",
+      "phase": "import",
+      "message": "Remove this undeclared field",
+      "file": "manifest.json",
+      "path": "$.unexpected"
+     }
+    ]
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "e4d080efb2412fbdc6a96ada11f6909797e379936e671524f367d66fdf07c606"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAicGFja2FnZXMiOiBbeyJjYXBhYmlsaXRpZXMiOiBbInNpZ25hbC1zdGF0aWMuY29uc2VxdWVuY2UiLCAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJzaWduYWwtc3RhdGljLnJlc29sdmUiXSwgImNvbXBhdGliaWxpdHkiOiB7Imhvc3RfY29udHJhY3QiOiAxLCAicmVxdWlyZXMiOiBbXSwgInJ1bnRpbWVfZm9ybWF0IjogMX0sICJjb250ZW50X2RlY2xhcmF0aW9ucyI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAiY29udGVudF9zaGEyNTYiOiAiMDhiMzQ4ODNkNWNlMGVlY2Q0ODI3OTg0ZGIxNTU2NGI0NWNkMGFmNjM2MDE2MWY2YzgxNDFlNDNhMTg4ODMzNyIsICJkZXBlbmRlbmNpZXMiOiBbXSwgImZpbGVzIjogW3siYnl0ZXMiOiAxMTY0LCAicGF0aCI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAic2hhMjU2IjogImVmMjA4ZjFmOTk1NDdmN2RjYWQwZTg2ZWIzMWE2MjBhMTA4NDc0ZDc5YzBlY2Y0ZWVjMTlkODJkODc5ODlmNGQifSwgeyJieXRlcyI6IDU1MDEsICJwYXRoIjogInJ1bnRpbWUvcnVsZXNldC55YW1sIiwgInNoYTI1NiI6ICJlYzRhMDk1ODcwNmEwMTJlYWJmYWM0YmNmMGY4YzQ3ODM5OWNmMDYwODQ1N2UyNmY1OTY5OWUzZmUwMmJmNGI4In1dLCAiaWQiOiAic3lsdmlhLWdtLmNvbmZvcm1hbmNlLnNpZ25hbC1zdGF0aWMiLCAibWV0YWRhdGEiOiB7ImxhYmVsIjogIlNpZ25hbCBhbmQgU3RhdGljIFJVTEUtMDA1IENvbmZvcm1hbmNlIn0sICJtaW5pbXVtX21vZGVsX2NhcGFiaWxpdHlfdGllciI6ICJzeWx2aWEuY2FwYWJpbGl0eS50MDIiLCAicGFydGljaXBhbnRfYXJ0aWZhY3RzIjogW10sICJwcm9tcHRfZnJhZ21lbnRzIjogW10sICJwcm92ZW5hbmNlIjogeyJwdWJsaXNoZXIiOiAic3lsdmlhLWdtLWNvbmZvcm1hbmNlIiwgInNvdXJjZV9zaGEyNTYiOiAiMzdlYWRhOGU5ZDQ5Y2FhMGI1NjE0ZGVmZWYwOGY2ODMxNjJlN2FmMWQ3ODQ0M2E0NjlkMjA4Nzc2ZDQwNzcwYyJ9LCAicm9sZSI6ICJwcmltYXJ5IiwgInRvb2xzIjogW3siY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLnJlc29sdmUiLCAiaW5wdXRfc2NoZW1hIjogeyJhZGRpdGlvbmFsUHJvcGVydGllcyI6IGZhbHNlLCAicHJvcGVydGllcyI6IHsicHJlc3N1cmUiOiB7InR5cGUiOiAiaW50ZWdlciJ9LCAic2tpbGwiOiB7ImVudW0iOiBbImludHJ1c2lvbiIsICJmaWVsZF9tZWRpY2luZSJdLCAidHlwZSI6ICJzdHJpbmcifX0sICJyZXF1aXJlZCI6IFsic2tpbGwiLCAicHJlc3N1cmUiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogInJlc29sdmVfaW50cnVzaW9uIiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJjaGFyZ2Vfc3BlbnQiOiB7Im1pbmltdW0iOiAwLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgInN0cmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgIndvdW5kcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifX0sICJyZXF1aXJlZCI6IFsic3RyZXNzIiwgIndvdW5kcyIsICJjaGFyZ2Vfc3BlbnQiLCAicHJvZ3Jlc3MiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogImFwcGx5X29wZXJhdGlvbl9jb3N0IiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJhbW91bnQiOiB7Im1pbmltdW0iOiAxLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmFtIjogeyJlbnVtIjogWyJnaG9zdF9yb3V0ZSIsICJzaWduYWxfYm9vc3QiXSwgInR5cGUiOiAic3RyaW5nIn19LCAicmVxdWlyZWQiOiBbInByb2dyYW0iLCAiYW1vdW50Il0sICJ0eXBlIjogIm9iamVjdCJ9LCAibmFtZSI6ICJydW5fcHJvZ3JhbSIsICJzdGF0ZV9wcmVkaWNhdGVzIjogW10sICJ0dXJuX3N0YXR1c2VzIjogWyJvcGVuIl0sICJ3cml0ZXJzIjogWyJkbSJdfV0sICJ1aV9zdXJmYWNlcyI6IFt7ImFjdGlvbnMiOiBbeyJpZCI6ICJib29zdC1zaWduYWwiLCAiaW50ZW50IjogInJ1bl9wcm9ncmFtIiwgImxhYmVsIjogIkJvb3N0IHNpZ25hbCIsICJwYXJhbXMiOiB7ImFtb3VudCI6IDEsICJwcm9ncmFtIjogInNpZ25hbF9ib29zdCJ9fV0sICJhbGxvd2VkX3BsYWNlbWVudHMiOiBbImRvY2tlZCIsICJmbG9hdGluZyIsICJ3aW5kb3ciXSwgImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJkZWZhdWx0X3BsYWNlbWVudCI6ICJkb2NrZWQiLCAiZGVmYXVsdF9zaXplIjogMTgwLCAiZ3JvdXAiOiBudWxsLCAiaWNvbiI6ICJcdTI1YzciLCAiaWQiOiAic2lnbmFsLXN0YXRpYy1zdGF0dXMiLCAibWluaW11bV9zaXplIjogOTYsICJvcmRlciI6IDEwLCAicmVuZGVyZXIiOiAia2V5X3ZhbHVlIiwgInNvdXJjZSI6IHsia2V5IjogInN0YXRlIiwgImtpbmQiOiAic3RhdGUiLCAibmFtZXNwYWNlIjogInN5bHZpYS1nbS5jb25mb3JtYW5jZS5zaWduYWwtc3RhdGljIn0sICJ0aXRsZSI6ICJPcGVyYXRpb24gc3RhdHVzIn1dLCAidmVyc2lvbiI6ICIwLjEuMCJ9XX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "package",
+   "expected": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+   "bound": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+   "outcome": {
+    "ok": {
+     "kind": "package",
+     "source_sha256": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+     "draft_root": "repair-draft"
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "stage",
+   "workspace": "package",
+   "source": "broken-package.archive",
+   "kind": "package",
+   "expected": "4f52499a4366a71a4dc951f79b3e4ac9e6f009b648bc8dc0406ef9ae7b879c1b",
+   "bound": null,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Existing repair workspace has no proven bound source",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "ok": {
+     "kind": "package",
+     "archive_sha256": "a4d3d1dd1a23ed213f6cfb6d7b7f037b5a90d7d0be16c9556677a8983971752e",
+     "closure_sha256": "3a6d96c625424710de5638355297617d3082e38ae7c2c8b8236c4f2caebf9069",
+     "plan": null,
+     "interview_contribution": null,
+     "setup_id": null
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair Plan contains files outside its fixed draft",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiB0cnVlLCAicGFja2FnZXMiOiBbeyJjYXBhYmlsaXRpZXMiOiBbInNpZ25hbC1zdGF0aWMuY29uc2VxdWVuY2UiLCAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJzaWduYWwtc3RhdGljLnJlc29sdmUiXSwgImNvbXBhdGliaWxpdHkiOiB7Imhvc3RfY29udHJhY3QiOiAxLCAicmVxdWlyZXMiOiBbXSwgInJ1bnRpbWVfZm9ybWF0IjogMX0sICJjb250ZW50X2RlY2xhcmF0aW9ucyI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAiY29udGVudF9zaGEyNTYiOiAiMDhiMzQ4ODNkNWNlMGVlY2Q0ODI3OTg0ZGIxNTU2NGI0NWNkMGFmNjM2MDE2MWY2YzgxNDFlNDNhMTg4ODMzNyIsICJkZXBlbmRlbmNpZXMiOiBbXSwgImZpbGVzIjogW3siYnl0ZXMiOiAxMTY0LCAicGF0aCI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAic2hhMjU2IjogImVmMjA4ZjFmOTk1NDdmN2RjYWQwZTg2ZWIzMWE2MjBhMTA4NDc0ZDc5YzBlY2Y0ZWVjMTlkODJkODc5ODlmNGQifSwgeyJieXRlcyI6IDU1MDEsICJwYXRoIjogInJ1bnRpbWUvcnVsZXNldC55YW1sIiwgInNoYTI1NiI6ICJlYzRhMDk1ODcwNmEwMTJlYWJmYWM0YmNmMGY4YzQ3ODM5OWNmMDYwODQ1N2UyNmY1OTY5OWUzZmUwMmJmNGI4In1dLCAiaWQiOiAic3lsdmlhLWdtLmNvbmZvcm1hbmNlLnNpZ25hbC1zdGF0aWMiLCAibWV0YWRhdGEiOiB7ImxhYmVsIjogIlNpZ25hbCBhbmQgU3RhdGljIFJVTEUtMDA1IENvbmZvcm1hbmNlIn0sICJtaW5pbXVtX21vZGVsX2NhcGFiaWxpdHlfdGllciI6ICJzeWx2aWEuY2FwYWJpbGl0eS50MDIiLCAicGFydGljaXBhbnRfYXJ0aWZhY3RzIjogW10sICJwcm9tcHRfZnJhZ21lbnRzIjogW10sICJwcm92ZW5hbmNlIjogeyJwdWJsaXNoZXIiOiAic3lsdmlhLWdtLWNvbmZvcm1hbmNlIiwgInNvdXJjZV9zaGEyNTYiOiAiMzdlYWRhOGU5ZDQ5Y2FhMGI1NjE0ZGVmZWYwOGY2ODMxNjJlN2FmMWQ3ODQ0M2E0NjlkMjA4Nzc2ZDQwNzcwYyJ9LCAicm9sZSI6ICJwcmltYXJ5IiwgInRvb2xzIjogW3siY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLnJlc29sdmUiLCAiaW5wdXRfc2NoZW1hIjogeyJhZGRpdGlvbmFsUHJvcGVydGllcyI6IGZhbHNlLCAicHJvcGVydGllcyI6IHsicHJlc3N1cmUiOiB7InR5cGUiOiAiaW50ZWdlciJ9LCAic2tpbGwiOiB7ImVudW0iOiBbImludHJ1c2lvbiIsICJmaWVsZF9tZWRpY2luZSJdLCAidHlwZSI6ICJzdHJpbmcifX0sICJyZXF1aXJlZCI6IFsic2tpbGwiLCAicHJlc3N1cmUiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogInJlc29sdmVfaW50cnVzaW9uIiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJjaGFyZ2Vfc3BlbnQiOiB7Im1pbmltdW0iOiAwLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgInN0cmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgIndvdW5kcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifX0sICJyZXF1aXJlZCI6IFsic3RyZXNzIiwgIndvdW5kcyIsICJjaGFyZ2Vfc3BlbnQiLCAicHJvZ3Jlc3MiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogImFwcGx5X29wZXJhdGlvbl9jb3N0IiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJhbW91bnQiOiB7Im1pbmltdW0iOiAxLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmFtIjogeyJlbnVtIjogWyJnaG9zdF9yb3V0ZSIsICJzaWduYWxfYm9vc3QiXSwgInR5cGUiOiAic3RyaW5nIn19LCAicmVxdWlyZWQiOiBbInByb2dyYW0iLCAiYW1vdW50Il0sICJ0eXBlIjogIm9iamVjdCJ9LCAibmFtZSI6ICJydW5fcHJvZ3JhbSIsICJzdGF0ZV9wcmVkaWNhdGVzIjogW10sICJ0dXJuX3N0YXR1c2VzIjogWyJvcGVuIl0sICJ3cml0ZXJzIjogWyJkbSJdfV0sICJ1aV9zdXJmYWNlcyI6IFt7ImFjdGlvbnMiOiBbeyJpZCI6ICJib29zdC1zaWduYWwiLCAiaW50ZW50IjogInJ1bl9wcm9ncmFtIiwgImxhYmVsIjogIkJvb3N0IHNpZ25hbCIsICJwYXJhbXMiOiB7ImFtb3VudCI6IDEsICJwcm9ncmFtIjogInNpZ25hbF9ib29zdCJ9fV0sICJhbGxvd2VkX3BsYWNlbWVudHMiOiBbImRvY2tlZCIsICJmbG9hdGluZyIsICJ3aW5kb3ciXSwgImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJkZWZhdWx0X3BsYWNlbWVudCI6ICJkb2NrZWQiLCAiZGVmYXVsdF9zaXplIjogMTgwLCAiZ3JvdXAiOiBudWxsLCAiaWNvbiI6ICJcdTI1YzciLCAiaWQiOiAic2lnbmFsLXN0YXRpYy1zdGF0dXMiLCAibWluaW11bV9zaXplIjogOTYsICJvcmRlciI6IDEwLCAicmVuZGVyZXIiOiAia2V5X3ZhbHVlIiwgInNvdXJjZSI6IHsia2V5IjogInN0YXRlIiwgImtpbmQiOiAic3RhdGUiLCAibmFtZXNwYWNlIjogInN5bHZpYS1nbS5jb25mb3JtYW5jZS5zaWduYWwtc3RhdGljIn0sICJ0aXRsZSI6ICJPcGVyYXRpb24gc3RhdHVzIn1dLCAidmVyc2lvbiI6ICIwLjEuMCJ9XX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "b9cd44ac7d80128f18e15225a6a87398ceb8b22bbdbd111c5030dba9ef921b96"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package manifest format is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "b9cd44ac7d80128f18e15225a6a87398ceb8b22bbdbd111c5030dba9ef921b96"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLjAsICJwYWNrYWdlcyI6IFt7ImNhcGFiaWxpdGllcyI6IFsic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJzaWduYWwtc3RhdGljLnByb2dyYW1zIiwgInNpZ25hbC1zdGF0aWMucmVzb2x2ZSJdLCAiY29tcGF0aWJpbGl0eSI6IHsiaG9zdF9jb250cmFjdCI6IDEsICJyZXF1aXJlcyI6IFtdLCAicnVudGltZV9mb3JtYXQiOiAxfSwgImNvbnRlbnRfZGVjbGFyYXRpb25zIjogImNvbnRlbnQvY29udGVudC1kZWNsYXJhdGlvbnMuanNvbiIsICJjb250ZW50X3NoYTI1NiI6ICIwOGIzNDg4M2Q1Y2UwZWVjZDQ4Mjc5ODRkYjE1NTY0YjQ1Y2QwYWY2MzYwMTYxZjZjODE0MWU0M2ExODg4MzM3IiwgImRlcGVuZGVuY2llcyI6IFtdLCAiZmlsZXMiOiBbeyJieXRlcyI6IDExNjQsICJwYXRoIjogImNvbnRlbnQvY29udGVudC1kZWNsYXJhdGlvbnMuanNvbiIsICJzaGEyNTYiOiAiZWYyMDhmMWY5OTU0N2Y3ZGNhZDBlODZlYjMxYTYyMGExMDg0NzRkNzljMGVjZjRlZWMxOWQ4MmQ4Nzk4OWY0ZCJ9LCB7ImJ5dGVzIjogNTUwMSwgInBhdGgiOiAicnVudGltZS9ydWxlc2V0LnlhbWwiLCAic2hhMjU2IjogImVjNGEwOTU4NzA2YTAxMmVhYmZhYzRiY2YwZjhjNDc4Mzk5Y2YwNjA4NDU3ZTI2ZjU5Njk5ZTNmZTAyYmY0YjgifV0sICJpZCI6ICJzeWx2aWEtZ20uY29uZm9ybWFuY2Uuc2lnbmFsLXN0YXRpYyIsICJtZXRhZGF0YSI6IHsibGFiZWwiOiAiU2lnbmFsIGFuZCBTdGF0aWMgUlVMRS0wMDUgQ29uZm9ybWFuY2UifSwgIm1pbmltdW1fbW9kZWxfY2FwYWJpbGl0eV90aWVyIjogInN5bHZpYS5jYXBhYmlsaXR5LnQwMiIsICJwYXJ0aWNpcGFudF9hcnRpZmFjdHMiOiBbXSwgInByb21wdF9mcmFnbWVudHMiOiBbXSwgInByb3ZlbmFuY2UiOiB7InB1Ymxpc2hlciI6ICJzeWx2aWEtZ20tY29uZm9ybWFuY2UiLCAic291cmNlX3NoYTI1NiI6ICIzN2VhZGE4ZTlkNDljYWEwYjU2MTRkZWZlZjA4ZjY4MzE2MmU3YWYxZDc4NDQzYTQ2OWQyMDg3NzZkNDA3NzBjIn0sICJyb2xlIjogInByaW1hcnkiLCAidG9vbHMiOiBbeyJjYXBhYmlsaXR5IjogInNpZ25hbC1zdGF0aWMucmVzb2x2ZSIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJwcmVzc3VyZSI6IHsidHlwZSI6ICJpbnRlZ2VyIn0sICJza2lsbCI6IHsiZW51bSI6IFsiaW50cnVzaW9uIiwgImZpZWxkX21lZGljaW5lIl0sICJ0eXBlIjogInN0cmluZyJ9fSwgInJlcXVpcmVkIjogWyJza2lsbCIsICJwcmVzc3VyZSJdLCAidHlwZSI6ICJvYmplY3QifSwgIm5hbWUiOiAicmVzb2x2ZV9pbnRydXNpb24iLCAic3RhdGVfcHJlZGljYXRlcyI6IFtdLCAidHVybl9zdGF0dXNlcyI6IFsib3BlbiJdLCAid3JpdGVycyI6IFsiZG0iXX0sIHsiY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLmNvbnNlcXVlbmNlIiwgImlucHV0X3NjaGVtYSI6IHsiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwgInByb3BlcnRpZXMiOiB7ImNoYXJnZV9zcGVudCI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgInByb2dyZXNzIjogeyJtaW5pbXVtIjogMCwgInR5cGUiOiAiaW50ZWdlciJ9LCAic3RyZXNzIjogeyJtaW5pbXVtIjogMCwgInR5cGUiOiAiaW50ZWdlciJ9LCAid291bmRzIjogeyJtaW5pbXVtIjogMCwgInR5cGUiOiAiaW50ZWdlciJ9fSwgInJlcXVpcmVkIjogWyJzdHJlc3MiLCAid291bmRzIiwgImNoYXJnZV9zcGVudCIsICJwcm9ncmVzcyJdLCAidHlwZSI6ICJvYmplY3QifSwgIm5hbWUiOiAiYXBwbHlfb3BlcmF0aW9uX2Nvc3QiLCAic3RhdGVfcHJlZGljYXRlcyI6IFtdLCAidHVybl9zdGF0dXNlcyI6IFsib3BlbiJdLCAid3JpdGVycyI6IFsiZG0iXX0sIHsiY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLnByb2dyYW1zIiwgImlucHV0X3NjaGVtYSI6IHsiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwgInByb3BlcnRpZXMiOiB7ImFtb3VudCI6IHsibWluaW11bSI6IDEsICJ0eXBlIjogImludGVnZXIifSwgInByb2dyYW0iOiB7ImVudW0iOiBbImdob3N0X3JvdXRlIiwgInNpZ25hbF9ib29zdCJdLCAidHlwZSI6ICJzdHJpbmcifX0sICJyZXF1aXJlZCI6IFsicHJvZ3JhbSIsICJhbW91bnQiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogInJ1bl9wcm9ncmFtIiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19XSwgInVpX3N1cmZhY2VzIjogW3siYWN0aW9ucyI6IFt7ImlkIjogImJvb3N0LXNpZ25hbCIsICJpbnRlbnQiOiAicnVuX3Byb2dyYW0iLCAibGFiZWwiOiAiQm9vc3Qgc2lnbmFsIiwgInBhcmFtcyI6IHsiYW1vdW50IjogMSwgInByb2dyYW0iOiAic2lnbmFsX2Jvb3N0In19XSwgImFsbG93ZWRfcGxhY2VtZW50cyI6IFsiZG9ja2VkIiwgImZsb2F0aW5nIiwgIndpbmRvdyJdLCAiY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLmNvbnNlcXVlbmNlIiwgImRlZmF1bHRfcGxhY2VtZW50IjogImRvY2tlZCIsICJkZWZhdWx0X3NpemUiOiAxODAsICJncm91cCI6IG51bGwsICJpY29uIjogIlx1MjVjNyIsICJpZCI6ICJzaWduYWwtc3RhdGljLXN0YXR1cyIsICJtaW5pbXVtX3NpemUiOiA5NiwgIm9yZGVyIjogMTAsICJyZW5kZXJlciI6ICJrZXlfdmFsdWUiLCAic291cmNlIjogeyJrZXkiOiAic3RhdGUiLCAia2luZCI6ICJzdGF0ZSIsICJuYW1lc3BhY2UiOiAic3lsdmlhLWdtLmNvbmZvcm1hbmNlLnNpZ25hbC1zdGF0aWMifSwgInRpdGxlIjogIk9wZXJhdGlvbiBzdGF0dXMifV0sICJ2ZXJzaW9uIjogIjAuMS4wIn1dfQ==",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "8f9adb6dc6ac06a62cce075d43a5736a35aa00989c065a1a759912c39fd74cbf"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package manifest format is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "8f9adb6dc6ac06a62cce075d43a5736a35aa00989c065a1a759912c39fd74cbf"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAiMyIsICJwYWNrYWdlcyI6IFt7ImNhcGFiaWxpdGllcyI6IFsic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJzaWduYWwtc3RhdGljLnByb2dyYW1zIiwgInNpZ25hbC1zdGF0aWMucmVzb2x2ZSJdLCAiY29tcGF0aWJpbGl0eSI6IHsiaG9zdF9jb250cmFjdCI6IDEsICJyZXF1aXJlcyI6IFtdLCAicnVudGltZV9mb3JtYXQiOiAxfSwgImNvbnRlbnRfZGVjbGFyYXRpb25zIjogImNvbnRlbnQvY29udGVudC1kZWNsYXJhdGlvbnMuanNvbiIsICJjb250ZW50X3NoYTI1NiI6ICIwOGIzNDg4M2Q1Y2UwZWVjZDQ4Mjc5ODRkYjE1NTY0YjQ1Y2QwYWY2MzYwMTYxZjZjODE0MWU0M2ExODg4MzM3IiwgImRlcGVuZGVuY2llcyI6IFtdLCAiZmlsZXMiOiBbeyJieXRlcyI6IDExNjQsICJwYXRoIjogImNvbnRlbnQvY29udGVudC1kZWNsYXJhdGlvbnMuanNvbiIsICJzaGEyNTYiOiAiZWYyMDhmMWY5OTU0N2Y3ZGNhZDBlODZlYjMxYTYyMGExMDg0NzRkNzljMGVjZjRlZWMxOWQ4MmQ4Nzk4OWY0ZCJ9LCB7ImJ5dGVzIjogNTUwMSwgInBhdGgiOiAicnVudGltZS9ydWxlc2V0LnlhbWwiLCAic2hhMjU2IjogImVjNGEwOTU4NzA2YTAxMmVhYmZhYzRiY2YwZjhjNDc4Mzk5Y2YwNjA4NDU3ZTI2ZjU5Njk5ZTNmZTAyYmY0YjgifV0sICJpZCI6ICJzeWx2aWEtZ20uY29uZm9ybWFuY2Uuc2lnbmFsLXN0YXRpYyIsICJtZXRhZGF0YSI6IHsibGFiZWwiOiAiU2lnbmFsIGFuZCBTdGF0aWMgUlVMRS0wMDUgQ29uZm9ybWFuY2UifSwgIm1pbmltdW1fbW9kZWxfY2FwYWJpbGl0eV90aWVyIjogInN5bHZpYS5jYXBhYmlsaXR5LnQwMiIsICJwYXJ0aWNpcGFudF9hcnRpZmFjdHMiOiBbXSwgInByb21wdF9mcmFnbWVudHMiOiBbXSwgInByb3ZlbmFuY2UiOiB7InB1Ymxpc2hlciI6ICJzeWx2aWEtZ20tY29uZm9ybWFuY2UiLCAic291cmNlX3NoYTI1NiI6ICIzN2VhZGE4ZTlkNDljYWEwYjU2MTRkZWZlZjA4ZjY4MzE2MmU3YWYxZDc4NDQzYTQ2OWQyMDg3NzZkNDA3NzBjIn0sICJyb2xlIjogInByaW1hcnkiLCAidG9vbHMiOiBbeyJjYXBhYmlsaXR5IjogInNpZ25hbC1zdGF0aWMucmVzb2x2ZSIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJwcmVzc3VyZSI6IHsidHlwZSI6ICJpbnRlZ2VyIn0sICJza2lsbCI6IHsiZW51bSI6IFsiaW50cnVzaW9uIiwgImZpZWxkX21lZGljaW5lIl0sICJ0eXBlIjogInN0cmluZyJ9fSwgInJlcXVpcmVkIjogWyJza2lsbCIsICJwcmVzc3VyZSJdLCAidHlwZSI6ICJvYmplY3QifSwgIm5hbWUiOiAicmVzb2x2ZV9pbnRydXNpb24iLCAic3RhdGVfcHJlZGljYXRlcyI6IFtdLCAidHVybl9zdGF0dXNlcyI6IFsib3BlbiJdLCAid3JpdGVycyI6IFsiZG0iXX0sIHsiY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLmNvbnNlcXVlbmNlIiwgImlucHV0X3NjaGVtYSI6IHsiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwgInByb3BlcnRpZXMiOiB7ImNoYXJnZV9zcGVudCI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgInByb2dyZXNzIjogeyJtaW5pbXVtIjogMCwgInR5cGUiOiAiaW50ZWdlciJ9LCAic3RyZXNzIjogeyJtaW5pbXVtIjogMCwgInR5cGUiOiAiaW50ZWdlciJ9LCAid291bmRzIjogeyJtaW5pbXVtIjogMCwgInR5cGUiOiAiaW50ZWdlciJ9fSwgInJlcXVpcmVkIjogWyJzdHJlc3MiLCAid291bmRzIiwgImNoYXJnZV9zcGVudCIsICJwcm9ncmVzcyJdLCAidHlwZSI6ICJvYmplY3QifSwgIm5hbWUiOiAiYXBwbHlfb3BlcmF0aW9uX2Nvc3QiLCAic3RhdGVfcHJlZGljYXRlcyI6IFtdLCAidHVybl9zdGF0dXNlcyI6IFsib3BlbiJdLCAid3JpdGVycyI6IFsiZG0iXX0sIHsiY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLnByb2dyYW1zIiwgImlucHV0X3NjaGVtYSI6IHsiYWRkaXRpb25hbFByb3BlcnRpZXMiOiBmYWxzZSwgInByb3BlcnRpZXMiOiB7ImFtb3VudCI6IHsibWluaW11bSI6IDEsICJ0eXBlIjogImludGVnZXIifSwgInByb2dyYW0iOiB7ImVudW0iOiBbImdob3N0X3JvdXRlIiwgInNpZ25hbF9ib29zdCJdLCAidHlwZSI6ICJzdHJpbmcifX0sICJyZXF1aXJlZCI6IFsicHJvZ3JhbSIsICJhbW91bnQiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogInJ1bl9wcm9ncmFtIiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19XSwgInVpX3N1cmZhY2VzIjogW3siYWN0aW9ucyI6IFt7ImlkIjogImJvb3N0LXNpZ25hbCIsICJpbnRlbnQiOiAicnVuX3Byb2dyYW0iLCAibGFiZWwiOiAiQm9vc3Qgc2lnbmFsIiwgInBhcmFtcyI6IHsiYW1vdW50IjogMSwgInByb2dyYW0iOiAic2lnbmFsX2Jvb3N0In19XSwgImFsbG93ZWRfcGxhY2VtZW50cyI6IFsiZG9ja2VkIiwgImZsb2F0aW5nIiwgIndpbmRvdyJdLCAiY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLmNvbnNlcXVlbmNlIiwgImRlZmF1bHRfcGxhY2VtZW50IjogImRvY2tlZCIsICJkZWZhdWx0X3NpemUiOiAxODAsICJncm91cCI6IG51bGwsICJpY29uIjogIlx1MjVjNyIsICJpZCI6ICJzaWduYWwtc3RhdGljLXN0YXR1cyIsICJtaW5pbXVtX3NpemUiOiA5NiwgIm9yZGVyIjogMTAsICJyZW5kZXJlciI6ICJrZXlfdmFsdWUiLCAic291cmNlIjogeyJrZXkiOiAic3RhdGUiLCAia2luZCI6ICJzdGF0ZSIsICJuYW1lc3BhY2UiOiAic3lsdmlhLWdtLmNvbmZvcm1hbmNlLnNpZ25hbC1zdGF0aWMifSwgInRpdGxlIjogIk9wZXJhdGlvbiBzdGF0dXMifV0sICJ2ZXJzaW9uIjogIjAuMS4wIn1dfQ==",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "f6b5803357f9c1e5f0262ae48cd5aa0b80a82ea489cd231e348a7e651c0c7be1"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package manifest format is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "f6b5803357f9c1e5f0262ae48cd5aa0b80a82ea489cd231e348a7e651c0c7be1"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAicGFja2FnZXMiOiBbXX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "513e3b6c8be7390714cf913ed488c998004f03044d43f40646427579d9068656"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package manifest packages are invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "513e3b6c8be7390714cf913ed488c998004f03044d43f40646427579d9068656"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAicGFja2FnZXMiOiBbMV19",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "49363148e198968dacea09064a272c40be02e68901e8cf25a26a6ba4fb2700b2"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package record is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "49363148e198968dacea09064a272c40be02e68901e8cf25a26a6ba4fb2700b2"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAicGFja2FnZXMiOiBbeyJpZCI6ICIifV19",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "ee3fbcbe4da752566f35eab54382cc634016d6a19850e72d18ea041ed123aafa"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package identity is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "ee3fbcbe4da752566f35eab54382cc634016d6a19850e72d18ea041ed123aafa"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAiZXh0cmEiOiAxfQ==",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "a27ec598b6c3016a37da59c980200c1b3201e7697baf590ab7fb4a27d787bc1d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "CommandRejected",
+    "message": "Package manifest fields are invalid",
+    "diagnostics": [
+     {
+      "code": "content_field_invalid",
+      "phase": "import",
+      "message": "Remove this undeclared field",
+      "file": "manifest.json",
+      "path": "$.extra"
+     },
+     {
+      "code": "content_field_invalid",
+      "phase": "import",
+      "message": "Add this required field",
+      "file": "manifest.json",
+      "path": "$.packages"
+     }
+    ]
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "a27ec598b6c3016a37da59c980200c1b3201e7697baf590ab7fb4a27d787bc1d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAiZm9ybWF0IjogMywgInBhY2thZ2VzIjogW119",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "cd4042f456d2453b2cd7398c8075be3939a74c7bf4244a39a5b1aad8cde34dd2"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "JSON object contains a duplicate field",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "cd4042f456d2453b2cd7398c8075be3939a74c7bf4244a39a5b1aad8cde34dd2"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "W10=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Package manifest must be an object",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAicGFja2FnZXMiOiBbeyJjYXBhYmlsaXRpZXMiOiBbInNpZ25hbC1zdGF0aWMuY29uc2VxdWVuY2UiLCAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJzaWduYWwtc3RhdGljLnJlc29sdmUiXSwgImNvbXBhdGliaWxpdHkiOiB7Imhvc3RfY29udHJhY3QiOiAxLCAicmVxdWlyZXMiOiBbXSwgInJ1bnRpbWVfZm9ybWF0IjogMX0sICJjb250ZW50X2RlY2xhcmF0aW9ucyI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAiY29udGVudF9zaGEyNTYiOiAiMDhiMzQ4ODNkNWNlMGVlY2Q0ODI3OTg0ZGIxNTU2NGI0NWNkMGFmNjM2MDE2MWY2YzgxNDFlNDNhMTg4ODMzNyIsICJkZXBlbmRlbmNpZXMiOiBbXSwgImZpbGVzIjogW3siYnl0ZXMiOiAxMTY0LCAicGF0aCI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAic2hhMjU2IjogImVmMjA4ZjFmOTk1NDdmN2RjYWQwZTg2ZWIzMWE2MjBhMTA4NDc0ZDc5YzBlY2Y0ZWVjMTlkODJkODc5ODlmNGQifSwgeyJieXRlcyI6IDU1MDEsICJwYXRoIjogInJ1bnRpbWUvcnVsZXNldC55YW1sIiwgInNoYTI1NiI6ICJlYzRhMDk1ODcwNmEwMTJlYWJmYWM0YmNmMGY4YzQ3ODM5OWNmMDYwODQ1N2UyNmY1OTY5OWUzZmUwMmJmNGI4In1dLCAiaWQiOiAic3lsdmlhLWdtLmNvbmZvcm1hbmNlLnNpZ25hbC1zdGF0aWMiLCAibWV0YWRhdGEiOiB7ImxhYmVsIjogIlNpZ25hbCBhbmQgU3RhdGljIFJVTEUtMDA1IENvbmZvcm1hbmNlIn0sICJtaW5pbXVtX21vZGVsX2NhcGFiaWxpdHlfdGllciI6ICJzeWx2aWEuY2FwYWJpbGl0eS50MDIiLCAicGFydGljaXBhbnRfYXJ0aWZhY3RzIjogW10sICJwcm9tcHRfZnJhZ21lbnRzIjogW10sICJwcm92ZW5hbmNlIjogeyJwdWJsaXNoZXIiOiAic3lsdmlhLWdtLWNvbmZvcm1hbmNlIiwgInNvdXJjZV9zaGEyNTYiOiAiMzdlYWRhOGU5ZDQ5Y2FhMGI1NjE0ZGVmZWYwOGY2ODMxNjJlN2FmMWQ3ODQ0M2E0NjlkMjA4Nzc2ZDQwNzcwYyJ9LCAicm9sZSI6ICJwcmltYXJ5IiwgInRvb2xzIjogW3siY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLnJlc29sdmUiLCAiaW5wdXRfc2NoZW1hIjogeyJhZGRpdGlvbmFsUHJvcGVydGllcyI6IGZhbHNlLCAicHJvcGVydGllcyI6IHsicHJlc3N1cmUiOiB7InR5cGUiOiAiaW50ZWdlciJ9LCAic2tpbGwiOiB7ImVudW0iOiBbImludHJ1c2lvbiIsICJmaWVsZF9tZWRpY2luZSJdLCAidHlwZSI6ICJzdHJpbmcifX0sICJyZXF1aXJlZCI6IFsic2tpbGwiLCAicHJlc3N1cmUiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogInJlc29sdmVfaW50cnVzaW9uIiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJjaGFyZ2Vfc3BlbnQiOiB7Im1pbmltdW0iOiAwLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgInN0cmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgIndvdW5kcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifX0sICJyZXF1aXJlZCI6IFsic3RyZXNzIiwgIndvdW5kcyIsICJjaGFyZ2Vfc3BlbnQiLCAicHJvZ3Jlc3MiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogImFwcGx5X29wZXJhdGlvbl9jb3N0IiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJhbW91bnQiOiB7Im1pbmltdW0iOiAxLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmFtIjogeyJlbnVtIjogWyJnaG9zdF9yb3V0ZSIsICJzaWduYWxfYm9vc3QiXSwgInR5cGUiOiAic3RyaW5nIn19LCAicmVxdWlyZWQiOiBbInByb2dyYW0iLCAiYW1vdW50Il0sICJ0eXBlIjogIm9iamVjdCJ9LCAibmFtZSI6ICJydW5fcHJvZ3JhbSIsICJzdGF0ZV9wcmVkaWNhdGVzIjogW10sICJ0dXJuX3N0YXR1c2VzIjogWyJvcGVuIl0sICJ3cml0ZXJzIjogWyJkbSJdfV0sICJ1aV9zdXJmYWNlcyI6IFt7ImFjdGlvbnMiOiBbeyJpZCI6ICJib29zdC1zaWduYWwiLCAiaW50ZW50IjogInJ1bl9wcm9ncmFtIiwgImxhYmVsIjogIkJvb3N0IHNpZ25hbCIsICJwYXJhbXMiOiB7ImFtb3VudCI6IDEsICJwcm9ncmFtIjogInNpZ25hbF9ib29zdCJ9fV0sICJhbGxvd2VkX3BsYWNlbWVudHMiOiBbImRvY2tlZCIsICJmbG9hdGluZyIsICJ3aW5kb3ciXSwgImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJkZWZhdWx0X3BsYWNlbWVudCI6ICJkb2NrZWQiLCAiZGVmYXVsdF9zaXplIjogMTgwLCAiZ3JvdXAiOiBudWxsLCAiaWNvbiI6ICJcdTI1YzciLCAiaWQiOiAic2lnbmFsLXN0YXRpYy1zdGF0dXMiLCAibWluaW11bV9zaXplIjogOTYsICJvcmRlciI6IDEwLCAicmVuZGVyZXIiOiAia2V5X3ZhbHVlIiwgInNvdXJjZSI6IHsia2V5IjogInN0YXRlIiwgImtpbmQiOiAic3RhdGUiLCAibmFtZXNwYWNlIjogInN5bHZpYS1nbS5jb25mb3JtYW5jZS5zaWduYWwtc3RhdGljIn0sICJ0aXRsZSI6ICJPcGVyYXRpb24gc3RhdHVzIn1dLCAidmVyc2lvbiI6ICIwLjEuMCJ9XX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/notes.txt",
+   "data": "b3V0c2lkZQ==",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/notes.txt",
+     "31207a2065f46a5b948fce6fe5c13e85abaf5631e2f894b47dcd4fce14f6c57b"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair draft contains files outside its package records",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/notes.txt",
+     "31207a2065f46a5b948fce6fe5c13e85abaf5631e2f894b47dcd4fce14f6c57b"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete",
+   "workspace": "package",
+   "path": "repair-draft/notes.txt",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair draft manifest is missing or oversized",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "package",
+   "path": "repair-draft/manifest.json",
+   "data": "eyJmb3JtYXQiOiAzLCAicGFja2FnZXMiOiBbeyJjYXBhYmlsaXRpZXMiOiBbInNpZ25hbC1zdGF0aWMuY29uc2VxdWVuY2UiLCAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJzaWduYWwtc3RhdGljLnJlc29sdmUiXSwgImNvbXBhdGliaWxpdHkiOiB7Imhvc3RfY29udHJhY3QiOiAxLCAicmVxdWlyZXMiOiBbXSwgInJ1bnRpbWVfZm9ybWF0IjogMX0sICJjb250ZW50X2RlY2xhcmF0aW9ucyI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAiY29udGVudF9zaGEyNTYiOiAiMDhiMzQ4ODNkNWNlMGVlY2Q0ODI3OTg0ZGIxNTU2NGI0NWNkMGFmNjM2MDE2MWY2YzgxNDFlNDNhMTg4ODMzNyIsICJkZXBlbmRlbmNpZXMiOiBbXSwgImZpbGVzIjogW3siYnl0ZXMiOiAxMTY0LCAicGF0aCI6ICJjb250ZW50L2NvbnRlbnQtZGVjbGFyYXRpb25zLmpzb24iLCAic2hhMjU2IjogImVmMjA4ZjFmOTk1NDdmN2RjYWQwZTg2ZWIzMWE2MjBhMTA4NDc0ZDc5YzBlY2Y0ZWVjMTlkODJkODc5ODlmNGQifSwgeyJieXRlcyI6IDU1MDEsICJwYXRoIjogInJ1bnRpbWUvcnVsZXNldC55YW1sIiwgInNoYTI1NiI6ICJlYzRhMDk1ODcwNmEwMTJlYWJmYWM0YmNmMGY4YzQ3ODM5OWNmMDYwODQ1N2UyNmY1OTY5OWUzZmUwMmJmNGI4In1dLCAiaWQiOiAic3lsdmlhLWdtLmNvbmZvcm1hbmNlLnNpZ25hbC1zdGF0aWMiLCAibWV0YWRhdGEiOiB7ImxhYmVsIjogIlNpZ25hbCBhbmQgU3RhdGljIFJVTEUtMDA1IENvbmZvcm1hbmNlIn0sICJtaW5pbXVtX21vZGVsX2NhcGFiaWxpdHlfdGllciI6ICJzeWx2aWEuY2FwYWJpbGl0eS50MDIiLCAicGFydGljaXBhbnRfYXJ0aWZhY3RzIjogW10sICJwcm9tcHRfZnJhZ21lbnRzIjogW10sICJwcm92ZW5hbmNlIjogeyJwdWJsaXNoZXIiOiAic3lsdmlhLWdtLWNvbmZvcm1hbmNlIiwgInNvdXJjZV9zaGEyNTYiOiAiMzdlYWRhOGU5ZDQ5Y2FhMGI1NjE0ZGVmZWYwOGY2ODMxNjJlN2FmMWQ3ODQ0M2E0NjlkMjA4Nzc2ZDQwNzcwYyJ9LCAicm9sZSI6ICJwcmltYXJ5IiwgInRvb2xzIjogW3siY2FwYWJpbGl0eSI6ICJzaWduYWwtc3RhdGljLnJlc29sdmUiLCAiaW5wdXRfc2NoZW1hIjogeyJhZGRpdGlvbmFsUHJvcGVydGllcyI6IGZhbHNlLCAicHJvcGVydGllcyI6IHsicHJlc3N1cmUiOiB7InR5cGUiOiAiaW50ZWdlciJ9LCAic2tpbGwiOiB7ImVudW0iOiBbImludHJ1c2lvbiIsICJmaWVsZF9tZWRpY2luZSJdLCAidHlwZSI6ICJzdHJpbmcifX0sICJyZXF1aXJlZCI6IFsic2tpbGwiLCAicHJlc3N1cmUiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogInJlc29sdmVfaW50cnVzaW9uIiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJjaGFyZ2Vfc3BlbnQiOiB7Im1pbmltdW0iOiAwLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgInN0cmVzcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifSwgIndvdW5kcyI6IHsibWluaW11bSI6IDAsICJ0eXBlIjogImludGVnZXIifX0sICJyZXF1aXJlZCI6IFsic3RyZXNzIiwgIndvdW5kcyIsICJjaGFyZ2Vfc3BlbnQiLCAicHJvZ3Jlc3MiXSwgInR5cGUiOiAib2JqZWN0In0sICJuYW1lIjogImFwcGx5X29wZXJhdGlvbl9jb3N0IiwgInN0YXRlX3ByZWRpY2F0ZXMiOiBbXSwgInR1cm5fc3RhdHVzZXMiOiBbIm9wZW4iXSwgIndyaXRlcnMiOiBbImRtIl19LCB7ImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5wcm9ncmFtcyIsICJpbnB1dF9zY2hlbWEiOiB7ImFkZGl0aW9uYWxQcm9wZXJ0aWVzIjogZmFsc2UsICJwcm9wZXJ0aWVzIjogeyJhbW91bnQiOiB7Im1pbmltdW0iOiAxLCAidHlwZSI6ICJpbnRlZ2VyIn0sICJwcm9ncmFtIjogeyJlbnVtIjogWyJnaG9zdF9yb3V0ZSIsICJzaWduYWxfYm9vc3QiXSwgInR5cGUiOiAic3RyaW5nIn19LCAicmVxdWlyZWQiOiBbInByb2dyYW0iLCAiYW1vdW50Il0sICJ0eXBlIjogIm9iamVjdCJ9LCAibmFtZSI6ICJydW5fcHJvZ3JhbSIsICJzdGF0ZV9wcmVkaWNhdGVzIjogW10sICJ0dXJuX3N0YXR1c2VzIjogWyJvcGVuIl0sICJ3cml0ZXJzIjogWyJkbSJdfV0sICJ1aV9zdXJmYWNlcyI6IFt7ImFjdGlvbnMiOiBbeyJpZCI6ICJib29zdC1zaWduYWwiLCAiaW50ZW50IjogInJ1bl9wcm9ncmFtIiwgImxhYmVsIjogIkJvb3N0IHNpZ25hbCIsICJwYXJhbXMiOiB7ImFtb3VudCI6IDEsICJwcm9ncmFtIjogInNpZ25hbF9ib29zdCJ9fV0sICJhbGxvd2VkX3BsYWNlbWVudHMiOiBbImRvY2tlZCIsICJmbG9hdGluZyIsICJ3aW5kb3ciXSwgImNhcGFiaWxpdHkiOiAic2lnbmFsLXN0YXRpYy5jb25zZXF1ZW5jZSIsICJkZWZhdWx0X3BsYWNlbWVudCI6ICJkb2NrZWQiLCAiZGVmYXVsdF9zaXplIjogMTgwLCAiZ3JvdXAiOiBudWxsLCAiaWNvbiI6ICJcdTI1YzciLCAiaWQiOiAic2lnbmFsLXN0YXRpYy1zdGF0dXMiLCAibWluaW11bV9zaXplIjogOTYsICJvcmRlciI6IDEwLCAicmVuZGVyZXIiOiAia2V5X3ZhbHVlIiwgInNvdXJjZSI6IHsia2V5IjogInN0YXRlIiwgImtpbmQiOiAic3RhdGUiLCAibmFtZXNwYWNlIjogInN5bHZpYS1nbS5jb25mb3JtYW5jZS5zaWduYWwtc3RhdGljIn0sICJ0aXRsZSI6ICJPcGVyYXRpb24gc3RhdHVzIn1dLCAidmVyc2lvbiI6ICIwLjEuMCJ9XX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "package",
+   "kind": "package",
+   "outcome": {
+    "ok": {
+     "kind": "package",
+     "archive_sha256": "a4d3d1dd1a23ed213f6cfb6d7b7f037b5a90d7d0be16c9556677a8983971752e",
+     "closure_sha256": "3a6d96c625424710de5638355297617d3082e38ae7c2c8b8236c4f2caebf9069",
+     "plan": null,
+     "interview_contribution": null,
+     "setup_id": null
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/manifest.json",
+     "255b638b85b6b93ad522f0f18bba928ff3a6fe28a62f6aa949a3748593b7c640"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "ef208f1f99547f7dcad0e86eb31a620a108474d79c0ecf4eec19d82d87989f4d"
+    ],
+    [
+     "repair-draft/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "stage",
+   "workspace": "plan",
+   "source": "junk-snapshot.sylvia-gm-plan",
+   "kind": "plan",
+   "expected": "7600b1a6e9c5c3b8563d4cbd388f4f59ac770fe244f7661a1b7809df62c6b3dc",
+   "bound": null,
+   "outcome": {
+    "error": "ValueError",
+    "message": "Archive ZIP directory is invalid",
+    "diagnostics": []
+   },
+   "tree": []
+  },
+  {
+   "op": "stage",
+   "workspace": "plan",
+   "source": "extra-member.sylvia-gm-plan",
+   "kind": "plan",
+   "expected": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+   "bound": null,
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+     "draft_root": "repair-draft"
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/notes.txt",
+     "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+    ],
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair Plan contains files outside its fixed draft",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/notes.txt",
+     "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+    ],
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete",
+   "workspace": "plan",
+   "path": "repair-draft/notes.txt",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "archive_sha256": "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25",
+     "closure_sha256": "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "plan": {
+      "artifact_id": "campaign-plan-relay-adventure-1c68fdcfbd3e3cbb",
+      "content_sha256": "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49",
+      "title": "The Silent Relay",
+      "payload_sha256": "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49",
+      "markdown_sha256": "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+     },
+     "interview_contribution": null,
+     "setup_id": null
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "package",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair draft manifest is missing or oversized",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "plan",
+   "path": "repair-draft/interview-contribution.json",
+   "data": "eyJmb3JtYXRfaWQiOiAic3lsdmlhLWdtLWludGVydmlldy1jb250cmlidXRpb24iLCAiZm9ybWF0X3ZlcnNpb24iOiAxLCAib3duZXJfa2luZCI6ICJjYW1wYWlnbl9wbGFuIiwgImlkIjogInJlbGF5LXF1ZXN0aW9ucyIsICJ0aXRsZSI6ICJyZWxheS1xdWVzdGlvbnMgcXVlc3Rpb25zIiwgInF1ZXN0aW9ucyI6IFt7ImlkIjogInNlbGVjdGlvbiIsICJwcm9tcHQiOiAiV2hpY2ggc2lnbmFsPyIsICJ0eXBlIjogImNob2ljZSIsICJyZXF1aXJlZCI6IHRydWUsICJhZGFwdGl2ZSI6IGZhbHNlLCAib3B0aW9ucyI6IFt7ImlkIjogImZpcnN0IiwgImxhYmVsIjogIkZpcnN0In0sIHsiaWQiOiAic2Vjb25kIiwgImxhYmVsIjogIlNlY29uZCJ9XSwgImNvbmRpdGlvbiI6IG51bGx9XX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/interview-contribution.json",
+     "d409b5d0e1973bd379ceaecfa5cedb50eb411100a358543e98e4f9d50d505377"
+    ],
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "archive_sha256": "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25",
+     "closure_sha256": "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "plan": {
+      "artifact_id": "campaign-plan-relay-adventure-1c68fdcfbd3e3cbb",
+      "content_sha256": "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49",
+      "title": "The Silent Relay",
+      "payload_sha256": "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49",
+      "markdown_sha256": "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+     },
+     "interview_contribution": {
+      "format_id": "sylvia-gm-interview-contribution",
+      "format_version": 1,
+      "owner_kind": "campaign_plan",
+      "id": "relay-questions",
+      "title": "relay-questions questions",
+      "questions": [
+       {
+        "adaptive": false,
+        "condition": null,
+        "id": "selection",
+        "options": [
+         {
+          "id": "first",
+          "label": "First"
+         },
+         {
+          "id": "second",
+          "label": "Second"
+         }
+        ],
+        "prompt": "Which signal?",
+        "required": true,
+        "type": "choice"
+       }
+      ]
+     },
+     "setup_id": null
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/interview-contribution.json",
+     "d409b5d0e1973bd379ceaecfa5cedb50eb411100a358543e98e4f9d50d505377"
+    ],
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete",
+   "workspace": "plan",
+   "path": "repair-draft/interview-contribution.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "edit_json",
+   "workspace": "plan",
+   "path": "repair-draft/snapshot/manifest.json",
+   "set": [
+    [
+     "packages",
+     1,
+     "dependencies",
+     0,
+     "content_sha256"
+    ],
+    "0000000000000000000000000000000000000000000000000000000000000000"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "e6a6a3ed8807ca86f30c94145df8ae3014b2db3e697a96ba1f64726de88afe4e"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "archive_sha256": "327b648ab60910dacfe92b2d10f7adbc697db0938382c025beb22a2a4cddde25",
+     "closure_sha256": "5f9e6964e73ed64fed285226e3215478e071ce04ef06fce56ec4fb0f178fced3",
+     "plan": {
+      "artifact_id": "campaign-plan-relay-adventure-1c68fdcfbd3e3cbb",
+      "content_sha256": "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49",
+      "title": "The Silent Relay",
+      "payload_sha256": "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49",
+      "markdown_sha256": "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+     },
+     "interview_contribution": null,
+     "setup_id": null
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "e6a6a3ed8807ca86f30c94145df8ae3014b2db3e697a96ba1f64726de88afe4e"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/snapshot/manifest.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "plan",
+   "path": "repair-draft/plan.md",
+   "data": "//4gYnJva2Vu",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "3db0703cfa9f31eb76cfed299d434759928201441e5ad74d8a46829fb6b41fc0"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "UnicodeDecodeError",
+    "message": "'utf-8' codec can't decode byte 0xff in position 0: invalid start byte",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "3db0703cfa9f31eb76cfed299d434759928201441e5ad74d8a46829fb6b41fc0"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/plan.md",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "edit_json",
+   "workspace": "plan",
+   "path": "repair-draft/record.json",
+   "set": [
+    [
+     "format_version"
+    ],
+    2
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "e99b895359b843938fa83df472b6fa2b23083f769a50b9b91ff9261166c674cf"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign Plan record identity or format is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "e99b895359b843938fa83df472b6fa2b23083f769a50b9b91ff9261166c674cf"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/record.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "edit_json",
+   "workspace": "plan",
+   "path": "repair-draft/record.json",
+   "set": [
+    [
+     "package_snapshot"
+    ],
+    "x.zip"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "c3869317eca71611584e66dd545b50b6ab4113ec9567299e0335fe439437d482"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign Plan snapshot filename is invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "c3869317eca71611584e66dd545b50b6ab4113ec9567299e0335fe439437d482"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/record.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "edit_json",
+   "workspace": "plan",
+   "path": "repair-draft/plan.json",
+   "set": [
+    [
+     "bindings",
+     "campaign_setting",
+     "id"
+    ],
+    "local.other"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "5d55088fed404a14b47f2a3f50adc1bdb3c36ced3b9391ceebd4e8ca2d5d6989"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign Plan Setting identity does not match its snapshot",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "5d55088fed404a14b47f2a3f50adc1bdb3c36ced3b9391ceebd4e8ca2d5d6989"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/plan.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "edit_json",
+   "workspace": "plan",
+   "path": "repair-draft/plan.json",
+   "set": [
+    [
+     "bindings",
+     "ruleset",
+     "version"
+    ],
+    "9.9.9"
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "f0bbd5eebd84a39974ce8e944899571210c8c10a9b6fca751d125491ca55e811"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign Plan Ruleset identity does not match its snapshot",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "f0bbd5eebd84a39974ce8e944899571210c8c10a9b6fca751d125491ca55e811"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/plan.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "edit_json",
+   "workspace": "plan",
+   "path": "repair-draft/plan.json",
+   "set": [
+    [
+     "bindings"
+    ],
+    []
+   ],
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "62ba733cb234b792bf9498d2d81b742c07b669aedb49fb20530c556a926eff07"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Campaign Plan bindings are invalid",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "62ba733cb234b792bf9498d2d81b742c07b669aedb49fb20530c556a926eff07"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/plan.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "write",
+   "workspace": "plan",
+   "path": "repair-draft/interview-contribution.json",
+   "data": "eyJ4IjogMX0=",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/interview-contribution.json",
+     "613fe5aa65343dbb1b9abe6abac6773f5c91bd60d3f2ffb7e2eae69e1db8b227"
+    ],
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ContentShapeError",
+    "message": "Content fields do not match the declared format",
+    "diagnostics": [
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "interview-contribution.json",
+      "path": "$.format_id",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "interview-contribution.json",
+      "path": "$.format_version",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "interview-contribution.json",
+      "path": "$.owner_kind",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "interview-contribution.json",
+      "path": "$.id",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "interview-contribution.json",
+      "path": "$.title",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     },
+     {
+      "code": "content_required_invalid",
+      "phase": "content",
+      "message": "Supply this required field.",
+      "file": "interview-contribution.json",
+      "path": "$.questions",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     },
+     {
+      "code": "content_additionalProperties_invalid",
+      "phase": "content",
+      "message": "Remove this undeclared field.",
+      "file": "interview-contribution.json",
+      "path": "$.x",
+      "guidance": "Read the interview_contribution content definition and correct this field."
+     }
+    ]
+   },
+   "tree": [
+    [
+     "repair-draft/interview-contribution.json",
+     "613fe5aa65343dbb1b9abe6abac6773f5c91bd60d3f2ffb7e2eae69e1db8b227"
+    ],
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete",
+   "workspace": "plan",
+   "path": "repair-draft/interview-contribution.json",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete",
+   "workspace": "plan",
+   "path": "repair-draft/plan.md",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair Plan files are incomplete",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "restore",
+   "workspace": "plan",
+   "path": "repair-draft/plan.md",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ],
+    [
+     "repair-draft/snapshot/manifest.json",
+     "b330400a3573643f0490c31fac692d6c3dde25cb6304eea4cc3d878b14e003b6"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/content/content-declarations.json",
+     "77c759e033c7d3488d9b1a51b4c6f25b34135f265791197aa37a20068c5866af"
+    ],
+    [
+     "repair-draft/snapshot/packages/local.relay-island/world.md",
+     "23770ab9bbbc66f2fc5ba88f2510dd3487b30a040ea0dd660ba0370e2fc0b3a9"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/content/content-declarations.json",
+     "d7764a9db09cd80ab6a47fbfa2f7f6698a6c5c06fb0db6f979bec3c13ecc3651"
+    ],
+    [
+     "repair-draft/snapshot/packages/sylvia-gm.conformance.signal-static/runtime/ruleset.yaml",
+     "ec4a0958706a012eabfac4bcf0f8c478399cf0608457e26f59699e3fe02bf4b8"
+    ]
+   ]
+  },
+  {
+   "op": "delete_tree",
+   "workspace": "plan",
+   "path": "repair-draft/snapshot",
+   "outcome": {
+    "ok": null
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair Plan snapshot is missing",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ]
+   ]
+  },
+  {
+   "op": "stage",
+   "workspace": "plan",
+   "source": "extra-member.sylvia-gm-plan",
+   "kind": "plan",
+   "expected": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+   "bound": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+   "outcome": {
+    "ok": {
+     "kind": "plan",
+     "source_sha256": "35bdf4169f3c9e960b2e946c6df37307aefe9233cdafd0d221d198558e89d22e",
+     "draft_root": "repair-draft"
+    }
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ]
+   ]
+  },
+  {
+   "op": "materialize",
+   "workspace": "plan",
+   "kind": "plan",
+   "outcome": {
+    "error": "ValueError",
+    "message": "Repair Plan snapshot is missing",
+    "diagnostics": []
+   },
+   "tree": [
+    [
+     "repair-draft/plan.json",
+     "1c68fdcfbd3e3cbbdea7aa664f365750ea5790c4288d115ece1c203c41beeb49"
+    ],
+    [
+     "repair-draft/plan.md",
+     "db0f0866fbfddae5f7ce6a04980275093c50f4b4ee5254d37e512e83aa0f623a"
+    ],
+    [
+     "repair-draft/record.json",
+     "ddae286e2752ac9a0ceb48dd88af0432120b5b3998d5ceae07b1591abaf7a7a7"
+    ]
+   ]
+  }
+ ]
+}

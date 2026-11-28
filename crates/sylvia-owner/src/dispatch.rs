@@ -232,6 +232,7 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
             commands::campaigns::handle_restore_trashed_campaign(context, params).await
         }
         "builder_chat_index" => commands::builder::handle_builder_chat_index(context, params).await,
+        "start_import_repair" => commands::builder::handle_start_import_repair(context, params).await,
         "create_builder_chat" => commands::builder::handle_create_builder_chat(context, params).await,
         "resume_agent_session" => commands::sessions::handle_resume_agent_session(context, params).await,
         "switch_session_reasoning" => {
