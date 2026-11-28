@@ -11,7 +11,8 @@ control, with confirmation required and an automatic response, and a saved resul
 steps those tests take on the card: its preview, a click without confirming, replacement
 parameters, a forged source, a click while the GM session holds campaign work, the confirmed
 click (its public call and result placed in the session), its replay, another source under the
-same operation, a preview once it resolved, and a button the card does not have. Each step
+same operation, a preview once it resolved, a button the card does not have, and a mechanics-choice
+source naming the card's action (Python's uncaught `KeyError` on its missing `button_index`). Each step
 records its answer (a receipt, or the preview with its confirmation token) or the failure's
 class, code and message; the run keeps its final database (`card_action/final.sqlite3.gz`). It
 writes `card_action/card_action_runs.json`; `tests/card_action.rs` replays every step on the
@@ -118,6 +119,12 @@ def main() -> None:
             click("a button the card does not have", card_request(
                 operation_id="card-missing", expected_revision=2,
                 source={"kind": "result_card", "action_id": "move", "button_index": 3}))
+            choice_source = {"kind": "mechanics_choice", "action_id": "move", "choice_id": "c", "choice_sequence": 0,
+                             "option_id": "o", "resolution_id": "r"}
+            click("a choice source on the card's action, previewed", card_request(
+                operation_id="card-choice", expected_revision=2, source=choice_source, preview_only=True))
+            click("a choice source on the card's action", card_request(
+                operation_id="card-choice", expected_revision=2, source=choice_source))
         checkpoint(database)
         (OUT / "final.sqlite3.gz").write_bytes(gzip.compress(database.read_bytes(), mtime=0))
     record = {"python": sys.version.split()[0], "owner_id": OWNER, "runs": runs}

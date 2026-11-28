@@ -1,0 +1,680 @@
+{
+ "python": "3.12.11",
+ "owner_id": "campaign-creation-runs",
+ "runs": [
+  {
+   "step": {
+    "op": "confirmation",
+    "operation_id": "nothing"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "confirmation",
+    "operation_id": "   "
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Campaign operation identity must be a non-whitespace string"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "blank-name",
+    "display_name": "  ",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "blank-turn",
+    "display_name": "Hollow Road",
+    "turn_id": "",
+    "candidate": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "blank-candidate",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": " "
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "half-session",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null,
+    "session": {
+     "session": "session-half",
+     "provider": "standin",
+     "model": null
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "blank-session",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null,
+    "session": {
+     "session": "",
+     "provider": "standin",
+     "model": "standin/x"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "bad-skill",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null,
+    "session": {
+     "session": "session-builder-hollow",
+     "provider": "standin",
+     "model": "standin/standin-narrator"
+    },
+    "skill": "BUILD EVERYTHING"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_authority_identity",
+    "message": "Campaign confirmation authority is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "hollow",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000002",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "hollow",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000002",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "hollow",
+    "display_name": "Another Road",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Campaign operation identity payload does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "confirmation",
+    "operation_id": "hollow"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000002",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "plain",
+    "display_name": "Plain Road",
+    "turn_id": "turn-plain",
+    "candidate": "candidate-install-plain",
+    "session": {
+     "session": "session-builder-hollow",
+     "provider": "standin",
+     "model": "standin/standin-narrator"
+    },
+    "skill": "BUILD RULESET"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000003",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "plain-again",
+    "display_name": "Plain Road",
+    "turn_id": "turn-plain",
+    "candidate": "candidate-install-plain",
+    "session": {
+     "session": "session-builder-hollow",
+     "provider": "standin",
+     "model": "standin/standin-narrator"
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Agent session identity payload does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "stateful",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-stateful",
+    "candidate": null,
+    "state": [
+     [
+      "story",
+      "weather",
+      "rain"
+     ],
+     [
+      "story",
+      "hour",
+      3
+     ]
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000005",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "stateful-ruleset",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-stateful",
+    "candidate": "candidate-install-plain",
+    "state": [
+     [
+      "synthetic.guided-plain",
+      "pace",
+      {
+       "steps": [
+        1,
+        2
+       ]
+      }
+     ]
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000006",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "duplicate-state",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null,
+    "state": [
+     [
+      "story",
+      "weather",
+      "rain"
+     ],
+     [
+      "story",
+      "weather",
+      "fog"
+     ]
+    ]
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Initial state keys must be unique"
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "unsafe-state",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null,
+    "state": [
+     [
+      "story",
+      "raw_reasoning",
+      "hidden"
+     ]
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "unsafe_canonical_payload",
+    "message": "Initial state contains a reserved canonical channel"
+   }
+  },
+  {
+   "step": {
+    "op": "reject",
+    "operation_id": "fenced"
+   },
+   "outcome": {
+    "ok": true
+   }
+  },
+  {
+   "step": {
+    "op": "reject",
+    "operation_id": "fenced"
+   },
+   "outcome": {
+    "ok": true
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "fenced",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "ready_campaign_not_created",
+    "message": "This prepared start was rejected without creating a campaign. Review the current choices and start again."
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "operation_id": "fenced"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "ready_campaign_not_created",
+    "message": "This prepared start was rejected without creating a campaign. Review the current choices and start again."
+   }
+  },
+  {
+   "step": {
+    "op": "reject",
+    "operation_id": "hollow"
+   },
+   "outcome": {
+    "ok": false
+   }
+  },
+  {
+   "step": {
+    "op": "start_and_confirm",
+    "confirm": {
+     "op": "confirm",
+     "operation_id": "held",
+     "display_name": "Held Road",
+     "turn_id": "turn-held",
+     "candidate": null
+    }
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000007",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirmation",
+    "operation_id": "held"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000007",
+     "resulting_revision": 0
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-early",
+    "campaign": "plain",
+    "expected_revision": 0,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign construction has not begun"
+   }
+  },
+  {
+   "step": {
+    "op": "begin",
+    "operation_id": "b-plain",
+    "campaign": "plain",
+    "expected_revision": 0,
+    "input": {
+     "lane_note": "quick"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000003",
+     "lane": "quick_start",
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "confirmation",
+    "operation_id": "b-plain"
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Campaign operation is not a confirmation"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "",
+    "campaign": "plain",
+    "expected_revision": 1,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "construction_plan_invalid",
+    "message": "Campaign construction plan is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": -1,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "construction_plan_invalid",
+    "message": "Campaign construction plan is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": 1,
+    "plan": "not an object"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "construction_plan_invalid",
+    "message": "Campaign construction plan is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": 1,
+    "plan": {
+     "raw_reasoning": "hidden"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "unsafe_canonical_payload",
+    "message": "Campaign construction plan contains a reserved canonical channel"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": 0,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Campaign construction expected revision is stale"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "missing",
+    "expected_revision": 1,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign is unavailable: missing or purged"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": 1,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000003",
+     "lane": "quick_start",
+     "canonical_representation_sha256": "347e1161721da888b7edba4293155635a8e248ce557215048f3eb9446940f44a",
+     "resulting_revision": 2
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": 1,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "00000000-0000-4000-8000-000000000003",
+     "lane": "quick_start",
+     "canonical_representation_sha256": "347e1161721da888b7edba4293155635a8e248ce557215048f3eb9446940f44a",
+     "resulting_revision": 2
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain",
+    "campaign": "plain",
+    "expected_revision": 1,
+    "plan": {
+     "premise": "Changed."
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Campaign operation identity payload does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-plain-again",
+    "campaign": "plain",
+    "expected_revision": 2,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign construction is already complete"
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "operation_id": "c-hollow",
+    "campaign": "hollow",
+    "expected_revision": 0,
+    "plan": {
+     "premise": "A road through a hollow hill.",
+     "beats": [
+      "arrive",
+      "descend"
+     ]
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign construction has not begun"
+   }
+  }
+ ]
+}
