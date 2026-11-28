@@ -7,11 +7,15 @@
 //! one byte for byte. It is the shipped request assembly on `claude_code`, `codex_app_server` and
 //! `anthropic_api`.
 //!
-//! Ported so far (L1): the tool-list settings, the host seal and the ledger contract, the check
-//! that canonical assembly's fixed blocks kept their tags, and the record labels. The mode and
+//! Ported so far: (L1) the tool-list settings, the host seal and the ledger contract, the check
+//! that canonical assembly's fixed blocks kept their tags, and the record labels; (L2a) the
+//! journal's view of a message ([`wire`]) and the facts and campaign-state updates ([`state`]). The mode and
 //! route (`gm_route`, `context_mode`, `LEDGER_REQUEST`) are `sylvia_provider::context_mode`,
 //! which providers read, re-exported here. The long model-read texts are data:
 //! `ledger_texts.json`, exported from the Python values by `generate_ledger_texts.py`.
+
+pub mod state;
+pub mod wire;
 
 use serde_json::Value as Json;
 use std::sync::OnceLock;

@@ -81,7 +81,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_character_draft_tool.py:62` | `character_draft_tool.open_draft` | Dump::INDENT2.ascii(false) | `content = json.dumps(dict(draft), ensure_ascii=False, indent=2) + "\n"` | `sylvia-agent` character_tool_vectors (the draft file written) |
 | `agent/_character_profile_tools.py:142` | `character_profile_tools.execute` | Dump::DEFAULT.ascii(false) | `if len(json.dumps(value, ensure_ascii=False).encode()) > 65536:` | `sylvia-agent` character_tool_vectors (the 64 KiB section limit) |
 | `agent/_character_profile_tools.py:193` | `character_profile_tools.execute` | Dump::INDENT2.ascii(false) | `content = json.dumps(dict(source.profile), ensure_ascii=False, indent=2) + "\n"` | `sylvia-agent` character_tool_vectors (the profile file written) |
-| `agent/_context_ledger.py:487` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
+| `agent/_context_ledger.py:487` | `_json` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | `sylvia-agent` ledger_state_vectors |
 | `agent/_context_ledger.py:1220` | `_tools_fingerprint` | Dump::WIRE.ascii(false) | `return _sha(json.dumps(list(tools or []), ensure_ascii=False, separators=(",", ":")))` | |
 | `agent/_fixed_tool_projection.py:52` | `argument_choices_record` | Dump::CANONICAL | `+ json.dumps(choices, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
 | `agent/_fixed_tool_projection.py:106` | `compact_schema.dump` | Dump::CANONICAL | `return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))` | |
