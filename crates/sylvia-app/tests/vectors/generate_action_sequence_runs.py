@@ -524,7 +524,8 @@ def intern(value: object, shared: dict) -> object:
         value = [intern(item, shared) for item in value]
     else:
         return value
-    text = json.dumps(value, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
+    # Hashed in its own key order: two equal values in different orders are different records.
+    text = json.dumps(value, ensure_ascii=True, separators=(",", ":"))
     if len(text) <= SHARED_BYTES:
         return value
     key = hashlib.sha256(text.encode()).hexdigest()[:24]

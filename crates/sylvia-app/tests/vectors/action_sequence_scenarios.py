@@ -150,3 +150,40 @@ def test_campaign_changes_between_compose_and_execute(lite):
     other = compose(lite, [walk(lite, "elsewhere", 15)], sequence_id="other-sequence")
     attempt(lambda: execute(lite, other))
     attempt(lambda: execute(lite, queue))
+
+
+def synthetic_case(tmp_path, name, **options):
+    from tests.test_action_sequences import NativeCase, create_session
+    from tests.test_player_actions import _create
+
+    value = NativeCase(tmp_path / f"{name}.sqlite3", "campaign", "owner")
+    _create(value.owner, **options)
+    create_session(value.owner, value.campaign_id)
+    return value
+
+
+def synthetic_step(identity, destination):
+    return {"step_id": identity, "source": {"kind": "panel", "surface_id": "operations.map", "action_id": "move"},
+            "selection": {"actor": "operator", "destination": destination, "map_revision": 7}}
+
+
+def test_waiting_choice_blocks_editing_and_other_sequences(tmp_path):
+    value = synthetic_case(tmp_path, "choice", choice=True)
+    try:
+        queue = compose(value, [synthetic_step("choice-step", [4, 4]), synthetic_step("later-step", [3, 3])])
+        attempt(lambda: execute(value, queue))
+        saved = read_queue(value)
+        version = saved["version"]
+        attempt(lambda: compose(value, [synthetic_step("choice-step", [4, 4])], expected_version=version))
+        attempt(lambda: compose(value, [synthetic_step("other-step", [2, 2])], sequence_id="other-sequence"))
+        attempt(lambda: read_queue(value))
+    finally:
+        value.close()
+
+
+def test_unavailable_declared_control_is_refused(tmp_path):
+    value = synthetic_case(tmp_path, "unavailable", controls={"confirmation": "sometimes"})
+    try:
+        attempt(lambda: compose(value, [synthetic_step("step", [4, 4])], sequence_id="unavailable"))
+    finally:
+        value.close()

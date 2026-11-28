@@ -7,6 +7,8 @@
 #[path = "common/tagged.rs"]
 mod tagged;
 
+use sylvia_base::testing::json_difference;
+
 use serde_json::{json, Value as Json};
 use sylvia_engine::expr::{evaluate_expression, EvalContext, EvalError, ExecutionBudget, Value};
 
@@ -83,11 +85,11 @@ fn every_generated_expression_evaluates_as_python_does() {
             }
             None => {
                 let mut expected = case.clone();
-                expected.as_object_mut().unwrap().remove("text");
+                expected.as_object_mut().unwrap().shift_remove("text");
                 expected
             }
         };
-        if actual != expected {
+        if json_difference(&actual, &expected).is_some() {
             failures.push(format!("{text}: python {expected}, rust {actual}"));
         }
     }

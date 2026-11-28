@@ -18,6 +18,7 @@ use sylvia_app::action_sequences::{
 use sylvia_app::authority::actions::ActionError;
 use sylvia_app::authority::content_reads::CatalogTool;
 use sylvia_app::player_actions::PlayerControls;
+use sylvia_base::testing::json_difference;
 use sylvia_base::JsonMap;
 use sylvia_domain::authority::{
     ActionReceipt, ActionRecord, ActionStatus, AwaitingChoiceReceipt, CampaignSnapshot, CampaignState,
@@ -351,8 +352,10 @@ impl Scripted {
             (_, Some(recorded)) => recorded.clone(),
             (_, None) => Json::Null,
         };
-        if name != "attempts" && recorded != args {
-            return Err(self.mismatch(format!("{name}: Rust passed {args}, Python passed {recorded}")));
+        if name != "attempts" {
+            if let Some(difference) = json_difference(&args, &recorded) {
+                return Err(self.mismatch(format!("{name}: {difference}; Rust passed {args}")));
+            }
         }
         if let Some(error) = event.get("raise") {
             return Err(raised(error));
@@ -770,10 +773,8 @@ fn action_sequence_runs_replay_as_python() {
             ));
             continue;
         }
-        if actual != run["outcome"] {
-            let shown: String =
-                format!("expected {}, got {actual}", run["outcome"]).chars().take(1500).collect();
-            failures.push(format!("{label}: {shown}"));
+        if let Some(difference) = json_difference(&actual, &run["outcome"]) {
+            failures.push(format!("{label}: {}", difference.chars().take(1500).collect::<String>()));
         }
     }
     let shown: Vec<String> =

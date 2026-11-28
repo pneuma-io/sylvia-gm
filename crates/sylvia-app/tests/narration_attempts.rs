@@ -384,7 +384,7 @@ async fn narration_attempts_answer_and_store_as_pythons_owner() {
         drop(handle);
         tokio::task::spawn_blocking(move || thread.join()).await.unwrap();
     }
-    assert_eq!(count, 114, "the record's step count");
+    assert_eq!(count, 121, "the record's step count");
     let python = folder.join("python.sqlite3");
     std::fs::write(&python, gunzip(&vectors.join("final.sqlite3.gz"))).unwrap();
     let (rust_rows, python_rows) = (table_rows(&database, &rust_ids), table_rows(&python, &python_ids));
