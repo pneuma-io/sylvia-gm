@@ -9,6 +9,7 @@ use sylvia_app::package_runtime::{
     validate_package_runtime, PackageRuntimeFailure, PACKAGE_RUNTIME_BYTE_LIMIT,
 };
 use sylvia_app::player_actions::parse_player_controls;
+use sylvia_base::testing::{assert_same_json, json_difference};
 use sylvia_domain::package_library::ToolDeclaration;
 use sylvia_engine::ruleset::model::{
     check_ruleset_file, coerce_bool, coerce_int, coerce_int_or_float_or_none, coerce_str, ModelRefusal,
@@ -74,10 +75,10 @@ fn shipped_runtimes_validate_as_python() {
             None => runtime_bytes(case),
         };
         let package_id = case["package_id"].as_str().unwrap();
-        assert_eq!(
-            outcome(package_id, &declarations(&case["declarations"]), &bytes),
-            case["result"],
-            "{package_id}"
+        assert_same_json(
+            &outcome(package_id, &declarations(&case["declarations"]), &bytes),
+            &case["result"],
+            package_id,
         );
     }
 }
@@ -100,7 +101,7 @@ fn every_case_validates_as_python() {
         } else {
             case["result"].clone()
         };
-        if actual != wanted {
+        if json_difference(&actual, &wanted).is_some() {
             failures.push(format!("case {index}: python {wanted}\n  rust {actual}"));
         }
     }
@@ -147,7 +148,7 @@ fn pydantic_conversions_match_python() {
             ),
         ];
         for (field, actual) in checks {
-            if &actual != wanted(field) {
+            if json_difference(&actual, wanted(field)).is_some() {
                 failures.push(format!("{field} {value}: python {} rust {actual}", wanted(field)));
             }
         }
@@ -201,7 +202,7 @@ fn player_controls_parse_as_python() {
             "calculations": list(&policy.calculations), "map_preview": object(&policy.map_preview),
             "available": policy.available, "preflight": policy.preflight, "preflight_path": object(&policy.preflight_path),
         });
-        if actual != case["result"] {
+        if json_difference(&actual, &case["result"]).is_some() {
             failures.push(format!("{value}\n  python {}\n  rust {actual}", case["result"]));
         }
     }

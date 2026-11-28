@@ -18,9 +18,8 @@
 //! - an attempt's `cancel` runs with the data lock released (still inside the region), since
 //!   Python's lock is reentrant and a cancel handle that read the narration state would otherwise
 //!   deadlock;
-//! - until lane 2's `action_sequences::last_attempt_commit` lands, the interrupted attempt's last
-//!   queued action ([`last_attempt_commit`]) is read as none, which is what Python finds without
-//!   saved action sequences (no Rust owner writes them yet).
+//! - the interrupted attempt's last queued action ([`last_attempt_commit`]) is lane 2's
+//!   `action_sequences::last_attempt_commit`, on the store, which is all it reads.
 
 use super::actions::ActionError;
 use super::narration::{CancelHandle, NarrationAttempt, NarrationState};
@@ -561,14 +560,17 @@ pub async fn interrupt_narration(
     expire_locked(store, &key).await
 }
 
-/// `action_sequences.last_attempt_commit(owner, campaign_id, attempt_id)`, lane 2's, read as none
-/// until it lands (see the module notes).
+/// `action_sequences.last_attempt_commit(owner, campaign_id, attempt_id)`: the latest action a
+/// queue bound to this attempt committed (lane 2's, on the store).
 async fn last_attempt_commit(
-    _store: &StoreHandle,
-    _campaign_id: &str,
-    _attempt_id: &str,
+    store: &StoreHandle,
+    campaign_id: &str,
+    attempt_id: &str,
 ) -> Result<Option<String>, ActionError> {
-    Ok(None)
+    let (campaign, attempt) = (campaign_id.to_owned(), attempt_id.to_owned());
+    Ok(store
+        .call(move |store| crate::action_sequences::last_attempt_commit_in_store(store, &campaign, &attempt))
+        .await?)
 }
 
 /// `_expire_narration_locked(attempt)`: end the attempt and its work, save its interruption and
@@ -764,12 +766,22 @@ impl<E> From<sylvia_store::StoreError> for RetryFailure<E> {
 /// on_attempt_started=...)`: narrate a stopped turn's saved result again without running its
 /// mechanics, under the campaign's work. An already resolved Retry is replayed. Any failure
 /// after the Retry's attempt starts interrupts the attempt (if still live) before it returns.
-pub async fn manual_retry<N: RetryNarration>(
+///
+/// `on_attempt_started` runs once the attempt has started, inside the same failure handling as
+/// the narrator: it may await owner calls (the session loop's `admit_attempt` interrupts the
+/// Retry when Stop came first) and its error ends the Retry as a narrator error would. It runs
+/// holding the operation guard and the campaign's work, but not the narration region.
+pub async fn manual_retry<N, S, F>(
     store: &StoreHandle,
     request: ManualRetry,
-    on_attempt_started: impl FnOnce() + Send,
+    on_attempt_started: S,
     mut narrator: N,
-) -> Result<ManualRetryResult, RetryFailure<N::Error>> {
+) -> Result<ManualRetryResult, RetryFailure<N::Error>>
+where
+    N: RetryNarration,
+    S: FnOnce() -> F + Send,
+    F: std::future::Future<Output = Result<(), N::Error>> + Send,
+{
     let _operation = store.operation()?;
     let _work = super::guided::campaign_work(store, &request.campaign_id).await?;
     let ManualRetry { campaign_id, interruption_id, retry_id, cancel } = request;
@@ -821,13 +833,15 @@ pub async fn manual_retry<N: RetryNarration>(
     .await?;
     let mut stream =
         RetryStream { store, campaign_id: campaign_id.clone(), retry_id: retry_id.clone(), refused: None };
-    on_attempt_started();
-    let outcome = match narrator.narrate(input.clone(), &mut stream).await {
-        Err(error) => Err(match stream.refused.take() {
-            Some(owner) => RetryFailure::Owner(owner),
-            None => RetryFailure::Narrator(error),
-        }),
-        Ok(()) => complete_attempt(store, &campaign_id, &retry_id).await.map_err(RetryFailure::Owner),
+    let outcome = match on_attempt_started().await {
+        Err(error) => Err(RetryFailure::Narrator(error)),
+        Ok(()) => match narrator.narrate(input.clone(), &mut stream).await {
+            Err(error) => Err(match stream.refused.take() {
+                Some(owner) => RetryFailure::Owner(owner),
+                None => RetryFailure::Narrator(error),
+            }),
+            Ok(()) => complete_attempt(store, &campaign_id, &retry_id).await.map_err(RetryFailure::Owner),
+        },
     };
     match outcome {
         Ok(canonical) => Ok(ManualRetryResult { input, canonical, replayed: false }),

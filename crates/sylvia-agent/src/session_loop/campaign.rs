@@ -10,7 +10,10 @@
 //! - **The live calls on a run:** `steer`, `stop`, `stop_agent_session`, `expire`, `disconnect`,
 //!   `reconnect`, and the idle, hint, progress and provisional reads, over the same active-run
 //!   registry Python keeps.
-//! - **Still `rust_port_pending`:** `run_builder` and `run_compaction` (T5b), and `retry` (T6).
+//! - **The Builder run and compaction** (T5b): `run_builder` drives a Builder chat's provider
+//!   with provisional prose, private records and its terminal; `run_compaction` runs `/compact`,
+//!   admitting only working-context checkpoints.
+//! - **Still `rust_port_pending`:** `retry` (T6).
 
 use super::{
     ProviderControl, ProviderEvent, SessionEvents, SessionFailure, SessionInputKind, SessionProvider,
@@ -543,6 +546,280 @@ impl SessionEvents for DmEvents<'_> {
     }
 }
 
+/// `_MAX_PROVISIONAL_SESSION_CHARS`.
+const MAX_PROVISIONAL_SESSION_CHARS: usize = 256_000;
+
+impl ActiveRun {
+    /// `emit_provisional(kind, text)`: safe prose held until it completes.
+    fn emit_provisional(&self, kind: SessionMessageKind, text: &str) -> CodedResult<()> {
+        if !matches!(kind, SessionMessageKind::SafeThink | SessionMessageKind::Talk) {
+            return Err(type_error("Only safe prose can enter a provisional session projection"));
+        }
+        let mut provisional = self.provisional();
+        let used: usize = provisional
+            .items
+            .iter()
+            .map(|item| item.get("text").map_or_else(String::new, py_str).chars().count())
+            .sum();
+        if used + text.chars().count() > MAX_PROVISIONAL_SESSION_CHARS {
+            return Err(rejected("Agent session provisional output is too large"));
+        }
+        let kind_value = kind.as_str();
+        if let Some(current) = provisional.items.last_mut() {
+            if current.get("kind").and_then(Json::as_str) == Some(kind_value) {
+                let joined = current.get("text").map_or_else(String::new, py_str) + text;
+                current.insert("text".into(), joined.into());
+                return Ok(());
+            }
+        }
+        provisional.items.push(object(vec![
+            ("kind", json!(kind_value)),
+            ("text", json!(text)),
+            ("collapsed_by_default", json!(kind == SessionMessageKind::SafeThink)),
+            ("provisional", json!(true)),
+            ("attempt_id", json!(self.attempt_id)),
+        ]));
+        Ok(())
+    }
+
+    /// `provisional_kind()`: the kind of the latest provisional segment.
+    fn provisional_kind(&self) -> Option<String> {
+        self.provisional().items.last().map(|item| item.get("kind").map_or_else(|| "None".to_owned(), py_str))
+    }
+}
+
+/// A coded refusal as the provider loop's error.
+fn provider_failure(error: CodedError) -> SessionProviderError {
+    error.into()
+}
+
+/// `_run_builder_with_session_work`'s event loop, as the Builder provider's event sink.
+struct BuilderEvents<'a> {
+    run: &'a CampaignSessionLoop,
+    request: &'a SessionRunRequest,
+    active: &'a ActiveRun,
+    provider_id: String,
+    model_id: String,
+    source_order: i64,
+    appended: Vec<SessionMessage>,
+    provisional_response_id: Option<String>,
+    native_requirements: HashMap<String, JsonMap>,
+}
+
+impl BuilderEvents<'_> {
+    /// `flush_provisional()`: each completed provisional segment saved, a TALK with its
+    /// response and native requirements.
+    async fn flush_provisional(&mut self) -> Result<(), SessionFailure> {
+        for (message_id, kind, mut content) in self.active.take_completed_provisional().map_err(failure)? {
+            if kind == SessionMessageKind::Talk {
+                if let Some(response_id) = self.provisional_response_id.clone().filter(|id| !id.is_empty()) {
+                    content.insert("provider_response_id".into(), json!(response_id));
+                    if let Some(requirement) = self.native_requirements.get(&response_id) {
+                        content.insert("native_continuation".into(), Json::Object(requirement.clone()));
+                    }
+                }
+            }
+            let message = self
+                .run
+                .owner
+                .append_agent_message(&self.request.session_id, &message_id, kind, &content)
+                .await
+                .map_err(failure)?;
+            self.appended.push(message);
+        }
+        Ok(())
+    }
+
+    /// `record_terminal(status, reason_code=...)`.
+    async fn record_terminal(&self, status: &str, reason_code: Option<&str>) -> Result<(), SessionFailure> {
+        let (owner, request) = (self.run.owner.as_ref(), self.request);
+        owner
+            .finish_private_provider_attempt(&request.session_id, &request.attempt_id, status == "completed")
+            .await
+            .map_err(owner_failure)?;
+        let timing_status = if status == "interrupted" { "failed" } else { status };
+        let timing =
+            self.run.finish_activity(&request.session_id, &request.attempt_id, timing_status, None)?;
+        let mut content = object(vec![
+            ("kind", json!("builder_attempt_terminal")),
+            ("attempt_id", json!(request.attempt_id)),
+            ("status", json!(status)),
+            ("activity_timing", Json::Object(timing)),
+        ]);
+        if let Some(reason) = reason_code.filter(|reason| !reason.is_empty()) {
+            content.insert("reason_code".into(), json!(reason));
+        }
+        let message_id = format!("builder-terminal-{}", request.attempt_id);
+        owner
+            .append_agent_message(&request.session_id, &message_id, SessionMessageKind::Evidence, &content)
+            .await
+            .map_err(failure)?;
+        Ok(())
+    }
+
+    async fn handle(&mut self, event: ProviderEvent, source_order: i64) -> Result<(), SessionFailure> {
+        let (request, active) = (self.request, self.active);
+        active.control.progress.observe();
+        let private = matches!(
+            event,
+            ProviderEvent::PrivateReasoning { .. } | ProviderEvent::PrivateContinuation { .. }
+        );
+        if active.control.cancelled() && !private && !matches!(event, ProviderEvent::Evidence { .. }) {
+            // Stop fences prose; completed tool receipts and their native continuation still
+            // describe effects that already happened.
+            return Ok(());
+        }
+        match event {
+            ProviderEvent::PrivateReasoning { text, response_id } => {
+                self.private_record(text, response_id, "thinking", source_order).await
+            }
+            ProviderEvent::PrivateContinuation { text, response_id } => {
+                self.private_record(text.clone(), Some(response_id.clone()), "continuation", source_order)
+                    .await?;
+                if !text.is_empty() && !response_id.is_empty() {
+                    let native = sylvia_base::pyjson::loads(&text).map_err(|error| {
+                        failure(
+                            CodedError::new("internal_error", error.to_string())
+                                .with_error_type("JSONDecodeError"),
+                        )
+                    })?;
+                    let has = |key: &str| native.as_object().is_some_and(|native| native.contains_key(key));
+                    let requirement = object(vec![
+                        ("provider_id", json!(self.provider_id)),
+                        ("model_id", json!(self.model_id)),
+                        ("anthropic_required", json!(has("anthropic_content"))),
+                        ("chat_completion_required", json!(has("chat_completion_metadata"))),
+                        ("reasoning_required", json!(has("reasoning_content"))),
+                    ]);
+                    self.native_requirements.insert(response_id, requirement);
+                }
+                Ok(())
+            }
+            ProviderEvent::SafeThink { text } => {
+                if !matches!(self.active.provisional_kind().as_deref(), None | Some("safe_think")) {
+                    self.flush_provisional().await?;
+                }
+                active.emit_provisional(SessionMessageKind::SafeThink, &text).map_err(failure)
+            }
+            ProviderEvent::Talk { text, response_id, .. } => {
+                if self.provisional_response_id != response_id {
+                    self.flush_provisional().await?;
+                }
+                self.provisional_response_id = response_id;
+                if !matches!(self.active.provisional_kind().as_deref(), None | Some("talk")) {
+                    self.flush_provisional().await?;
+                }
+                active.emit_provisional(SessionMessageKind::Talk, &text).map_err(failure)
+            }
+            ProviderEvent::ProseComplete => self.flush_provisional().await,
+            ProviderEvent::Evidence { message_id, payload } => {
+                if !active.control.cancelled() {
+                    self.flush_provisional().await?;
+                }
+                // `native_requirements.get(str(response_id))`.
+                let response_id =
+                    payload.get("provider_response_id").map_or_else(|| "None".to_owned(), py_str);
+                let requirement = self.native_requirements.get(&response_id).cloned();
+                let mut content = payload;
+                if let Some(requirement) = requirement {
+                    content.insert("native_continuation".into(), Json::Object(requirement));
+                }
+                let activity = object(vec![
+                    ("attempt_id", json!(request.attempt_id)),
+                    ("basis_message_id", json!(request.message_id)),
+                    ("source_order", json!(source_order)),
+                ]);
+                content.insert("activity".into(), Json::Object(activity));
+                let message = self
+                    .run
+                    .owner
+                    .append_agent_message(
+                        &request.session_id,
+                        &message_id,
+                        SessionMessageKind::Evidence,
+                        &content,
+                    )
+                    .await
+                    .map_err(failure)?;
+                self.appended.push(message);
+                Ok(())
+            }
+            ProviderEvent::Action { .. } => {
+                Err(failure(rejected("Builder provider cannot emit gameplay session events")))
+            }
+        }
+    }
+
+    /// A private reasoning or continuation record.
+    async fn private_record(
+        &self,
+        text: String,
+        response_id: Option<String>,
+        kind: &str,
+        source_order: i64,
+    ) -> Result<(), SessionFailure> {
+        if text.is_empty() {
+            return Ok(());
+        }
+        let request = self.request;
+        let record = ProviderPrivateRecord {
+            session_id: request.session_id.clone(),
+            attempt_id: request.attempt_id.clone(),
+            response_id: response_id
+                .filter(|id| !id.is_empty())
+                .unwrap_or_else(|| request.attempt_id.clone()),
+            turn_id: request.turn_id.clone(),
+            basis_message_id: request.message_id.clone(),
+            source_order,
+            provider_id: self.provider_id.clone(),
+            model_id: self.model_id.clone(),
+            kind: kind.to_owned(),
+            payload: text,
+        };
+        self.run.owner.append_private_provider_record(&record).await.map_err(owner_failure)
+    }
+}
+
+impl SessionEvents for BuilderEvents<'_> {
+    fn emit(&mut self, event: ProviderEvent) -> BoxFuture<'_, Result<(), SessionProviderError>> {
+        Box::pin(async move {
+            let source_order = self.source_order;
+            self.source_order += 1;
+            self.handle(event, source_order)
+                .await
+                .map_err(|error| SessionProviderError { error, loop_reason: None })
+        })
+    }
+}
+
+/// `run_compaction`'s event loop: only working-context checkpoints are admitted.
+struct CompactionEvents<'a> {
+    owner: &'a dyn TurnOwner,
+    session_id: &'a str,
+    control: &'a ProviderControl,
+}
+
+impl SessionEvents for CompactionEvents<'_> {
+    fn emit(&mut self, event: ProviderEvent) -> BoxFuture<'_, Result<(), SessionProviderError>> {
+        Box::pin(async move {
+            if self.control.cancelled() {
+                return Err(provider_failure(rejected("Context compaction was cancelled")));
+            }
+            let ProviderEvent::Evidence { message_id, payload } = event else {
+                return Err(provider_failure(rejected("Compaction cannot perform gameplay or narrate")));
+            };
+            if payload.get("kind").and_then(Json::as_str) != Some("working_context_checkpoint") {
+                return Err(provider_failure(rejected("Compaction cannot perform gameplay or narrate")));
+            }
+            self.owner
+                .append_agent_message(self.session_id, &message_id, SessionMessageKind::Evidence, &payload)
+                .await
+                .map_err(provider_failure)?;
+            Ok(())
+        })
+    }
+}
+
 impl CampaignSessionLoop {
     /// `CampaignSessionLoop(owner, ...)`.
     pub fn new(owner: Arc<dyn TurnOwner>, hooks: LoopHooks) -> Self {
@@ -874,7 +1151,10 @@ impl CampaignSessionLoop {
         initial_high_water: i64,
         redirection: Option<&NarrationInterruption>,
     ) -> Result<SessionRunResult, SessionFailure> {
-        let campaign_id = provider_input.session.campaign_id().expect("a DM run has a campaign").to_owned();
+        // `assert campaign_id is not None`: a bare `AssertionError`, an internal fault.
+        let Some(campaign_id) = provider_input.session.campaign_id().map(str::to_owned) else {
+            return Err(failure(CodedError::new("internal_error", "").with_error_type("AssertionError")));
+        };
         let active = Arc::new(ActiveRun {
             campaign_id,
             attempt_id: request.attempt_id.clone(),
@@ -1201,24 +1481,311 @@ impl CampaignSessionLoop {
         Ok(())
     }
 
-    /// `run_builder(request, provider, persist)`: one Builder turn; the appended messages.
+    /// `run_builder(request, provider, persist)`: one Builder turn under Stop and shutdown,
+    /// without gameplay authority; the messages it appended.
     pub async fn run_builder(
         &self,
-        _request: SessionRunRequest,
-        _provider: Arc<dyn SessionProvider>,
-        _persist: BuilderPersist,
+        request: SessionRunRequest,
+        provider: Arc<dyn SessionProvider>,
+        persist: BuilderPersist,
     ) -> Result<Vec<SessionMessage>, SessionFailure> {
-        Err(pending_run("CampaignSessionLoop.run_builder"))
+        {
+            let mut state = self.state();
+            if state.active.contains_key(&request.session_id) || state.pending.contains(&request.session_id) {
+                return Err(failure(rejected("Agent session already has active provider work")));
+            }
+            state.pending.insert(request.session_id.clone());
+        }
+        let _reservation = Reservation { state: &self.state, session_id: request.session_id.clone() };
+        let held = self.owner.builder_session_work(&request.session_id).await.map_err(owner_failure)?;
+        let context = held.context.clone();
+        let outcome = self.run_builder_with_session_work(request, provider, persist, context).await;
+        drop(held);
+        outcome
     }
 
-    /// `run_compaction(session_id, attempt_id, provider)`: `/compact`.
+    /// `_run_builder_with_session_work(request, provider, persist, context)`.
+    async fn run_builder_with_session_work(
+        &self,
+        request: SessionRunRequest,
+        provider: Arc<dyn SessionProvider>,
+        persist: BuilderPersist,
+        context: SessionContext,
+    ) -> Result<Vec<SessionMessage>, SessionFailure> {
+        let owner = self.owner.as_ref();
+        let (input_kind, input_content) = match request.input_kind {
+            SessionInputKind::BuilderStart => {
+                let launched = context.messages.iter().any(|message| {
+                    message.kind() == SessionMessageKind::Evidence
+                        && matches!(
+                            message.content().get("kind").and_then(Json::as_str),
+                            Some("builder_launch_context" | "import_repair_context")
+                        )
+                });
+                if !request.user_text.is_empty() || !launched {
+                    return Err(failure(rejected("Builder start requires its saved launch context")));
+                }
+                if context.messages.iter().any(|message| {
+                    message.kind() == SessionMessageKind::User || content_is(message, "kind", "builder_start")
+                }) {
+                    return Err(failure(rejected(
+                        "Builder chat has already started; send a message to continue",
+                    )));
+                }
+                let content =
+                    object(vec![("kind", json!("builder_start")), ("attempt_id", json!(request.attempt_id))]);
+                (SessionMessageKind::Evidence, content)
+            }
+            SessionInputKind::User => {
+                let mut content = object(vec![
+                    ("text", json!(request.user_text)),
+                    ("attempt_id", json!(request.attempt_id)),
+                ]);
+                if let Some(answers) = &request.builder_question_answers {
+                    let answers = Json::Array(answers.iter().cloned().map(Json::Object).collect());
+                    content = crate::builder::question_answers::builder_question_answer_content(
+                        &context,
+                        &answers,
+                        &request.user_text,
+                    )
+                    .map_err(failure)?;
+                    content.insert("attempt_id".into(), json!(request.attempt_id));
+                }
+                (SessionMessageKind::User, content)
+            }
+            _ => return Err(failure(rejected("Builder input kind is unsupported"))),
+        };
+        owner
+            .append_agent_message(&request.session_id, &request.message_id, input_kind, &input_content)
+            .await
+            .map_err(failure)?;
+        let history = owner.session_context(&request.session_id).await.map_err(failure)?;
+        let provider_input = SessionProviderInput::new(
+            context.session.clone(),
+            history,
+            Vec::new(),
+            Arc::new(ProviderControl::new()),
+        );
+        // Builder provider work is attached to the durable session, even when that session
+        // belongs to a campaign: the frontend streams, stops and reconnects by session id.
+        let active = Arc::new(ActiveRun {
+            campaign_id: context.session.session_id().to_owned(),
+            attempt_id: request.attempt_id.clone(),
+            control: Arc::clone(&provider_input.control),
+            basis_message_id: Some(request.message_id.clone()),
+            provisional: Mutex::default(),
+        });
+        {
+            let mut state = self.state();
+            if state.stop_requested.contains(&request.session_id) {
+                return Err(failure(rejected("Agent session was stopped before provider admission")));
+            }
+            state.active.insert(request.session_id.clone(), Arc::clone(&active));
+            state.pending.remove(&request.session_id);
+        }
+        let mut work_started = false;
+        let mut events = BuilderEvents {
+            run: self,
+            request: &request,
+            active: &active,
+            provider_id: provider_input.session.fields().provider_id.clone(),
+            model_id: provider_input.session.fields().model_id.clone(),
+            source_order: 0,
+            appended: Vec::new(),
+            provisional_response_id: None,
+            native_requirements: HashMap::new(),
+        };
+        let outcome = async {
+            let control = Arc::clone(&active.control);
+            let cancel: Arc<dyn Fn() + Send + Sync> = Arc::new(move || {
+                let _ = control.cancel();
+            });
+            if let Some(started) = &self.hooks.on_provider_work_started {
+                started(&active.campaign_id, &active.attempt_id, cancel);
+            }
+            work_started = true;
+            active.control.admit(|| ()).map_err(provider_failure)?;
+            provider.run(provider_input, &mut events).await?;
+            if active.control.cancelled() {
+                return Err(provider_failure(rejected("Agent session provider work was cancelled")));
+            }
+            let persisted = async {
+                events.flush_provisional().await?;
+                persist().await.map_err(failure)
+            }
+            .await;
+            match persisted {
+                Ok(Some(messages)) => events.appended.extend(messages),
+                Ok(None) => {}
+                Err(SessionFailure::Turn(TurnFailure::Coded(error)))
+                    if active.control.cancelled() && owner_closed(&error) =>
+                {
+                    return Err(SessionProviderError {
+                        error: cancelled_during_shutdown(),
+                        loop_reason: None,
+                    });
+                }
+                Err(error) => return Err(SessionProviderError { error, loop_reason: None }),
+            }
+            events
+                .record_terminal("completed", None)
+                .await
+                .map_err(|error| SessionProviderError { error, loop_reason: None })?;
+            Ok(std::mem::take(&mut events.appended))
+        }
+        .await;
+        let outcome = match outcome {
+            Ok(appended) => Ok(appended),
+            Err(SessionProviderError { error, loop_reason }) => {
+                let error = match error {
+                    SessionFailure::Turn(TurnFailure::Provider(provider_error))
+                        if request.input_kind == SessionInputKind::User =>
+                    {
+                        SessionFailure::Turn(TurnFailure::Provider(
+                            provider_error.with_accepted_message_id(&request.message_id),
+                        ))
+                    }
+                    other => other,
+                };
+                // Shutdown may already have closed storage: the saved input without a terminal
+                // still identifies the interrupted work after a restart.
+                let cancelled = active.control.cancelled();
+                let reason_code = if cancelled {
+                    None
+                } else if let Some(reason) = loop_reason {
+                    Some(reason)
+                } else if matches!(
+                    &error,
+                    SessionFailure::Turn(TurnFailure::Provider(provider_error))
+                        if provider_error.kind.is_a(sylvia_provider::error::ErrorKind::OutputLimit)
+                ) {
+                    Some("output_limit".to_owned())
+                } else {
+                    None
+                };
+                let status = if cancelled { "stopped" } else { "interrupted" };
+                let _ = events.record_terminal(status, reason_code.as_deref()).await;
+                Err(error)
+            }
+        };
+        if work_started {
+            if let Some(finished) = &self.hooks.on_provider_work_finished {
+                finished(&active.campaign_id, &active.attempt_id);
+            }
+        }
+        self.state().active.remove(&request.session_id);
+        outcome
+    }
+
+    /// `run_compaction(session_id, attempt_id, provider)`: manual context maintenance under the
+    /// ordinary session lock, without a game action.
     pub async fn run_compaction(
         &self,
-        _session_id: &str,
-        _attempt_id: &str,
-        _provider: Arc<dyn SessionProvider>,
+        session_id: &str,
+        attempt_id: &str,
+        provider: Arc<dyn SessionProvider>,
     ) -> Result<(), SessionFailure> {
-        Err(pending_run("CampaignSessionLoop.run_compaction"))
+        {
+            let mut state = self.state();
+            if state.active.contains_key(session_id) || state.pending.contains(session_id) {
+                return Err(failure(rejected("Agent session already has active provider work")));
+            }
+            state.pending.insert(session_id.to_owned());
+        }
+        let owner = self.owner.as_ref();
+        // Python reads the role before its `try`: a failed read leaves the reservation in place.
+        let role = owner.session_context(session_id).await.map_err(failure)?.session.role();
+        let mut started = false;
+        let outcome = async {
+            let held = if role == WriterRole::Builder {
+                owner.builder_session_work(session_id).await
+            } else {
+                owner.agent_session_work(session_id).await
+            }
+            .map_err(owner_failure)?;
+            let control = Arc::new(ProviderControl::new());
+            let active = Arc::new(ActiveRun {
+                campaign_id: session_id.to_owned(),
+                attempt_id: attempt_id.to_owned(),
+                control: Arc::clone(&control),
+                basis_message_id: None,
+                provisional: Mutex::default(),
+            });
+            {
+                let mut state = self.state();
+                if state.stop_requested.contains(session_id) {
+                    return Err(failure(rejected("Session was stopped before compaction")));
+                }
+                state.active.insert(session_id.to_owned(), Arc::clone(&active));
+                state.pending.remove(session_id);
+            }
+            let request = object(vec![
+                ("kind", json!("context_compaction_requested")),
+                ("attempt_id", json!(attempt_id)),
+            ]);
+            owner
+                .append_agent_message(
+                    session_id,
+                    &format!("compact-request-{attempt_id}"),
+                    SessionMessageKind::Evidence,
+                    &request,
+                )
+                .await
+                .map_err(failure)?;
+            let mut status = "interrupted";
+            let ran = async {
+                let cancel_control = Arc::clone(&control);
+                let cancel: Arc<dyn Fn() + Send + Sync> = Arc::new(move || {
+                    let _ = cancel_control.cancel();
+                });
+                if let Some(started_hook) = &self.hooks.on_provider_work_started {
+                    started_hook(session_id, attempt_id, cancel);
+                }
+                started = true;
+                let input = SessionProviderInput::new(
+                    held.context.session.clone(),
+                    held.context.clone(),
+                    Vec::new(),
+                    Arc::clone(&control),
+                );
+                let mut events = CompactionEvents { owner, session_id, control: &control };
+                provider.run(input, &mut events).await.map_err(|error| error.error)
+            }
+            .await;
+            if ran.is_ok() {
+                status = "completed";
+            }
+            // `finally`: the terminal is saved however the provider ended; its own failure wins.
+            let terminal = object(vec![
+                ("kind", json!("context_compaction_terminal")),
+                ("attempt_id", json!(attempt_id)),
+                ("status", json!(status)),
+            ]);
+            owner
+                .append_agent_message(
+                    session_id,
+                    &format!("compact-terminal-{attempt_id}"),
+                    SessionMessageKind::Evidence,
+                    &terminal,
+                )
+                .await
+                .map_err(failure)?;
+            drop(held);
+            ran
+        }
+        .await;
+        if started {
+            if let Some(finished) = &self.hooks.on_provider_work_finished {
+                finished(session_id, attempt_id);
+            }
+        }
+        {
+            let mut state = self.state();
+            state.active.remove(session_id);
+            state.pending.remove(session_id);
+            state.stop_requested.remove(session_id);
+        }
+        outcome
     }
 
     /// `retry(session_id, ...)`: one manual narration retry.

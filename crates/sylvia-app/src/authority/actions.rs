@@ -905,7 +905,7 @@ fn preparation_origin(
     let mut origin = sylvia_domain::player_actions::player_control_origin(
         &Json::Object(source),
         pending.basis_revision,
-        None,
+        &Json::Null,
         command.session_id.as_deref(),
     )?;
     let mut policy = JsonMap::new();
