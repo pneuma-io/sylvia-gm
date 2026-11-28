@@ -405,6 +405,29 @@
   },
   {
    "step": {
+    "op": "start_and_reject",
+    "operation_id": "held-rejected"
+   },
+   "outcome": {
+    "ok": true
+   }
+  },
+  {
+   "step": {
+    "op": "confirm",
+    "operation_id": "held-rejected",
+    "display_name": "Hollow Road",
+    "turn_id": "turn-hollow",
+    "candidate": null
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "ready_campaign_not_created",
+    "message": "This prepared start was rejected without creating a campaign. Review the current choices and start again."
+   }
+  },
+  {
+   "step": {
     "op": "confirmation",
     "operation_id": "held"
    },

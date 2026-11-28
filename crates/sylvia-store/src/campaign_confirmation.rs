@@ -97,6 +97,18 @@ impl StoreHandle {
     /// reporting its absence, unless it already confirmed a campaign.
     pub async fn reject_uncreated_ready_campaign(&self, operation_id: &str) -> StoreResult<bool> {
         let mut held = self.hold_ready_campaigns().await?;
+        self.reject_uncreated_ready_campaign_held(&mut held, operation_id).await
+    }
+
+    /// `reject_uncreated_ready_campaign` inside a prepared start that already holds the fence
+    /// (`with owner.ready_campaign_start_work(id):`; Python's lock is reentrant): the operation
+    /// guard and the confirmation check, then the identity fenced in the held set.
+    pub async fn reject_uncreated_ready_campaign_held(
+        &self,
+        held: &mut ReadyStartWork,
+        operation_id: &str,
+    ) -> StoreResult<bool> {
+        let _operation = self.operation()?;
         if self.campaign_confirmation(operation_id).await?.is_some() {
             return Ok(false);
         }
