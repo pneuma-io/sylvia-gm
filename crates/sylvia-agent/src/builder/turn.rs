@@ -23,6 +23,9 @@ use super::content_definition::content_definition_tool;
 use super::evidence::{builder_tool_evidence, tool_call_details};
 use super::history::{builder_native_request, provider_history};
 use super::mode::AgentMode;
+use super::plan_tools::{
+    campaign_plan_tools, creation_subflow_completion_tool, OwnerCheck, PlanAuthoritySource, PlanPublisher,
+};
 use super::prompt::{builder_prompt, creation_subflow_purpose, effective_tracked_skill};
 use super::rejected;
 use super::ruleset_tools::{ruleset_draft_check_tool, ruleset_test_tool, Cancelled};
@@ -156,11 +159,12 @@ pub struct BuilderTurnTools {
     pub publish_participant: Option<ParticipantPublisher>,
     pub reuse_participant: Option<ParticipantReader>,
     pub read_participant: Option<ParticipantReader>,
-    pub campaign_plan_authority: bool,
-    pub publish_campaign_plan: bool,
+    /// `campaign_plan_authority`: the Plan's exact closure, fixed or selected later.
+    pub campaign_plan_authority: Option<PlanAuthoritySource>,
+    pub publish_campaign_plan: Option<PlanPublisher>,
     pub publish_campaign_setting: Option<SettingPublisher>,
     pub check_campaign_setting: Option<SettingPublisher>,
-    pub check_campaign_plan: bool,
+    pub check_campaign_plan: Option<OwnerCheck>,
     pub repair_tools: Vec<ToolSpec>,
     pub profile_tools: Vec<ToolSpec>,
     pub campaign_content_authority: Option<CampaignContent>,
@@ -198,18 +202,6 @@ fn character_purpose(purpose: Option<&str>) -> bool {
     matches!(purpose, Some("player_character" | "companion"))
 }
 
-fn plan_definition(name: &str) -> CodedResult<ToolSpec> {
-    let definition = match name {
-        "inspect_campaign_sources" => sylvia_app::builder_tools::campaign_source_tool_definition(),
-        "create_campaign_plan_draft" => {
-            sylvia_app::builder_tools::create_campaign_plan_draft_tool_definition()
-        }
-        "publish_campaign_plan" => sylvia_app::builder_tools::campaign_plan_tool_definition(),
-        other => panic!("not a Plan tool: {other}"),
-    };
-    pending_tool(definition)
-}
-
 /// `stream_builder_turn`'s tool list, in Python's order, before the history tool. The Ruleset
 /// draft tools work in `workspace`, and the test stops when `cancelled` says so.
 pub fn application_tools(
@@ -238,9 +230,9 @@ pub fn application_tools(
             && message.content().get("kind").and_then(Json::as_str) == Some("creation_subflow_link")
     });
     if context.session.campaign_id().is_some() && subflow_link {
-        specs.push(pending("complete_creation_subflow")?);
+        specs.push(creation_subflow_completion_tool()?);
     }
-    if !declarations.is_empty() && (character || tools.campaign_plan_authority) {
+    if !declarations.is_empty() && (character || tools.campaign_plan_authority.is_some()) {
         let role = if character { purpose.as_deref() } else { None };
         let check = participant_draft_check_tool(
             role,
@@ -286,16 +278,17 @@ pub fn application_tools(
         specs.push(library_source_tool(Arc::clone(library))?);
         specs.push(library_source_copy_tool(Arc::clone(library), workspace)?);
     }
-    if matches!(skill.as_deref(), None | Some("BUILD CAMPAIGN PLAN"))
-        && !character
-        && tools.campaign_plan_authority
-    {
-        specs.push(plan_definition("inspect_campaign_sources")?);
-        specs.push(plan_definition("create_campaign_plan_draft")?);
-        specs.push(plan_definition("publish_campaign_plan")?);
-        if tools.check_campaign_plan {
-            specs.push(pending("check_campaign_plan_draft")?);
-        }
+    if let (true, false, Some(authority)) = (
+        matches!(skill.as_deref(), None | Some("BUILD CAMPAIGN PLAN")),
+        character,
+        &tools.campaign_plan_authority,
+    ) {
+        specs.extend(campaign_plan_tools(
+            workspace,
+            authority.clone(),
+            tools.publish_campaign_plan.clone(),
+            tools.check_campaign_plan.clone(),
+        )?);
     }
     let setting_skill = matches!(skill.as_deref(), None | Some("BUILD CAMPAIGN SETTING")) && !character;
     if let (true, Some(publisher)) = (setting_skill, &tools.publish_campaign_setting) {
