@@ -32,7 +32,6 @@ use sylvia_domain::session::{
     SessionActivityBasis, SessionContext, SessionMessage, SessionMessageKind, SessionRecord,
 };
 use sylvia_provider::BoxFuture;
-use sylvia_store::snapshots::DisplayQuery;
 
 /// The loop's Retry narrator, as lane 3's `manual_retry` runs a narrator.
 struct LoopNarration<'n> {
