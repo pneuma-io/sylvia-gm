@@ -10,12 +10,14 @@ use serde_json::json;
 use std::collections::VecDeque;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
+use sylvia_agent::builder::character_tools::ParticipantInput;
 use sylvia_agent::builder::turn::{exported_tool, stream_builder_turn, BuilderTurn, BuilderTurnTools};
 use sylvia_agent::provider_turn::TurnFailure;
 use sylvia_agent::session_loop::provider::{SessionEvents, SessionFailure, SessionProviderError};
 use sylvia_agent::session_loop::{ProviderControl, ProviderEvent};
 use sylvia_base::{pyjson, Json, JsonMap};
 use sylvia_domain::authority::WriterRole;
+use sylvia_domain::package_library::ParticipantArtifactDeclaration;
 use sylvia_domain::session::{
     SessionContext, SessionMessage, SessionMessageKind, SessionRecord, SessionRecordFields, SessionStatus,
 };
@@ -205,6 +207,34 @@ fn fresh_work(name: &str) -> std::path::PathBuf {
     work
 }
 
+/// The generator's recorded declarations.
+fn declarations(value: &Json) -> Vec<ParticipantArtifactDeclaration> {
+    value
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|fields| ParticipantArtifactDeclaration {
+            kind: fields["kind"].as_str().unwrap().into(),
+            schema_id: fields["schema_id"].as_str().unwrap().into(),
+            schema_sha256: fields["schema_sha256"].as_str().unwrap().into(),
+            schema: fields["schema"].as_object().cloned().unwrap(),
+            entity_state_schema: fields["entity_state_schema"].as_object().cloned(),
+            initial_state_calculations: fields["initial_state_calculations"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|item| item.as_object().cloned().unwrap())
+                .collect(),
+            initial_state_validation: fields["initial_state_validation"].as_object().cloned(),
+        })
+        .collect()
+}
+
+/// The generator's `stub` reader: answers an empty mapping.
+fn stand_in_reader() -> sylvia_agent::builder::character_tools::ParticipantReader {
+    Arc::new(|_: &str, _: &str, _: Option<&str>| Ok(JsonMap::new()))
+}
+
 #[test]
 fn builder_turn_matches_python() {
     let vectors = vectors();
@@ -265,6 +295,23 @@ fn builder_turn_matches_python() {
             campaign_plan_authority: has("campaign_plan_authority"),
             check_campaign_plan: has("check_campaign_plan"),
             publish_campaign_plan: has("publish_campaign_plan"),
+            participant_declarations: declarations(&spec["declarations"]),
+            setting_character_schema: spec["setting_character_schema"].as_object().cloned(),
+            participant_schemas: declarations(&spec["declarations"])
+                .into_iter()
+                .map(|declaration| (declaration.schema_id, declaration.schema))
+                .collect(),
+            plan_characters: spec.get("plan_declarations").map(|plan| (declarations(plan), None)),
+            publish_participant: has("publish_participant").then(|| {
+                Arc::new(|_: &ParticipantInput| Ok(JsonMap::new()))
+                    as sylvia_agent::builder::character_tools::ParticipantPublisher
+            }),
+            reuse_participant: has("reuse_participant").then(stand_in_reader),
+            read_participant: has("read_participant").then(stand_in_reader),
+            resolve_source_profile: has("resolve_source_profile").then(|| {
+                Arc::new(|_: Option<&Json>| Ok(None))
+                    as sylvia_agent::builder::character_tools::SourceProfileResolver
+            }),
             ..BuilderTurnTools::default()
         };
         let turn = BuilderTurn {
