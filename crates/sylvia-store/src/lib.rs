@@ -41,6 +41,7 @@ mod owner_sessions;
 pub mod package_reads;
 pub mod packages;
 mod participant_history;
+pub mod plan_handoff;
 mod player_reads;
 pub mod private_records;
 pub mod purge;
