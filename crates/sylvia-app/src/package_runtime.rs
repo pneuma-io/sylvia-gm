@@ -691,7 +691,7 @@ fn load_runtime(package_id: &str, runtime_bytes: &[u8], authoring: bool) -> Outc
 pub fn validate_package_runtime(
     package_id: &str,
     declarations: &[ToolDeclaration],
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<(), PackageRuntimeFailure> {
     let runtime = cached_parse(package_id, runtime_bytes, true)?;
     let declared: Vec<&str> = declarations.iter().map(|declaration| declaration.name.as_str()).collect();
@@ -737,10 +737,44 @@ pub fn validate_package_runtime(
     Ok(())
 }
 
+/// A package runtime's bytes as a caller holds them: a slice, a `Vec`, or a shared
+/// `Arc<Vec<u8>>`. Python keys its parse cache by the bytes object, and a dict lookup takes the
+/// same object without comparing its contents. A caller that keeps its bytes in an `Arc` gets
+/// that here: a kept entry holding the same `Arc` is found without comparing 14.5 MB.
+pub trait RuntimeBytes {
+    /// The bytes.
+    fn runtime_bytes(&self) -> &[u8];
+    /// The shared allocation, when the caller holds one.
+    fn shared(&self) -> Option<&std::sync::Arc<Vec<u8>>> {
+        None
+    }
+}
+
+impl RuntimeBytes for [u8] {
+    fn runtime_bytes(&self) -> &[u8] {
+        self
+    }
+}
+
+impl RuntimeBytes for Vec<u8> {
+    fn runtime_bytes(&self) -> &[u8] {
+        self
+    }
+}
+
+impl RuntimeBytes for std::sync::Arc<Vec<u8>> {
+    fn runtime_bytes(&self) -> &[u8] {
+        self
+    }
+    fn shared(&self) -> Option<&std::sync::Arc<Vec<u8>>> {
+        Some(self)
+    }
+}
+
 /// `_parse_runtime(package_id=..., runtime_bytes=...)`, the execution parse.
 pub(crate) fn parse_runtime(
     package_id: &str,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Outcome<std::sync::Arc<RuntimeTables>> {
     cached_parse(package_id, runtime_bytes, false)
 }
@@ -754,13 +788,15 @@ pub(crate) fn parse_runtime(
 /// builds the same data. An authoring parse never takes an execution entry, since the execution
 /// load skips the stricter checks. Neither the cache nor the reuse can change a result.
 ///
-/// This keeps the same bound and the same key. A lookup compares the bytes as Python's dict does
-/// once a hash matches, by length and then by content. It never hashes them: a SHA-256 of SRD
-/// Lite's 14.5 MB runtime took about 64 ms on every call, where the comparison is a single memory
-/// compare. Two different runtimes can never share an entry.
+/// This keeps the same bound and the same key. A lookup matches as Python's dict does: the same
+/// object first (here the same `Arc`, see [`RuntimeBytes`]), then equal bytes, by length and
+/// then by content. It never hashes them: a SHA-256 of SRD Lite's 14.5 MB runtime took about
+/// 64 ms on every call. The identity check is sound because an entry holds its own clone of the
+/// `Arc`, so that allocation stays alive and unchanged while the entry exists: a caller's `Arc`
+/// at the same address is the same bytes. Two different runtimes can never share an entry.
 fn cached_parse(
     package_id: &str,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
     authoring: bool,
 ) -> Outcome<std::sync::Arc<RuntimeTables>> {
     use std::sync::{Arc, Mutex, OnceLock};
@@ -779,12 +815,17 @@ fn cached_parse(
         }
     }
     // A failed parse is not kept, as Python keeps only parsed runtimes.
-    let runtime = Arc::new(load_runtime(package_id, runtime_bytes, authoring)?);
+    let runtime = Arc::new(load_runtime(package_id, runtime_bytes.runtime_bytes(), authoring)?);
     let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
     entries.retain(|entry| !entry.is(package_id, runtime_bytes, authoring));
     entries.push(ParsedRuntime {
         package_id: package_id.to_owned(),
-        bytes: runtime_bytes.into(),
+        // The caller's own allocation when it shares one, as Python's key holds the caller's
+        // bytes object; otherwise a copy.
+        bytes: runtime_bytes
+            .shared()
+            .cloned()
+            .unwrap_or_else(|| Arc::new(runtime_bytes.runtime_bytes().to_vec())),
         authoring,
         runtime: runtime.clone(),
     });
@@ -794,25 +835,26 @@ fn cached_parse(
     Ok(runtime)
 }
 
-/// One kept parse and its key: the package id, its own copy of the exact bytes (as Python's key
+/// One kept parse and its key: the package id, the exact bytes (kept alive here, as Python's key
 /// holds the bytes object) and whether it was the authoring parse.
 struct ParsedRuntime {
     package_id: String,
-    bytes: Box<[u8]>,
+    bytes: std::sync::Arc<Vec<u8>>,
     authoring: bool,
     runtime: std::sync::Arc<RuntimeTables>,
 }
 
 impl ParsedRuntime {
     /// Whether this entry's key is `(package_id, runtime_bytes, authoring)`.
-    fn is(&self, package_id: &str, runtime_bytes: &[u8], authoring: bool) -> bool {
-        if self.authoring != authoring
-            || self.package_id != package_id
-            || self.bytes.len() != runtime_bytes.len()
-        {
+    fn is(&self, package_id: &str, runtime_bytes: &(impl RuntimeBytes + ?Sized), authoring: bool) -> bool {
+        if self.authoring != authoring || self.package_id != package_id {
             return false;
         }
-        self.bytes[..] == *runtime_bytes
+        if runtime_bytes.shared().is_some_and(|shared| std::sync::Arc::ptr_eq(shared, &self.bytes)) {
+            return true;
+        }
+        let bytes = runtime_bytes.runtime_bytes();
+        self.bytes.len() == bytes.len() && self.bytes[..] == *bytes
     }
 }
 
@@ -836,7 +878,7 @@ pub struct RulesetTestRuntimeFacts {
 /// `runtime.tools[name]`'s `KeyError`, for the first missing name in `required`'s order.
 pub fn ruleset_test_runtime_facts(
     package_id: &str,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
     required: &[&str],
 ) -> Result<RulesetTestRuntimeFacts, PackageRuntimeFailure> {
     let runtime = parse_runtime(package_id, runtime_bytes)?;
@@ -864,7 +906,7 @@ pub fn ruleset_test_runtime_facts(
 /// value that is not an object counts as absent.
 pub fn package_model_decision_boundary(
     package_id: &str,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<Option<JsonMap>, PackageRuntimeFailure> {
     let runtime = parse_runtime(package_id, runtime_bytes)?;
     let declared = |name: &str| {
@@ -920,7 +962,7 @@ fn tool_metadata(tool: &ToolDef) -> Outcome<JsonMap> {
 pub fn package_tool_permanently_refused(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<bool, PackageRuntimeFailure> {
     let runtime = parse_runtime(package_id, runtime_bytes)?;
     Ok(runtime
@@ -934,7 +976,7 @@ pub fn package_tool_permanently_refused(
 pub fn package_tool_description(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<String, PackageRuntimeFailure> {
     let runtime = parse_runtime(package_id, runtime_bytes)?;
     let tool = validate_runtime_declaration(&runtime, declaration)?;
@@ -947,7 +989,7 @@ pub fn package_tool_description(
 pub fn package_tool_model_behavior(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<
     (sylvia_domain::authority::ModelToolBehavior, Vec<sylvia_domain::package_library::StatePredicate>),
     PackageRuntimeFailure,
@@ -991,7 +1033,7 @@ pub fn package_tool_model_behavior(
 pub fn package_tool_decision_title(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<String, PackageRuntimeFailure> {
     let runtime = parse_runtime(package_id, runtime_bytes)?;
     let tool = validate_runtime_declaration(&runtime, declaration)?;
@@ -1013,7 +1055,7 @@ pub fn package_tool_decision_title(
 pub fn package_tool_player_controls(
     package_id: &str,
     declaration: &ToolDeclaration,
-    runtime_bytes: &[u8],
+    runtime_bytes: &(impl RuntimeBytes + ?Sized),
 ) -> Result<PlayerControls, PackageRuntimeFailure> {
     let runtime = parse_runtime(package_id, runtime_bytes)?;
     let metadata = tool_metadata(runtime_tool(&runtime, &declaration.name)?)?;
@@ -1113,6 +1155,21 @@ tools:
         // Another allocation of the same bytes is the same key, as Python's bytes equality is.
         let copy = bytes.clone();
         assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &copy).unwrap()));
+    }
+
+    #[test]
+    fn a_shared_runtime_is_kept_as_the_callers_own_allocation() {
+        let package = "test.cache.shared";
+        let bytes = Arc::new(runtime(package, "Shrug."));
+        let parsed = parse_runtime(package, &bytes).unwrap();
+        // The entry holds the caller's Arc, not a copy, so its address names these bytes for
+        // as long as the entry exists.
+        assert_eq!(Arc::strong_count(&bytes), 2);
+        assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &bytes).unwrap()));
+        // Equal bytes in another allocation still find the entry, by content.
+        let other = Arc::new(bytes.to_vec());
+        assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &other).unwrap()));
+        assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &bytes[..]).unwrap()));
     }
 
     #[test]
