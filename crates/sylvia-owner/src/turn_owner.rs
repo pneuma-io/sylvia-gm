@@ -6,19 +6,28 @@
 
 use crate::commands::campaigns::store_error;
 use crate::owner_reads::OwnerReads;
-use sylvia_agent::provider_session::reads::TurnOwner;
+use sylvia_agent::provider_session::reads::{HeldWork, NarrationAttemptStart, TurnOwner};
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
-use sylvia_app::authority::{campaign_file, content_reads, knowledge, turn_reads, turns};
+use sylvia_app::authority::narration_attempts::{self as narration, NarrationStart};
+use sylvia_app::authority::{campaign_file, content_reads, knowledge, player_reads, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
-use sylvia_domain::authority::ActionCommand;
+use sylvia_domain::authority::{
+    ActionCommand, ActionReceipt, CanonicalEvent, CanonicalReplay, NarrationInterruption, ProseChannel,
+};
+use sylvia_domain::provider_records::ProviderPrivateRecord;
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
-use sylvia_domain::session::{SessionActivityBasis, SessionMessage, SessionMessageKind};
+use sylvia_domain::session::{SessionActivityBasis, SessionContext, SessionMessage, SessionMessageKind, SessionRecord};
 use sylvia_provider::BoxFuture;
 use sylvia_store::snapshots::DisplayQuery;
+
+/// A store operation's refusal, in its class.
+fn store_failure(error: sylvia_store::StoreError) -> AuthorityFailure {
+    AuthorityFailure::Coded(store_error(error))
+}
 
 /// An owner refusal in its class (`Domain` keeps a `MechanicsRejected`'s fields).
 fn authority_failure(error: ActionError) -> AuthorityFailure {
@@ -319,6 +328,240 @@ impl TurnOwner for OwnerReads {
             }
             Ok(None)
         })
+    }
+
+    fn agent_session_work<'a>(&'a self, session_id: &'a str) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
+        Box::pin(async move {
+            let held = self.store().agent_session_work(session_id).await.map_err(store_failure)?;
+            let context = held.context.clone();
+            Ok(HeldWork { context, work: Box::new(held) })
+        })
+    }
+
+    fn campaign_ending_choice_text<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _message_id: &'a str,
+        _choice: &'a JsonMap,
+    ) -> BoxFuture<'a, Result<String, AuthorityFailure>> {
+        // Lane 3's N2b (#483).
+        Box::pin(async { Err(pending("campaign_ending_choice_text").into()) })
+    }
+
+    fn player_action_response_basis<'a>(
+        &'a self,
+        session_id: &'a str,
+        action_id: &'a str,
+        automatic: bool,
+    ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
+        Box::pin(async move {
+            player_reads::player_action_response_basis(self.store(), session_id, action_id, automatic)
+                .await
+                .map_err(store_failure)
+        })
+    }
+
+    fn unresolved_session_interruption<'a>(
+        &'a self,
+        context: &'a SessionContext,
+    ) -> BoxFuture<'a, Result<Option<(NarrationInterruption, bool)>, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::unresolved_session_interruption(self.store(), context).await.map_err(authority_failure)
+        })
+    }
+
+    fn narration_interruption<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        interruption_id: &'a str,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::narration_interruption(self.store(), campaign_id, interruption_id)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn redirect_narration<'a>(
+        &'a self,
+        _session_id: &'a str,
+        _message_id: &'a str,
+        _content: &'a JsonMap,
+        _interruption_id: &'a str,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        // Lane 3's N2b (#483).
+        Box::pin(async { Err(pending("redirect_narration").into()) })
+    }
+
+    fn saved_action_receipt<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        action_id: &'a str,
+    ) -> BoxFuture<'a, Result<ActionReceipt, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::saved_action_receipt(self.store(), campaign_id, action_id).await.map_err(authority_failure)
+        })
+    }
+
+    fn start_narration_attempt(&self, start: NarrationAttemptStart) -> BoxFuture<'_, Result<(), AuthorityFailure>> {
+        Box::pin(async move {
+            let cancel = start.cancel;
+            let start = NarrationStart {
+                campaign_id: start.campaign_id,
+                attempt_id: start.attempt_id,
+                turn_id: start.turn_id,
+                cancel: Box::new(move || cancel()),
+                last_action_id: start.last_action_id,
+                interruption_id: start.interruption_id,
+            };
+            narration::start_narration_attempt(self.store(), start).await.map_err(authority_failure)
+        })
+    }
+
+    fn emit_narration_token<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+        channel: ProseChannel,
+        token: &'a str,
+        response_blocks: Option<&'a Json>,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        Box::pin(async move {
+            narration::emit_narration_token(self.store(), campaign_id, attempt_id, channel, token, response_blocks)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn flush_narration<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        Box::pin(async move {
+            narration::flush_narration(self.store(), campaign_id, attempt_id).await.map_err(authority_failure)
+        })
+    }
+
+    fn bind_narration_action<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+        action_id: &'a str,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        Box::pin(async move {
+            narration::bind_narration_action(self.store(), campaign_id, attempt_id, action_id)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn complete_narration_attempt<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<Vec<CanonicalEvent>, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::complete_narration_attempt(self.store(), campaign_id, attempt_id)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn interrupt_narration<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::interrupt_narration(self.store(), campaign_id, attempt_id).await.map_err(authority_failure)
+        })
+    }
+
+    fn disconnect_narration<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+        now: f64,
+    ) -> BoxFuture<'a, Result<f64, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::disconnect_narration(self.store(), campaign_id, attempt_id, now)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn reconnect_narration<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+        now: f64,
+        acknowledged_sequence: i64,
+    ) -> BoxFuture<'a, Result<CanonicalReplay, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::reconnect_narration(self.store(), campaign_id, attempt_id, now, acknowledged_sequence)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn expire_narration<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        attempt_id: &'a str,
+        now: f64,
+    ) -> BoxFuture<'a, Result<NarrationInterruption, AuthorityFailure>> {
+        Box::pin(async move {
+            narration::expire_narration(self.store(), campaign_id, attempt_id, now).await.map_err(authority_failure)
+        })
+    }
+
+    fn append_private_provider_record<'a>(
+        &'a self,
+        record: &'a ProviderPrivateRecord,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        Box::pin(async move { self.store().append_private_provider_record(record).await.map_err(store_failure) })
+    }
+
+    fn finish_private_provider_attempt<'a>(
+        &'a self,
+        session_id: &'a str,
+        attempt_id: &'a str,
+        completed: bool,
+    ) -> BoxFuture<'a, Result<(), AuthorityFailure>> {
+        Box::pin(async move {
+            self.store().finish_private_provider_attempt(session_id, attempt_id, completed).await.map_err(store_failure)
+        })
+    }
+
+    fn append_session_canonical_references<'a>(
+        &'a self,
+        session_id: &'a str,
+        events: &'a [CanonicalEvent],
+    ) -> BoxFuture<'a, Result<Vec<SessionMessage>, AuthorityFailure>> {
+        Box::pin(async move {
+            self.store().append_session_canonical_references(session_id, events).await.map_err(store_failure)
+        })
+    }
+
+    fn append_live_steering_message<'a>(
+        &'a self,
+        session_id: &'a str,
+        message_id: &'a str,
+        kind: SessionMessageKind,
+        content: &'a JsonMap,
+    ) -> BoxFuture<'a, Result<SessionMessage, AuthorityFailure>> {
+        Box::pin(async move {
+            self.store()
+                .append_live_steering_message(session_id, message_id, kind, content)
+                .await
+                .map_err(store_failure)
+        })
+    }
+
+    fn stop_agent_session<'a>(&'a self, _session_id: &'a str) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
+        // Not ported yet by lane 3.
+        Box::pin(async { Err(pending("stop_agent_session").into()) })
     }
 
     fn session_activity_basis<'a>(
