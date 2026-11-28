@@ -335,6 +335,9 @@
     "volatile_files": [
       "^diagnostics/"
     ],
+    "optional_files": [
+      "^diagnostics/runtime\\.pending\\.jsonl$"
+    ],
     "ignore_headers_row_8": [
       "User-Agent",
       "Accept-Encoding",

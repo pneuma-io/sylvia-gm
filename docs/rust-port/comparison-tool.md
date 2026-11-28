@@ -132,6 +132,7 @@ header. A session adds its own under `rules`:
   recording is written, so a protected credential never reaches the repository. The work
   folder still holds the raw data; never commit a work folder.
 - `volatile_files`: files that must exist but whose content is not compared.
+- `optional_files`: files left out of the comparison entirely, present or not. Only for a file no reader ever opens: Python's diagnostics writer stages each snapshot in `diagnostics/runtime.pending.jsonl` and replaces the real file atomically, and an owner that exits mid-write leaves the replacement behind in some runs (`action-queue`).
 - Files are listed by path. After the rules are applied they are ordered again by the
   normalised path, so an aliased identifier in a path (a new campaign's folder) cannot reorder
   them between runs.
