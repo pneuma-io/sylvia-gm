@@ -71,6 +71,7 @@ import copy
 import dataclasses
 import inspect
 import json
+import threading
 import os
 import random
 import sys
@@ -133,9 +134,15 @@ def plain(value: object, depth: int = 0) -> object:
     return {"__repr__": repr(value), "__class__": type(value).__name__}
 
 
+#: One writer at a time: the provider's stream is logged on the provider runtime's thread while
+#: the turn logs its owner calls on its own, and appends from two handles can interleave on Windows.
+TRACE_LOCK = threading.Lock()
+
+
 def log(entry: dict[str, object]) -> None:
-    with TRACE_LOG.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(entry, default=str) + "\n")
+    line = json.dumps(entry, default=str) + "\n"
+    with TRACE_LOCK, TRACE_LOG.open("a", encoding="utf-8") as handle:
+        handle.write(line)
 
 
 def tags(messages: object) -> list[object]:

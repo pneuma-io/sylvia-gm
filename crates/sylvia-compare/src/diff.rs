@@ -10,6 +10,8 @@
 //!   which identifier appears where, just not on its spelling. An alias can be limited to the
 //!   values of named keys, so it cannot hide a wrong hash somewhere else;
 //! - `volatile_files`: data-folder files whose size and content vary (logs);
+//! - `optional_files`: data-folder files whose very presence varies, left out on both sides.
+//!   Only for a file nothing reads, such as a replacement an interrupted atomic write leaves;
 //! - `ignore_headers_row_8` and `header_name_case_row_40`: the two that cover agreed Rust
 //!   differences (`differences.md` rows 8 and 40) in model requests' headers.
 //!
@@ -35,6 +37,9 @@ pub struct Rules {
     pub alias: Vec<Alias>,
     /// Regular expressions for data-folder paths whose size and content are not compared.
     pub volatile_files: Vec<String>,
+    /// Regular expressions for data-folder paths left out of the comparison entirely, present
+    /// or not: only a file no reader ever opens (an interrupted atomic write's replacement).
+    pub optional_files: Vec<String>,
     /// Model-request header names that differences row 8 lets differ (the HTTP client's own
     /// headers): dropped from each `model_requests` entry's `headers` on both sides, name
     /// compared case-insensitively, a trailing `*` a prefix. Only the names row 8 declares
@@ -104,6 +109,7 @@ impl Rules {
                 keys: vec!["diagnostic_id".into(), "id".into(), "session".into()],
             }],
             volatile_files: Vec::new(),
+            optional_files: Vec::new(),
             ignore_headers_row_8: Vec::new(),
             header_name_case_row_next: false,
         }
@@ -117,6 +123,7 @@ impl Rules {
         self.scrub.extend(other.scrub);
         self.alias.extend(other.alias);
         self.volatile_files.extend(other.volatile_files);
+        self.optional_files.extend(other.optional_files);
         self.ignore_headers_row_8.extend(other.ignore_headers_row_8);
         self.header_name_case_row_next |= other.header_name_case_row_next;
         self
@@ -129,6 +136,7 @@ struct Compiled {
     scrub: Vec<(Regex, String)>,
     alias: Vec<(String, Regex, Vec<String>)>,
     volatile_files: Vec<Regex>,
+    optional_files: Vec<Regex>,
 }
 
 fn compile(rules: &Rules) -> Result<Compiled, String> {
@@ -149,6 +157,11 @@ fn compile(rules: &Rules) -> Result<Compiled, String> {
             .collect::<Result<_, String>>()?,
         volatile_files: rules
             .volatile_files
+            .iter()
+            .map(|pattern| regex(pattern))
+            .collect::<Result<_, String>>()?,
+        optional_files: rules
+            .optional_files
             .iter()
             .map(|pattern| regex(pattern))
             .collect::<Result<_, String>>()?,
@@ -267,8 +280,15 @@ pub fn normalise(recording: &Json, rules: &Rules) -> Result<Json, String> {
     let mut recording = recording.clone();
     drop_row_8_headers(&mut recording, rules)?;
     fold_header_names(&mut recording, rules);
-    // A volatile file keeps its path (it must still exist) and loses everything else.
+    // An optional file is left out, present or not. A volatile file keeps its path (it must
+    // still exist) and loses everything else.
     if let Some(files) = recording.get_mut("files").and_then(Json::as_array_mut) {
+        files.retain(|file| {
+            !file
+                .get("path")
+                .and_then(Json::as_str)
+                .is_some_and(|path| compiled.optional_files.iter().any(|pattern| pattern.is_match(path)))
+        });
         for file in files {
             let volatile = file
                 .get("path")
@@ -504,6 +524,25 @@ mod tests {
         let mut wrong = second.clone();
         wrong["files"][0]["bytes"] = json!(3);
         assert_eq!(compare(&normal(&first), &normal(&wrong), 10).len(), 1);
+    }
+
+    #[test]
+    fn optional_files_are_left_out_whether_present_or_not() {
+        let rules = Rules {
+            volatile_files: vec!["^diagnostics/".into()],
+            optional_files: vec![r"^diagnostics/runtime\.pending\.jsonl$".into()],
+            ..Rules::default()
+        };
+        let without =
+            json!({"files": [{"path": "diagnostics/runtime.jsonl", "bytes": 1}, {"path": "z", "bytes": 1}]});
+        let with = json!({"files": [{"path": "diagnostics/runtime.jsonl", "bytes": 9},
+                                    {"path": "diagnostics/runtime.pending.jsonl", "bytes": 4},
+                                    {"path": "z", "bytes": 1}]});
+        let normal = |value| normalise(value, &rules).unwrap();
+        assert!(compare(&normal(&without), &normal(&with), 10).is_empty());
+        // A volatile file must still exist, and any other file still counts.
+        let missing = json!({"files": [{"path": "z", "bytes": 1}]});
+        assert!(!compare(&normal(&without), &normal(&missing), 10).is_empty());
     }
 
     #[test]
