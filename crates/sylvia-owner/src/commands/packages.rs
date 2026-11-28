@@ -335,6 +335,42 @@ pub async fn handle_install_package_file(ctx: &DispatchContext, params: &JsonMap
     }
 }
 
+/// `handle_confirm_character_card_import`, for `preview_character_card_file` and
+/// `confirm_character_card_import`: a desktop-selected card staged as a pending preview, or that
+/// exact preview imported. A `ValueError` or `OSError`, including a missing argument (an
+/// `OwnerProtocolError` is a `ValueError`, read inside the `try`), is `character_card_invalid`
+/// with its own text; anything else keeps its reply.
+pub async fn handle_confirm_character_card_import(
+    ctx: &DispatchContext,
+    params: &JsonMap,
+) -> CodedResult<Json> {
+    let invalid = |message: String| {
+        CodedError::new("character_card_invalid", message).with_error_type("CommandRejected")
+    };
+    let previewing = ctx.method == "preview_character_card_file";
+    let argument = required(params, if previewing { "source_path" } else { "source_sha256" })
+        .map_err(|error| invalid(error.message))?;
+    let storage_root = ctx.storage_root.clone();
+    let outcome = tokio::task::spawn_blocking(move || {
+        use sylvia_app::character_card_import::{confirm_card_preview, stage_card_preview};
+        if previewing {
+            // `Path(source_path)`, used as given.
+            stage_card_preview(&storage_root, std::path::Path::new(&argument))
+        } else {
+            confirm_card_preview(&storage_root, &argument)
+        }
+    })
+    .await
+    .map_err(|error| CodedError::new("internal_error", error.to_string()))?;
+    match outcome {
+        Ok(reply) => Ok(Json::Object(reply)),
+        Err(error) if matches!(domain_caught_as(&error), CaughtAs::Value | CaughtAs::Os) => {
+            Err(invalid(error.message().to_owned()))
+        }
+        Err(error) => Err(store_error(sylvia_store::StoreError::from(error))),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

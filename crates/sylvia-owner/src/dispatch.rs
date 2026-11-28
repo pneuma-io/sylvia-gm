@@ -220,6 +220,9 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "install_package" => commands::packages::handle_install_package(context, params).await,
         "install_package_file" => commands::packages::handle_install_package_file(context, params).await,
+        "preview_character_card_file" | "confirm_character_card_import" => {
+            commands::packages::handle_confirm_character_card_import(context, params).await
+        }
         "export_package_candidate" | "export_package_candidate_file" => {
             commands::packages::handle_export_package_candidate(context, params).await
         }

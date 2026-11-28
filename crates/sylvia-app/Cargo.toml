@@ -16,6 +16,8 @@ sylvia-store.workspace = true
 serde_json.workspace = true
 # Python lookaround in the No Ruleset mechanics patterns (docs/rust-port/sites/regex-sites.md).
 fancy-regex.workspace = true
+# `zlib.crc32` for card PNG chunks (character_card_import.py). Already in sylvia-domain's tree. Added by lane 1.
+flate2.workspace = true
 # NFC member names in import repair (import_repair.py's unicodedata.normalize). Added by lane 1.
 unicode-normalization.workspace = true
 
