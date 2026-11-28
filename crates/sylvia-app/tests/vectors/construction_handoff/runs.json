@@ -1,0 +1,1070 @@
+{
+ "python": "3.12.11",
+ "owner_id": "construction-handoff-runs",
+ "campaigns": {
+  "legacy": {
+   "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+   "lock_id": "lock-4893d5031afbfc910ec8c19a83da26d3b7f0e5fe"
+  },
+  "prepared": {
+   "campaign_id": "5c22c469-63e9-48fd-a4d4-748ca3c77ebf",
+   "lock_id": "lock-4c5c0bf1be0e6aada91c319aa5c808f19349bdd5"
+  },
+  "manual": {
+   "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+   "lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3"
+  },
+  "skillful": {
+   "campaign_id": "5bd0f521-be84-462b-bb9b-e05d0e8e2329",
+   "lock_id": "lock-fdd0d89c21ab9ba76d5f4f1dcaffba0d871bde56"
+  },
+  "unbegun": {
+   "campaign_id": "7ea3ef27-e2e9-4528-a4e0-689e1888df20",
+   "lock_id": "lock-837b0d3f1b922694bb8fb09644828b892f1aaeb8"
+  }
+ },
+ "runs": [
+  {
+   "step": {
+    "op": "plan",
+    "plan_id": "plan-none"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff_read",
+    "handoff_id": "handoff-none"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Builder-to-DM handoff is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-nobody",
+    "evidence_id": "e-nobody",
+    "source_kind": "user_provided",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-manual",
+    "evidence_id": "e-short",
+    "source_kind": "user_provided",
+    "content_sha256": "abc",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "content_sha256 must be a lowercase SHA-256 identity"
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-manual",
+    "evidence_id": "e-open",
+    "source_kind": "open_source",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Open-source evidence requires a source locator"
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-manual",
+    "evidence_id": "e-located",
+    "source_kind": "user_provided",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": "https://example.invalid/note",
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "User-provided evidence cannot claim an external locator"
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-manual",
+    "evidence_id": "manual-evidence",
+    "source_kind": "user_provided",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "evidence_id": "manual-evidence",
+     "source_kind": "user_provided",
+     "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_locator": null,
+     "safe_excerpt": "A user-provided note.",
+     "claims": [
+      "construction-input"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-manual",
+    "evidence_id": "manual-evidence",
+    "source_kind": "user_provided",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "evidence_id": "manual-evidence",
+     "source_kind": "user_provided",
+     "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_locator": null,
+     "safe_excerpt": "A user-provided note.",
+     "claims": [
+      "construction-input"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n",
+     "sequel": {
+      "source_id": "x"
+     }
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Live adventure additions require explicit sequel review"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_campaign_plan",
+    "message": "Campaign Plan admission payload is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": -1,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_campaign_plan",
+    "message": "Campaign Plan admission payload is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": []
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_campaign_plan",
+    "message": "Campaign Plan admission payload is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_plan_content_mismatch",
+    "message": "Campaign Plan content identity does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 1,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Campaign Plan expected revision is stale"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": "lock-wrong",
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "campaign_plan_lock_mismatch",
+    "message": "Campaign Plan expected package lock is not current"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "missing-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan provenance evidence is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "plan_id": "plan-manual",
+     "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+     "package_lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3",
+     "source_session_id": "session-builder-manual",
+     "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+     "content": {
+      "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+     },
+     "provenance_evidence_ids": [
+      "manual-evidence"
+     ],
+     "plan_revision": 1,
+     "resulting_campaign_revision": 3,
+     "payload_sha256": "9c25439fb69cd1958abfc654e84420ffc9d8484041b21655763a77e1db985a31"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "plan_id": "plan-manual",
+     "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+     "package_lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3",
+     "source_session_id": "session-builder-manual",
+     "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+     "content": {
+      "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+     },
+     "provenance_evidence_ids": [
+      "manual-evidence"
+     ],
+     "plan_revision": 1,
+     "resulting_campaign_revision": 3,
+     "payload_sha256": "9c25439fb69cd1958abfc654e84420ffc9d8484041b21655763a77e1db985a31"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-manual",
+    "campaign": "manual",
+    "session": "session-builder-manual",
+    "expected_revision": 3,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "manual-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Campaign Plan identity payload does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-skill",
+    "evidence_id": "skill-evidence",
+    "source_kind": "user_provided",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "evidence_id": "skill-evidence",
+     "source_kind": "user_provided",
+     "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_locator": null,
+     "safe_excerpt": "A user-provided note.",
+     "claims": [
+      "construction-input"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "admit",
+    "plan_id": "plan-skill",
+    "campaign": "skillful",
+    "session": "session-builder-skill",
+    "expected_revision": 2,
+    "lock": null,
+    "content": {
+     "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+    },
+    "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "provenance": [
+     "skill-evidence"
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan source session is not authoritative"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "invalid_builder_dm_handoff",
+    "message": "Builder-to-DM handoff request is invalid"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-none",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign Plan is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "handoff_turn_incomplete",
+    "message": "Builder-to-DM handoff has an incomplete TURN"
+   }
+  },
+  {
+   "step": {
+    "op": "complete_turn",
+    "campaign": "manual",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "ok": null
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 2,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Builder-to-DM handoff expected revision is stale"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 2,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "handoff_plan_mismatch",
+    "message": "Builder-to-DM handoff Campaign Plan is not exact and accepted"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-builder-legacy",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "DM session identity is already in use"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "ok": {
+     "handoff_id": "handoff-manual",
+     "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+     "builder_session_id": "session-builder-manual",
+     "dm_session_id": "session-dm-manual",
+     "package_lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3",
+     "package_candidate_id": null,
+     "plan_id": "plan-manual",
+     "plan_revision": 1,
+     "expected_revision": 3,
+     "resulting_campaign_revision": 4,
+     "completed_turn_id": "turn-manual",
+     "payload_sha256": "433e0c5d3b852a07fe82a646ae16eb67cf5563287555b4a400fc8ce93e605342"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/standin-narrator",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "ok": {
+     "handoff_id": "handoff-manual",
+     "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+     "builder_session_id": "session-builder-manual",
+     "dm_session_id": "session-dm-manual",
+     "package_lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3",
+     "package_candidate_id": null,
+     "plan_id": "plan-manual",
+     "plan_revision": 1,
+     "expected_revision": 3,
+     "resulting_campaign_revision": 4,
+     "completed_turn_id": "turn-manual",
+     "payload_sha256": "433e0c5d3b852a07fe82a646ae16eb67cf5563287555b4a400fc8ce93e605342"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "handoff",
+    "handoff_id": "handoff-manual",
+    "campaign": "manual",
+    "builder": "session-builder-manual",
+    "dm_session": "session-dm-manual",
+    "dm_model": "standin/another-model",
+    "expected_revision": 3,
+    "plan_id": "plan-manual",
+    "plan_revision": 1,
+    "plan_sha": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+    "turn": "turn-manual"
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Builder-to-DM handoff identity payload does not match"
+   }
+  },
+  {
+   "step": {
+    "op": "handoff_read",
+    "handoff_id": "handoff-manual"
+   },
+   "outcome": {
+    "ok": {
+     "handoff_id": "handoff-manual",
+     "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+     "builder_session_id": "session-builder-manual",
+     "dm_session_id": "session-dm-manual",
+     "package_lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3",
+     "package_candidate_id": null,
+     "plan_id": "plan-manual",
+     "plan_revision": 1,
+     "expected_revision": 3,
+     "resulting_campaign_revision": 4,
+     "completed_turn_id": "turn-manual",
+     "payload_sha256": "433e0c5d3b852a07fe82a646ae16eb67cf5563287555b4a400fc8ce93e605342"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "plan",
+    "plan_id": "plan-manual"
+   },
+   "outcome": {
+    "ok": {
+     "plan_id": "plan-manual",
+     "campaign_id": "b2609a0b-dd2b-4550-8c65-6018eee38dc1",
+     "package_lock_id": "lock-e2e3e77ea1663123edce120de4feb951857c4ce3",
+     "source_session_id": "session-builder-manual",
+     "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+     "content": {
+      "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+     },
+     "provenance_evidence_ids": [
+      "manual-evidence"
+     ],
+     "plan_revision": 1,
+     "resulting_campaign_revision": 3,
+     "payload_sha256": "9c25439fb69cd1958abfc654e84420ffc9d8484041b21655763a77e1db985a31"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "unbegun",
+    "plan_text": "# Hollow Road\n\nA road runs under a hollow hill.\n",
+    "override": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign construction has not begun"
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "legacy",
+    "plan_text": "   ",
+    "override": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign plan file is empty or unusable"
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "legacy",
+    "plan_text": "# Hollow Road\n\nA road runs under a hollow hill.\n",
+    "override": false
+   },
+   "outcome": {
+    "ok": {
+     "completed": {
+      "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+      "lane": "quick_start",
+      "canonical_representation_sha256": "edc8f6655450ef65a34e316c2847464c4c93882881207157dce8a69c42ed8927",
+      "resulting_revision": 2
+     },
+     "plan": {
+      "plan_id": "campaign-plan-7b987e5bb26d671495aa5fde",
+      "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+      "package_lock_id": "lock-4893d5031afbfc910ec8c19a83da26d3b7f0e5fe",
+      "source_session_id": "session-builder-legacy",
+      "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+      "content": {
+       "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+      },
+      "provenance_evidence_ids": [
+       "construction-evidence-7b987e5bb26d671495aa5fde"
+      ],
+      "plan_revision": 1,
+      "resulting_campaign_revision": 3,
+      "payload_sha256": "7d748993aacd511f8290439ee4ea520807c914b79f8f9101c168fc41657ab830"
+     },
+     "handoff": {
+      "handoff_id": "builder-dm-handoff-7b987e5bb26d671495aa5fde",
+      "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+      "builder_session_id": "session-builder-legacy",
+      "dm_session_id": "session-dm-7b987e5bb26d671495aa5fde",
+      "package_lock_id": "lock-4893d5031afbfc910ec8c19a83da26d3b7f0e5fe",
+      "package_candidate_id": null,
+      "plan_id": "campaign-plan-7b987e5bb26d671495aa5fde",
+      "plan_revision": 1,
+      "expected_revision": 3,
+      "resulting_campaign_revision": 4,
+      "completed_turn_id": "turn-legacy",
+      "payload_sha256": "a4f66c8aabbf4999bd5d0079150c3fffd0b17a3474998fa2fae051f7d6b0c1c0"
+     }
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "legacy",
+    "plan_text": "# Hollow Road\n\nA road runs under a hollow hill.\n",
+    "override": false
+   },
+   "outcome": {
+    "ok": {
+     "completed": {
+      "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+      "lane": "quick_start",
+      "canonical_representation_sha256": "edc8f6655450ef65a34e316c2847464c4c93882881207157dce8a69c42ed8927",
+      "resulting_revision": 2
+     },
+     "plan": {
+      "plan_id": "campaign-plan-7b987e5bb26d671495aa5fde",
+      "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+      "package_lock_id": "lock-4893d5031afbfc910ec8c19a83da26d3b7f0e5fe",
+      "source_session_id": "session-builder-legacy",
+      "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+      "content": {
+       "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+      },
+      "provenance_evidence_ids": [
+       "construction-evidence-7b987e5bb26d671495aa5fde"
+      ],
+      "plan_revision": 1,
+      "resulting_campaign_revision": 3,
+      "payload_sha256": "7d748993aacd511f8290439ee4ea520807c914b79f8f9101c168fc41657ab830"
+     },
+     "handoff": {
+      "handoff_id": "builder-dm-handoff-7b987e5bb26d671495aa5fde",
+      "campaign_id": "03aa3897-fcf4-46b6-986c-39e8c7bb69f6",
+      "builder_session_id": "session-builder-legacy",
+      "dm_session_id": "session-dm-7b987e5bb26d671495aa5fde",
+      "package_lock_id": "lock-4893d5031afbfc910ec8c19a83da26d3b7f0e5fe",
+      "package_candidate_id": null,
+      "plan_id": "campaign-plan-7b987e5bb26d671495aa5fde",
+      "plan_revision": 1,
+      "expected_revision": 3,
+      "resulting_campaign_revision": 4,
+      "completed_turn_id": "turn-legacy",
+      "payload_sha256": "a4f66c8aabbf4999bd5d0079150c3fffd0b17a3474998fa2fae051f7d6b0c1c0"
+     }
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "legacy",
+    "plan_text": "# Hollow Road\n\nA road runs under a hollow hill.\n\nA changed line.\n",
+    "override": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Campaign plan file changed after DM startup"
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "prepared",
+    "plan_text": "# Hollow Road\n\nA road runs under a hollow hill.\n",
+    "override": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "model_capability_unrated",
+    "message": "Selected model capability guidance requires explicit confirmation"
+   }
+  },
+  {
+   "step": {
+    "op": "finalize",
+    "campaign": "prepared",
+    "plan_text": "# Hollow Road\n\nA road runs under a hollow hill.\n",
+    "override": true
+   },
+   "outcome": {
+    "ok": {
+     "completed": {
+      "campaign_id": "5c22c469-63e9-48fd-a4d4-748ca3c77ebf",
+      "lane": "quick_start",
+      "canonical_representation_sha256": "edc8f6655450ef65a34e316c2847464c4c93882881207157dce8a69c42ed8927",
+      "resulting_revision": 2
+     },
+     "plan": {
+      "plan_id": "campaign-plan-dee4ba49e652d81bc53d03ee",
+      "campaign_id": "5c22c469-63e9-48fd-a4d4-748ca3c77ebf",
+      "package_lock_id": "lock-4c5c0bf1be0e6aada91c319aa5c808f19349bdd5",
+      "source_session_id": "session-builder-prepared",
+      "content_sha256": "9cd6c5f145e9bce5d221becc32bb3f37a8e8d2362aab669471de274b16ec7548",
+      "content": {
+       "campaign_plan_markdown": "# Hollow Road\n\nA road runs under a hollow hill.\n"
+      },
+      "provenance_evidence_ids": [
+       "construction-evidence-dee4ba49e652d81bc53d03ee"
+      ],
+      "plan_revision": 1,
+      "resulting_campaign_revision": 3,
+      "payload_sha256": "3db71627618961b42670d55a69c1bfbb287de2bae8c1032c841f4b713298d97a"
+     },
+     "handoff": {
+      "handoff_id": "builder-dm-handoff-dee4ba49e652d81bc53d03ee",
+      "campaign_id": "5c22c469-63e9-48fd-a4d4-748ca3c77ebf",
+      "builder_session_id": "session-builder-prepared",
+      "dm_session_id": "session-dm-dee4ba49e652d81bc53d03ee",
+      "package_lock_id": "lock-4c5c0bf1be0e6aada91c319aa5c808f19349bdd5",
+      "package_candidate_id": "candidate-install-plain",
+      "plan_id": "campaign-plan-dee4ba49e652d81bc53d03ee",
+      "plan_revision": 1,
+      "expected_revision": 3,
+      "resulting_campaign_revision": 4,
+      "completed_turn_id": "turn-prepared",
+      "payload_sha256": "6d4ede453312a279addf90287f0e9df40e20d4fe9c4ed977d450c13534162c2c"
+     }
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "evidence",
+    "session": "session-builder-legacy",
+    "evidence_id": "late-evidence",
+    "source_kind": "user_provided",
+    "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source_locator": null,
+    "safe_excerpt": "A user-provided note.",
+    "claims": [
+     "construction-input"
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "evidence_id": "late-evidence",
+     "source_kind": "user_provided",
+     "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+     "source_locator": null,
+     "safe_excerpt": "A user-provided note.",
+     "claims": [
+      "construction-input"
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "guidance",
+    "campaign": "prepared",
+    "model": "standin/standin-narrator",
+    "override": false
+   },
+   "outcome": {
+    "ok": {
+     "payload": {
+      "minimum_tier_id": "sylvia.capability.t00",
+      "model_id": "standin/standin-narrator",
+      "override_accepted": false,
+      "placement_evidence_sha256": null,
+      "placement_tier_id": null,
+      "registry_version": "sylvia.capability.registry.v1",
+      "status": "unrated",
+      "warning_code": "model_capability_unrated"
+     },
+     "may_continue": false
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "guidance",
+    "campaign": "prepared",
+    "model": "standin/standin-narrator",
+    "override": true
+   },
+   "outcome": {
+    "ok": {
+     "payload": {
+      "minimum_tier_id": "sylvia.capability.t00",
+      "model_id": "standin/standin-narrator",
+      "override_accepted": true,
+      "placement_evidence_sha256": null,
+      "placement_tier_id": null,
+      "registry_version": "sylvia.capability.registry.v1",
+      "status": "unrated",
+      "warning_code": "model_capability_unrated"
+     },
+     "may_continue": true
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "guidance",
+    "campaign": "legacy",
+    "model": "standin/standin-narrator",
+    "override": false
+   },
+   "outcome": {
+    "ok": {
+     "payload": {
+      "minimum_tier_id": null,
+      "model_id": "standin/standin-narrator",
+      "override_accepted": false,
+      "placement_evidence_sha256": null,
+      "placement_tier_id": null,
+      "registry_version": "sylvia.capability.registry.v1",
+      "status": "not_applicable",
+      "warning_code": null
+     },
+     "may_continue": true
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "guidance",
+    "campaign_id": "campaign-nowhere",
+    "model": "standin/standin-narrator",
+    "override": false
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "package_unavailable",
+    "message": "Campaign package lock is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "guidance",
+    "campaign_id": "  ",
+    "model": "standin/standin-narrator",
+    "override": false
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Campaign identity must be a non-whitespace string"
+   }
+  }
+ ]
+}

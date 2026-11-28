@@ -67,7 +67,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | --- | --- | --- | --- | --- |
 | `agent/_builder_session.py:436` | `_builder_reference_tool.inspect_page` | .casefold() | `paths = [path for path in references.paths if query.casefold() in path.casefold()]` | `sylvia-agent` source_tool_vectors (`pystr::casefold`) |
 | `agent/_builder_session.py:850` | `_campaign_content_tools.discover` | .casefold() | `terms = query.casefold().split()` | `sylvia-agent` source_tool_vectors (`pystr::casefold`, a sharp s; `pystr::is_space`, an em space) |
-| `agent/_builder_session.py:1578` | `_campaign_source_tool.inspect` | .casefold() | `matches = tuple(item for item in paths if not needle or needle in item.casefold())` | |
+| `agent/_builder_session.py:1578` | `_campaign_source_tool.inspect` | .casefold() | `matches = tuple(item for item in paths if not needle or needle in item.casefold())` | `sylvia-agent` plan_tool_vectors (`pystr::casefold`, an upper-case query) |
 | `agent/_content_definition_tool.py:106` | `content_definition_tool.read` | .isdecimal() | `if not token.isdecimal():` | `sylvia-agent` character_tool_vectors (`pystr::decimal`; an Arabic-Indic index) |
 | `agent/_native_continuation.py:10` | `requires_reasoning_with_tools` | .casefold() | `identity = model.wire_model_id.casefold().split("/")[-1]` | |
 | `agent/_provider_resolver.py:599` | `ConfiguredProviderResolver.model_choices` | .casefold() | `item.provider_name.casefold(),` | |

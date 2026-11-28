@@ -1,0 +1,3041 @@
+{
+ "python": "3.12",
+ "published": {
+  "payload": {
+   "bindings": {
+    "ruleset": {
+     "id": "r"
+    },
+    "campaign_setting": {
+     "id": "s"
+    },
+    "package_closure_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+   },
+   "title": "Iron Debt"
+  },
+  "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "artifact_id": "campaign-plan-1",
+  "title": "Iron Debt",
+  "readable_markdown": "# Iron Debt\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "referenced_setting_paths": [
+   "npcs/mara.md"
+  ],
+  "plan_path": "campaign-plan-draft/plan.json",
+  "readable_path": "campaign-plan-draft/plan.md"
+ },
+ "cases": [
+  {
+   "tool": "plan",
+   "authority": {
+    "ruleset": {
+     "package_id": "sylvia.srd-lite.bg3",
+     "version": "0.3.29",
+     "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90"
+    },
+    "setting": {
+     "package_id": "pneuma.severed-lands",
+     "version": "1.0.0-alpha.2.naming.1",
+     "content_sha256": "8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1"
+    },
+    "closure_sha256": "12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff",
+    "setting_paths": [
+     "locations/harbor.md",
+     "lore/broken.md",
+     "lore/refused.md",
+     "npcs/ash.md",
+     "npcs/mara.md"
+    ],
+    "setting_files": {
+     "locations/harbor.md": "# Harbor\nGulls and rope\u00e9",
+     "npcs/mara.md": "# Mara",
+     "npcs/ash.md": "# Ash",
+     "lore/broken.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "disk"
+      }
+     },
+     "lore/refused.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "No",
+       "code": "setting_unavailable"
+      }
+     }
+    },
+    "setting_knowledge_ids": [
+     "harbor"
+    ],
+    "participant_schemas": [
+     {
+      "kind": "player_character",
+      "schema_id": "example.hero",
+      "schema": {
+       "type": "object"
+      }
+     }
+    ],
+    "setting_character_schema": null,
+    "state_schemas": [
+     {
+      "key": "state",
+      "required": true
+     },
+     {
+      "key": "other"
+     }
+    ]
+   },
+   "deferred": false,
+   "publisher": null,
+   "checker": null,
+   "files": {},
+   "calls": [
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "query": " NPCS "
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "offset": 2,
+      "limit": 2
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "offset": 8
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "offset": 9
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "limit": 513
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "limit": true
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "path": "x"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "query": 5
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "campaign-plan/example/plan.json"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "campaign-plan/example/plan.md"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "ruleset/identity.json"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "setting/locations/harbor.md",
+      "query": null
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "setting/lore/broken.md"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "unknown.md"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "setting/npcs/mara.md",
+      "offset": 0
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "setting/npcs/mara.md",
+      "query": "x"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "delete"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "setting/lore/refused.md"
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": "  ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": true,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2.0,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn ",
+      "unknown": 1
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       "ok",
+       " "
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "random",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": "npcs/ash.md",
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 3,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 65,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": -1,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "locations/missing.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ghost.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " "
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "compatible",
+      "player_character_path": 5,
+      "required_companion_paths": [],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "title": " The Iron Debt ",
+      "premise": "A heist in the harbor\u00e9",
+      "tone": "Tense",
+      "player_character_mode": "fixed",
+      "player_character_path": "setting/npcs/mara.md",
+      "required_companion_paths": [
+       "npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "starting_location_path": "setting/locations/harbor.md",
+      "opening_situation": "The tide turns.",
+      "primary_objective": "Steal the ledger.",
+      "completion_conditions": [
+       " The ledger is taken ",
+       "Escape"
+      ],
+      "custom_companion_minimum": 0,
+      "custom_companion_maximum": 2,
+      "opening_direction": " Start at dawn "
+     }
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ],
+    [
+     "publish_campaign_plan",
+     {
+      "x": 1
+     }
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ]
+   ],
+   "tool_names": [
+    "inspect_campaign_sources",
+    "create_campaign_plan_draft",
+    "publish_campaign_plan"
+   ],
+   "answers": [
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "paths": [
+       "campaign-plan/example/plan.json",
+       "campaign-plan/example/plan.md",
+       "ruleset/identity.json",
+       "setting/locations/harbor.md",
+       "setting/lore/broken.md",
+       "setting/lore/refused.md",
+       "setting/npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "total": 8,
+      "next_offset": null
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "paths": [
+       "setting/npcs/ash.md",
+       "setting/npcs/mara.md"
+      ],
+      "total": 2,
+      "next_offset": null
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "paths": [
+       "ruleset/identity.json",
+       "setting/locations/harbor.md"
+      ],
+      "total": 8,
+      "next_offset": 4
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "paths": [],
+      "total": 8,
+      "next_offset": null
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_page_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_page_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_page_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_query_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_query_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "path": "campaign-plan/example/plan.json",
+      "content": "{\"bindings\":{\"campaign_setting\":{\"content_sha256\":\"8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1\",\"id\":\"pneuma.severed-lands\",\"version\":\"1.0.0-alpha.2.naming.1\"},\"package_closure_sha256\":\"12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff\",\"ruleset\":{\"content_sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"id\":\"sylvia.srd-lite.bg3\",\"version\":\"0.3.29\"}},\"boundaries\":[\"Respect the player's stated boundaries.\"],\"completion_conditions\":[\"Replace with the final act's exact closing event.\"],\"continuation_conditions\":[\"Unresolved consequences may continue in later play.\"],\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"conditions\":[\"Replace with the actual final act closing event.\"],\"id\":\"story-concluded\",\"immediate_aftermath\":[\"Name the immediate loose end and its resolution.\"],\"open_world\":true,\"outcome\":\"Replace with the concise intended outcome.\"}]},\"failure_conditions\":[],\"format_id\":\"sylvia-gm-campaign-plan\",\"format_version\":2,\"gm_guidance\":{\"instructions\":\"Use the exact Ruleset for encoded mechanics and the Setting as the world source.\",\"player_freedom\":\"Let player decisions determine the route and consequences.\",\"preparation_detail\":\"Read the current act and its required objectives before framing its main problem or judging completion. All linked objectives and their conditions must hold; optional work does not replace the named closing event. Retrieve Setting entries when needed for the current situation.\",\"railroading\":\"Preserve the premise without forcing one solution.\"},\"id\":\"replace-with-campaign-id\",\"initial_state\":{\"entities\":[],\"facts\":[\"Replace this example fact with the campaign's actual starting state.\"],\"mechanics\":[{\"key\":\"state\",\"namespace\":\"sylvia.srd-lite.bg3\",\"value\":{\"advancement\":{\"allocation\":\"The Player Character and Companions start and remain at level 2. Story success, defeat, combat and optional jobs never award advancement. Grant only the adventure's actually earned money, possessions and narrative rewards. Any lower-level encounter-variant notes are authoring guidance for a separately revised Plan, not permission to override this declaration in play.\",\"maximum_level\":2,\"method\":\"fixed\",\"recipients\":\"whole_party\",\"starting_level\":2,\"timing\":\"This edition stays at level 2 throughout its authored adventure and optional continuation. It awards no XP or level increases; changing that policy requires an explicitly revised Plan.\"}}}]},\"intended_player_experience\":\"Replace with the intended player experience.\",\"objectives\":[{\"completion_conditions\":[\"Replace with the required main-story discoveries/events.\",\"Replace with the exact closing event and any explicit alternative outcome.\"],\"description\":\"Replace with the campaign's first objective.\",\"id\":\"primary-objective\",\"title\":\"Primary objective\"}],\"premise\":\"Replace with the campaign premise from campaign_construction_brief.\",\"revision\":1,\"secrets\":[],\"setting_references\":{\"creatures\":[],\"factions\":[],\"items\":[],\"locations\":[],\"lore\":[],\"npcs\":[]},\"side_content\":[],\"starting_location\":{\"id\":\"replace-with-location-id\",\"path\":\"locations/harbor.md\"},\"starting_party\":{\"custom_companions\":{\"maximum\":0,\"minimum\":0},\"player_character\":{\"mode\":\"compatible\"},\"required_companions\":[]},\"structure\":[{\"branches\":[\"Allow another approach when the player changes direction.\"],\"consequences\":[\"Carry committed outcomes into the next situation.\"],\"dynamic_encounter_guidance\":[\"Use only mechanics exposed by the Ruleset.\"],\"id\":\"act-1\",\"objectives\":[\"primary-objective\"],\"planned_encounters\":[],\"setting_refs\":[\"locations/harbor.md\"],\"situations\":[\"Replace with the opening playable situation.\"],\"summary\":\"Replace with a concise act summary.\",\"title\":\"Opening\"}],\"title\":\"Replace with campaign title\",\"tone\":\"Replace with the requested tone.\",\"unsupported_mechanics\":[]}"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "path": "campaign-plan/example/plan.md",
+      "content": "# Replace with campaign title\n\nWrite the readable GM rendering of the structured plan here."
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "path": "ruleset/identity.json",
+      "content": "{\"binding\":{\"content_sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"id\":\"sylvia.srd-lite.bg3\",\"version\":\"0.3.29\"},\"campaign_setting\":{\"content_sha256\":\"8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1\",\"id\":\"pneuma.severed-lands\",\"version\":\"1.0.0-alpha.2.naming.1\"},\"package_closure_sha256\":\"12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff\",\"participant_artifacts\":[{\"kind\":\"player_character\",\"schema\":{\"type\":\"object\"},\"schema_id\":\"example.hero\"}]}"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "path": "setting/locations/harbor.md",
+      "content": "# Harbor\nGulls and rope\u00e9"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_unavailable"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_unavailable"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_path_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_path_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_path_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_action_invalid"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "raised": "CommandRejected",
+     "message": "No"
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_party_policy_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_party_policy_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_party_policy_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_party_policy_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_party_policy_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_party_policy_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_source_missing"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_source_missing"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_opening_direction_invalid"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": true,
+      "status": "draft_ready",
+      "title": "The Iron Debt",
+      "plan_path": "campaign-plan-draft/plan.json",
+      "readable_path": "campaign-plan-draft/plan.md"
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": true,
+      "status": "draft_ready",
+      "title": "The Iron Debt",
+      "plan_path": "campaign-plan-draft/plan.json",
+      "readable_path": "campaign-plan-draft/plan.md"
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_invalid",
+      "message": "Starting-state schema fields are invalid",
+      "validation_errors": []
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "builder_tool_parameters_invalid"
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_invalid",
+      "message": "Starting-state schema fields are invalid",
+      "validation_errors": []
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "read_setting": "locations/harbor.md"
+    },
+    {
+     "read_setting": "lore/broken.md"
+    },
+    {
+     "read_setting": "lore/refused.md"
+    }
+   ],
+   "files_after": {
+    "campaign-plan-draft/plan.json": "{\"bindings\":{\"campaign_setting\":{\"content_sha256\":\"8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1\",\"id\":\"pneuma.severed-lands\",\"version\":\"1.0.0-alpha.2.naming.1\"},\"package_closure_sha256\":\"12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff\",\"ruleset\":{\"content_sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"id\":\"sylvia.srd-lite.bg3\",\"version\":\"0.3.29\"}},\"boundaries\":[\"Respect the player's stated boundaries.\"],\"completion_conditions\":[\"The ledger is taken\",\"Escape\"],\"continuation_conditions\":[\"Unresolved consequences may continue in later play.\"],\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"conditions\":[\"The ledger is taken\",\"Escape\"],\"id\":\"story-concluded\",\"immediate_aftermath\":[],\"open_world\":true,\"outcome\":\"Steal the ledger.\"}]},\"failure_conditions\":[],\"format_id\":\"sylvia-gm-campaign-plan\",\"format_version\":2,\"gm_guidance\":{\"instructions\":\"Use the exact Ruleset for encoded mechanics and the Setting as the world source.\",\"player_freedom\":\"Let player decisions determine the route and consequences.\",\"preparation_detail\":\"Read the current act and its required objectives before framing its main problem or judging completion. All linked objectives and their conditions must hold; optional work does not replace the named closing event. Retrieve Setting entries when needed for the current situation.\",\"railroading\":\"Preserve the premise without forcing one solution.\"},\"id\":\"campaign-8906c558824a5efa\",\"initial_state\":{\"entities\":[],\"facts\":[\"A heist in the harbor\u00e9\"]},\"intended_player_experience\":\"A heist in the harbor\u00e9\",\"objectives\":[{\"completion_conditions\":[\"The ledger is taken\",\"Escape\"],\"description\":\"Steal the ledger.\",\"id\":\"primary-objective\",\"title\":\"Primary objective\"}],\"opening_direction\":\"Start at dawn\",\"premise\":\"A heist in the harbor\u00e9\",\"revision\":1,\"secrets\":[],\"setting_references\":{\"creatures\":[],\"factions\":[],\"items\":[],\"locations\":[],\"lore\":[],\"npcs\":[]},\"side_content\":[],\"starting_location\":{\"id\":\"starting-location\",\"path\":\"locations/harbor.md\"},\"starting_party\":{\"custom_companions\":{\"maximum\":2,\"minimum\":0},\"player_character\":{\"character\":{\"id\":\"fixed-player-character\",\"path\":\"npcs/mara.md\"},\"mode\":\"fixed\"},\"required_companions\":[{\"id\":\"required-companion-1\",\"path\":\"npcs/ash.md\"},{\"id\":\"required-companion-2\",\"path\":\"npcs/mara.md\"}]},\"structure\":[{\"branches\":[\"Allow another approach when the player changes direction.\"],\"consequences\":[\"Carry committed outcomes into the next situation.\"],\"dynamic_encounter_guidance\":[\"Use only mechanics exposed by the Ruleset.\"],\"id\":\"act-1\",\"objectives\":[\"primary-objective\"],\"planned_encounters\":[],\"setting_refs\":[\"npcs/mara.md\",\"npcs/ash.md\",\"locations/harbor.md\"],\"situations\":[\"The tide turns.\"],\"summary\":\"The tide turns.\",\"title\":\"Opening\"}],\"title\":\"The Iron Debt\",\"tone\":\"Tense\",\"unsupported_mechanics\":[]}",
+    "campaign-plan-draft/plan.md": "# The Iron Debt\r\n\r\nA heist in the harbor\u00e9\r\n\r\n## Tone\r\n\r\nTense\r\n\r\n## Opening direction\r\n\r\nStart at dawn\r\n\r\n## Opening situation\r\n\r\nThe tide turns.\r\n\r\n## Primary objective\r\n\r\nSteal the ledger.\r\n\r\n## Completion and aftermath\r\n\r\n- The ledger is taken\r\n- Escape\r\n"
+   }
+  },
+  {
+   "tool": "plan",
+   "authority": {
+    "ruleset": {
+     "package_id": "sylvia.srd-lite.bg3",
+     "version": "0.3.29",
+     "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90"
+    },
+    "setting": {
+     "package_id": "pneuma.severed-lands",
+     "version": "1.0.0-alpha.2.naming.1",
+     "content_sha256": "8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1"
+    },
+    "closure_sha256": "12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff",
+    "setting_paths": [
+     "locations/harbor.md",
+     "lore/broken.md",
+     "lore/refused.md",
+     "npcs/ash.md",
+     "npcs/mara.md"
+    ],
+    "setting_files": {
+     "locations/harbor.md": "# Harbor\nGulls and rope\u00e9",
+     "npcs/mara.md": "# Mara",
+     "npcs/ash.md": "# Ash",
+     "lore/broken.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "disk"
+      }
+     },
+     "lore/refused.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "No",
+       "code": "setting_unavailable"
+      }
+     }
+    },
+    "setting_knowledge_ids": [
+     "harbor"
+    ],
+    "participant_schemas": [
+     {
+      "kind": "player_character",
+      "schema_id": "example.hero",
+      "schema": {
+       "type": "object"
+      }
+     }
+    ],
+    "setting_character_schema": null,
+    "state_schemas": [
+     {
+      "key": "state",
+      "required": true
+     },
+     {
+      "key": "other"
+     }
+    ]
+   },
+   "deferred": false,
+   "publisher": null,
+   "checker": null,
+   "files": {
+    "campaign-plan-draft/setting-files/World.md": "edited"
+   },
+   "calls": [
+    [
+     "publish_campaign_plan",
+     {}
+    ]
+   ],
+   "tool_names": [
+    "inspect_campaign_sources",
+    "create_campaign_plan_draft",
+    "publish_campaign_plan"
+   ],
+   "answers": [
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_invalid",
+      "message": "Inherited package edits require an independent Campaign Plan Builder chat",
+      "validation_errors": []
+     }
+    }
+   ],
+   "callback_calls": [],
+   "files_after": {
+    "campaign-plan-draft/setting-files/World.md": "edited"
+   }
+  },
+  {
+   "tool": "plan",
+   "authority": {
+    "ruleset": {
+     "package_id": "sylvia.srd-lite.bg3",
+     "version": "0.3.29",
+     "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90"
+    },
+    "setting": {
+     "package_id": "pneuma.severed-lands",
+     "version": "1.0.0-alpha.2.naming.1",
+     "content_sha256": "8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1"
+    },
+    "closure_sha256": "12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff",
+    "setting_paths": [
+     "locations/harbor.md",
+     "lore/broken.md",
+     "lore/refused.md",
+     "npcs/ash.md",
+     "npcs/mara.md"
+    ],
+    "setting_files": {
+     "locations/harbor.md": "# Harbor\nGulls and rope\u00e9",
+     "npcs/mara.md": "# Mara",
+     "npcs/ash.md": "# Ash",
+     "lore/broken.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "disk"
+      }
+     },
+     "lore/refused.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "No",
+       "code": "setting_unavailable"
+      }
+     }
+    },
+    "setting_knowledge_ids": [
+     "harbor"
+    ],
+    "participant_schemas": [
+     {
+      "kind": "player_character",
+      "schema_id": "example.hero",
+      "schema": {
+       "type": "object"
+      }
+     }
+    ],
+    "setting_character_schema": null,
+    "state_schemas": [
+     {
+      "key": "state",
+      "required": true
+     },
+     {
+      "key": "other"
+     }
+    ]
+   },
+   "deferred": false,
+   "publisher": [
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Plan invalid because aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "code": "x",
+      "diagnostics": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       }
+      ]
+     }
+    },
+    {
+     "raise": {
+      "class": "ValueError",
+      "message": "bad value"
+     }
+    },
+    {
+     "raise": {
+      "class": "OSError",
+      "message": "disk"
+     }
+    },
+    {
+     "raise": {
+      "class": "StaleRevision",
+      "message": "old"
+     }
+    },
+    "published",
+    "published-without-artifact"
+   ],
+   "checker": null,
+   "files": {},
+   "calls": [
+    [
+     "publish_campaign_plan",
+     {}
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ],
+    [
+     "publish_campaign_plan",
+     {}
+    ]
+   ],
+   "tool_names": [
+    "inspect_campaign_sources",
+    "create_campaign_plan_draft",
+    "publish_campaign_plan"
+   ],
+   "answers": [
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_invalid",
+      "message": "Plan invalid because aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "validation_errors": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "message": "Fix fields",
+        "file": "campaign-plan-draft/plan.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "message": "Setting file",
+        "file": "campaign-plan-draft/setting-files/World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "message": "Ruleset file",
+        "file": "campaign-plan-draft/ruleset-files/rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "message": "problem 3"
+       }
+      ]
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_invalid",
+      "message": "bad value",
+      "validation_errors": []
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_unavailable"
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "raised": "StaleRevision",
+     "message": "old"
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": true,
+      "status": "ready",
+      "artifact_kind": "campaign_plan",
+      "player_character_required": true,
+      "message": "Campaign Plan saved. Starting play still requires a Player Character and completed campaign setup.",
+      "artifact_id": "campaign-plan-1",
+      "title": "Iron Debt",
+      "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "plan_path": "campaign-plan-draft/plan.json",
+      "readable_path": "campaign-plan-draft/plan.md",
+      "readable_preview": "# Iron Debt\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "ruleset": {
+       "id": "r"
+      },
+      "campaign_setting": {
+       "id": "s"
+      },
+      "package_closure_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "library_artifact": {
+       "artifact_id": "library-1"
+      },
+      "tracked_skill": {
+       "name": "BUILD CAMPAIGN PLAN",
+       "sha256": "4de7e57525961304c8c8fd5979b94c6864c5a007f038c0820a6432eea40346a1"
+      }
+     }
+    },
+    {
+     "tool": "publish_campaign_plan",
+     "result": {
+      "success": true,
+      "status": "ready",
+      "artifact_kind": "campaign_plan",
+      "player_character_required": true,
+      "message": "Campaign Plan saved. Starting play still requires a Player Character and completed campaign setup.",
+      "artifact_id": "campaign-plan-1",
+      "title": "Iron Debt",
+      "content_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "plan_path": "campaign-plan-draft/plan.json",
+      "readable_path": "campaign-plan-draft/plan.md",
+      "readable_preview": "# Iron Debt\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "ruleset": {
+       "id": "r"
+      },
+      "campaign_setting": {
+       "id": "s"
+      },
+      "package_closure_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "tracked_skill": {
+       "name": "BUILD CAMPAIGN PLAN",
+       "sha256": "4de7e57525961304c8c8fd5979b94c6864c5a007f038c0820a6432eea40346a1"
+      }
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "publish_plan": null
+    },
+    {
+     "publish_plan": null
+    },
+    {
+     "publish_plan": null
+    },
+    {
+     "publish_plan": null
+    },
+    {
+     "publish_plan": null
+    },
+    {
+     "publish_plan": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "plan",
+   "authority": {
+    "ruleset": {
+     "package_id": "sylvia.srd-lite.bg3",
+     "version": "0.3.29",
+     "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90"
+    },
+    "setting": {
+     "package_id": "pneuma.severed-lands",
+     "version": "1.0.0-alpha.2.naming.1",
+     "content_sha256": "8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1"
+    },
+    "closure_sha256": "12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff",
+    "setting_paths": [
+     "npcs/mara.md"
+    ],
+    "setting_files": {
+     "locations/harbor.md": "# Harbor\nGulls and rope\u00e9",
+     "npcs/mara.md": "# Mara",
+     "npcs/ash.md": "# Ash",
+     "lore/broken.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "disk"
+      }
+     },
+     "lore/refused.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "No",
+       "code": "setting_unavailable"
+      }
+     }
+    },
+    "setting_knowledge_ids": [
+     "harbor"
+    ],
+    "participant_schemas": [
+     {
+      "kind": "player_character",
+      "schema_id": "example.hero",
+      "schema": {
+       "type": "object"
+      }
+     }
+    ],
+    "setting_character_schema": null,
+    "state_schemas": []
+   },
+   "deferred": false,
+   "publisher": null,
+   "checker": [
+    {
+     "return": {
+      "ok": true
+     }
+    }
+   ],
+   "files": {},
+   "calls": [
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "campaign-plan/example/plan.json"
+     }
+    ],
+    [
+     "check_campaign_plan_draft",
+     {}
+    ],
+    [
+     "check_campaign_plan_draft",
+     {
+      "x": 1
+     }
+    ]
+   ],
+   "tool_names": [
+    "inspect_campaign_sources",
+    "create_campaign_plan_draft",
+    "publish_campaign_plan",
+    "check_campaign_plan_draft"
+   ],
+   "answers": [
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "path": "campaign-plan/example/plan.json",
+      "content": "{\"bindings\":{\"campaign_setting\":{\"content_sha256\":\"8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1\",\"id\":\"pneuma.severed-lands\",\"version\":\"1.0.0-alpha.2.naming.1\"},\"package_closure_sha256\":\"12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff\",\"ruleset\":{\"content_sha256\":\"c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90\",\"id\":\"sylvia.srd-lite.bg3\",\"version\":\"0.3.29\"}},\"boundaries\":[\"Respect the player's stated boundaries.\"],\"completion_conditions\":[\"Replace with the final act's exact closing event.\"],\"continuation_conditions\":[\"Unresolved consequences may continue in later play.\"],\"ending\":{\"mode\":\"finite\",\"outcomes\":[{\"after_story\":null,\"conditions\":[\"Replace with the actual final act closing event.\"],\"id\":\"story-concluded\",\"immediate_aftermath\":[\"Name the immediate loose end and its resolution.\"],\"open_world\":true,\"outcome\":\"Replace with the concise intended outcome.\"}]},\"failure_conditions\":[],\"format_id\":\"sylvia-gm-campaign-plan\",\"format_version\":2,\"gm_guidance\":{\"instructions\":\"Use the exact Ruleset for encoded mechanics and the Setting as the world source.\",\"player_freedom\":\"Let player decisions determine the route and consequences.\",\"preparation_detail\":\"Read the current act and its required objectives before framing its main problem or judging completion. All linked objectives and their conditions must hold; optional work does not replace the named closing event. Retrieve Setting entries when needed for the current situation.\",\"railroading\":\"Preserve the premise without forcing one solution.\"},\"id\":\"replace-with-campaign-id\",\"initial_state\":{\"entities\":[],\"facts\":[\"Replace this example fact with the campaign's actual starting state.\"]},\"intended_player_experience\":\"Replace with the intended player experience.\",\"objectives\":[{\"completion_conditions\":[\"Replace with the required main-story discoveries/events.\",\"Replace with the exact closing event and any explicit alternative outcome.\"],\"description\":\"Replace with the campaign's first objective.\",\"id\":\"primary-objective\",\"title\":\"Primary objective\"}],\"premise\":\"Replace with the campaign premise from campaign_construction_brief.\",\"revision\":1,\"secrets\":[],\"setting_references\":{\"creatures\":[],\"factions\":[],\"items\":[],\"locations\":[],\"lore\":[],\"npcs\":[]},\"side_content\":[],\"starting_location\":{\"id\":\"replace-with-location-id\",\"path\":\"npcs/mara.md\"},\"starting_party\":{\"custom_companions\":{\"maximum\":0,\"minimum\":0},\"player_character\":{\"mode\":\"compatible\"},\"required_companions\":[]},\"structure\":[{\"branches\":[\"Allow another approach when the player changes direction.\"],\"consequences\":[\"Carry committed outcomes into the next situation.\"],\"dynamic_encounter_guidance\":[\"Use only mechanics exposed by the Ruleset.\"],\"id\":\"act-1\",\"objectives\":[\"primary-objective\"],\"planned_encounters\":[],\"setting_refs\":[\"npcs/mara.md\"],\"situations\":[\"Replace with the opening playable situation.\"],\"summary\":\"Replace with a concise act summary.\",\"title\":\"Opening\"}],\"title\":\"Replace with campaign title\",\"tone\":\"Replace with the requested tone.\",\"unsupported_mechanics\":[]}"
+     }
+    },
+    {
+     "tool": "check_campaign_plan_draft",
+     "result": {
+      "success": true,
+      "status": "valid_draft",
+      "ok": true
+     }
+    },
+    {
+     "tool": "check_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "code": "builder_tool_parameters_invalid"
+     }
+    }
+   ],
+   "callback_calls": [],
+   "files_after": {}
+  },
+  {
+   "tool": "plan",
+   "authority": {
+    "ruleset": {
+     "package_id": "sylvia.srd-lite.bg3",
+     "version": "0.3.29",
+     "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90"
+    },
+    "setting": {
+     "package_id": "pneuma.severed-lands",
+     "version": "1.0.0-alpha.2.naming.1",
+     "content_sha256": "8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1"
+    },
+    "closure_sha256": "12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff",
+    "setting_paths": [],
+    "setting_files": {
+     "locations/harbor.md": "# Harbor\nGulls and rope\u00e9",
+     "npcs/mara.md": "# Mara",
+     "npcs/ash.md": "# Ash",
+     "lore/broken.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "disk"
+      }
+     },
+     "lore/refused.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "No",
+       "code": "setting_unavailable"
+      }
+     }
+    },
+    "setting_knowledge_ids": [
+     "harbor"
+    ],
+    "participant_schemas": [
+     {
+      "kind": "player_character",
+      "schema_id": "example.hero",
+      "schema": {
+       "type": "object"
+      }
+     }
+    ],
+    "setting_character_schema": null,
+    "state_schemas": [
+     {
+      "key": "state",
+      "required": true
+     },
+     {
+      "key": "other"
+     }
+    ]
+   },
+   "deferred": false,
+   "publisher": null,
+   "checker": null,
+   "files": {},
+   "calls": [
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "read",
+      "path": "campaign-plan/example/plan.json"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list"
+     }
+    ]
+   ],
+   "tool_names": [
+    "inspect_campaign_sources",
+    "create_campaign_plan_draft",
+    "publish_campaign_plan"
+   ],
+   "answers": [
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "source_unavailable"
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "paths": [
+       "campaign-plan/example/plan.json",
+       "campaign-plan/example/plan.md",
+       "ruleset/identity.json"
+      ],
+      "total": 3,
+      "next_offset": null
+     }
+    }
+   ],
+   "callback_calls": [],
+   "files_after": {}
+  },
+  {
+   "tool": "plan",
+   "authority": {
+    "ruleset": {
+     "package_id": "sylvia.srd-lite.bg3",
+     "version": "0.3.29",
+     "content_sha256": "c27f2f272691eb8e49ab4ffeb3d4cbf4fa8a10c667073bd6edf84573367bca90"
+    },
+    "setting": {
+     "package_id": "pneuma.severed-lands",
+     "version": "1.0.0-alpha.2.naming.1",
+     "content_sha256": "8b8ca023d05299b9173bbb4d21c4d9eef94b602eb02d47d5d31c9a74452308d1"
+    },
+    "closure_sha256": "12d5492c98b4c3dc465bb2fbfc50f4767b2a1734822308d0078d0293c0ff96ff",
+    "setting_paths": [
+     "locations/harbor.md",
+     "lore/broken.md",
+     "lore/refused.md",
+     "npcs/ash.md",
+     "npcs/mara.md"
+    ],
+    "setting_files": {
+     "locations/harbor.md": "# Harbor\nGulls and rope\u00e9",
+     "npcs/mara.md": "# Mara",
+     "npcs/ash.md": "# Ash",
+     "lore/broken.md": {
+      "raise": {
+       "class": "OSError",
+       "message": "disk"
+      }
+     },
+     "lore/refused.md": {
+      "raise": {
+       "class": "CommandRejected",
+       "message": "No",
+       "code": "setting_unavailable"
+      }
+     }
+    },
+    "setting_knowledge_ids": [
+     "harbor"
+    ],
+    "participant_schemas": [
+     {
+      "kind": "player_character",
+      "schema_id": "example.hero",
+      "schema": {
+       "type": "object"
+      }
+     }
+    ],
+    "setting_character_schema": null,
+    "state_schemas": [
+     {
+      "key": "state",
+      "required": true
+     },
+     {
+      "key": "other"
+     }
+    ]
+   },
+   "deferred": true,
+   "selections": [
+    false,
+    true,
+    true
+   ],
+   "publisher": null,
+   "checker": null,
+   "files": {},
+   "calls": [
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list"
+     }
+    ],
+    [
+     "inspect_campaign_sources",
+     {
+      "action": "list",
+      "limit": 1
+     }
+    ],
+    [
+     "create_campaign_plan_draft",
+     {
+      "x": 1
+     }
+    ]
+   ],
+   "tool_names": [
+    "inspect_campaign_sources",
+    "create_campaign_plan_draft",
+    "publish_campaign_plan"
+   ],
+   "answers": [
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": false,
+      "code": "builder_setting_selection_required",
+      "message": "Use select_builder_setting with the exact saved Setting first."
+     }
+    },
+    {
+     "tool": "inspect_campaign_sources",
+     "result": {
+      "success": true,
+      "status": "available",
+      "paths": [
+       "campaign-plan/example/plan.json"
+      ],
+      "total": 8,
+      "next_offset": 1
+     }
+    },
+    {
+     "tool": "create_campaign_plan_draft",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_concept_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "select_authority": null
+    },
+    {
+     "select_authority": null
+    },
+    {
+     "select_authority": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "plan_check",
+   "outcomes": [
+    {
+     "return": {
+      "readiness": {
+       "characters": "incomplete"
+      },
+      "status": "kept"
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Plan invalid",
+      "code": "campaign_plan_fields_invalid",
+      "diagnostics": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       },
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       }
+      ]
+     }
+    },
+    {
+     "raise": {
+      "class": "ValueError",
+      "message": "plain"
+     }
+    },
+    {
+     "raise": {
+      "class": "StaleRevision",
+      "message": "old"
+     }
+    },
+    {
+     "raise": {
+      "class": "OSError",
+      "message": "disk"
+     }
+    },
+    {
+     "raise": {
+      "class": "KeyError",
+      "message": "missing"
+     }
+    }
+   ],
+   "calls": [
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {
+     "x": 1
+    }
+   ],
+   "tool_names": [
+    "check_campaign_plan_draft"
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "status": "kept",
+      "readiness": {
+       "characters": "incomplete"
+      }
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "state_changed": false,
+      "code": "campaign_plan_fields_invalid",
+      "message": "Plan invalid",
+      "validation_errors": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "expected": "string",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       },
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "expected": "string",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       }
+      ]
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "state_changed": false,
+      "code": "campaign_plan_invalid",
+      "message": "plain",
+      "validation_errors": []
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "state_changed": false,
+      "code": "stale_revision",
+      "message": "old",
+      "validation_errors": []
+     }
+    },
+    {
+     "raised": "OSError",
+     "message": "disk"
+    },
+    {
+     "raised": "KeyError",
+     "message": "'missing'"
+    },
+    {
+     "result": {
+      "success": false,
+      "code": "builder_tool_parameters_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "check_plan": null
+    },
+    {
+     "check_plan": null
+    },
+    {
+     "check_plan": null
+    },
+    {
+     "check_plan": null
+    },
+    {
+     "check_plan": null
+    },
+    {
+     "check_plan": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "import_repair",
+   "outcomes": [
+    {
+     "return": {
+      "readiness": {
+       "characters": "incomplete"
+      },
+      "status": "kept"
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Plan invalid",
+      "code": "campaign_plan_fields_invalid",
+      "diagnostics": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       },
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       }
+      ]
+     }
+    },
+    {
+     "raise": {
+      "class": "ValueError",
+      "message": "plain"
+     }
+    },
+    {
+     "raise": {
+      "class": "StaleRevision",
+      "message": "old"
+     }
+    },
+    {
+     "raise": {
+      "class": "OSError",
+      "message": "disk"
+     }
+    },
+    {
+     "raise": {
+      "class": "KeyError",
+      "message": "missing"
+     }
+    },
+    {
+     "return": {
+      "readiness": {
+       "characters": "incomplete"
+      },
+      "status": "kept"
+     }
+    },
+    {
+     "raise": {
+      "class": "CommandRejected",
+      "message": "Plan invalid",
+      "code": "campaign_plan_fields_invalid",
+      "diagnostics": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       },
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "guidance": "Edit it",
+        "expected": "string"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       }
+      ]
+     }
+    }
+   ],
+   "calls": [
+    [
+     "check_import_repair",
+     {}
+    ],
+    [
+     "check_import_repair",
+     {}
+    ],
+    [
+     "check_import_repair",
+     {}
+    ],
+    [
+     "check_import_repair",
+     {}
+    ],
+    [
+     "check_import_repair",
+     {}
+    ],
+    [
+     "check_import_repair",
+     {}
+    ],
+    [
+     "publish_import_repair",
+     {}
+    ],
+    [
+     "publish_import_repair",
+     {}
+    ],
+    [
+     "publish_import_repair",
+     {
+      "x": 1
+     }
+    ]
+   ],
+   "tool_names": [
+    "check_import_repair",
+    "publish_import_repair"
+   ],
+   "answers": [
+    {
+     "tool": "check_import_repair",
+     "result": {
+      "success": true,
+      "readiness": {
+       "characters": "incomplete"
+      },
+      "status": "kept"
+     }
+    },
+    {
+     "tool": "check_import_repair",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_fields_invalid",
+      "message": "Plan invalid",
+      "validation_errors": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "expected": "string",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       },
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "expected": "string",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       }
+      ]
+     }
+    },
+    {
+     "tool": "check_import_repair",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "import_repair_invalid",
+      "message": "plain",
+      "validation_errors": []
+     }
+    },
+    {
+     "tool": "check_import_repair",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "stale_revision",
+      "message": "old",
+      "validation_errors": []
+     }
+    },
+    {
+     "tool": "check_import_repair",
+     "raised": "OSError",
+     "message": "disk"
+    },
+    {
+     "tool": "check_import_repair",
+     "raised": "KeyError",
+     "message": "'missing'"
+    },
+    {
+     "tool": "publish_import_repair",
+     "result": {
+      "success": true,
+      "readiness": {
+       "characters": "incomplete"
+      },
+      "status": "kept"
+     }
+    },
+    {
+     "tool": "publish_import_repair",
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "campaign_plan_fields_invalid",
+      "message": "Plan invalid",
+      "validation_errors": [
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "expected": "string",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       },
+       {
+        "code": "d2",
+        "phase": "content",
+        "message": "problem 2"
+       },
+       {
+        "code": "d3",
+        "phase": "content",
+        "message": "problem 3"
+       },
+       {
+        "code": "d4",
+        "phase": "content",
+        "message": "problem 4"
+       },
+       {
+        "code": "d5",
+        "phase": "content",
+        "message": "problem 5"
+       },
+       {
+        "code": "campaign_plan_fields_invalid",
+        "phase": "content",
+        "message": "Fix fields",
+        "file": "x.json",
+        "path": "$"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Setting file",
+        "file": "World.md",
+        "package_id": "pneuma.severed-lands",
+        "expected": "string",
+        "guidance": "Edit it"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Ruleset file",
+        "file": "rules.yaml",
+        "package_id": "sylvia.srd-lite.bg3"
+       },
+       {
+        "code": "package_content_invalid",
+        "phase": "content",
+        "message": "Other",
+        "file": "a.md",
+        "package_id": "other"
+       },
+       {
+        "code": "d0",
+        "phase": "content",
+        "message": "problem 0"
+       },
+       {
+        "code": "d1",
+        "phase": "content",
+        "message": "problem 1"
+       }
+      ]
+     }
+    },
+    {
+     "tool": "publish_import_repair",
+     "result": {
+      "success": false,
+      "code": "builder_tool_parameters_invalid"
+     }
+    }
+   ],
+   "callback_calls": [
+    {
+     "check_repair": null
+    },
+    {
+     "check_repair": null
+    },
+    {
+     "check_repair": null
+    },
+    {
+     "check_repair": null
+    },
+    {
+     "check_repair": null
+    },
+    {
+     "check_repair": null
+    },
+    {
+     "publish_repair": null
+    },
+    {
+     "publish_repair": null
+    }
+   ],
+   "files_after": {}
+  },
+  {
+   "tool": "subflow",
+   "calls": [
+    {
+     "summary": " Ready ",
+     "boundary_conflicts": []
+    },
+    {
+     "summary": "Ready",
+     "boundary_conflicts": [
+      " Conflict one ",
+      "Two"
+     ]
+    },
+    {
+     "summary": "  ",
+     "boundary_conflicts": []
+    },
+    {
+     "summary": "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+     "boundary_conflicts": []
+    },
+    {
+     "summary": "\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9",
+     "boundary_conflicts": []
+    },
+    {
+     "summary": "Ready",
+     "boundary_conflicts": [
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c",
+      "c"
+     ]
+    },
+    {
+     "summary": "Ready",
+     "boundary_conflicts": [
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+     ]
+    },
+    {
+     "summary": "Ready",
+     "boundary_conflicts": [
+      " "
+     ]
+    },
+    {
+     "summary": "Ready",
+     "boundary_conflicts": "none"
+    },
+    {
+     "summary": "Ready"
+    },
+    {
+     "summary": "Ready",
+     "boundary_conflicts": [],
+     "extra": 1
+    },
+    {
+     "summary": 5,
+     "boundary_conflicts": []
+    }
+   ],
+   "tool_names": [
+    "complete_creation_subflow"
+   ],
+   "answers": [
+    {
+     "result": {
+      "success": true,
+      "status": "ready",
+      "summary": "Ready",
+      "boundary_conflicts": []
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "blocked",
+      "summary": "Ready",
+      "boundary_conflicts": [
+       "Conflict one",
+       "Two"
+      ]
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": true,
+      "status": "ready",
+      "summary": "\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9",
+      "boundary_conflicts": []
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    },
+    {
+     "result": {
+      "success": false,
+      "status": "rejected",
+      "code": "completion_invalid"
+     }
+    }
+   ],
+   "callback_calls": [],
+   "files_after": {}
+  }
+ ]
+}

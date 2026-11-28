@@ -1220,6 +1220,169 @@
   },
   {
    "step": {
+    "op": "start",
+    "attempt": "a6"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "a6": 0,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "interrupt",
+    "attempt": "a6"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-00000000000a",
+     "turn_id": "turn",
+     "last_action_id": null,
+     "failed_attempt_id": "a6",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "a6": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": "last"
+    },
+    "retry": "r7",
+    "script": [
+     {
+      "emit": [
+       "talk",
+       "Never said.",
+       null
+      ]
+     }
+    ],
+    "stopped_before_admission": true
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Agent session was stopped before Retry provider admission"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "a6": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0,
+    "r7": 1
+   }
+  },
+  {
+   "step": {
+    "op": "status",
+    "attempt": "r7"
+   },
+   "outcome": {
+    "ok": "interrupted"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "a6": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0,
+    "r7": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retryable",
+    "failed": "r7"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-00000000000a",
+     "turn_id": "turn",
+     "last_action_id": null,
+     "failed_attempt_id": "r7",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "a6": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0,
+    "r7": 1
+   }
+  },
+  {
+   "step": {
     "op": "interruptions"
    },
    "outcome": {
@@ -1267,6 +1430,17 @@
       "retryable": false,
       "resolving_retry_id": "c1",
       "resolved_sequence": 11
+     },
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-00000000000a",
+      "turn_id": "turn",
+      "last_action_id": null,
+      "failed_attempt_id": "r7",
+      "retryable": true,
+      "resolving_retry_id": null,
+      "resolved_sequence": null
      }
     ]
    },
@@ -1276,6 +1450,7 @@
     "a2": 1,
     "a3": 1,
     "a5": 1,
+    "a6": 1,
     "c1": 0,
     "c2": 0,
     "r1": 0,
@@ -1283,7 +1458,8 @@
     "r3": 1,
     "r4": 1,
     "r5": 1,
-    "r6": 0
+    "r6": 0,
+    "r7": 1
    }
   }
  ]

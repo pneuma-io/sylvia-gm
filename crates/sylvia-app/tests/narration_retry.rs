@@ -139,6 +139,9 @@ impl RetryNarration for Script {
 
 fn resolve(value: &Json, ids: &[String]) -> Json {
     match value {
+        Json::Object(map) if map.len() == 1 && map.get("interruption") == Some(&Json::from("last")) => {
+            Json::from(ids.last().map_or("interruption-unreturned", String::as_str))
+        }
         Json::Object(map) if map.len() == 1 && map.get("interruption").is_some_and(Json::is_u64) => {
             // An owner that diverged may not have returned it; its steps then differ.
             Json::from(
@@ -300,6 +303,9 @@ async fn run(store: &StoreHandle, step: &Json, cancels: &Cancels) -> Json {
     }
 }
 
+/// The session loop's refusal when Stop came before a Retry's admission.
+const STOPPED_BEFORE_ADMISSION: &str = "Agent session was stopped before Retry provider admission";
+
 async fn retry(store: &StoreHandle, step: &Json, cancels: &Cancels) -> Json {
     let started = Arc::new(Mutex::new(0usize));
     let seen = Arc::clone(&started);
@@ -310,7 +316,21 @@ async fn retry(store: &StoreHandle, step: &Json, cancels: &Cancels) -> Json {
         cancel: counter(cancels, step["retry"].as_str().unwrap()),
     };
     let script = Script(step["script"].as_array().unwrap().clone());
-    match narration::manual_retry(store, request, move || *seen.lock().unwrap() += 1, script).await {
+    let stopped = step["stopped_before_admission"].as_bool().unwrap_or(false);
+    let retry_id = request.retry_id.clone();
+    // A `stopped_before_admission` Retry is admitted as the session loop's `admit_attempt` does
+    // when Stop came first: it interrupts the Retry, then refuses.
+    let admitted = move || async move {
+        *seen.lock().unwrap() += 1;
+        if !stopped {
+            return Ok(());
+        }
+        narration::interrupt_narration(store, CAMPAIGN, &retry_id)
+            .await
+            .map_err(|error| format!("{error:?}"))?;
+        Err(STOPPED_BEFORE_ADMISSION.to_owned())
+    };
+    match narration::manual_retry(store, request, admitted, script).await {
         Ok(result) => json!({
             "ok": {
                 "__class__": "ManualRetryResult",
@@ -321,6 +341,9 @@ async fn retry(store: &StoreHandle, step: &Json, cancels: &Cancels) -> Json {
             "started": *started.lock().unwrap(),
         }),
         Err(RetryFailure::Owner(error)) => failure(error),
+        Err(RetryFailure::Narrator(message)) if message == STOPPED_BEFORE_ADMISSION => {
+            json!({"error": "CommandRejected", "code": "command_rejected", "message": message})
+        }
         Err(RetryFailure::Narrator(message)) => {
             json!({"error": "RuntimeError", "code": null, "message": message})
         }
@@ -334,7 +357,7 @@ async fn manual_retry_and_redirection_answer_and_store_as_pythons_owner() {
         serde_json::from_str(&std::fs::read_to_string(vectors.join("narration_retry_runs.json")).unwrap())
             .unwrap();
     let runs = record["runs"].as_array().unwrap();
-    assert_eq!(runs.len(), 39);
+    assert_eq!(runs.len(), 44);
     let folder = Path::new(env!("CARGO_TARGET_TMPDIR")).join("sylvia-app").join("narration-retry");
     if let Err(error) = std::fs::remove_dir_all(&folder) {
         assert_eq!(error.kind(), std::io::ErrorKind::NotFound, "cannot clear {}: {error}", folder.display());
