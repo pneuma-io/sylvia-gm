@@ -14,6 +14,7 @@ use super::pydata::{
     keys_except, not_text, number_lt, repr, sorted, sorted_repr, to_str, truthy, unhashable,
 };
 use crate::expr::parse_expression;
+use crate::expr::text_cache::TextCache;
 use crate::pyerror::{PyError, PyErrorKind, PyResult};
 use sylvia_base::pystr::strip;
 use sylvia_base::pyyaml::{self, Data, YamlError};
@@ -199,9 +200,14 @@ fn iterate(value: &Data) -> PyResult<Vec<Data>> {
     })
 }
 
-/// `_validate_expression(expression)`: parse only.
+/// `_validate_expression(expression)`: parse only, behind Python's `lru_cache(maxsize=1024)`,
+/// which keeps the texts that parsed (a failure raises, so it is checked again next time).
 fn expression_error(expression: &str) -> Option<String> {
-    parse_expression(expression).err().map(|error| error.message)
+    static VALIDATED: TextCache<()> = TextCache::new(1024);
+    VALIDATED
+        .get_or_try(expression, |text| parse_expression(text).map(|_| ()))
+        .err()
+        .map(|error| error.message)
 }
 
 // ── Top level ──────────────────────────────────────────────────────────────────
