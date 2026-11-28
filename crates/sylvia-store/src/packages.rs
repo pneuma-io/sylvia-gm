@@ -1119,7 +1119,7 @@ fn verify_packages(connection: &Connection) -> Checked<()> {
         named_rows(connection, "SELECT * FROM package_manifests WHERE status = 'published'", &[])?;
     for values in manifest_rows {
         let row = Named { columns: &manifest_columns, values };
-        let manifest = manifest_from_record(&parse_canonical(&row.text("canonical_json")?)?, None)?;
+        let manifest = crate::campaigns::manifest_from_json(&row.text("canonical_json")?)?;
         let (package_id, version, sha256) = manifest.identity();
         if (package_id, version, sha256)
             != (
@@ -1444,13 +1444,9 @@ pub fn surfaces_for_lock(
         let Some(canonical) = row else {
             return Err(schema_identity("Current package surface manifest is unavailable"));
         };
-        // `_manifest_from_json`: `manifest_from_record(_parse(canonical_json))`.
-        let manifest = sylvia_domain::package_library::manifest_from_record(
-            &crate::campaigns::parse_canonical(&py_str(&canonical))?,
-            None,
-        )?;
-        prompts.extend(manifest.prompt_fragments);
-        ui.extend(manifest.ui_surfaces);
+        let manifest = crate::campaigns::manifest_from_json(&py_str(&canonical))?;
+        prompts.extend(manifest.prompt_fragments.iter().cloned());
+        ui.extend(manifest.ui_surfaces.iter().cloned());
     }
     Ok((prompts, ui))
 }

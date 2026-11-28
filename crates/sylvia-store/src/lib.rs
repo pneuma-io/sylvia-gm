@@ -33,6 +33,7 @@ pub mod interruptions;
 pub mod lanes;
 pub mod launch;
 pub mod lifecycle;
+pub mod manifest_reuse;
 pub mod mechanics_choices;
 pub mod narration;
 pub mod owner_lifecycle;
