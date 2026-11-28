@@ -350,7 +350,7 @@ pub async fn handle_session_context(ctx: &DispatchContext, params: &JsonMap) -> 
 }
 
 /// `_optional_nonnegative_int(params, key)`: absent or `null` is `None`.
-fn optional_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<Option<i64>> {
+pub(crate) fn optional_nonnegative_int(params: &JsonMap, key: &str) -> CodedResult<Option<i64>> {
     match params.get(key) {
         None | Some(Json::Null) => Ok(None),
         Some(_) => super::campaigns::required_nonnegative_int(params, key).map(Some),
