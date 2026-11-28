@@ -8,16 +8,12 @@
 //! - `provider_tool_calls`: a `read_session_history` call's arguments become `{}`;
 //! - `working_context_checkpoint`: only its marker (the continuation notes stay private);
 //! - `gm_wire_journal` and `gm_native_records`: only the context ledger's markers
-//!   (`journal_marker`, `native_marker`, `_stub_marker` from `agent/_context_ledger.py` lines
-//!   1957–1991, ported here with lane 4's agreement until their L1 exports the ledger's own).
+//!   (`journal_marker` and `native_marker`, with `_stub_marker`, from
+//!   `sylvia_agent::context_ledger`, #510).
 
+use sylvia_agent::context_ledger::{journal_marker, native_marker, JOURNAL_KIND, NATIVE_KIND};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::session::SessionMessage;
-
-/// `JOURNAL_KIND`.
-const JOURNAL_KIND: &str = "gm_wire_journal";
-/// `NATIVE_KIND`.
-const NATIVE_KIND: &str = "gm_native_records";
 
 /// A Python exception the owner does not catch: its internal-error reply, with the class.
 fn internal(class: &'static str, message: String) -> CodedError {
@@ -33,62 +29,6 @@ fn get(value: &JsonMap, key: &str) -> Json {
 /// mapping's keys; anything else is a `TypeError`.
 fn iterate(value: &Json) -> CodedResult<Vec<Json>> {
     sylvia_domain::pyops::py_iter(value).map_err(|error| internal("TypeError", error.message().to_owned()))
-}
-
-/// `len(value or ())`: a falsy value counts nothing; a list, mapping or string counts its items,
-/// keys or characters; a non-zero number or `True` has no length (`TypeError`).
-fn length_or_empty(value: &Json) -> CodedResult<usize> {
-    if !sylvia_domain::pyops::py_truthy(value) {
-        return Ok(0);
-    }
-    match value {
-        Json::Array(items) => Ok(items.len()),
-        Json::Object(map) => Ok(map.len()),
-        Json::String(text) => Ok(sylvia_base::pystr::len(text)),
-        other => Err(internal(
-            "TypeError",
-            format!("object of type '{}' has no len()", sylvia_domain::pyops::py_type_name(other)),
-        )),
-    }
-}
-
-/// `_stub_marker(value)`: a record left out of an export keeps only its kind.
-fn stub_marker(value: &JsonMap) -> Option<JsonMap> {
-    if value.get("omitted_from_export") != Some(&Json::Bool(true)) {
-        return None;
-    }
-    let mut stub = JsonMap::new();
-    stub.insert("kind".into(), get(value, "kind"));
-    stub.insert("omitted_from_export".into(), Json::Bool(true));
-    Some(stub)
-}
-
-/// `native_marker(value)`: the only part of a native-records record that may leave the owner.
-fn native_marker(value: &JsonMap) -> CodedResult<JsonMap> {
-    if let Some(stub) = stub_marker(value) {
-        return Ok(stub);
-    }
-    let mut marker = JsonMap::new();
-    marker.insert("kind".into(), NATIVE_KIND.into());
-    for key in ["native_record_id", "epoch", "generation", "boundary", "status"] {
-        marker.insert(key.into(), get(value, key));
-    }
-    marker.insert("record_count".into(), length_or_empty(&get(value, "records"))?.into());
-    Ok(marker)
-}
-
-/// `journal_marker(value)`: the only part of a journal record that may leave the owner.
-fn journal_marker(value: &JsonMap) -> CodedResult<JsonMap> {
-    if let Some(stub) = stub_marker(value) {
-        return Ok(stub);
-    }
-    let mut marker = JsonMap::new();
-    marker.insert("kind".into(), JOURNAL_KIND.into());
-    for key in ["journal_record_id", "epoch", "generation", "base_count"] {
-        marker.insert(key.into(), get(value, key));
-    }
-    marker.insert("entry_count".into(), length_or_empty(&get(value, "entries"))?.into());
-    Ok(marker)
 }
 
 /// `{**mapping, key: value}`: an existing key keeps its place; a new one is appended.
