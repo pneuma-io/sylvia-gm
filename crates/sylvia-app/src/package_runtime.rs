@@ -804,11 +804,24 @@ fn cached_parse(
     let parsed = PARSED.get_or_init(|| Mutex::new(Vec::new()));
     {
         let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        // Execution accepts legacy files; it cannot attest the stricter authoring checks.
-        let admitted = !authoring && entries.iter().any(|entry| entry.is(package_id, runtime_bytes, true));
-        let key = authoring || admitted;
-        if let Some(index) = entries.iter().position(|entry| entry.is(package_id, runtime_bytes, key)) {
-            let entry = entries.remove(index);
+        // Execution accepts legacy files; it cannot attest the stricter authoring checks. Python
+        // asks for the admitted key first, then its own: one scan for each finds the same entry.
+        let admitted = || entries.iter().position(|entry| entry.is(package_id, runtime_bytes, true));
+        let found = if authoring {
+            admitted()
+        } else {
+            admitted().or_else(|| entries.iter().position(|entry| entry.is(package_id, runtime_bytes, false)))
+        };
+        if let Some(index) = found {
+            let mut entry = entries.remove(index);
+            // Keep the caller's allocation for this key from now on, so its next lookup is the
+            // identity match (Python's dict keeps the first object, and compares contents for
+            // every other one). The bytes are equal, so the key is unchanged.
+            if let Some(shared) = runtime_bytes.shared() {
+                if !Arc::ptr_eq(shared, &entry.bytes) {
+                    entry.bytes = Arc::clone(shared);
+                }
+            }
             let runtime = entry.runtime.clone();
             entries.push(entry);
             return Ok(runtime);
@@ -1166,9 +1179,11 @@ tools:
         // as long as the entry exists.
         assert_eq!(Arc::strong_count(&bytes), 2);
         assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &bytes).unwrap()));
-        // Equal bytes in another allocation still find the entry, by content.
+        // Equal bytes in another allocation still find the entry, by content, and the entry then
+        // keeps that allocation, so its next lookup is by identity.
         let other = Arc::new(bytes.to_vec());
         assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &other).unwrap()));
+        assert_eq!((Arc::strong_count(&bytes), Arc::strong_count(&other)), (1, 2));
         assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &bytes[..]).unwrap()));
     }
 
