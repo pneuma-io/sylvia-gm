@@ -110,6 +110,8 @@ impl TurnOwner for OwnerReads {
     }
 
     fn record_mechanics_diagnostic(&self, diagnostic: JsonMap) -> CodedResult<()> {
+        // `with self._operation():`, refused once the owner is closing.
+        let _operation = self.store().operation().map_err(store_error)?;
         // Kept beside the Full Audit trace in lane 3's `NarrationState` (#442).
         self.store().narration().record_mechanics_diagnostic(diagnostic);
         Ok(())
@@ -145,6 +147,7 @@ impl TurnOwner for OwnerReads {
         campaign_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Vec<PackageLockRecord>>> {
         Box::pin(async move {
+            let _operation = self.store().operation().map_err(store_error)?;
             let campaign_id = campaign_id.to_owned();
             self.store()
                 .call(move |store| store.package_lock_lineage(&campaign_id))
@@ -174,6 +177,7 @@ impl TurnOwner for OwnerReads {
         include_unexposed: bool,
     ) -> BoxFuture<'a, CodedResult<Vec<CatalogEntry>>> {
         Box::pin(async move {
+            let _operation = self.store().operation().map_err(store_error)?;
             let tools = content_reads::catalog(self.store(), campaign_id, include_unexposed)
                 .await
                 .map_err(store_error)?;
@@ -195,6 +199,7 @@ impl TurnOwner for OwnerReads {
 
     fn accepted_campaign_plan<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<JsonMap>> {
         Box::pin(async move {
+            let _operation = self.store().operation().map_err(store_error)?;
             let id = campaign_id.to_owned();
             let plan = self
                 .store()
@@ -315,6 +320,7 @@ impl TurnOwner for OwnerReads {
             // `AuthorityOwner.actor_decision_request`'s opening: a package that declares no
             // isolated participant has no actor decision. The rest (the turn checks and the
             // projection) is T6's, with `run_required_actor_decision`.
+            let _operation = self.store().operation().map_err(store_error)?;
             let id = campaign_id.to_owned();
             let isolated = self
                 .store()
@@ -593,10 +599,9 @@ impl TurnOwner for OwnerReads {
 
     fn stop_agent_session<'a>(
         &'a self,
-        _session_id: &'a str,
+        session_id: &'a str,
     ) -> BoxFuture<'a, Result<SessionRecord, AuthorityFailure>> {
-        // Lane 3's next PR (with `player_projection_page`).
-        Box::pin(async { Err(pending("stop_agent_session").into()) })
+        Box::pin(async move { self.store().stop_agent_session(session_id).await.map_err(store_failure) })
     }
 
     fn session_activity_basis<'a>(
@@ -605,6 +610,7 @@ impl TurnOwner for OwnerReads {
         attempt_id: Option<&'a str>,
     ) -> BoxFuture<'a, CodedResult<SessionActivityBasis>> {
         Box::pin(async move {
+            let _operation = self.store().operation().map_err(store_error)?;
             let (session_id, attempt_id) = (session_id.to_owned(), attempt_id.map(str::to_owned));
             self.store()
                 .call(move |store| store.session_activity_basis(&session_id, attempt_id.as_deref()))
