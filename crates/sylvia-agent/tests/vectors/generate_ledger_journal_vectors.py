@@ -160,6 +160,13 @@ def chain_records(epoch: str, generation: object, batches: list[list[dict[str, o
     return records
 
 
+def equal_generations() -> list[dict[str, object]]:
+    """One valid chain whose first record says generation `True` and whose second says 1."""
+    records = chain_records("e", True, [[entry("b")], [entry("c")]])
+    records[1]["generation"] = 1
+    return records
+
+
 def synthetic() -> list[dict[str, object]]:
     cases: list[tuple[str, list[object], dict[str, object]]] = []
     add = lambda function, *args, **kwargs: cases.append((function, list(args), kwargs))  # noqa: E731
@@ -196,6 +203,9 @@ def synthetic() -> list[dict[str, object]]:
         "entries": broken("entries", "x"), "invalid entry": broken("entries", [{"c": "nope", "m": {"role": "u"}}]),
         "generation text": [*good, {**later[0], "generation": "1"}],
         "bool generation": chain_records("e", True, [[entry("b")]]),
+        # `True == 1`: Python's `max` keeps the first of equal generations, so the chain is
+        # generation `True` (its genesis prints `True`), and the record of generation 1 is on it.
+        "equal generations": equal_generations(),
         "keyframe bytes text": broken("keyframe_bytes", "7"),
         "keyframe bytes missing": [good[0], {k: v for k, v in good[1].items() if k != "keyframe_bytes"}],
         "keyframe bytes list": broken("keyframe_bytes", [1]),
@@ -210,7 +220,9 @@ def synthetic() -> list[dict[str, object]]:
                        native(boundary=-1, head=None), native(boundary=True, head=None),
                        native(status="lost"), native(version=2), native(generation=1), native(records="ab"),
                        native(context_owner={"owner": "other"}), native(boundary="2"),
-                       native(omitted_from_export=True), native(answer="x")]
+                       native(omitted_from_export=True), native(answer="x"),
+                       # Last, so no later record on its boundary hides it: a head off this chain.
+                       native(boundary=2, head="not this chain's head", records=[{"r": 9}])]
     loads["native unhashable status"] = [*good, native(status=["collected"])]
     loads["native unhashable status, earlier mismatch"] = [*good, native(status=["collected"], version=2)]
     for name, records in loads.items():
@@ -238,6 +250,11 @@ def synthetic() -> list[dict[str, object]]:
     add("native_inputs", encode(gap))
     gap.native = {2: {"status": "collected", "records": [1], "answer": {"a": 1}}, 1: {"status": "collected"}}
     add("native_gap", encode(gap), 3)
+    add("native_inputs", encode(gap))
+    add("native_answers", encode(gap))
+    # A boundary at the journal's end is no earlier request's.
+    gap.native = {3: {"status": "collected", "records": [1], "answer": {"a": 3}},
+                  1: {"status": "collected", "records": [], "answer": {"a": 1}}}
     add("native_inputs", encode(gap))
     add("native_answers", encode(gap))
     add("native_record", encode(loaded), context_owner=OWNER, boundary=2, status="collected", reason=None,
