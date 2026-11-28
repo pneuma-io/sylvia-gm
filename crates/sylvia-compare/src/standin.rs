@@ -13,6 +13,9 @@
 //! - `[fail]` sends a partial chunk and drops the connection mid-stream, the first time a given
 //!   player message is seen; the owner sees a lost connection. Later requests are answered.
 //! - `[late]` holds before answering until the session releases it, then answers.
+//! - `[fail-opening]` fails like `[fail]`, but is looked for in the whole request, once: put in
+//!   a campaign's name, it reaches the opening (whose only user message is "Ready to Begin"), so
+//!   a session can fail an opening and retry it. Every later request is answered.
 //! - `[call:<suffix> <json>]` makes the GM call a tool: on a request that offers a tool named
 //!   `<suffix>` or ending `_<suffix>` (the first such tool, in request order), the stand-in
 //!   answers with a call to it whose arguments are `<json>` byte for byte. A message may carry
@@ -56,6 +59,7 @@ const CREATED: u64 = 1_700_000_000;
 /// Markers in the latest player message, as in `tests/stop_resume_owner_fixture.py`.
 const HOLD: &str = "[hold]";
 const FAIL: &str = "[fail]";
+const FAIL_OPENING: &str = "[fail-opening]";
 const LATE: &str = "[late]";
 /// `PARTIAL` in the fixture: what a held or failed reply streams before stopping.
 const PARTIAL: &str = "Partial narration that Stop must discard.";
@@ -327,7 +331,7 @@ fn respond(stream: &TcpStream, request: &Request, state: &State) -> bool {
 
     let streaming = body.get("stream").and_then(Json::as_bool).unwrap_or(false);
     let player = latest_player_message(&body);
-    match script(&player, state) {
+    match opening_script(&body, state).unwrap_or_else(|| script(&player, state)) {
         Script::Hold => {
             if streaming {
                 start_chunked_stream(stream, &[role_chunk(), content_chunk(PARTIAL)]);
@@ -372,6 +376,14 @@ fn script(player: &str, state: &State) -> Script {
     } else {
         Script::Answer
     }
+}
+
+/// `[fail-opening]`: the first request carrying the marker anywhere in its messages fails.
+fn opening_script(request: &Json, state: &State) -> Option<Script> {
+    let messages = request.get("messages").map(Json::to_string).unwrap_or_default();
+    (messages.contains(FAIL_OPENING)
+        && state.failed.lock().expect("failed lock").insert(FAIL_OPENING.to_owned()))
+    .then_some(Script::Fail)
 }
 
 /// Hold the connection until the owner closes it, the stand-in finishes, or (`late`) the
@@ -899,6 +911,14 @@ mod tests {
         assert!(matches!(script("[fail] go", &state), Script::Fail));
         assert!(matches!(script("[fail] go", &state), Script::Answer));
         assert!(matches!(script("[late] go", &state), Script::Late));
+        // `[fail-opening]` anywhere in the messages fails the first such request only.
+        let opening = json!({"messages": [
+            {"role": "system", "content": "# Storm Courier [fail-opening]"},
+            {"role": "user", "content": "Ready to Begin"},
+        ]});
+        assert!(matches!(opening_script(&opening, &state), Some(Script::Fail)));
+        assert!(opening_script(&opening, &state).is_none());
+        assert!(opening_script(&json!({"messages": [{"role": "user", "content": "go"}]}), &state).is_none());
         assert!(matches!(script("go", &state), Script::Answer));
     }
 
