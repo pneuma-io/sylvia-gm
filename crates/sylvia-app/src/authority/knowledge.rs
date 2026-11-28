@@ -659,6 +659,9 @@ fn search_on(
         private_references = super::content_reads::campaign_setting_knowledge(store, campaign_id, &plan)?.1;
     }
     let lock = &snapshot.state.package_lock;
+    // Every text file below is read through one connection, opened at the first read (Python
+    // opens one for each `package_file_bytes`; the answers are the same, see `PackageFileReader`).
+    let mut reader: Option<sylvia_store::package_reads::PackageFileReader<'_>> = None;
     for source in ["campaign_setting", "ruleset"] {
         let Some(Json::Object(bindings)) = bindings.filter(|_| requested(source)) else { continue };
         let Some(Json::Object(binding)) = bindings.get(source) else { continue };
@@ -702,7 +705,11 @@ fn search_on(
                 if ![".json", ".md", ".txt", ".yaml", ".yml"].contains(&suffix.as_str()) {
                     continue;
                 }
-                let value = match store.package_file_bytes(
+                let reader = match &mut reader {
+                    Some(reader) => reader,
+                    empty => empty.insert(store.package_file_reader()?),
+                };
+                let value = match reader.file_bytes(
                     entry.package_id(),
                     entry.version(),
                     entry.sha256(),
