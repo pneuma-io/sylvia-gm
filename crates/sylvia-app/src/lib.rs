@@ -65,6 +65,7 @@ pub mod piece_table;
 pub mod plan_bundle;
 pub mod plan_network_admission;
 pub mod plan_snapshot;
+pub mod plan_snapshot_materializer;
 pub mod plan_spatial_admission;
 pub mod plan_state_admission;
 pub mod player_actions;

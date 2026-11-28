@@ -26,8 +26,8 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/package_materialization.py:161` | `materialize_package_archive` | .casefold() | `folded = path.casefold()` |  `sylvia-app` bundled_vectors |
 | `builder/_package_materializer.py:176` | `_read_payloads` | .casefold() | `normalized = relative.casefold()` |  `sylvia-app` package_materializer_vectors |
 | `builder/_package_record_edits.py:193` | `apply_package_record_edits` | .casefold() | `if len({name.casefold() for name in expected_paths}) != len(expected_paths):` |  `sylvia-app` package_record_edit_vectors |
-| `builder/_plan_snapshot_materializer.py:179` | `_removed_paths` | .casefold() | `if len({item.casefold() for item in result}) != len(result):` | |
-| `builder/_plan_snapshot_materializer.py:200` | `_apply_plan_file_edits` | .casefold() | `if {path.casefold() for path in removed} & {path.casefold() for path in changed}:` | |
+| `builder/_plan_snapshot_materializer.py:179` | `_removed_paths` | .casefold() | `if len({item.casefold() for item in result}) != len(result):` | yes |
+| `builder/_plan_snapshot_materializer.py:200` | `_apply_plan_file_edits` | .casefold() | `if {path.casefold() for path in removed} & {path.casefold() for path in changed}:` | yes |
 | `domain/authority.py:587` | `_is_reserved_canonical_channel` | .casefold() | `tokens = tuple(token for token in re.split(r"[^a-z0-9]+", separated.casefold()) if token)` | `sylvia-domain` identity_vectors |
 | `domain/campaign_plan.py:377` | `_scan_private` | .casefold() | `if key_text.casefold() in _PRIVATE_KEYS:` | `sylvia-domain` campaign_plan_vectors |
 | `domain/package_library.py:2033` | `manifest_from_record` | .casefold() | `if len({file.path.casefold() for file in files}) != len(files):` | `sylvia-domain` manifest_vectors |

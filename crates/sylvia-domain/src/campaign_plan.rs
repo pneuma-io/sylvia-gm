@@ -135,7 +135,7 @@ fn safe_field_name(name: &str) -> bool {
 }
 
 /// `CampaignPlanFieldsError(value, keys, label, optional=..., path=...)`.
-fn fields_error(
+pub fn fields_error(
     value: &JsonMap,
     keys: &[&str],
     label: &str,
