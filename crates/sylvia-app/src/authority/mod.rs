@@ -16,6 +16,7 @@ pub mod package_candidates;
 pub mod player_projection;
 pub mod player_reads;
 pub mod portable;
+pub mod sequence_owner;
 pub mod snapshots;
 pub mod turn_reads;
 pub mod turns;
