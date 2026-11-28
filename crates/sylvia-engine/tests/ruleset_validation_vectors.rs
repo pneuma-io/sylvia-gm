@@ -8,6 +8,7 @@
 use serde_json::{json, Value as Json};
 use sha2::{Digest, Sha256};
 use sylvia_base::pyyaml::{self, Data};
+use sylvia_base::testing::{assert_same_json, json_difference};
 use sylvia_engine::ruleset::authoring_shape::runtime_authoring_shape_errors;
 use sylvia_engine::ruleset::authoring_shape::{
     COMPATIBILITY_EFFECT_HANDLERS, EFFECT_BODY_FIELDS, NEUTRAL_EFFECT_HANDLERS, SCALAR_EFFECT_BODIES,
@@ -86,9 +87,10 @@ fn check(text: &str, expected: &Json) -> Option<String> {
     }
     let mut wanted = expected.clone();
     for key in ["text", "source"] {
-        wanted.as_object_mut().unwrap().remove(key);
+        wanted.as_object_mut().unwrap().shift_remove(key);
     }
-    (actual != wanted).then(|| format!("python {wanted}\n  rust {actual}"))
+    json_difference(&actual, &wanted)
+        .map(|difference| format!("{difference}\n  python {wanted}\n  rust {actual}"))
 }
 
 #[test]
@@ -116,15 +118,31 @@ fn declarations_match_python() {
         items.sort_unstable();
         json!(items)
     };
-    assert_eq!(wanted["VALID_PARAM_TYPES"], sorted(VALID_PARAM_TYPES));
-    assert_eq!(wanted["VALID_EFFECT_KEYS"], json!(VALID_EFFECT_KEYS), "kept in sorted order");
-    assert_eq!(wanted["VALID_TRIGGERS"], sorted(VALID_TRIGGERS));
-    assert_eq!(wanted["SCALAR_EFFECT_BODIES"], sorted(SCALAR_EFFECT_BODIES));
-    assert_eq!(wanted["NEUTRAL_EFFECT_HANDLERS"], json!(NEUTRAL_EFFECT_HANDLERS));
-    assert_eq!(wanted["COMPATIBILITY_EFFECT_HANDLERS"], json!(COMPATIBILITY_EFFECT_HANDLERS));
+    assert_same_json(&sorted(VALID_PARAM_TYPES), &wanted["VALID_PARAM_TYPES"], "VALID_PARAM_TYPES");
+    assert_same_json(
+        &json!(VALID_EFFECT_KEYS),
+        &wanted["VALID_EFFECT_KEYS"],
+        "VALID_EFFECT_KEYS, kept in sorted order",
+    );
+    assert_same_json(&sorted(VALID_TRIGGERS), &wanted["VALID_TRIGGERS"], "VALID_TRIGGERS");
+    assert_same_json(&sorted(SCALAR_EFFECT_BODIES), &wanted["SCALAR_EFFECT_BODIES"], "SCALAR_EFFECT_BODIES");
+    assert_same_json(
+        &json!(NEUTRAL_EFFECT_HANDLERS),
+        &wanted["NEUTRAL_EFFECT_HANDLERS"],
+        "NEUTRAL_EFFECT_HANDLERS",
+    );
+    assert_same_json(
+        &json!(COMPATIBILITY_EFFECT_HANDLERS),
+        &wanted["COMPATIBILITY_EFFECT_HANDLERS"],
+        "COMPATIBILITY_EFFECT_HANDLERS",
+    );
     let fields: serde_json::Map<String, Json> =
         EFFECT_BODY_FIELDS.iter().map(|(name, fields)| ((*name).to_owned(), json!(fields))).collect();
-    assert_eq!(wanted["EFFECT_BODY_FIELDS"], Json::Object(fields), "same handlers, fields in the same order");
+    assert_same_json(
+        &Json::Object(fields),
+        &wanted["EFFECT_BODY_FIELDS"],
+        "EFFECT_BODY_FIELDS: same handlers, fields in the same order",
+    );
 }
 
 #[test]
@@ -134,7 +152,7 @@ fn yaml_text_validates_as_python() {
     assert!(texts.len() >= 30);
     for case in texts {
         let text = case["text"].as_str().unwrap();
-        assert_eq!(text_outcome(text), case["validate_text"], "{text:?}");
+        assert_same_json(&text_outcome(text), &case["validate_text"], format!("{text:?}"));
     }
     let checked =
         vectors["cases"].as_array().unwrap().iter().filter(|case| case.get("validate_text").is_some());

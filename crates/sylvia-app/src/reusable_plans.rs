@@ -43,7 +43,7 @@ const COMMON_FIELDS: [&str; 8] = [
 ];
 
 /// `_LIBRARY_WRITE_LOCK`.
-static LIBRARY_WRITE_LOCK: Mutex<()> = Mutex::new(());
+pub(crate) static LIBRARY_WRITE_LOCK: Mutex<()> = Mutex::new(());
 
 /// `CampaignPlanValidator`: `(payload, readable_markdown) -> ValidatedCampaignPlan`.
 pub type PlanValidator<'a> = &'a dyn Fn(&Json, &str) -> DomainResult<ValidatedCampaignPlan>;

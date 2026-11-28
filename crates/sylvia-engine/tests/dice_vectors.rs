@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::OnceLock;
 use sylvia_base::pyjson::{self, Dump};
+use sylvia_base::testing::{assert_same_json, json_difference};
 use sylvia_engine::dice::{Die, RollResult, RollSource};
 use sylvia_engine::dice_expr::{parse_dice_expr, roll_initiative_expr};
 use sylvia_engine::rng_queue::RngQueue;
@@ -146,7 +147,7 @@ fn every_call_matches_python_under_every_seed() {
         dice.seeded_rolls(Some(seed), |dice| {
             for (index, (call, expected)) in script.iter().zip(results).enumerate() {
                 let actual = run(dice, call);
-                if &actual != expected {
+                if json_difference(&actual, expected).is_some() {
                     failures
                         .push(format!("seed {seed} call {index} {call}: python {expected}, rust {actual}"));
                     break;
@@ -195,15 +196,16 @@ fn context_streams_behave_like_python_context_variables() {
         dice.set_seed(33);
         rolls.push(d20(dice));
     });
-    assert_eq!(json!(rolls), expected["nested"]);
+    assert_same_json(&json!(rolls), &expected["nested"], "nested");
 
     dice.set_seed(5);
     let mut default = vec![d20(&mut dice)];
     dice.seeded_rolls(Some(6), |dice| default.push(d20(dice)));
     default.push(d20(&mut dice));
-    assert_eq!(
-        json!({"rolls": default, "seed": dice.get_seed().map(|s| s as i64)}),
-        expected["default_after_tool"]
+    assert_same_json(
+        &json!({"rolls": default, "seed": dice.get_seed().map(|s| s as i64)}),
+        &expected["default_after_tool"],
+        "default_after_tool",
     );
 
     let scripted = &expected["scripted"];
@@ -221,8 +223,8 @@ fn context_streams_behave_like_python_context_variables() {
         out.push(items[dice.weighted_pick(&items, "weight", None).unwrap().unwrap()].clone());
         out
     });
-    assert_eq!(json!(results), scripted["results"]);
-    assert_eq!(json!(*calls.borrow()), scripted["calls"]);
+    assert_same_json(&json!(results), &scripted["results"], "scripted results");
+    assert_same_json(&json!(*calls.borrow()), &scripted["calls"], "scripted calls");
 }
 
 #[test]
@@ -231,14 +233,14 @@ fn rng_queue_matches_python() {
     for case in vectors["queues"].as_array().unwrap() {
         let seed = int(&case["seed"]);
         let mut queue = RngQueue::new(int(&case["size"]), Some(seed)).unwrap();
-        assert_eq!(queue.to_dict(), case["first"], "seed {seed}");
+        assert_same_json(&queue.to_dict(), &case["first"], format!("seed {seed}"));
         assert_eq!(RngQueue::from_dict(&queue.to_dict()).as_ref(), Some(&queue));
         let consumed: Vec<Value> = (0..=queue.size).map(|_| queue.consume().to_dict()).collect();
-        assert_eq!(json!(consumed), case["consumed"]);
+        assert_same_json(&json!(consumed), &case["consumed"], "consumed");
         assert_eq!(queue.to_context_block(), case["block"].as_str().unwrap());
         assert_eq!(queue.remaining(), int(&case["remaining"]));
         queue.regenerate(None);
-        assert_eq!(queue.to_dict(), case["again"]);
+        assert_same_json(&queue.to_dict(), &case["again"], "again");
         queue.regenerate(Some(seed + 1));
         assert_eq!(queue.to_dict(), case["reseeded"]);
     }

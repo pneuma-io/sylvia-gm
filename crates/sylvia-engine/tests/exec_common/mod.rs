@@ -5,6 +5,7 @@ use indexmap::IndexMap;
 use serde_json::{json, Value as Json};
 use std::cell::Cell;
 use sylvia_base::pyyaml::{self, Data};
+use sylvia_base::testing::json_difference;
 use sylvia_domain::authority::{MechanicsChoiceOption, MechanicsChoiceRequest};
 use sylvia_engine::dice::Dice;
 use sylvia_engine::exec::context::{ChoiceControl, NestedMode, ProcedureExecutor};
@@ -222,7 +223,7 @@ pub fn check_all(vectors: &Json, minimum: usize) {
         }
         let mut wanted = case.clone();
         for key in ["document", "tool", "params", "seed", "choice", "shuffled", "state", "deferred"] {
-            wanted.as_object_mut().unwrap().remove(key);
+            wanted.as_object_mut().unwrap().shift_remove(key);
         }
         if let Some(names) = case.get("shuffled").and_then(Json::as_array) {
             for name in names.iter().filter_map(Json::as_str) {
@@ -250,9 +251,21 @@ pub fn check_all(vectors: &Json, minimum: usize) {
                 }
             }
         }
-        if actual != wanted {
+        // The record's own fields are an envelope of the test's making; each field's value is
+        // Python's, compared with its key order and number forms.
+        let envelope = |record: &Json| {
+            record.as_object().unwrap().keys().cloned().collect::<std::collections::BTreeSet<_>>()
+        };
+        let difference = if envelope(&actual) == envelope(&wanted) {
+            actual.as_object().unwrap().iter().find_map(|(key, value)| {
+                json_difference(value, &wanted[key]).map(|difference| format!("{key}: {difference}"))
+            })
+        } else {
+            Some(format!("fields {:?} != {:?}", envelope(&actual), envelope(&wanted)))
+        };
+        if let Some(difference) = difference {
             failures.push(format!(
-                "case {index}: {}\n  python {wanted}\n  rust   {actual}",
+                "case {index}: {}\n  {difference}\n  python {wanted}\n  rust   {actual}",
                 case["document"]["tools"]["main"]["effects"]
             ));
         }

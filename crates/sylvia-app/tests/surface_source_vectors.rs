@@ -6,6 +6,7 @@ use serde_json::{json, Value as Json};
 use sylvia_app::tactical_grid::{
     resolve_surface_source, resolve_surface_source_with_state_paths, StatePaths, SurfaceParticipant,
 };
+use sylvia_base::testing::assert_same_json;
 use sylvia_domain::error::DomainError;
 
 /// A participant with whichever attributes the case gives.
@@ -69,7 +70,11 @@ fn surface_sources_resolve_as_python() {
             Ok((value, paths)) => {
                 let plain =
                     resolve_surface_source(&case["source"], state, &participants).expect("the same answer");
-                assert_eq!(plain, value, "resolve_surface_source answers as the state-path form does");
+                assert_same_json(
+                    &plain,
+                    &value,
+                    "resolve_surface_source answers as the state-path form does",
+                );
                 json!({"result": value, "state_paths": sorted(&paths)})
             }
             Err(error) => json!({"error": [class(&error), error.to_string()]}),

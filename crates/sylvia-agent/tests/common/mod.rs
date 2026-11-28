@@ -680,6 +680,12 @@ impl TurnOwner for Recorded {
     ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
         loop_call("agent_session_work")
     }
+    fn builder_session_work<'a>(
+        &'a self,
+        _session_id: &'a str,
+    ) -> BoxFuture<'a, Result<HeldWork, AuthorityFailure>> {
+        loop_call("builder_session_work")
+    }
     fn campaign_ending_choice_text<'a>(
         &'a self,
         _session_id: &'a str,

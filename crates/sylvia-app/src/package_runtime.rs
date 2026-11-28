@@ -693,7 +693,7 @@ pub fn validate_package_runtime(
     declarations: &[ToolDeclaration],
     runtime_bytes: &[u8],
 ) -> Result<(), PackageRuntimeFailure> {
-    let runtime = load_runtime(package_id, runtime_bytes, true)?;
+    let runtime = cached_parse(package_id, runtime_bytes, true)?;
     let declared: Vec<&str> = declarations.iter().map(|declaration| declaration.name.as_str()).collect();
     let unique: HashSet<&str> = declared.iter().copied().collect();
     if unique.len() != declarations.len() {
@@ -738,25 +738,40 @@ pub fn validate_package_runtime(
 }
 
 /// `_parse_runtime(package_id=..., runtime_bytes=...)`, the execution parse.
-///
-/// Python keeps the 16 most recently used parsed runtimes in the process, keyed by the package
-/// id and the exact bytes, and reuses an authoring parse of the same bytes. An authoring parse
-/// that succeeds has no duplicate keys, so the execution parse of those bytes builds the same
-/// data: neither the cache nor the reuse can change a result. This keeps the same bound and the
-/// same key. A lookup compares the bytes as Python's dict does once a hash matches, by length and
-/// then by content. It never hashes them: a SHA-256 of SRD Lite's 14.5 MB runtime took about
-/// 64 ms on every call, where the comparison is a single memory compare. Two different runtimes
-/// can never share an entry.
 pub(crate) fn parse_runtime(
     package_id: &str,
     runtime_bytes: &[u8],
+) -> Outcome<std::sync::Arc<RuntimeTables>> {
+    cached_parse(package_id, runtime_bytes, false)
+}
+
+/// `_parse_runtime(package_id=..., runtime_bytes=..., authoring=...)`.
+///
+/// Python keeps the 16 most recently used parsed runtimes in the process, keyed by the package
+/// id, the exact bytes and `authoring`. Package validation (`authoring=True`) reads and fills the
+/// authoring entries. An execution parse first takes an authoring entry for the same bytes: an
+/// authoring parse that succeeds has no duplicate keys, so the execution parse of those bytes
+/// builds the same data. An authoring parse never takes an execution entry, since the execution
+/// load skips the stricter checks. Neither the cache nor the reuse can change a result.
+///
+/// This keeps the same bound and the same key. A lookup compares the bytes as Python's dict does
+/// once a hash matches, by length and then by content. It never hashes them: a SHA-256 of SRD
+/// Lite's 14.5 MB runtime took about 64 ms on every call, where the comparison is a single memory
+/// compare. Two different runtimes can never share an entry.
+fn cached_parse(
+    package_id: &str,
+    runtime_bytes: &[u8],
+    authoring: bool,
 ) -> Outcome<std::sync::Arc<RuntimeTables>> {
     use std::sync::{Arc, Mutex, OnceLock};
     static PARSED: OnceLock<Mutex<Vec<ParsedRuntime>>> = OnceLock::new();
     let parsed = PARSED.get_or_init(|| Mutex::new(Vec::new()));
     {
         let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-        if let Some(index) = entries.iter().position(|entry| entry.is(package_id, runtime_bytes)) {
+        // Execution accepts legacy files; it cannot attest the stricter authoring checks.
+        let admitted = !authoring && entries.iter().any(|entry| entry.is(package_id, runtime_bytes, true));
+        let key = authoring || admitted;
+        if let Some(index) = entries.iter().position(|entry| entry.is(package_id, runtime_bytes, key)) {
             let entry = entries.remove(index);
             let runtime = entry.runtime.clone();
             entries.push(entry);
@@ -764,12 +779,13 @@ pub(crate) fn parse_runtime(
         }
     }
     // A failed parse is not kept, as Python keeps only parsed runtimes.
-    let runtime = Arc::new(load_runtime(package_id, runtime_bytes, false)?);
+    let runtime = Arc::new(load_runtime(package_id, runtime_bytes, authoring)?);
     let mut entries = parsed.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
-    entries.retain(|entry| !entry.is(package_id, runtime_bytes));
+    entries.retain(|entry| !entry.is(package_id, runtime_bytes, authoring));
     entries.push(ParsedRuntime {
         package_id: package_id.to_owned(),
         bytes: runtime_bytes.into(),
+        authoring,
         runtime: runtime.clone(),
     });
     while entries.len() > PARSED_RUNTIME_LIMIT {
@@ -778,18 +794,22 @@ pub(crate) fn parse_runtime(
     Ok(runtime)
 }
 
-/// One kept parse and its key: the package id and its own copy of the exact bytes, as Python's
-/// key holds the bytes object.
+/// One kept parse and its key: the package id, its own copy of the exact bytes (as Python's key
+/// holds the bytes object) and whether it was the authoring parse.
 struct ParsedRuntime {
     package_id: String,
     bytes: Box<[u8]>,
+    authoring: bool,
     runtime: std::sync::Arc<RuntimeTables>,
 }
 
 impl ParsedRuntime {
-    /// Whether this entry's key is `(package_id, runtime_bytes)`.
-    fn is(&self, package_id: &str, runtime_bytes: &[u8]) -> bool {
-        if self.package_id != package_id || self.bytes.len() != runtime_bytes.len() {
+    /// Whether this entry's key is `(package_id, runtime_bytes, authoring)`.
+    fn is(&self, package_id: &str, runtime_bytes: &[u8], authoring: bool) -> bool {
+        if self.authoring != authoring
+            || self.package_id != package_id
+            || self.bytes.len() != runtime_bytes.len()
+        {
             return false;
         }
         self.bytes[..] == *runtime_bytes
@@ -1093,5 +1113,39 @@ tools:
         // Another allocation of the same bytes is the same key, as Python's bytes equality is.
         let copy = bytes.clone();
         assert!(Arc::ptr_eq(&parsed, &parse_runtime(package, &copy).unwrap()));
+    }
+
+    #[test]
+    fn validation_fills_the_authoring_entry_and_execution_takes_it() {
+        let package = "test.cache.authoring";
+        let bytes = runtime(package, "Clap twice.");
+        validate_package_runtime(package, &[declaration()], &bytes).unwrap();
+        // Both lookups find the one entry validation kept: no parse runs for either.
+        let execution = parse_runtime(package, &bytes).unwrap();
+        assert!(Arc::ptr_eq(&execution, &cached_parse(package, &bytes, true).unwrap()));
+    }
+
+    #[test]
+    fn an_authoring_parse_never_takes_an_execution_entry() {
+        // A duplicate field loads for execution but not for authoring.
+        let package = "test.cache.strict";
+        let bytes = String::from_utf8(runtime(package, "Spin."))
+            .unwrap()
+            .replace(
+                "    effects: []
+",
+                "    effects: []
+    effects: []
+",
+            )
+            .into_bytes();
+        assert!(parse_runtime(package, &bytes).is_ok());
+        match validate_package_runtime(package, &[declaration()], &bytes) {
+            Err(PackageRuntimeFailure::Rejected(error)) => {
+                assert_eq!(error.message, "Package runtime YAML is invalid");
+            }
+            Err(other) => panic!("another failure: {other:?}"),
+            Ok(()) => panic!("the execution parse was reused for validation"),
+        }
     }
 }

@@ -115,7 +115,7 @@ def _write(text, roots, outcome, budget) -> None:
             record["budget"] = budget
     except Unsupported:
         return
-    line = json.dumps(record, sort_keys=True, ensure_ascii=False)
+    line = json.dumps(record, ensure_ascii=False)
     digest = hashlib.sha256(line.encode("utf-8")).digest()
     if digest in _seen:
         return

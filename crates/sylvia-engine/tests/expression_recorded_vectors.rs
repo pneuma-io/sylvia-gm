@@ -8,6 +8,8 @@
 #[path = "common/tagged.rs"]
 mod tagged;
 
+use sylvia_base::testing::json_difference;
+
 use serde_json::{json, Value as Json};
 use std::cell::Cell;
 use sylvia_engine::expr::{evaluate_expression, Dict, EvalContext, ExecutionBudget, Value};
@@ -67,8 +69,8 @@ fn every_recorded_evaluation_replays_as_python() {
             Some(result) => json!({"result": result}),
             None => json!({"error": case["error"], "message": case["message"]}),
         };
-        if actual != expected {
-            failures.push(format!("{text}: python {expected}, rust {actual}"));
+        if let Some(difference) = json_difference(&actual, &expected) {
+            failures.push(format!("{text}: {difference}\n  python {expected}, rust {actual}"));
         }
     }
     assert!(
