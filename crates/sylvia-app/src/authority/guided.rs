@@ -341,6 +341,7 @@ pub async fn create_guided_campaign_draft(
     builder_provider_id: &str,
     builder_model_id: &str,
 ) -> StoreResult<GuidedCampaignDraft> {
+    let _operation = store.operation()?;
     for (value, label) in [
         (operation_id, "Campaign operation identity"),
         (display_name, "Campaign display name"),
@@ -619,6 +620,7 @@ pub async fn advance_guided_campaign_draft(
     bundled: &Arc<BundledPackages>,
     advance: &AdvanceAnswer<'_>,
 ) -> StoreResult<GuidedCampaignDraft> {
+    let _operation = store.operation()?;
     let _work = campaign_work(store, advance.campaign_id).await?;
     let invalid = || rejected("Guided Campaign answer is invalid", "invalid_campaign_interview_answer");
     for (value, label) in [
@@ -704,6 +706,7 @@ pub async fn campaign_construction_basis(
     store: &StoreHandle,
     campaign_id: &str,
 ) -> StoreResult<CampaignConstructionBasis> {
+    let _operation = store.operation()?;
     validate_authority_identity(campaign_id, "Campaign identity", false)?;
     let campaign_id = campaign_id.to_owned();
     store.call(move |store| store.campaign_construction_basis(&campaign_id)).await
@@ -718,6 +721,7 @@ pub async fn bind_guided_campaign_basis(
     bundled: &Arc<BundledPackages>,
     bind: &BindRequest<'_>,
 ) -> StoreResult<CampaignConfirmation> {
+    let _operation = store.operation()?;
     let campaign_id = bind.campaign_id.to_owned();
     let _work = campaign_work(store, &campaign_id).await?;
     let invalid = || rejected("Guided Campaign binding authority is invalid", "invalid_authority_identity");
@@ -850,6 +854,7 @@ pub async fn begin_campaign_construction(
     expected_revision: i64,
     canonical_input: &Json,
 ) -> StoreResult<CampaignConstructionBegun> {
+    let _operation = store.operation()?;
     let invalid = || rejected("Campaign construction input is invalid", "construction_input_invalid");
     if validate_authority_identity(operation_id, "Campaign operation identity", false).is_err()
         || validate_authority_identity(campaign_id, "Campaign identity", false).is_err()
@@ -928,6 +933,7 @@ pub async fn finalize_campaign_construction(
     validate_authority_identity(finalize.campaign_id, "Campaign identity", false)?;
     validate_authority_identity(finalize.dm_provider_id, "DM provider identity", false)?;
     validate_authority_identity(finalize.dm_model_id, "DM model identity", false)?;
+    let _operation = store.operation()?;
     let campaign_id = finalize.campaign_id.to_owned();
     let basis = {
         let campaign_id = campaign_id.clone();

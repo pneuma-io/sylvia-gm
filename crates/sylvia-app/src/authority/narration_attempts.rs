@@ -5,7 +5,8 @@
 //! `expire_narration`, `interrupt_narration` (with `_expire_narration_locked`),
 //! `_flush_attempt_buffer`, `_attempt` and `_live_attempt`; and the interruption reads
 //! `unresolved_session_interruption`, `retryable_interruption`, `narration_interruption`, with
-//! `_can_redirect_interruption`, and `private_provider_index`.
+//! `_can_redirect_interruption`, and `private_provider_index`; and the turn's other owner calls:
+//! `redirect_narration`, `manual_retry`, `saved_action_receipt` and `campaign_ending_choice_text`.
 //!
 //! Every attempt lives in the owner's [`NarrationState`], keyed by `(campaign_id, attempt_id)`.
 //! Each operation holds [`NarrationState::region`] where Python holds `_narration_lock`
@@ -25,8 +26,9 @@ use super::narration::{CancelHandle, NarrationAttempt, NarrationState};
 use sylvia_base::{Json, JsonMap};
 use sylvia_domain::authority::{
     response_blocks_text, validate_authority_identity, validate_response_blocks, CanonicalEvent,
-    CanonicalReplay, NarrationInterruption, ProseChannel, WriterRole,
+    CanonicalReplay, ManualRetryResult, NarrationInterruption, ProseChannel, RetryNarrationInput, WriterRole,
 };
+use sylvia_domain::pyops::py_type_name;
 use sylvia_domain::session::{SessionContext, SessionMessageKind};
 use sylvia_domain::DomainError;
 use sylvia_store::interruptions::{new_interruption_id, NarrationSegment};
@@ -97,6 +99,7 @@ fn finite(now: f64, message: &str) -> Result<f64, ActionError> {
 
 /// `start_narration_attempt(...)`: begin the campaign's work and admit one live attempt.
 pub async fn start_narration_attempt(store: &StoreHandle, start: NarrationStart) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let work = super::guided::campaign_work(store, &start.campaign_id).await?;
     // A failure drops `work`, finishing it, as Python's `except BaseException` does.
     start_attempt(store, start, None, Some(work)).await
@@ -223,6 +226,7 @@ pub async fn emit_narration_token(
     token: &str,
     response_blocks: Option<&Json>,
 ) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -275,6 +279,7 @@ pub async fn flush_narration(
     campaign_id: &str,
     attempt_id: &str,
 ) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -298,6 +303,7 @@ pub async fn bind_narration_action(
     attempt_id: &str,
     action_id: &str,
 ) -> Result<(), ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -325,6 +331,17 @@ pub async fn bind_narration_action(
 /// resolve the interruption a Retry answers), end it and its work, and return its canonical
 /// events.
 pub async fn complete_narration_attempt(
+    store: &StoreHandle,
+    campaign_id: &str,
+    attempt_id: &str,
+) -> Result<Vec<CanonicalEvent>, ActionError> {
+    let _operation = store.operation()?;
+    complete_attempt(store, campaign_id, attempt_id).await
+}
+
+/// `_complete_narration_attempt(campaign_id, attempt_id)`: the completion for an operation that
+/// already holds the owner's operation guard (`manual_retry`).
+async fn complete_attempt(
     store: &StoreHandle,
     campaign_id: &str,
     attempt_id: &str,
@@ -408,6 +425,7 @@ pub async fn disconnect_narration(
     attempt_id: &str,
     now: f64,
 ) -> Result<f64, ActionError> {
+    let _operation = store.operation()?;
     let now = finite(now, "Disconnect time must be finite")?;
     let narration = store.narration();
     let Some(grace) = narration.disconnect_grace() else {
@@ -428,6 +446,7 @@ pub async fn reconnect_narration(
     now: f64,
     acknowledged_sequence: i64,
 ) -> Result<CanonicalReplay, ActionError> {
+    let _operation = store.operation()?;
     let now = finite(now, "Reconnect time must be finite")?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
@@ -449,7 +468,13 @@ pub async fn reconnect_narration(
             return Err(rejected("Narration reconnect deadline elapsed"));
         }
     }
-    Ok(super::player_reads::canonical_replay(store, narration, campaign_id, acknowledged_sequence).await?)
+    Ok(super::player_reads::canonical_replay_in_operation(
+        store,
+        narration,
+        campaign_id,
+        acknowledged_sequence,
+    )
+    .await?)
 }
 
 /// `narration_attempt_status(campaign_id, attempt_id)`: the attempt's transport lifecycle.
@@ -458,6 +483,7 @@ pub async fn narration_attempt_status(
     campaign_id: &str,
     attempt_id: &str,
 ) -> Result<String, ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let _region = narration.region().await;
     attempt(narration, &key(campaign_id, attempt_id), |attempt| {
@@ -497,6 +523,7 @@ pub async fn expire_narration(
     attempt_id: &str,
     now: f64,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -521,6 +548,7 @@ pub async fn interrupt_narration(
     campaign_id: &str,
     attempt_id: &str,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let narration = store.narration();
     let key = key(campaign_id, attempt_id);
     let _region = narration.region().await;
@@ -547,7 +575,10 @@ async fn last_attempt_commit(
 
 /// `_expire_narration_locked(attempt)`: end the attempt and its work, save its interruption and
 /// cancel it once. The caller holds the region.
-async fn expire_locked(store: &StoreHandle, key: &Key) -> Result<NarrationInterruption, ActionError> {
+pub(super) async fn expire_locked(
+    store: &StoreHandle,
+    key: &Key,
+) -> Result<NarrationInterruption, ActionError> {
     let narration = store.narration();
     let fresh = new_interruption_id()?;
     let (work, campaign_id, attempt_id) = attempt(narration, key, |attempt| {
@@ -602,6 +633,293 @@ async fn expire_locked(store: &StoreHandle, key: &Key) -> Result<NarrationInterr
     Ok(record)
 }
 
+/// `redirect_narration(session_id=..., message_id=..., content=..., interruption_id=...)`: a GM
+/// session's new guidance for a stopped narration, saved with its continuation's reservation and
+/// without discarding saved results. The answer is the interruption it redirects.
+pub async fn redirect_narration(
+    store: &StoreHandle,
+    session_id: &str,
+    message_id: &str,
+    content: &JsonMap,
+    interruption_id: &str,
+) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
+    let _work = store.session_campaign_work(session_id).await?;
+    let id = session_id.to_owned();
+    let context = store.call(move |store| store.session_context(&id)).await?;
+    let campaign_id = match context.session.campaign_id() {
+        Some(campaign_id) if context.session.role() == WriterRole::Dm => campaign_id.to_owned(),
+        _ => return Err(rejected("Only a GM session can redirect campaign narration")),
+    };
+    let (campaign, interruption) = (campaign_id.clone(), interruption_id.to_owned());
+    let interruption = store.call(move |store| store.interruption(&campaign, &interruption)).await?;
+    if !can_redirect_interruption(&interruption, &context) {
+        return Err(rejected("Only stopped narration accepts replacement input"));
+    }
+    if !equals_optional(content.get("turn_id"), Some(interruption.turn_id.as_str())) {
+        return Err(rejected("Replacement input belongs to another turn"));
+    }
+    let Some(Json::String(attempt_id)) = content.get("attempt_id") else {
+        return Err(rejected("Replacement input requires an attempt identity"));
+    };
+    let (session_id, message_id, content, record, attempt_id) = (
+        session_id.to_owned(),
+        message_id.to_owned(),
+        content.clone(),
+        interruption.clone(),
+        attempt_id.clone(),
+    );
+    store
+        .call(move |store| {
+            store.redirect_interruption(&session_id, &message_id, &content, &record, &attempt_id)
+        })
+        .await?;
+    Ok(interruption)
+}
+
+/// The narrator's stop signal when the owner refused one of its tokens: the owner's own error
+/// stays with the [`RetryStream`], and `manual_retry` returns it if the narrator then fails, as
+/// Python's exception passes through the narrator unchanged.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EmitRefused {
+    pub message: String,
+}
+
+/// `NarrationStream`: where a Retry's narrator emits its tokens, into the Retry's attempt.
+pub struct RetryStream<'s> {
+    store: &'s StoreHandle,
+    campaign_id: String,
+    retry_id: String,
+    /// The first error the owner raised for a token.
+    refused: Option<ActionError>,
+}
+
+impl RetryStream<'_> {
+    /// `emit(channel, token, response_blocks=...)`: `emit_narration_token` on the Retry's attempt.
+    pub async fn emit(
+        &mut self,
+        channel: ProseChannel,
+        token: &str,
+        response_blocks: Option<&Json>,
+    ) -> Result<(), EmitRefused> {
+        match emit_narration_token(
+            self.store,
+            &self.campaign_id,
+            &self.retry_id,
+            channel,
+            token,
+            response_blocks,
+        )
+        .await
+        {
+            Ok(()) => Ok(()),
+            Err(error) => {
+                let message = match &error {
+                    ActionError::Domain(error) => error.message().to_owned(),
+                    ActionError::Store(error) => error.to_string(),
+                };
+                self.refused.get_or_insert(error);
+                Err(EmitRefused { message })
+            }
+        }
+    }
+}
+
+/// `narrator(retry_input, stream)`: one manual Retry's narration.
+pub trait RetryNarration: Send {
+    type Error: Send;
+    fn narrate<'a>(
+        &'a mut self,
+        input: RetryNarrationInput,
+        stream: &'a mut RetryStream<'_>,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<(), Self::Error>> + Send + 'a>>;
+}
+
+/// `manual_retry(...)`'s identities and cancel handle.
+pub struct ManualRetry {
+    pub campaign_id: String,
+    pub interruption_id: String,
+    pub retry_id: String,
+    pub cancel: CancelHandle,
+}
+
+/// What `manual_retry` raises: the owner's own error, or the narrator's.
+#[derive(Debug)]
+pub enum RetryFailure<E> {
+    Owner(ActionError),
+    Narrator(E),
+}
+
+impl<E> From<ActionError> for RetryFailure<E> {
+    fn from(error: ActionError) -> Self {
+        Self::Owner(error)
+    }
+}
+
+impl<E> From<sylvia_store::StoreError> for RetryFailure<E> {
+    fn from(error: sylvia_store::StoreError) -> Self {
+        Self::Owner(error.into())
+    }
+}
+
+/// `manual_retry(campaign_id=..., interruption_id=..., retry_id=..., narrator=..., cancel=...,
+/// on_attempt_started=...)`: narrate a stopped turn's saved result again without running its
+/// mechanics, under the campaign's work. An already resolved Retry is replayed. Any failure
+/// after the Retry's attempt starts interrupts the attempt (if still live) before it returns.
+pub async fn manual_retry<N: RetryNarration>(
+    store: &StoreHandle,
+    request: ManualRetry,
+    on_attempt_started: impl FnOnce() + Send,
+    mut narrator: N,
+) -> Result<ManualRetryResult, RetryFailure<N::Error>> {
+    let _operation = store.operation()?;
+    let _work = super::guided::campaign_work(store, &request.campaign_id).await?;
+    let ManualRetry { campaign_id, interruption_id, retry_id, cancel } = request;
+    let reserved = {
+        let (campaign, interruption, retry) =
+            (campaign_id.clone(), interruption_id.clone(), retry_id.clone());
+        store.call(move |store| store.reserve_retry(&campaign, &interruption, &retry)).await?
+    };
+    let campaign = campaign_id.clone();
+    let snapshot = store.call(move |store| store.snapshot(&campaign)).await?;
+    let action_receipt = match &reserved.last_action_id {
+        None => None,
+        Some(action_id) => {
+            let (campaign, action) = (campaign_id.clone(), action_id.clone());
+            Some(store.call(move |store| store.action_receipt(&campaign, &action)).await?)
+        }
+    };
+    let input = RetryNarrationInput {
+        campaign_id: campaign_id.clone(),
+        interruption_id: interruption_id.clone(),
+        retry_id: retry_id.clone(),
+        failed_attempt_id: reserved.failed_attempt_id.clone(),
+        canonical_high_water: snapshot.events.last().map_or(0, |event| event.sequence),
+        turn_id: reserved.turn_id.clone(),
+        action_receipt,
+    };
+    if !reserved.retryable {
+        let canonical = snapshot
+            .events
+            .into_iter()
+            .filter(|event| event.attempt_id.as_deref() == Some(retry_id.as_str()))
+            .collect();
+        return Ok(ManualRetryResult { input, canonical, replayed: true });
+    }
+    let failure_interruption_id = (reserved.failed_attempt_id == retry_id).then(|| interruption_id.clone());
+    start_attempt(
+        store,
+        NarrationStart {
+            campaign_id: campaign_id.clone(),
+            attempt_id: retry_id.clone(),
+            turn_id: reserved.turn_id.clone(),
+            cancel,
+            last_action_id: reserved.last_action_id.clone(),
+            interruption_id: Some(interruption_id.clone()),
+        },
+        failure_interruption_id,
+        None,
+    )
+    .await?;
+    let mut stream =
+        RetryStream { store, campaign_id: campaign_id.clone(), retry_id: retry_id.clone(), refused: None };
+    on_attempt_started();
+    let outcome = match narrator.narrate(input.clone(), &mut stream).await {
+        Err(error) => Err(match stream.refused.take() {
+            Some(owner) => RetryFailure::Owner(owner),
+            None => RetryFailure::Narrator(error),
+        }),
+        Ok(()) => complete_attempt(store, &campaign_id, &retry_id).await.map_err(RetryFailure::Owner),
+    };
+    match outcome {
+        Ok(canonical) => Ok(ManualRetryResult { input, canonical, replayed: false }),
+        Err(failure) => {
+            // `except BaseException`: interrupt the still-live attempt, then raise. An error while
+            // interrupting replaces the original, as Python's would.
+            let narration = store.narration();
+            let key = key(&campaign_id, &retry_id);
+            let _region = narration.region().await;
+            if !attempt(narration, &key, |attempt| attempt.terminal)? {
+                expire_locked(store, &key).await?;
+            }
+            Err(failure)
+        }
+    }
+}
+
+/// `campaign_ending_choice_text(session_id, message_id, choice)`: admit a real player's ending
+/// button and give its explicit OOC instruction. The choice must name the session's current
+/// ending and be `continue` (only for an open-world ending) or `finish`; once an ending choice is
+/// saved, only that same saved message's own choice is admitted again.
+pub async fn campaign_ending_choice_text(
+    store: &StoreHandle,
+    session_id: &str,
+    message_id: &str,
+    choice: &JsonMap,
+) -> Result<String, ActionError> {
+    let _operation = store.operation()?;
+    let _work = store.session_campaign_work(session_id).await?;
+    let id = session_id.to_owned();
+    let page = store.call(move |store| store.session_history_page(&id, None, 50)).await?;
+    let unavailable = || rejected("This campaign ending is unavailable");
+    let selected = choice.get("choice");
+    let Some(ending) = page.campaign_ending else { return Err(unavailable()) };
+    let mut keys: Vec<&str> = choice.keys().map(String::as_str).collect();
+    keys.sort_unstable();
+    if keys != ["choice", "ending_id"] {
+        return Err(unavailable());
+    }
+    let field = |key: &str| {
+        ending
+            .get(key)
+            .cloned()
+            .ok_or_else(|| ActionError::from(DomainError::uncaught("KeyError", format!("'{key}'"))))
+    };
+    if choice.get("ending_id") != Some(&field("ending_id")?) {
+        return Err(unavailable());
+    }
+    // `selected not in {"continue", "finish"}`: a list or object is unhashable.
+    if let Some(value @ (Json::Array(_) | Json::Object(_))) = selected {
+        return Err(DomainError::uncaught(
+            "TypeError",
+            format!("unhashable type: '{}'", py_type_name(value)),
+        )
+        .into());
+    }
+    let selected = match selected.and_then(Json::as_str) {
+        Some(selected @ ("continue" | "finish")) => selected,
+        _ => return Err(unavailable()),
+    };
+    let context = store.session_context(session_id).await?;
+    let previous = context.messages.iter().find(|item| item.message_id() == message_id);
+    if !field("choice")?.is_null()
+        && previous.is_none_or(|previous| {
+            previous.content().get("campaign_ending_choice") != Some(&Json::Object(choice.clone()))
+        })
+    {
+        return Err(rejected("An ending choice is already saved; use OOC to change direction"));
+    }
+    if selected == "continue" {
+        if !truthy(&field("open_world")?) {
+            return Err(rejected("This ending does not support open-world continuation"));
+        }
+        return Ok("Continue adventuring in this world.".to_owned());
+    }
+    Ok("Finish the story.".to_owned())
+}
+
+/// Python's truth value of a JSON value.
+fn truthy(value: &Json) -> bool {
+    match value {
+        Json::Null => false,
+        Json::Bool(flag) => *flag,
+        Json::Number(number) => number.as_f64().is_some_and(|value| value != 0.0),
+        Json::String(text) => !text.is_empty(),
+        Json::Array(items) => !items.is_empty(),
+        Json::Object(map) => !map.is_empty(),
+    }
+}
+
 /// `_can_redirect_interruption(interruption, context)`: a saved Stop of the failed attempt, or a
 /// replacement accepted for its Retry before a restart.
 pub fn can_redirect_interruption(interruption: &NarrationInterruption, context: &SessionContext) -> bool {
@@ -636,6 +954,7 @@ pub async fn unresolved_session_interruption(
     store: &StoreHandle,
     context: &SessionContext,
 ) -> Result<Option<(NarrationInterruption, bool)>, ActionError> {
+    let _operation = store.operation()?;
     let Some(campaign_id) = context.session.campaign_id().map(str::to_owned) else { return Ok(None) };
     if context.session.role() != WriterRole::Dm {
         return Ok(None);
@@ -663,6 +982,7 @@ pub async fn retryable_interruption(
     campaign_id: &str,
     failed_attempt_id: &str,
 ) -> Result<Option<NarrationInterruption>, ActionError> {
+    let _operation = store.operation()?;
     if validate_authority_identity(campaign_id, "Campaign identity", false).is_err()
         || validate_authority_identity(failed_attempt_id, "Failed narration attempt identity", false).is_err()
     {
@@ -687,6 +1007,7 @@ pub async fn narration_interruption(
     campaign_id: &str,
     interruption_id: &str,
 ) -> Result<NarrationInterruption, ActionError> {
+    let _operation = store.operation()?;
     let (campaign, interruption) = (campaign_id.to_owned(), interruption_id.to_owned());
     Ok(store.call(move |store| store.interruption(&campaign, &interruption)).await?)
 }
@@ -698,6 +1019,7 @@ pub async fn saved_action_receipt(
     campaign_id: &str,
     action_id: &str,
 ) -> Result<sylvia_domain::authority::ActionReceipt, ActionError> {
+    let _operation = store.operation()?;
     let (campaign, action) = (campaign_id.to_owned(), action_id.to_owned());
     Ok(store.call(move |store| store.action_receipt(&campaign, &action)).await?)
 }
@@ -708,6 +1030,7 @@ pub async fn private_provider_index(
     store: &StoreHandle,
     session_id: &str,
 ) -> Result<Vec<JsonMap>, ActionError> {
+    let _operation = store.operation()?;
     let session = session_id.to_owned();
     Ok(store.call(move |store| store.private_provider_index(&session)).await?)
 }

@@ -273,9 +273,9 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `agent/_builder_title.py:53` | `FirstReplyTitle.feed` | len() against a limit | `if not final and len(candidate) <= 256:` | |
 | `agent/_builder_title.py:60` | `FirstReplyTitle.feed` | len() against a limit | `if not final and len(self._prefix) <= 256 and TITLE_PREFIX.startswith(candidate):` | |
 | `agent/_campaign_memory.py:70` | `select_campaign_memory` | len() against a limit | `if len(selected) < _MAX_MEMORY_RECORDS and used_bytes + size <= _MAX_MEMORY_BYTES:` | |
-| `agent/_character_profile_tools.py:142` | `character_profile_tools.execute` | len() against a limit | `if len(json.dumps(value, ensure_ascii=False).encode()) > 65536:` | |
+| `agent/_character_profile_tools.py:142` | `character_profile_tools.execute` | len() against a limit | `if len(json.dumps(value, ensure_ascii=False).encode()) > 65536:` | `sylvia-agent` character_tool_vectors (a 70,000-character entry refused) |
 | `agent/_library_source_tool.py:46` | `library_source_tool.inspect` | len() against a limit | `if not isinstance(query, str) or len(query) > 120:` | |
-| `agent/_participant_file_tool.py:41` | `participant_file_tool.use_file` | len() against a limit | `if len(data) > _MAX_DRAFT_BYTES:` | |
+| `agent/_participant_file_tool.py:41` | `participant_file_tool.use_file` | len() against a limit | `if len(data) > _MAX_DRAFT_BYTES:` | `sylvia-agent` character_tool_vectors (a 256 KiB draft refused) |
 | `agent/_provider_session.py:1278` | `_validated_speaker_name` | len() against a limit | `or len(name) > _SPEAKER_NAME_MAX_LENGTH` | |
 | `agent/_provider_session.py:1748` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not gm_system_prompt.strip() or len(encoded_prompt) > _MAX_GM_SYSTEM_PROMPT_BYTES:` | |
 | `agent/_provider_session.py:1774` | `ProviderSessionAdapter.__init__` | len() against a limit | `if not campaign_plan_text.strip() or len(encoded_plan) > _MAX_CAMPAIGN_PLAN_BYTES:` | |

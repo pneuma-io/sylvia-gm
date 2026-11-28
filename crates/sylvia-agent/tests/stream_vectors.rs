@@ -10,92 +10,21 @@
 
 mod common;
 
+use common::replay::{event_json, no_facts, Scripted};
 use common::turn_state;
-use common::{model, session_context, session_record, text, tool, Recorded};
+use common::{session_context, session_record, text, tool, Recorded};
 use serde_json::Value as J;
 use std::sync::{Arc, Mutex};
-use sylvia_agent::campaign_memory::KnowledgeReference;
 use sylvia_agent::provider_session::context::ProviderSessionAdapter;
 use sylvia_agent::provider_session::reads::{OpeningReads, TurnOwner};
 use sylvia_agent::provider_turn::round::stream_provider_round;
 use sylvia_agent::provider_turn::{TurnEvents, TurnFailure, TurnResult};
 use sylvia_agent::session_loop::{ProviderControl, ProviderEvent, SessionProviderInput};
-use sylvia_base::{CodedResult, JsonMap};
 use sylvia_provider::config::env::Environment;
-use sylvia_provider::types::{ModelInfo, ProviderResponse, ProviderStreamChunk, PyValue};
-use sylvia_provider::{BoxFuture, ChunkStream, Provider, ProviderRequest, ProviderResult};
+use sylvia_provider::{BoxFuture, Provider};
 
 fn vectors() -> J {
     serde_json::from_str(include_str!("vectors/stream_vectors.json")).expect("vector file is valid JSON")
-}
-
-fn chunk(value: &J) -> ProviderStreamChunk {
-    let text = |key: &str| value[key].as_str().unwrap_or("").to_owned();
-    let opt = |key: &str| value[key].as_str().map(str::to_owned);
-    ProviderStreamChunk {
-        content: text("content"),
-        reasoning_content: text("reasoning_content"),
-        tool_call_delta: (!value["tool_call_delta"].is_null()).then(|| value["tool_call_delta"].clone()),
-        finish_reason: (!value["finish_reason"].is_null())
-            .then(|| PyValue::from_json(value["finish_reason"].clone())),
-        anthropic_content: value["anthropic_content"].as_array().cloned(),
-        chat_completion_metadata: value["chat_completion_metadata"].as_object().cloned(),
-        provider_reported_reasoning_effort: opt("provider_reported_reasoning_effort"),
-        provider_reported_service_tier: opt("provider_reported_service_tier"),
-    }
-}
-
-/// The GM provider: answers each stream with the next recorded one and records the request.
-struct Scripted {
-    model: ModelInfo,
-    streams: Mutex<Vec<Vec<J>>>,
-    requests: Mutex<Vec<J>>,
-}
-
-impl Provider for Scripted {
-    fn model_info(&self) -> Option<&ModelInfo> {
-        Some(&self.model)
-    }
-    fn generate(&self, _request: ProviderRequest) -> BoxFuture<'_, ProviderResult<ProviderResponse>> {
-        unreachable!("no recorded round compacts")
-    }
-    fn generate_stream(&self, request: ProviderRequest) -> ChunkStream<'_> {
-        self.requests.lock().unwrap().push(serde_json::json!({
-            "messages": request.messages, "tools": request.tools, "timeout": request.timeout, "options": request.options,
-        }));
-        let chunks = {
-            let mut streams = self.streams.lock().unwrap();
-            assert!(!streams.is_empty(), "Rust sent more requests than Python");
-            streams.remove(0)
-        };
-        Box::pin(futures_util::stream::iter(chunks.into_iter().map(|value| Ok(chunk(&value)))))
-    }
-    fn close(&self) -> BoxFuture<'_, ()> {
-        Box::pin(async {})
-    }
-    fn set_audit_context(&self, _context: &JsonMap) -> bool {
-        true
-    }
-}
-
-/// `plain(ProviderEvent)`.
-fn event_json(event: &ProviderEvent) -> J {
-    let mut value = serde_json::json!({
-        "__class__": "ProviderEvent", "kind": event.kind().as_str(), "text": event.text(),
-        "action_command": null, "evidence": null, "message_id": null, "action_feedback": null,
-        "response_blocks": null, "response_id": event.response_id(),
-    });
-    match event {
-        ProviderEvent::Evidence { message_id, payload } => {
-            value["evidence"] = J::Object(payload.clone());
-            value["message_id"] = J::from(message_id.as_str());
-        }
-        ProviderEvent::Talk { response_blocks: Some(blocks), .. } => {
-            value["response_blocks"] = J::Array(blocks.iter().cloned().map(J::Object).collect());
-        }
-        _ => {}
-    }
-    value
 }
 
 struct Collected(Vec<J>);
@@ -105,25 +34,6 @@ impl TurnEvents for Collected {
         self.0.push(event_json(&event));
         Box::pin(async { Ok(()) })
     }
-}
-
-fn no_facts(_query: &str, references: &[KnowledgeReference]) -> CodedResult<Vec<JsonMap>> {
-    assert!(references.is_empty(), "the recorded campaign has no facts");
-    Ok(Vec::new())
-}
-
-/// The recorded streams: each request's chunks, in order.
-fn streams(events: &[J]) -> Vec<Vec<J>> {
-    let mut streams: Vec<Vec<J>> = Vec::new();
-    for event in events {
-        match event["event"].as_str() {
-            Some("provider_stream") => streams.push(Vec::new()),
-            Some("provider_chunk") => streams.last_mut().unwrap().push(event["chunk"].clone()),
-            Some("provider_chunk_error") => panic!("no recorded stream fails"),
-            _ => {}
-        }
-    }
-    streams
 }
 
 #[tokio::test]
@@ -139,11 +49,7 @@ async fn stream_round_matches_python() {
                 .map(|event| event["hex"].as_str().unwrap().to_owned())
                 .collect(),
         ));
-        let provider = Arc::new(Scripted {
-            model: model(&case["model"]),
-            streams: Mutex::new(streams(events)),
-            requests: Mutex::default(),
-        });
+        let provider = Arc::new(Scripted::new(&case["model"], events));
         let args = &case["adapter"];
         let draw = Arc::clone(&ids);
         let adapter = Arc::new(
@@ -203,18 +109,7 @@ async fn stream_round_matches_python() {
         }
         owner.check(&name);
         assert!(ids.lock().unwrap().is_empty(), "{name}: Rust drew fewer uuid4 values than Python");
-        let sent: Vec<J> = events
-            .iter()
-            .filter(|event| event["event"] == "provider_stream")
-            .map(|event| {
-                serde_json::json!({"messages": event["messages"], "tools": event["tools"], "timeout": event["timeout"], "options": event["options"]})
-            })
-            .collect();
-        assert_eq!(
-            text(&J::Array(provider.requests.lock().unwrap().clone())),
-            text(&J::Array(sent)),
-            "{name}: the request"
-        );
+        provider.check(&name, events);
         let emitted: Vec<J> = events
             .iter()
             .filter(|event| event["event"] == "phase_event")

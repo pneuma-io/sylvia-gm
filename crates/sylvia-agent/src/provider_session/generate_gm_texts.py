@@ -26,6 +26,9 @@ produce them, never retyped:
   `stream_provider_round` builds inline, its string constants read from the Python source
   with `ast` (the facts' JSON comes between the first two; the provisional-prose sentence is
   added only when that prose needs review).
+- `character_files_prefix` and `character_files_interpretation`: the
+  `SYLVIA_GM_RELEVANT_CHARACTER_FILES` message `_relevant_character_files_message` builds
+  inline, its text before the JSON and the JSON's `interpretation`, read with `ast`.
 
 Reference tooling for the port; retired with the Python source.
 """
@@ -147,6 +150,31 @@ def narration_facts() -> dict[str, str]:
     raise SystemExit("the narration-facts message was not found")
 
 
+def character_files() -> dict[str, str]:
+    """The relevant Character Files message's constants, from `_relevant_character_files_message`."""
+    import ast
+
+    source = (ROOT / "src/sylvia_gm/agent/_provider_session.py").read_text(encoding="utf-8")
+    function = next(node for node in ast.walk(ast.parse(source))
+                    if isinstance(node, ast.FunctionDef)
+                    and node.name == "_relevant_character_files_message")
+    found: dict[str, str] = {}
+    for node in ast.walk(function):
+        if not isinstance(node, ast.Dict):
+            continue
+        keys = [key.value if isinstance(key, ast.Constant) else None for key in node.keys]
+        if "content" in keys:
+            content = node.values[keys.index("content")]
+            assert isinstance(content, ast.BinOp) and isinstance(content.right, ast.Call)
+            found["character_files_prefix"] = ast.literal_eval(content.left)
+        if "interpretation" in keys:
+            found["character_files_interpretation"] = ast.literal_eval(
+                node.values[keys.index("interpretation")])
+    assert len(found) == 2 and all(isinstance(value, str) for value in found.values())
+    assert found["character_files_prefix"].startswith("SYLVIA_GM_RELEVANT_CHARACTER_FILES ")
+    return found
+
+
 def main() -> None:
     prompts = {(mechanics, tools): session._dm_system_prompt(  # noqa: SLF001
         campaign_has_mechanics=mechanics, tools_available=tools)
@@ -164,6 +192,7 @@ def main() -> None:
         "opening_task_prefix": opening[: -len("{}")],
         **control_texts(),
         **narration_facts(),
+        **character_files(),
     }
     text = json.dumps(exported, ensure_ascii=True, indent=1, allow_nan=False) + chr(10)
     assert json.loads(text) == exported

@@ -1,0 +1,451 @@
+{
+  "name": "session-reads",
+  "description": "Session reads and the narration stream commands before any turn runs, on a No Ruleset campaign made through the interview (its DM session) and a Builder chat (stand-in model): session_context for no, an unknown and both sessions; session_history_page with its default, a limit and a cursor, and every refused limit and cursor (zero, too large, text, booleans, a float, null, negative), an unknown session; the context again after a next-reply effort and a speed are saved; then each stream command's refusals with no live attempt (interrupt, disconnect, heartbeat, status, reconnect); then shut down.",
+  "standin": true,
+  "summarise_tables": [
+    "^package_",
+    "^packages$"
+  ],
+  "rules": {
+    "ignore_keys": [
+      "diagnostic_id"
+    ],
+    "scrub": [
+      {
+        "pattern": "data: [A-Za-z0-9+/=]{40,}",
+        "with": "data: <protected credential>"
+      }
+    ],
+    "volatile_files": [
+      "^diagnostics/"
+    ]
+  },
+  "steps": [
+    {
+      "method": "save_provider_settings",
+      "expect_ok": true,
+      "params": {
+        "provider_id": "standin",
+        "preset_id": "custom",
+        "display_name": "Stand-in",
+        "base_url": "${standin_url}",
+        "credential": "${standin_key}",
+        "model_id": "${standin_model}",
+        "model_name": "Stand-in Narrator",
+        "context_window": 4000000,
+        "max_output_tokens": 4096,
+        "transport": "chat_completions"
+      }
+    },
+    {
+      "method": "model_choices",
+      "expect_ok": true,
+      "save": {
+        "provider_id": "/result/0/provider_id",
+        "model_id": "/result/0/model_id"
+      }
+    },
+    {
+      "method": "create_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-draft",
+        "display_name": "Storm Courier",
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      },
+      "save": {
+        "campaign_id": "/result/campaign_id",
+        "builder_session_id": "/result/builder_session_id"
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-ruleset",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 0,
+        "current_step": "ruleset",
+        "visible_answer": "No Ruleset",
+        "answer": {
+          "candidate_id": null
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-name",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 1,
+        "current_step": "name",
+        "visible_answer": "Storm Courier",
+        "answer": {
+          "display_name": "Storm Courier"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-boundaries",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 2,
+        "current_step": "boundaries_preferences",
+        "visible_answer": "None; Mystery",
+        "answer": {
+          "boundaries": "None",
+          "preferences": "Mystery"
+        }
+      }
+    },
+    {
+      "method": "advance_guided_campaign_draft",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "storm-requests",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "expected_construction_revision": 3,
+        "current_step": "specific_requests",
+        "visible_answer": "No additional requests",
+        "answer": {
+          "no_additional_requests": true,
+          "requests": ""
+        }
+      }
+    },
+    {
+      "method": "start_guided_campaign",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "operation_id": "storm-start",
+        "campaign_id": "${campaign_id}",
+        "builder_session_id": "${builder_session_id}",
+        "display_name": "Storm Courier",
+        "candidate_id": null,
+        "setting_id": null,
+        "plan_id": null,
+        "player_character_id": null,
+        "companion_ids": [],
+        "premise": "A courier shelters from a storm."
+      }
+    },
+    {
+      "method": "finalize_campaign_construction",
+      "expect_ok": true,
+      "timeout_s": 600,
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "dm_provider_id": "${provider_id}",
+        "dm_model_id": "${model_id}"
+      },
+      "save": {
+        "session_id": "/result/handoff/dm_session_id",
+        "turn_id": "/result/dm_turn_id"
+      }
+    },
+    {
+      "method": "set_default_model",
+      "params": {
+        "provider_id": "${provider_id}",
+        "model_id": "${model_id}"
+      }
+    },
+    {
+      "method": "create_builder_chat",
+      "expect_ok": true,
+      "params": {
+        "operation_id": "reads-chat"
+      },
+      "save": {
+        "chat": "/result/session/session_id"
+      }
+    },
+    {
+      "method": "session_context",
+      "params": {}
+    },
+    {
+      "method": "session_context",
+      "params": {
+        "session_id": "session-missing"
+      }
+    },
+    {
+      "method": "session_context",
+      "params": {
+        "session_id": "${chat}"
+      }
+    },
+    {
+      "method": "session_context",
+      "params": {
+        "session_id": "${session_id}"
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${chat}"
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}"
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 1
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 1,
+        "before_sequence": 2
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 200,
+        "before_sequence": 999999999999
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 0
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 201
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": "5"
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": true
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 1.0
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": null
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "before_sequence": 0
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "before_sequence": -3
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "before_sequence": "2"
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "before_sequence": false
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "before_sequence": null
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "${session_id}",
+        "limit": 0,
+        "before_sequence": 0
+      }
+    },
+    {
+      "method": "session_history_page",
+      "params": {
+        "session_id": "session-missing"
+      }
+    },
+    {
+      "method": "switch_session_reasoning",
+      "params": {
+        "session_id": "${chat}",
+        "effort": "provider_default",
+        "mode": "once"
+      }
+    },
+    {
+      "method": "switch_session_speed",
+      "params": {
+        "session_id": "${chat}",
+        "speed": "standard"
+      }
+    },
+    {
+      "method": "session_context",
+      "params": {
+        "session_id": "${chat}"
+      }
+    },
+    {
+      "method": "interrupt_stream",
+      "params": {}
+    },
+    {
+      "method": "interrupt_stream",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "interrupt_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "disconnect_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "disconnect_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing",
+        "attachment_generation": -1
+      }
+    },
+    {
+      "method": "disconnect_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing",
+        "attachment_generation": 1
+      }
+    },
+    {
+      "method": "stream_heartbeat",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "stream_heartbeat",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing",
+        "attachment_generation": "1"
+      }
+    },
+    {
+      "method": "stream_heartbeat",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "stream_heartbeat",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing",
+        "attachment_generation": 1
+      }
+    },
+    {
+      "method": "narration_attempt_status",
+      "params": {
+        "campaign_id": "${campaign_id}"
+      }
+    },
+    {
+      "method": "narration_attempt_status",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "reconnect_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing"
+      }
+    },
+    {
+      "method": "reconnect_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing",
+        "acknowledged_sequence": 0
+      }
+    },
+    {
+      "method": "reconnect_stream",
+      "params": {
+        "campaign_id": "${campaign_id}",
+        "attempt_id": "attempt-missing",
+        "acknowledged_sequence": 0,
+        "attachment_generation": 1
+      }
+    },
+    {
+      "method": "shutdown"
+    }
+  ]
+}

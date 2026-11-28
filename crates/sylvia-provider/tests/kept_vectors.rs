@@ -98,10 +98,18 @@ fn continuations() {
         );
         match (ours, case.get("delivery"), case.get("mismatch"), case.get("raw")) {
             (Ok(Delivery::Prompt(content)), Some(expected), None, None) => {
-                assert_eq!(json!(["prompt", content]), *expected, "{name}")
+                sylvia_base::testing::assert_same_json(
+                    &json!(["prompt", content]),
+                    expected,
+                    name.to_string(),
+                )
             }
             (Ok(Delivery::Answer(answer)), Some(expected), None, None) => {
-                assert_eq!(json!(["answer", Json::Object(answer)]), *expected, "{name}")
+                sylvia_base::testing::assert_same_json(
+                    &json!(["answer", Json::Object(answer)]),
+                    expected,
+                    name.to_string(),
+                )
             }
             (Err(ContinuationError::Mismatch(mismatch)), None, Some(reason), None) => {
                 assert_eq!(mismatch.reason, reason.as_str().unwrap(), "{name}")
@@ -177,7 +185,11 @@ fn pools() {
             }
         }
         pool.close_all();
-        assert_eq!(Value::Array(results), script["results"], "pool {name}");
+        sylvia_base::testing::assert_same_json(
+            &Value::Array(results),
+            &script["results"],
+            format!("pool {name}"),
+        );
     }
 }
 
@@ -205,13 +217,18 @@ fn expiry() {
     assert!(pool.keep(kept.clone(), 0).is_empty());
     assert_eq!(pool.len(), 1);
     // The reaper runs on its own thread; under load (other checks on the same machine) it can be
-    // scheduled late, so wait for it with a generous deadline instead of a fixed sleep.
+    // scheduled late, so wait for it with a generous deadline instead of a fixed sleep. As in
+    // Python's `KeptProcess.close`, the closed flag is set first and the callbacks run after it,
+    // on the reaper's thread, so wait for the callback too.
     let deadline = std::time::Instant::now() + Duration::from_secs(10);
-    while (!pool.is_empty() || !kept.is_closed()) && std::time::Instant::now() < deadline {
+    let reaped =
+        || pool.is_empty() && kept.is_closed() && closed.load(std::sync::atomic::Ordering::SeqCst) == 1;
+    while !reaped() && std::time::Instant::now() < deadline {
         std::thread::sleep(Duration::from_millis(20));
     }
     assert_eq!(pool.len(), 0, "the idle process was not reaped within 10 s");
     assert!(kept.is_closed());
+    assert_eq!(closed.load(std::sync::atomic::Ordering::SeqCst), 1, "its callback did not run within 10 s");
     kept.close();
     assert_eq!(closed.load(std::sync::atomic::Ordering::SeqCst), 1);
     // A process taken back before its time does not expire.
@@ -268,9 +285,17 @@ fn native() {
             }
         };
         assert_eq!(found.status, case["status"].as_str().unwrap(), "{name}");
-        assert_eq!(Value::Array(found.records), case["records"], "{name}");
+        sylvia_base::testing::assert_same_json(
+            &Value::Array(found.records),
+            &case["records"],
+            name.to_string(),
+        );
         assert_eq!(found.reason, case["reason"].as_str(), "{name}");
-        assert_eq!(found.answer.unwrap_or(Value::Null), case["answer"], "{name}");
+        sylvia_base::testing::assert_same_json(
+            &found.answer.unwrap_or(Value::Null),
+            &case["answer"],
+            name.to_string(),
+        );
         let _ = std::fs::remove_dir_all(&root);
     }
 }
@@ -329,24 +354,42 @@ fn cleanup() {
         })
         .collect();
     listing.sort();
-    assert_eq!(json!(listing), case["session_files"]);
+    sylvia_base::testing::assert_same_json(
+        &json!(listing),
+        &case["session_files"],
+        concat!(file!(), ":", line!()),
+    );
     let active: BTreeSet<String> = ["step-active", "22222222-2222-3333-4444-555555555555"]
         .iter()
         .map(|name| (*name).to_owned())
         .collect();
     let swept = claude_native::sweep(&config, &home.join("steps"), &active, &home, case["now"].as_f64());
-    assert_eq!(json!(swept), case["swept"]);
-    assert_eq!(json!(files_under(&home)), case["after_sweep"]);
-    assert_eq!(json!(claude_native::remove_debug_logs(Some(&home.join("cache")), &home)), case["debug_logs"]);
-    assert_eq!(
-        json!(claude_native::delete_session(&root.join("elsewhere"), session, &home)),
-        case["outside"]
+    sylvia_base::testing::assert_same_json(&json!(swept), &case["swept"], concat!(file!(), ":", line!()));
+    sylvia_base::testing::assert_same_json(
+        &json!(files_under(&home)),
+        &case["after_sweep"],
+        concat!(file!(), ":", line!()),
     );
-    assert_eq!(
-        json!(claude_native::delete_session(&config, "22222222-2222-3333-4444-555555555555", &home)),
-        case["deleted"]
+    sylvia_base::testing::assert_same_json(
+        &json!(claude_native::remove_debug_logs(Some(&home.join("cache")), &home)),
+        &case["debug_logs"],
+        concat!(file!(), ":", line!()),
     );
-    assert_eq!(json!(files_under(&home)), case["after"]);
+    sylvia_base::testing::assert_same_json(
+        &json!(claude_native::delete_session(&root.join("elsewhere"), session, &home)),
+        &case["outside"],
+        concat!(file!(), ":", line!()),
+    );
+    sylvia_base::testing::assert_same_json(
+        &json!(claude_native::delete_session(&config, "22222222-2222-3333-4444-555555555555", &home)),
+        &case["deleted"],
+        concat!(file!(), ":", line!()),
+    );
+    sylvia_base::testing::assert_same_json(
+        &json!(files_under(&home)),
+        &case["after"],
+        concat!(file!(), ":", line!()),
+    );
     let _ = std::fs::remove_dir_all(&root);
     let _ = SystemTime::now();
 }
@@ -429,7 +472,11 @@ fn settings() {
             std::thread::sleep(Duration::from_millis(50));
         }
         claude_settings::cancel_all();
-        assert_eq!(Value::Array(results), case["results"], "settings {name}");
+        sylvia_base::testing::assert_same_json(
+            &Value::Array(results),
+            &case["results"],
+            format!("settings {name}"),
+        );
         let calls = std::fs::read_to_string(home.join("profile").join("fake-calls.txt")).unwrap_or_default();
         let ours: Vec<&str> = calls.lines().filter(|line| *line != "status").collect();
         let theirs: Vec<&str> = case["launched"]
@@ -441,7 +488,7 @@ fn settings() {
             .collect();
         assert_eq!(ours, theirs, "child processes for {name}");
         let config = std::fs::read_to_string(root.join("config.yaml")).ok();
-        assert_eq!(json!(config), case["config"], "config for {name}");
+        sylvia_base::testing::assert_same_json(&json!(config), &case["config"], format!("config for {name}"));
         let _ = std::fs::remove_dir_all(root.parent().unwrap());
     }
 }

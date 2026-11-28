@@ -148,10 +148,22 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
     if method == "finalize_campaign_construction" {
         return commands::campaigns::handle_finalize_campaign_construction(context, params).await;
     }
+    // A submitted turn's provider errors keep Python's provider-error reply too.
+    if method == "submit_session_input" {
+        return commands::sessions::handle_submit_session_input(context, params).await;
+    }
+    if method == "start_dm_session" {
+        return commands::sessions::handle_start_dm_session(context, params).await;
+    }
+    if method == "manual_retry_session" {
+        return commands::sessions::handle_manual_retry_session(context, params).await;
+    }
     let handled: CodedResult<Json> = match method {
         "handshake_status" => commands::campaigns::handle_handshake_status(context, params).await,
         "campaign_index" => commands::campaigns::handle_campaign_index(context, params).await,
+        "player_projection_page" => commands::campaigns::handle_player_projection_page(context, params).await,
         "catalog" => commands::campaigns::handle_catalog(context, params).await,
+        "snapshot" | "display_snapshot" => commands::campaigns::handle_snapshot(context, params).await,
         "backup_database" => commands::campaigns::handle_backup_database(context, params).await,
         "campaign_creation_catalog" => {
             commands::campaigns::handle_campaign_creation_catalog(context, params).await
@@ -174,6 +186,14 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         "export_campaign" | "export_campaign_file" => {
             commands::campaigns::handle_export_campaign(context, params).await
         }
+        "package_candidates" => commands::packages::handle_package_candidates(context, params).await,
+        "inspect_package_candidate" => {
+            commands::packages::handle_inspect_package_candidate(context, params).await
+        }
+        "package_candidate_text" => commands::packages::handle_package_candidate_text(context, params).await,
+        "compare_package_candidates" => {
+            commands::packages::handle_compare_package_candidates(context, params).await
+        }
         "install_package" => commands::packages::handle_install_package(context, params).await,
         "install_package_file" => commands::packages::handle_install_package_file(context, params).await,
         "export_package_candidate" | "export_package_candidate_file" => {
@@ -192,6 +212,18 @@ pub async fn dispatch(context: &DispatchContext, method: &str, params: &JsonMap)
         }
         "switch_session_speed" => commands::sessions::handle_switch_session_speed(context, params).await,
         "steer_session" => commands::sessions::handle_steer_session(context, params).await,
+        "switch_session_model" => commands::sessions::handle_switch_session_model(context, params).await,
+        "stop_agent_session" => commands::sessions::handle_stop_agent_session(context, params).await,
+        "interrupt_stream" => commands::sessions::handle_interrupt_stream(context, params).await,
+        "disconnect_stream" => commands::sessions::handle_disconnect_stream(context, params).await,
+        "stream_heartbeat" => commands::sessions::handle_stream_heartbeat(context, params).await,
+        "narration_attempt_status" => {
+            commands::sessions::handle_narration_attempt_status(context, params).await
+        }
+        "reconnect_stream" => commands::sessions::handle_reconnect_stream(context, params).await,
+        "session_context" | "session_history_page" => {
+            commands::sessions::handle_session_context(context, params).await
+        }
         "rename_builder_chat" => commands::builder::handle_rename_builder_chat(context, params).await,
         "delete_builder_chat" => commands::builder::handle_delete_builder_chat(context, params).await,
         "model_choices" => commands::providers::handle_model_choices(context, params).await,

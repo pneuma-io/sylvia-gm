@@ -4,6 +4,7 @@
 
 #![allow(dead_code)]
 
+pub mod replay;
 pub mod turn_state;
 
 use serde_json::Value as J;
@@ -13,6 +14,7 @@ use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
 use sylvia_app::authority::actions::ActionExecution;
+use sylvia_base::testing::json_difference;
 use sylvia_base::{CodedResult, JsonMap};
 use sylvia_domain::authority::{
     ActionCommand, ActionReceipt, ActionStatus, AwaitingChoiceReceipt, MechanicsChoiceOption,
@@ -354,7 +356,9 @@ impl Recorded {
         assert_eq!(read["name"].as_str(), Some(name), "Rust's next call differs from Python's");
         let mut recorded = read["args"].as_array().cloned().unwrap_or_default();
         recorded.extend(read["kwargs"].as_object().into_iter().flat_map(|kwargs| kwargs.values().cloned()));
-        if read["name"].as_str() != Some(name) || J::Array(recorded.clone()) != args {
+        if read["name"].as_str() != Some(name)
+            || json_difference(&args, &J::Array(recorded.clone())).is_some()
+        {
             self.failures.lock().unwrap().push(format!(
                 "call differs: Python {}({}), Rust {name}({args})",
                 read["name"],
@@ -429,10 +433,17 @@ impl OpeningReads for Recorded {
         acknowledged_sequence: i64,
     ) -> BoxFuture<'a, CodedResult<CanonicalReplay>> {
         let result = self.next("canonical_replay", serde_json::json!([campaign_id, acknowledged_sequence]));
-        empty_history(&result, "canonical");
-        empty_history(&result, "provisional");
+        // The GM turn reads only the canonical events; a recording with provisional projections
+        // would need them built too.
+        assert!(
+            result["provisional"].as_array().is_none_or(Vec::is_empty),
+            "a recorded replay has provisional projections the test owner does not build"
+        );
         ready(CanonicalReplay {
-            canonical: Vec::new(),
+            canonical: result["canonical"]
+                .as_array()
+                .map(|events| events.iter().map(canonical_event).collect())
+                .unwrap_or_default(),
             provisional: Vec::new(),
             high_water: result["high_water"].as_i64().unwrap(),
         })
@@ -643,6 +654,16 @@ impl TurnOwner for Recorded {
             terminal: message(&result["terminal"]),
             has_compaction: result["has_compaction"].as_bool().unwrap(),
         })
+    }
+    fn actor_decision_request<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        turn_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<sylvia_app::actor_decisions::ActorDecisionRequest>>> {
+        let result = self.next("actor_decision_request", serde_json::json!([campaign_id, turn_id]));
+        // A recorded request is T6's (`run_required_actor_decision`); none is recorded yet.
+        assert!(result.is_null(), "a recorded actor decision request is not replayed before T6");
+        ready(None)
     }
     fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> BoxFuture<'a, CodedResult<Option<String>>> {
         ready(opt(&self.next("current_open_turn", serde_json::json!([campaign_id]))))

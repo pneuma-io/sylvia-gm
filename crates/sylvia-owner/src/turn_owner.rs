@@ -9,14 +9,24 @@ use crate::owner_reads::OwnerReads;
 use sylvia_agent::provider_session::reads::TurnOwner;
 use sylvia_agent::stateless_mcp::listing::CatalogEntry;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_app::actor_decisions::ActorDecisionRequest;
 use sylvia_app::authority::actions::{self, ActionError, ActionExecution};
-use sylvia_app::authority::{campaign_file, content_reads, turn_reads, turns};
+use sylvia_app::authority::{campaign_file, content_reads, knowledge, turn_reads, turns};
 use sylvia_base::{CodedError, CodedResult, Json, JsonMap};
 use sylvia_domain::authority::ActionCommand;
 use sylvia_domain::authority::ModelDecisionBoundary;
 use sylvia_domain::package_library::PackageLockRecord;
 use sylvia_domain::session::{SessionActivityBasis, SessionMessage, SessionMessageKind};
 use sylvia_provider::BoxFuture;
+use sylvia_store::snapshots::DisplayQuery;
+
+/// An owner refusal in its class (`Domain` keeps a `MechanicsRejected`'s fields).
+fn authority_failure(error: ActionError) -> AuthorityFailure {
+    match error {
+        ActionError::Domain(error) => AuthorityFailure::Domain(error),
+        ActionError::Store(error) => AuthorityFailure::Coded(store_error(error)),
+    }
+}
 
 /// An `AuthorityOwner` method lane 3 has not ported yet.
 fn pending(method: &str) -> CodedError {
@@ -244,35 +254,71 @@ impl TurnOwner for OwnerReads {
                 basis_message_ids,
                 turn_id: turn_id.map(str::to_owned),
             };
-            campaign_file::update_campaign_file(self.store(), owner_id, &update).await.map_err(|error| {
-                match error {
-                    ActionError::Domain(error) => AuthorityFailure::Domain(error),
-                    ActionError::Store(error) => AuthorityFailure::Coded(store_error(error)),
-                }
-            })
+            campaign_file::update_campaign_file(self.store(), owner_id, &update)
+                .await
+                .map_err(authority_failure)
         })
     }
 
     fn search_campaign_knowledge<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _query: &'a Json,
-        _sources: Option<&'a Json>,
-        _limit: &'a Json,
-        _offset: &'a Json,
+        campaign_id: &'a str,
+        query: &'a Json,
+        sources: Option<&'a Json>,
+        limit: &'a Json,
+        offset: &'a Json,
     ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
-        // Lane 3's K1.
-        Box::pin(async { Err(pending("search_campaign_knowledge").into()) })
+        Box::pin(async move {
+            let request = knowledge::KnowledgeSearch {
+                query: query.clone(),
+                sources: sources.cloned(),
+                limit: limit.clone(),
+                offset: offset.clone(),
+            };
+            knowledge::search_campaign_knowledge(self.store(), campaign_id, &request)
+                .await
+                .map_err(authority_failure)
+        })
     }
 
     fn read_campaign_reference<'a>(
         &'a self,
-        _campaign_id: &'a str,
-        _source: &'a Json,
-        _path: &'a Json,
+        campaign_id: &'a str,
+        source: &'a Json,
+        path: &'a Json,
     ) -> BoxFuture<'a, Result<JsonMap, AuthorityFailure>> {
-        // Lane 3's K1.
-        Box::pin(async { Err(pending("read_campaign_reference").into()) })
+        // The MCP server's read passes no `maximum_bytes`: the owner's default.
+        Box::pin(async move {
+            knowledge::read_campaign_reference(self.store(), campaign_id, source, path, None)
+                .await
+                .map_err(authority_failure)
+        })
+    }
+
+    fn actor_decision_request<'a>(
+        &'a self,
+        campaign_id: &'a str,
+        _turn_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<ActorDecisionRequest>>> {
+        Box::pin(async move {
+            // `AuthorityOwner.actor_decision_request`'s opening: a package that declares no
+            // isolated participant has no actor decision. The rest (the turn checks and the
+            // projection) is T6's, with `run_required_actor_decision`.
+            let id = campaign_id.to_owned();
+            let isolated = self
+                .store()
+                .call(move |store| {
+                    let snapshot = store.display_snapshot(&id, &DisplayQuery::default())?;
+                    let declared = content_reads::decision_scope_declaration(store, &snapshot.state)?;
+                    Ok(declared.is_some_and(|declared| declared.contains_key("isolated_participant")))
+                })
+                .await
+                .map_err(store_error)?;
+            if isolated {
+                return Err(pending("actor_decision_request"));
+            }
+            Ok(None)
+        })
     }
 
     fn session_activity_basis<'a>(

@@ -1,0 +1,141 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "campaign_id": "campaign",
+ "runs": [
+  {
+   "step": {
+    "op": "start",
+    "attempt": "done"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "done": 0
+   }
+  },
+  {
+   "step": {
+    "op": "emit",
+    "attempt": "done",
+    "token": "The door opens."
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "done": 0
+   }
+  },
+  {
+   "step": {
+    "op": "complete",
+    "attempt": "done"
+   },
+   "outcome": {
+    "ok": 1
+   },
+   "cancels": {
+    "done": 0
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "attempt": "live"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "done": 0,
+    "live": 0
+   }
+  },
+  {
+   "step": {
+    "op": "emit",
+    "attempt": "live",
+    "token": "Half a sent"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "done": 0,
+    "live": 0
+   }
+  },
+  {
+   "step": {
+    "op": "close"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "done": 0,
+    "live": 1
+   }
+  },
+  {
+   "step": {
+    "op": "close"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "done": 0,
+    "live": 1
+   }
+  },
+  {
+   "step": {
+    "op": "status",
+    "attempt": "live"
+   },
+   "outcome": {
+    "error": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   },
+   "cancels": {
+    "done": 0,
+    "live": 1
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "attempt": "after"
+   },
+   "outcome": {
+    "error": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   },
+   "cancels": {
+    "after": 0,
+    "done": 0,
+    "live": 1
+   }
+  },
+  {
+   "step": {
+    "op": "current_open_turn"
+   },
+   "outcome": {
+    "error": "RuntimeError",
+    "code": null,
+    "message": "Application authority owner is closed"
+   },
+   "cancels": {
+    "after": 0,
+    "done": 0,
+    "live": 1
+   }
+  }
+ ]
+}

@@ -15,11 +15,17 @@
 //! it waits and once more when it ends. A provider that answers without waiting gives one batch
 //! for the whole response, as in Python.
 
+use super::character_tools::{
+    character_draft_tool, participant_artifact_tool, participant_draft_check_tool, participant_file_tool,
+    reuse_character_copy_tool, ParticipantPublisher, ParticipantReader, SourceProfileResolver,
+};
+use super::content_definition::content_definition_tool;
 use super::evidence::{builder_tool_evidence, tool_call_details};
 use super::history::{builder_native_request, provider_history};
 use super::mode::AgentMode;
 use super::prompt::{builder_prompt, creation_subflow_purpose, effective_tracked_skill};
 use super::rejected;
+use super::ruleset_tools::{ruleset_draft_check_tool, ruleset_test_tool, Cancelled};
 use super::runner::{AgentRunner, RunnerOptions, StreamEvent, StreamEventKind, TurnError};
 use super::skills::{builder_skill_references, load_builder_skill};
 use super::title::{title_instruction, FirstReplyTitle};
@@ -28,12 +34,14 @@ use crate::native_continuation::requires_reasoning_with_tools;
 use crate::session_loop::provider::{SessionEvents, SessionProviderError};
 use crate::session_loop::{ProviderControl, ProviderEvent};
 use crate::working_context::{history_tool, CheckpointBridge, WorkingContextOptions, WorkingContextProvider};
+use indexmap::IndexMap;
 use std::future::Future;
 use std::path::Path;
 use std::sync::{Arc, OnceLock};
 use std::task::Poll;
 use sylvia_base::hash::sha256_hex;
 use sylvia_base::{pyjson, CodedError, CodedResult, Json, JsonMap};
+use sylvia_domain::package_library::ParticipantArtifactDeclaration;
 use sylvia_domain::session::{SessionContext, SessionMessageKind, SessionStatus, BUILDER_SKILLS};
 use sylvia_provider::Provider;
 
@@ -51,6 +59,12 @@ fn specs() -> &'static JsonMap {
 
 fn definition(name: &str) -> &'static Json {
     specs().get(name).unwrap_or_else(|| panic!("no exported definition for {name}"))
+}
+
+/// A Builder tool's exported definition (`builder_tool_specs.json`), for the modules that port
+/// its handler.
+pub(crate) fn exported_definition(name: &str) -> &'static Json {
+    definition(name)
 }
 
 /// A tool whose handler a later PR ports: its exact definition, and `rust_port_pending`.
@@ -120,12 +134,23 @@ pub type ContinuationReader = Arc<dyn Fn(&str) -> Option<JsonMap> + Send + Sync>
 /// take their owner callbacks then; here a present collaborator offers its tools' definitions.
 #[derive(Default, Clone)]
 pub struct BuilderTurnTools {
-    /// Character declarations from the caller or the selected Plan (B5).
-    pub character_declarations: bool,
+    /// `participant_declarations`: the chat's character declarations.
+    pub participant_declarations: Vec<ParticipantArtifactDeclaration>,
+    /// `setting_character_schema`: the Setting's character data schema.
+    pub setting_character_schema: Option<JsonMap>,
+    /// The selected Plan's `character_declarations` and `setting_character_schema`
+    /// (`campaign_plan_authority()`), used when the chat has no declarations of its own.
+    pub plan_characters: Option<(Vec<ParticipantArtifactDeclaration>, Option<JsonMap>)>,
+    /// `participant_schemas`: the schemas the publication tool offers, by schema ID.
+    pub participant_schemas: IndexMap<String, JsonMap>,
+    /// `resolve_source_profile`: verifies a draft check's named general profile.
+    pub resolve_source_profile: Option<SourceProfileResolver>,
     pub publish_ruleset_candidate: bool,
-    pub publish_participant: bool,
-    pub reuse_participant: bool,
-    pub read_participant: bool,
+    /// The worker `test_ruleset_draft` runs; this executable in its worker mode when `None`.
+    pub ruleset_test_worker: Option<sylvia_app::ruleset_testing::WorkerCommand>,
+    pub publish_participant: Option<ParticipantPublisher>,
+    pub reuse_participant: Option<ParticipantReader>,
+    pub read_participant: Option<ParticipantReader>,
     pub campaign_plan_authority: bool,
     pub publish_campaign_plan: bool,
     pub publish_campaign_setting: bool,
@@ -180,17 +205,23 @@ fn plan_definition(name: &str) -> CodedResult<ToolSpec> {
     pending_tool(definition)
 }
 
-/// `stream_builder_turn`'s tool list, in Python's order, before the history tool.
-pub fn application_tools(context: &SessionContext, tools: &BuilderTurnTools) -> CodedResult<Vec<ToolSpec>> {
+/// `stream_builder_turn`'s tool list, in Python's order, before the history tool. The Ruleset
+/// draft tools work in `workspace`, and the test stops when `cancelled` says so.
+pub fn application_tools(
+    context: &SessionContext,
+    tools: &BuilderTurnTools,
+    workspace: &Path,
+    cancelled: Cancelled,
+) -> CodedResult<Vec<ToolSpec>> {
     let purpose = creation_subflow_purpose(context);
     let character = character_purpose(purpose.as_deref());
     let skill = effective_tracked_skill(context);
-    if tools.character_declarations
-        || (character && (tools.read_participant || tools.reuse_participant || tools.publish_participant))
-    {
-        return Err(CodedError::new("rust_port_pending", "not yet ported: Builder character tools"));
-    }
-    let mut specs = vec![pending("get_content_definition")?];
+    // `character_declarations`: the chat's own, else the selected Plan's.
+    let (declarations, world_schema) = match &tools.plan_characters {
+        Some((plan, schema)) if tools.participant_declarations.is_empty() => (plan.clone(), schema.clone()),
+        _ => (tools.participant_declarations.clone(), tools.setting_character_schema.clone()),
+    };
+    let mut specs = vec![content_definition_tool(&declarations, world_schema.clone())?];
     specs.extend(tools.repair_tools.iter().cloned());
     specs.extend(tools.source_tools.iter().cloned());
     if context.session.campaign_id().is_none() {
@@ -204,9 +235,40 @@ pub fn application_tools(context: &SessionContext, tools: &BuilderTurnTools) -> 
     if context.session.campaign_id().is_some() && subflow_link {
         specs.push(pending("complete_creation_subflow")?);
     }
+    if !declarations.is_empty() && (character || tools.campaign_plan_authority) {
+        let role = if character { purpose.as_deref() } else { None };
+        let check = participant_draft_check_tool(
+            role,
+            &declarations,
+            world_schema,
+            tools.resolve_source_profile.clone(),
+        )?;
+        let file = if character { Some(participant_file_tool(&check, workspace)?) } else { None };
+        specs.push(check);
+        specs.extend(file);
+    }
     if matches!(skill.as_deref(), None | Some("BUILD RULESET")) && !character {
-        specs.push(pending("check_ruleset_draft")?);
-        specs.push(pending("test_ruleset_draft")?);
+        specs.push(ruleset_draft_check_tool(workspace)?);
+        specs.push(ruleset_test_tool(workspace, cancelled, tools.ruleset_test_worker.clone())?);
+    }
+    let schema_ids: Vec<String> =
+        tools.participant_declarations.iter().map(|declaration| declaration.schema_id.clone()).collect();
+    if let (true, Some(read)) = (character, &tools.read_participant) {
+        specs.push(character_draft_tool(Arc::clone(read), workspace, &schema_ids)?);
+    }
+    if let (true, Some(reuse)) = (character, &tools.reuse_participant) {
+        specs.push(reuse_character_copy_tool(Arc::clone(reuse), &schema_ids)?);
+    }
+    if let (true, Some(publish)) = (character, &tools.publish_participant) {
+        let tool = participant_artifact_tool(
+            purpose.as_deref(),
+            Arc::clone(publish),
+            &tools.participant_schemas,
+            false,
+        )?;
+        let file = participant_file_tool(&tool, workspace)?;
+        specs.push(tool);
+        specs.push(file);
     }
     if tools.campaign_content_authority {
         specs.push(pending("discover_campaign_content")?);
@@ -551,7 +613,11 @@ pub async fn stream_builder_turn(
     }
     std::fs::create_dir_all(workspace)
         .map_err(|error| CodedError::rejected(error.to_string()).with_error_type("OSError"))?;
-    let mut tools = application_tools(context, &turn.tools)?;
+    let cancelled: Cancelled = {
+        let control = Arc::clone(control);
+        Arc::new(move || control.cancelled())
+    };
+    let mut tools = application_tools(context, &turn.tools, workspace, cancelled)?;
     let mut title = turn.request_title.then(FirstReplyTitle::new);
     let checkpoints = Arc::new(CheckpointBridge::new());
     let model = provider.model_info().cloned();

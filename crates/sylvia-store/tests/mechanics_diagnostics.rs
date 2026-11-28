@@ -6,6 +6,7 @@
 mod common;
 
 use serde_json::json;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::Json;
 use sylvia_store::narration::NarrationState;
 
@@ -37,5 +38,5 @@ fn mechanics_diagnostics_match_python() {
     }
     assert_eq!(statuses, 6);
     let last = &steps.last().unwrap()["status"]["safe_mechanics_diagnostics"];
-    assert_eq!(Json::Array(state.mechanics_diagnostics()), *last);
+    assert_same_json(&Json::Array(state.mechanics_diagnostics()), last, "the kept diagnostics");
 }

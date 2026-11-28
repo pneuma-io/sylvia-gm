@@ -12,6 +12,7 @@ use common::Recorded;
 use serde_json::Value as J;
 use std::sync::Arc;
 use sylvia_agent::session_loop::campaign::{CampaignSessionLoop, LoopHooks};
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, CodedResult};
 
 /// Python's outcome: `{"result": ...}` or `{"raised": {class, message, code}}`.
@@ -61,7 +62,7 @@ async fn idle_loop_matches_python() {
             Some(raised) => serde_json::json!({"raised": raised}),
             None => serde_json::json!({"result": case["result"]}),
         };
-        assert_eq!(found, expected, "{name}");
+        assert_same_json(&found, &expected, name);
         owner.check(name);
     }
 }

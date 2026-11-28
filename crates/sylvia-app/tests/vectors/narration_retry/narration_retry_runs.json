@@ -1,0 +1,1290 @@
+{
+ "python": "3.12.11",
+ "owner_id": "owner",
+ "campaign_id": "campaign",
+ "runs": [
+  {
+   "step": {
+    "op": "start",
+    "attempt": "a1"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "a1": 0
+   }
+  },
+  {
+   "step": {
+    "op": "emit",
+    "attempt": "a1",
+    "channel": "talk",
+    "token": "Half a sent"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    "a1": 0
+   }
+  },
+  {
+   "step": {
+    "op": "interrupt",
+    "attempt": "a1"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000003",
+     "turn_id": "turn",
+     "last_action_id": null,
+     "failed_attempt_id": "a1",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    "a1": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 0
+    },
+    "retry": "r1",
+    "script": [
+     {
+      "emit": [
+       "talk",
+       "The retry speaks.",
+       null
+      ]
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ManualRetryResult",
+     "input": {
+      "__class__": "RetryNarrationInput",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000003",
+      "retry_id": "r1",
+      "failed_attempt_id": "a1",
+      "canonical_high_water": 6,
+      "turn_id": "turn",
+      "action_receipt": null
+     },
+     "canonical": [
+      {
+       "__class__": "CanonicalEvent",
+       "sequence": 7,
+       "event_type": "talk",
+       "turn_id": "turn",
+       "action_id": null,
+       "safe_payload": {
+        "text": "The retry speaks."
+       },
+       "visibility": "player_safe",
+       "attempt_id": "r1",
+       "attempt_ordinal": 0
+      }
+     ],
+     "replayed": false
+    },
+    "started": 1
+   },
+   "cancels": {
+    "a1": 1,
+    "r1": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 0
+    },
+    "retry": "r1",
+    "script": [
+     {
+      "emit": [
+       "talk",
+       "Never said.",
+       null
+      ]
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ManualRetryResult",
+     "input": {
+      "__class__": "RetryNarrationInput",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000003",
+      "retry_id": "r1",
+      "failed_attempt_id": "a1",
+      "canonical_high_water": 7,
+      "turn_id": "turn",
+      "action_receipt": null
+     },
+     "canonical": [
+      {
+       "__class__": "CanonicalEvent",
+       "sequence": 7,
+       "event_type": "talk",
+       "turn_id": "turn",
+       "action_id": null,
+       "safe_payload": {
+        "text": "The retry speaks."
+       },
+       "visibility": "player_safe",
+       "attempt_id": "r1",
+       "attempt_ordinal": 0
+      }
+     ],
+     "replayed": true
+    },
+    "started": 0
+   },
+   "cancels": {
+    "a1": 1,
+    "r1": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 0
+    },
+    "retry": "r2",
+    "script": [
+     {
+      "emit": [
+       "talk",
+       "Never said.",
+       null
+      ]
+     }
+    ]
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Interruption already has a different retry identity"
+   },
+   "cancels": {
+    "a1": 1,
+    "r1": 0,
+    "r2": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": "interruption-missing",
+    "retry": "r2",
+    "script": []
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Narration interruption is unavailable"
+   },
+   "cancels": {
+    "a1": 1,
+    "r1": 0,
+    "r2": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 0
+    },
+    "retry": " r1",
+    "script": []
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Retry identity must not have leading or trailing whitespace"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "r1": 0,
+    "r2": 0
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "attempt": "a2"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 0,
+    "r1": 0,
+    "r2": 0
+   }
+  },
+  {
+   "step": {
+    "op": "bind",
+    "attempt": "a2",
+    "action": "move"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 0,
+    "r1": 0,
+    "r2": 0
+   }
+  },
+  {
+   "step": {
+    "op": "interrupt",
+    "attempt": "a2"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000004",
+     "turn_id": "turn",
+     "last_action_id": "move",
+     "failed_attempt_id": "a2",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "r1": 0,
+    "r2": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 1
+    },
+    "retry": "r3",
+    "script": [
+     {
+      "raise": "provider went away"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "RuntimeError",
+    "code": null,
+    "message": "provider went away"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retryable",
+    "failed": "a2"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retryable",
+    "failed": "r3"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000004",
+     "turn_id": "turn",
+     "last_action_id": "move",
+     "failed_attempt_id": "r3",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "status",
+    "attempt": "r3"
+   },
+   "outcome": {
+    "ok": "interrupted"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 1
+    },
+    "retry": "r3",
+    "script": [
+     {
+      "emit": [
+       "talk",
+       "Second time lucky.",
+       null
+      ]
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ManualRetryResult",
+     "input": {
+      "__class__": "RetryNarrationInput",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000004",
+      "retry_id": "r3",
+      "failed_attempt_id": "r3",
+      "canonical_high_water": 7,
+      "turn_id": "turn",
+      "action_receipt": {
+       "__class__": "ActionReceipt",
+       "campaign_id": "campaign",
+       "action_id": "move",
+       "status": "committed",
+       "result": {
+        "context": {},
+        "logs": [],
+        "narrative_directives": [],
+        "narrative_hooks": {},
+        "status": "committed",
+        "tool": "move_unit"
+       },
+       "resulting_revision": 1
+      }
+     },
+     "canonical": [
+      {
+       "__class__": "CanonicalEvent",
+       "sequence": 8,
+       "event_type": "talk",
+       "turn_id": "turn",
+       "action_id": null,
+       "safe_payload": {
+        "text": "Second time lucky."
+       },
+       "visibility": "player_safe",
+       "attempt_id": "r3",
+       "attempt_ordinal": 0
+      }
+     ],
+     "replayed": false
+    },
+    "started": 1
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "attempt": "a3"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "interrupt",
+    "attempt": "a3"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000006",
+     "turn_id": "turn",
+     "last_action_id": null,
+     "failed_attempt_id": "a3",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 2
+    },
+    "retry": "r4",
+    "script": [
+     {
+      "emit": [
+       "safe_think",
+       "x",
+       [
+        {
+         "kind": "narration",
+         "text": "x"
+        }
+       ]
+      ]
+     },
+     {
+      "raise": "after a refused token"
+     }
+    ]
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Response blocks are valid only for TALK"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1
+   }
+  },
+  {
+   "step": {
+    "op": "status",
+    "attempt": "r4"
+   },
+   "outcome": {
+    "ok": "interrupted"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 2
+    },
+    "retry": "r5",
+    "script": []
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "A successful Retry must produce TALK or an action result"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 2
+    },
+    "retry": "r6",
+    "script": [
+     {
+      "emit": [
+       "safe_think",
+       "Thinking it over.",
+       null
+      ]
+     },
+     {
+      "emit": [
+       "talk",
+       "The door holds.",
+       null
+      ]
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ManualRetryResult",
+     "input": {
+      "__class__": "RetryNarrationInput",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000006",
+      "retry_id": "r6",
+      "failed_attempt_id": "r5",
+      "canonical_high_water": 8,
+      "turn_id": "turn",
+      "action_receipt": null
+     },
+     "canonical": [
+      {
+       "__class__": "CanonicalEvent",
+       "sequence": 9,
+       "event_type": "think",
+       "turn_id": "turn",
+       "action_id": null,
+       "safe_payload": {
+        "text": "Thinking it over."
+       },
+       "visibility": "player_safe",
+       "attempt_id": "r6",
+       "attempt_ordinal": 0
+      },
+      {
+       "__class__": "CanonicalEvent",
+       "sequence": 10,
+       "event_type": "talk",
+       "turn_id": "turn",
+       "action_id": null,
+       "safe_payload": {
+        "text": "The door holds."
+       },
+       "visibility": "player_safe",
+       "attempt_id": "r6",
+       "attempt_ordinal": 1
+      }
+     ],
+     "replayed": false
+    },
+    "started": 1
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "start",
+    "attempt": "a5"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "emit",
+    "attempt": "a5",
+    "channel": "talk",
+    "token": "Stopped mid"
+   },
+   "outcome": {
+    "ok": null
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "interrupt",
+    "attempt": "a5"
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000009",
+     "turn_id": "turn",
+     "last_action_id": null,
+     "failed_attempt_id": "a5",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-early",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "turn",
+     "attempt_id": "c1"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Only stopped narration accepts replacement input"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "append",
+    "session": "gm",
+    "message": "stop-a5",
+    "kind": "evidence",
+    "content": {
+     "kind": "session_attempt_terminal",
+     "attempt_id": "a5",
+     "failure_category": "user_cancelled"
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "SessionMessage",
+     "session_id": "gm",
+     "sequence": 3,
+     "message_id": "stop-a5",
+     "kind": "evidence",
+     "content": {
+      "kind": "session_attempt_terminal",
+      "attempt_id": "a5",
+      "failure_category": "user_cancelled"
+     },
+     "canonical_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "unresolved",
+    "session": "gm"
+   },
+   "outcome": {
+    "ok": [
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000009",
+      "turn_id": "turn",
+      "last_action_id": null,
+      "failed_attempt_id": "a5",
+      "retryable": true,
+      "resolving_retry_id": null,
+      "resolved_sequence": null
+     },
+     true
+    ]
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "builder",
+    "message": "redirect-builder",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "turn",
+     "attempt_id": "c1"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Only a GM session can redirect campaign narration"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-turn",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "elsewhere",
+     "attempt_id": "c1"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Replacement input belongs to another turn"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-no-attempt",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "turn"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Replacement input requires an attempt identity"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-saved",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "turn",
+     "attempt_id": "r1"
+    }
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Continuation identity already has saved output"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-blank",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "turn",
+     "attempt_id": " c1"
+    }
+   },
+   "outcome": {
+    "error": "ValueError",
+    "code": null,
+    "message": "Continuation identity must not have leading or trailing whitespace"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-1",
+    "interruption": {
+     "interruption": 3
+    },
+    "content": {
+     "text": "Go left.",
+     "turn_id": "turn",
+     "attempt_id": "c1",
+     "redirect_interruption_id": {
+      "interruption": 3
+     }
+    }
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "NarrationInterruption",
+     "campaign_id": "campaign",
+     "interruption_id": "interruption-00000000-0000-4000-8000-000000000009",
+     "turn_id": "turn",
+     "last_action_id": null,
+     "failed_attempt_id": "a5",
+     "retryable": true,
+     "resolving_retry_id": null,
+     "resolved_sequence": null
+    }
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "unresolved",
+    "session": "gm"
+   },
+   "outcome": {
+    "ok": [
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000009",
+      "turn_id": "turn",
+      "last_action_id": null,
+      "failed_attempt_id": "a5",
+      "retryable": true,
+      "resolving_retry_id": "c1",
+      "resolved_sequence": null
+     },
+     true
+    ]
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 3
+    },
+    "retry": "c2",
+    "script": []
+   },
+   "outcome": {
+    "error": "IdempotencyConflict",
+    "code": "idempotency_conflict",
+    "message": "Interruption already has a different retry identity"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "retry",
+    "interruption": {
+     "interruption": 3
+    },
+    "retry": "c1",
+    "script": [
+     {
+      "emit": [
+       "talk",
+       "Left, then.",
+       null
+      ]
+     }
+    ]
+   },
+   "outcome": {
+    "ok": {
+     "__class__": "ManualRetryResult",
+     "input": {
+      "__class__": "RetryNarrationInput",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000009",
+      "retry_id": "c1",
+      "failed_attempt_id": "a5",
+      "canonical_high_water": 10,
+      "turn_id": "turn",
+      "action_receipt": null
+     },
+     "canonical": [
+      {
+       "__class__": "CanonicalEvent",
+       "sequence": 11,
+       "event_type": "talk",
+       "turn_id": "turn",
+       "action_id": null,
+       "safe_payload": {
+        "text": "Left, then."
+       },
+       "visibility": "player_safe",
+       "attempt_id": "c1",
+       "attempt_ordinal": 0
+      }
+     ],
+     "replayed": false
+    },
+    "started": 1
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "redirect",
+    "session": "gm",
+    "message": "redirect-resolved",
+    "interruption": {
+     "interruption": 0
+    },
+    "content": {
+     "text": "Again.",
+     "turn_id": "turn",
+     "attempt_id": "c9"
+    }
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Only stopped narration accepts replacement input"
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  },
+  {
+   "step": {
+    "op": "interruptions"
+   },
+   "outcome": {
+    "ok": [
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000003",
+      "turn_id": "turn",
+      "last_action_id": null,
+      "failed_attempt_id": "a1",
+      "retryable": false,
+      "resolving_retry_id": "r1",
+      "resolved_sequence": 7
+     },
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000004",
+      "turn_id": "turn",
+      "last_action_id": "move",
+      "failed_attempt_id": "r3",
+      "retryable": false,
+      "resolving_retry_id": "r3",
+      "resolved_sequence": 8
+     },
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000006",
+      "turn_id": "turn",
+      "last_action_id": null,
+      "failed_attempt_id": "r5",
+      "retryable": false,
+      "resolving_retry_id": "r6",
+      "resolved_sequence": 10
+     },
+     {
+      "__class__": "NarrationInterruption",
+      "campaign_id": "campaign",
+      "interruption_id": "interruption-00000000-0000-4000-8000-000000000009",
+      "turn_id": "turn",
+      "last_action_id": null,
+      "failed_attempt_id": "a5",
+      "retryable": false,
+      "resolving_retry_id": "c1",
+      "resolved_sequence": 11
+     }
+    ]
+   },
+   "cancels": {
+    " r1": 0,
+    "a1": 1,
+    "a2": 1,
+    "a3": 1,
+    "a5": 1,
+    "c1": 0,
+    "c2": 0,
+    "r1": 0,
+    "r2": 0,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "r6": 0
+   }
+  }
+ ]
+}

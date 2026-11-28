@@ -218,6 +218,7 @@ pub async fn execute_action(
     owner_id: &str,
     command: &ActionCommand,
 ) -> Result<ActionExecution, ActionError> {
+    let _operation = store.operation()?;
     let _work = super::guided::campaign_work(store, &command.campaign_id).await?;
     execute_action_in_work(store, owner_id, command, &ExecuteOptions::default()).await
 }
@@ -626,6 +627,7 @@ pub async fn resolve_mechanics_choice(
     owner_id: &str,
     command: &ResolveMechanicsChoiceCommand,
 ) -> Result<ActionExecution, ActionError> {
+    let _operation = store.operation()?;
     let campaign_id = command.campaign_id.clone();
     let pending = store.call(move |store| store.pending_mechanics_action(&campaign_id)).await?;
     let _work = if pending.as_ref().is_some_and(|pending| pending.player_action_origin.is_some()) {

@@ -1125,6 +1125,18 @@ pub async fn handle_campaign_creation_catalog(ctx: &DispatchContext, params: &Js
     Ok(Json::Array(catalog.into_iter().map(Json::Object).collect()))
 }
 
+/// `handle_snapshot` and `handle_display_snapshot`: the desktop's snapshot of a campaign
+/// (`AuthorityOwner.desktop_snapshot`), complete or, for `display_snapshot`, display-only.
+pub async fn handle_snapshot(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    use sylvia_app::authority::snapshots::{desktop_snapshot, DesktopSnapshot};
+    let campaign_id = required(params, "campaign_id")?;
+    let display_only = ctx.method == "display_snapshot";
+    match desktop_snapshot(&ctx.store, &campaign_id, display_only).await.map_err(store_error)? {
+        DesktopSnapshot::Full(snapshot) => crate::owner_json::snapshot_value(&snapshot),
+        DesktopSnapshot::Display(snapshot) => crate::owner_json::display_snapshot_value(&snapshot),
+    }
+}
+
 /// `handle_catalog`: the campaign's admitted tools (`AuthorityOwner.catalog(campaign_id)`), each
 /// as its package identity, name, capability and input schema.
 pub async fn handle_catalog(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
@@ -1164,6 +1176,40 @@ pub async fn handle_backup_database(ctx: &DispatchContext, params: &JsonMap) -> 
     reply.insert("backup_id".into(), backup_id.into());
     reply.insert("status".into(), "created".into());
     Ok(Json::Object(reply))
+}
+
+/// `handle_player_projection_page`: `ctx.application_owner.player_projection_page(campaign_id,
+/// after_sequence=...)`, each projection as Python's `_json_value` writes a dataclass (its fields,
+/// in order).
+pub async fn handle_player_projection_page(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let campaign_id = required(params, "campaign_id")?;
+    let after_sequence = match params.get("after_sequence") {
+        None | Some(Json::Null) => None,
+        Some(_) => Some(Json::from(required_nonnegative_int(params, "after_sequence")?)),
+    };
+    let projections = sylvia_app::authority::player_projection::player_projection_page(
+        &ctx.store,
+        &campaign_id,
+        after_sequence.as_ref(),
+    )
+    .await
+    .map_err(sylvia_app::authority::actions::ActionError::into_coded)?;
+    let items = projections
+        .iter()
+        .map(|item| {
+            let mut value = JsonMap::new();
+            value.insert("kind".into(), item.kind.as_str().into());
+            value.insert("sequence".into(), item.sequence.map_or(Json::Null, Json::from));
+            value.insert("text".into(), item.text.clone().map_or(Json::Null, Json::from));
+            value.insert("safe_payload".into(), Json::Object(item.safe_payload.clone()));
+            value.insert("collapsed_by_default".into(), item.collapsed_by_default.into());
+            value.insert("provisional".into(), item.provisional.into());
+            value.insert("action_id".into(), item.action_id.clone().map_or(Json::Null, Json::from));
+            value.insert("attempt_id".into(), item.attempt_id.clone().map_or(Json::Null, Json::from));
+            Json::Object(value)
+        })
+        .collect();
+    crate::owner_json::json_value(&Json::Array(items))
 }
 
 #[cfg(test)]

@@ -18,6 +18,7 @@ use sylvia_agent::session_loop::{
     mechanics_rejection_feedback, ProviderControl, ProviderEvent, SessionProviderInput,
 };
 use sylvia_agent::stateless_mcp::ModelMechanicsTool;
+use sylvia_base::testing::assert_same_json;
 use sylvia_base::{CodedError, JsonMap};
 use sylvia_domain::authority::{
     ModelDecisionActor, ModelDecisionBoundary, ModelDecisionOwner, ModelToolBehavior, WriterRole,
@@ -213,7 +214,11 @@ fn decisions_match_python() {
         let expected = case["results"].as_object().unwrap();
         assert_eq!(results.len(), expected.len(), "every Python predicate is checked");
         for (name, result) in results {
-            assert_eq!(outcome(result), expected[name], "case {index}, {name}, state {}", case["assigned"]);
+            assert_same_json(
+                &outcome(result),
+                &expected[name],
+                format!("case {index}, {name}, state {}", case["assigned"]),
+            );
         }
     }
 }
@@ -278,7 +283,7 @@ fn attempt_progress_matches_python() {
             };
             outputs.push(output);
         }
-        assert_eq!(J::Array(outputs), case["outputs"], "{}", case["script"]);
+        assert_same_json(&J::Array(outputs), &case["outputs"], &case["script"]);
     }
 }
 
@@ -316,7 +321,7 @@ async fn provider_control_matches_python() {
             };
             outputs.push(output);
         }
-        assert_eq!(J::Array(outputs), case["outputs"], "{}", case["script"]);
+        assert_same_json(&J::Array(outputs), &case["outputs"], &case["script"]);
     }
 }
 
@@ -380,7 +385,7 @@ fn preparation_scopes_match_python() {
                 serde_json::json!({"code": error.code, "error": error.message})
             }
         };
-        assert_eq!(result, case["result"], "{case}");
+        assert_same_json(&result, &case["result"], case);
     }
 }
 

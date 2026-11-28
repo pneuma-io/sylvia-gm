@@ -15,6 +15,7 @@ use serde_json::Value as J;
 use std::sync::Mutex;
 use sylvia_agent::stateless_mcp::execute::execute_action;
 use sylvia_agent::stateless_mcp::AuthorityFailure;
+use sylvia_base::testing::assert_same_json;
 use sylvia_domain::authority::{ActionCommand, WriterRole};
 use sylvia_domain::error::DomainError;
 
@@ -115,7 +116,7 @@ async fn mechanics_executions_match_python() {
                         expected[key] = value.clone();
                     }
                 }
-                assert_eq!(error_json(&error), expected, "{name}");
+                assert_same_json(&error_json(&error), &expected, &name);
             }
             None => {
                 let receipt = result.unwrap_or_else(|error| panic!("{name}: {error:?}"));

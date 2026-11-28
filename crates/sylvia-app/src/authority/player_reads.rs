@@ -25,33 +25,42 @@ pub fn project_private_tool_inputs(
     store: &AuthorityStore,
     mut snapshot: CampaignSnapshot,
 ) -> StoreResult<CampaignSnapshot> {
-    let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
-    let private_packages: BTreeSet<String> = snapshot
-        .state
-        .package_lock
-        .entries()
-        .iter()
-        .filter(|entry| private_keys.iter().any(|key| key.starts_with(&format!("{}.", entry.package_id()))))
-        .map(|entry| entry.package_id().to_owned())
-        .collect();
-    for action in &mut snapshot.actions {
-        if private_packages.contains(&action.package_id) {
-            action.parameters = JsonMap::new();
-        }
-    }
-    for event in &mut snapshot.events {
-        let private = matches!(event.safe_payload.get("package_id"), Some(Json::String(id)) if private_packages.contains(id));
-        if event.event_type == CanonicalEventType::ToolCall && private {
-            // `{**payload, "parameters": {}}`: an existing key keeps its place.
-            event.safe_payload.insert("parameters".into(), Json::Object(JsonMap::new()));
-        }
-    }
+    project_private_records(
+        store,
+        &snapshot.state.package_lock,
+        &mut snapshot.actions,
+        &mut snapshot.events,
+    )?;
     Ok(snapshot)
+}
+
+/// `_project_private_tool_inputs` on a snapshot's or a display snapshot's actions and events.
+pub(super) fn project_private_records(
+    store: &AuthorityStore,
+    lock: &sylvia_domain::authority::PackageLock,
+    actions: &mut [sylvia_domain::authority::ActionRecord],
+    events: &mut [sylvia_domain::authority::CanonicalEvent],
+) -> StoreResult<()> {
+    let private_keys = engine_private_keys(store, lock)?;
+    super::snapshots::hide_private_tool_inputs(lock, &private_keys, actions, events);
+    Ok(())
 }
 
 /// `AuthorityOwner.canonical_replay(campaign_id, acknowledged_sequence=...)`: the canonical events
 /// after the acknowledged sequence, the owner's provisional state and the high water mark.
 pub async fn canonical_replay(
+    store: &StoreHandle,
+    narration: &NarrationState,
+    campaign_id: &str,
+    acknowledged_sequence: i64,
+) -> StoreResult<CanonicalReplay> {
+    let _operation = store.operation()?;
+    canonical_replay_in_operation(store, narration, campaign_id, acknowledged_sequence).await
+}
+
+/// `_canonical_replay(campaign_id, acknowledged_sequence)`: the replay for an operation that
+/// already holds the owner's operation guard (`reconnect_narration`).
+pub(super) async fn canonical_replay_in_operation(
     store: &StoreHandle,
     narration: &NarrationState,
     campaign_id: &str,
@@ -102,7 +111,7 @@ fn response_action_ids(
 
 /// `_player_response_reservations(campaign_id)`: the actions saved responses already answer, and
 /// the narration attempts that are those responses.
-fn player_response_reservations(
+pub(super) fn player_response_reservations(
     store: &AuthorityStore,
     campaign_id: &str,
 ) -> StoreResult<(BTreeSet<String>, BTreeSet<String>)> {
@@ -156,6 +165,7 @@ fn player_response_reservations(
 /// `AuthorityOwner.player_action_context(campaign_id)`: the saved outcomes since the last
 /// ordinary GM narration that no saved response has answered yet.
 pub async fn player_action_context(store: &StoreHandle, campaign_id: &str) -> StoreResult<Vec<JsonMap>> {
+    let _operation = store.operation()?;
     let id = campaign_id.to_owned();
     store.call(move |store| player_action_context_on(store, &id)).await
 }
@@ -206,6 +216,7 @@ pub async fn player_action_response_basis(
     action_id: &str,
     automatic: bool,
 ) -> StoreResult<JsonMap> {
+    let _operation = store.operation()?;
     let (session_id, action_id) = (session_id.to_owned(), action_id.to_owned());
     store
         .call(move |store| {
@@ -256,6 +267,7 @@ pub async fn player_action_response_context(
     campaign_id: &str,
     basis: &JsonMap,
 ) -> StoreResult<Vec<JsonMap>> {
+    let _operation = store.operation()?;
     let (id, basis) = (campaign_id.to_owned(), Arc::new(basis.clone()));
     store
         .call(move |store| {
@@ -277,6 +289,7 @@ pub async fn action_sequence_response_results(
     session_id: &str,
     basis_message_id: Option<&str>,
 ) -> StoreResult<Vec<JsonMap>> {
+    let _operation = store.operation()?;
     let (session_id, basis) = (session_id.to_owned(), basis_message_id.map(str::to_owned));
     store.call(move |store| action_sequences::response_results(store, &session_id, basis.as_deref())).await
 }

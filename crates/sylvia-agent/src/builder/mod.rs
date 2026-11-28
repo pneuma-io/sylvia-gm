@@ -7,12 +7,16 @@
 //! evidence. The texts the model reads are exported from Python into `builder_texts.json` by
 //! `generate_builder_texts.py`, never retyped.
 
+pub mod character_profile_tools;
+pub mod character_tools;
+pub mod content_definition;
 pub mod evidence;
 pub mod history;
 pub mod mode;
 pub mod prompt;
 pub mod question_answers;
 pub mod ruleset_tests;
+pub mod ruleset_tools;
 pub mod runner;
 pub mod skills;
 pub mod title;
@@ -67,4 +71,65 @@ pub(crate) fn frozen_in(value: &Json, names: &[&str]) -> sylvia_base::CodedResul
         return Err(type_error(format!("unhashable type: '{}'", frozen_type_name(value))));
     }
     Ok(names.iter().any(|name| sylvia_domain::pyops::py_eq(value, &Json::from(*name))))
+}
+
+/// Whether Python's `type(error).__name__` is an `AuthorityError`: the class whose refusals
+/// carry a `code` and that the Builder tools catch (`except AuthorityError`).
+pub(crate) fn is_authority_error(class: &str) -> bool {
+    matches!(
+        class,
+        "AuthorityError"
+            | "SchemaIdentityError"
+            | "OwnerConflict"
+            | "WrongOwner"
+            | "WrongWriter"
+            | "StaleRevision"
+            | "IdempotencyConflict"
+            | "CommandRejected"
+            | "MechanicsRejected"
+            | "RulesetPreconditionRejected"
+            | "PortableRecoveryFailure"
+            | "_BackupFailure"
+            | "_ExportFailure"
+    )
+}
+
+/// Which `except` clause of a Builder tool catches an error, by Python's class.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum PyFamily {
+    /// `CommandRejected` and its subclasses.
+    CommandRejected,
+    /// Another `AuthorityError`.
+    Authority,
+    /// `OSError` and its subclasses.
+    Os,
+    /// `UnicodeError` and its subclasses (all `ValueError`s).
+    Unicode,
+    /// Another `ValueError` (`json.JSONDecodeError`, `StaleWorkspaceFileError`,
+    /// `ContentShapeError`, `ParticipantValidationError`, ...).
+    Value,
+    /// `TypeError`.
+    Type,
+    /// Anything else (`KeyError`, `RuntimeError`, ...): no Builder tool catches it.
+    Other,
+}
+
+/// The family of `error`'s Python class.
+pub(crate) fn py_family(error: &sylvia_domain::DomainError) -> PyFamily {
+    let class = error.python_class();
+    match class {
+        "CommandRejected"
+        | "MechanicsRejected"
+        | "RulesetPreconditionRejected"
+        | "PortableRecoveryFailure"
+        | "_BackupFailure"
+        | "_ExportFailure" => PyFamily::CommandRejected,
+        _ if is_authority_error(class) => PyFamily::Authority,
+        "OSError" | "FileNotFoundError" | "FileExistsError" | "PermissionError" | "IsADirectoryError"
+        | "NotADirectoryError" => PyFamily::Os,
+        "UnicodeError" | "UnicodeDecodeError" | "UnicodeEncodeError" => PyFamily::Unicode,
+        "TypeError" => PyFamily::Type,
+        _ if error.is_value_error() || matches!(class, "ValueError" | "JSONDecodeError") => PyFamily::Value,
+        _ => PyFamily::Other,
+    }
 }

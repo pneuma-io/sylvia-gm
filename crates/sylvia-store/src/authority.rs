@@ -174,6 +174,7 @@ impl crate::handle::StoreHandle {
         display_name: &str,
         automatic: bool,
     ) -> StoreResult<sylvia_domain::session::BuilderChatRecord> {
+        let _operation = self.operation()?;
         let _session = self.lanes().sessions.acquire(session_id).await;
         let (session_id, display_name) = (session_id.to_owned(), display_name.to_owned());
         self.call(move |store| store.rename_builder_chat(&session_id, &display_name, automatic)).await
@@ -209,6 +210,7 @@ impl crate::handle::StoreHandle {
                 "builder_chat_work_in_progress",
             ));
         };
+        let _operation = self.operation()?;
         let _session = self.lanes().sessions.acquire(session_id).await;
         let session_id = session_id.to_owned();
         self.call(move |store| store.delete_builder_chat(&session_id)).await

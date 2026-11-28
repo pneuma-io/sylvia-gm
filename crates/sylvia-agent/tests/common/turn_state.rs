@@ -12,8 +12,20 @@ use sylvia_agent::stateless_mcp::ModelMechanicsTool;
 use sylvia_base::JsonMap;
 use sylvia_domain::authority::{ModelDecisionBoundary, ModelToolBehavior};
 
-/// Locals read but never written back (the phases traced so far do not change them).
+/// Locals not written back whole: the current player message and the participants are compared
+/// by their identities (`IDENTITIES`), and an actor request is not built before T6.
 pub const READ_ONLY: [&str; 3] = ["current_player_message", "participants", "actor_request"];
+
+/// The identity a dump of a [`READ_ONLY`] local is compared by.
+fn identity(key: &str, value: &J) -> Option<J> {
+    match key {
+        "current_player_message" => Some(value.get("message_id").cloned().unwrap_or(J::Null)),
+        "participants" => Some(J::Array(
+            value.as_array().unwrap().iter().map(|item| item["participant_id"].clone()).collect(),
+        )),
+        _ => None,
+    }
+}
 
 fn tagged_list(messages: &J, tags: &J) -> Vec<Tagged> {
     let tags = tags.as_array().cloned().unwrap_or_default();
@@ -415,6 +427,12 @@ pub fn dump(state: &ProviderTurnState) -> J {
     put(&mut out, "current_application_controls", &l.current_application_controls, |v| to(v));
     put(&mut out, "current_catalog", &l.current_catalog, tools_json);
     put(&mut out, "current_player_action", &l.current_player_action, |v| to(v));
+    put(&mut out, "current_player_message", &l.current_player_message, |v| {
+        v.as_ref().map_or(J::Null, |message| json!({"message_id": message.message_id()}))
+    });
+    put(&mut out, "participants", &l.participants, |v| {
+        J::Array(v.iter().map(|item| json!({"participant_id": item.participant_id()})).collect())
+    });
     put(&mut out, "current_user_wire_text", &l.current_user_wire_text, |v| to(v));
     put(&mut out, "decision_boundary", &l.decision_boundary, |v| v.as_ref().map_or(J::Null, boundary_json));
     put(&mut out, "direct_response", &l.direct_response, |v| to(v));
@@ -595,6 +613,9 @@ pub fn compare(name: &str, ours: &J, theirs: &J) {
         let (a, b) = (ours[group].as_object().unwrap(), theirs[group].as_object().unwrap());
         for (key, value) in b {
             if group == "locals" && READ_ONLY.contains(&key.as_str()) {
+                if let (Some(theirs), Some(ours)) = (identity(key, value), a.get(key)) {
+                    assert_eq!(identity(key, ours), Some(theirs), "{name}: {group}.{key} differs");
+                }
                 continue;
             }
             match a.get(key) {

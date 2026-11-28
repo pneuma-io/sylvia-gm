@@ -355,7 +355,11 @@ async fn run_case(case: &Value, now: &str) {
         assert_eq!(sorted(a), sorted(b), "{name}: log line {index}");
     }
     assert_eq!(our_log.len(), their_log.len(), "{name}: log");
-    assert_eq!(json!(files(&home)), case["files"], "{name}: files left in the home");
+    sylvia_base::testing::assert_same_json(
+        &json!(files(&home)),
+        &case["files"],
+        format!("{name}: files left in the home"),
+    );
     let _ = std::fs::remove_dir_all(home.parent().unwrap());
 }
 

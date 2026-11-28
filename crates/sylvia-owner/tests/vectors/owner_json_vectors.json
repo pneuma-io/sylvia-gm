@@ -1,0 +1,512 @@
+{
+ "cases": [
+  {
+   "value": {
+    "plain": [
+     1,
+     2.5,
+     null,
+     true,
+     "\u00e9"
+    ],
+    "nested": {
+     "a": {
+      "b": []
+     }
+    }
+   },
+   "ok": {
+    "plain": [
+     1,
+     2.5,
+     null,
+     true,
+     "\u00e9"
+    ],
+    "nested": {
+     "a": {
+      "b": []
+     }
+    }
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_results",
+    "results": [
+     {
+      "name": "read_session_history",
+      "content": "secret history",
+      "call_id": "c1"
+     },
+     {
+      "name": "roll",
+      "content": "4"
+     },
+     {
+      "name": "read_session_history"
+     },
+     "not a mapping"
+    ],
+    "extra": 1
+   },
+   "ok": {
+    "kind": "provider_tool_results",
+    "results": [
+     {
+      "name": "read_session_history",
+      "content": "{\"status\":\"session_history_read\"}",
+      "call_id": "c1"
+     },
+     {
+      "name": "roll",
+      "content": "4"
+     },
+     {
+      "name": "read_session_history",
+      "content": "{\"status\":\"session_history_read\"}"
+     },
+     "not a mapping"
+    ],
+    "extra": 1
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_results"
+   },
+   "ok": {
+    "kind": "provider_tool_results",
+    "results": []
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_results",
+    "results": "ab"
+   },
+   "ok": {
+    "kind": "provider_tool_results",
+    "results": [
+     "a",
+     "b"
+    ]
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_results",
+    "results": {
+     "x": 1
+    }
+   },
+   "ok": {
+    "kind": "provider_tool_results",
+    "results": [
+     "x"
+    ]
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_results",
+    "results": null
+   },
+   "error": {
+    "class": "TypeError",
+    "message": "'NoneType' object is not iterable"
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_results",
+    "results": 5
+   },
+   "error": {
+    "class": "TypeError",
+    "message": "'int' object is not iterable"
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_calls",
+    "assistant": {
+     "role": "assistant",
+     "tool_calls": [
+      {
+       "id": "c1",
+       "function": {
+        "name": "read_session_history",
+        "arguments": "{\"query\": \"x\"}"
+       }
+      },
+      {
+       "id": "c2",
+       "function": {
+        "name": "roll",
+        "arguments": "{}"
+       }
+      },
+      {
+       "id": "c3",
+       "function": "not a mapping"
+      },
+      {
+       "id": "c4"
+      },
+      7
+     ]
+    }
+   },
+   "ok": {
+    "kind": "provider_tool_calls",
+    "assistant": {
+     "role": "assistant",
+     "tool_calls": [
+      {
+       "id": "c1",
+       "function": {
+        "name": "read_session_history",
+        "arguments": "{}"
+       }
+      },
+      {
+       "id": "c2",
+       "function": {
+        "name": "roll",
+        "arguments": "{}"
+       }
+      },
+      {
+       "id": "c3",
+       "function": "not a mapping"
+      },
+      {
+       "id": "c4"
+      },
+      7
+     ]
+    }
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_calls",
+    "assistant": {
+     "role": "assistant"
+    }
+   },
+   "ok": {
+    "kind": "provider_tool_calls",
+    "assistant": {
+     "role": "assistant",
+     "tool_calls": []
+    }
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_calls",
+    "assistant": "text"
+   },
+   "ok": {
+    "kind": "provider_tool_calls",
+    "assistant": "text"
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_calls"
+   },
+   "ok": {
+    "kind": "provider_tool_calls"
+   }
+  },
+  {
+   "value": {
+    "kind": "provider_tool_calls",
+    "assistant": {
+     "tool_calls": null
+    }
+   },
+   "error": {
+    "class": "TypeError",
+    "message": "'NoneType' object is not iterable"
+   }
+  },
+  {
+   "value": {
+    "kind": "working_context_checkpoint",
+    "checkpoint_id": "cp-1",
+    "covered_exchanges": 4,
+    "notes": "private"
+   },
+   "ok": {
+    "kind": "working_context_checkpoint",
+    "checkpoint_id": "cp-1",
+    "covered_exchanges": 4,
+    "text": "Context compacted \u00b7 saved conversation is kept"
+   }
+  },
+  {
+   "value": {
+    "kind": "working_context_checkpoint"
+   },
+   "ok": {
+    "kind": "working_context_checkpoint",
+    "checkpoint_id": null,
+    "covered_exchanges": null,
+    "text": "Context compacted \u00b7 saved conversation is kept"
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": "j1",
+    "epoch": 2,
+    "generation": 3,
+    "base_count": 1,
+    "entries": [
+     {
+      "private": true
+     },
+     {}
+    ],
+    "secret": "x"
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": "j1",
+    "epoch": 2,
+    "generation": 3,
+    "base_count": 1,
+    "entry_count": 2
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal"
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "base_count": null,
+    "entry_count": 0
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": "abc"
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "base_count": null,
+    "entry_count": 3
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": {
+     "a": 1,
+     "b": 2
+    }
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "base_count": null,
+    "entry_count": 2
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": 0
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "base_count": null,
+    "entry_count": 0
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": false
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "base_count": null,
+    "entry_count": 0
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": 3
+   },
+   "error": {
+    "class": "TypeError",
+    "message": "object of type 'int' has no len()"
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": true
+   },
+   "error": {
+    "class": "TypeError",
+    "message": "object of type 'bool' has no len()"
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "entries": 1.5
+   },
+   "error": {
+    "class": "TypeError",
+    "message": "object of type 'float' has no len()"
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "omitted_from_export": true,
+    "entries": 3
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "omitted_from_export": true
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_wire_journal",
+    "omitted_from_export": 1,
+    "entries": []
+   },
+   "ok": {
+    "kind": "gm_wire_journal",
+    "journal_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "base_count": null,
+    "entry_count": 0
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_native_records",
+    "native_record_id": "n1",
+    "epoch": 1,
+    "generation": 1,
+    "boundary": "b",
+    "status": "complete",
+    "records": [
+     1,
+     2,
+     3
+    ]
+   },
+   "ok": {
+    "kind": "gm_native_records",
+    "native_record_id": "n1",
+    "epoch": 1,
+    "generation": 1,
+    "boundary": "b",
+    "status": "complete",
+    "record_count": 3
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_native_records",
+    "records": ""
+   },
+   "ok": {
+    "kind": "gm_native_records",
+    "native_record_id": null,
+    "epoch": null,
+    "generation": null,
+    "boundary": null,
+    "status": null,
+    "record_count": 0
+   }
+  },
+  {
+   "value": {
+    "kind": "gm_native_records",
+    "omitted_from_export": true
+   },
+   "ok": {
+    "kind": "gm_native_records",
+    "omitted_from_export": true
+   }
+  },
+  {
+   "value": {
+    "messages": [
+     {
+      "kind": "gm_wire_journal",
+      "entries": [
+       1
+      ]
+     },
+     {
+      "kind": "provider_tool_results",
+      "results": []
+     }
+    ]
+   },
+   "ok": {
+    "messages": [
+     {
+      "kind": "gm_wire_journal",
+      "journal_record_id": null,
+      "epoch": null,
+      "generation": null,
+      "base_count": null,
+      "entry_count": 1
+     },
+     {
+      "kind": "provider_tool_results",
+      "results": []
+     }
+    ]
+   }
+  },
+  {
+   "value": [
+    {
+     "kind": "working_context_checkpoint",
+     "checkpoint_id": "cp-2"
+    }
+   ],
+   "ok": [
+    {
+     "kind": "working_context_checkpoint",
+     "checkpoint_id": "cp-2",
+     "covered_exchanges": null,
+     "text": "Context compacted \u00b7 saved conversation is kept"
+    }
+   ]
+  }
+ ]
+}

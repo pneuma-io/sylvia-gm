@@ -450,6 +450,7 @@ pub async fn search_campaign_knowledge(
     // `bounded_search_page` refuses an offset that is not an `int` the same way as one outside
     // the results.
     let offset = py_int(&request.offset).unwrap_or(-1);
+    let _operation = store.operation()?;
     let campaign_id = campaign_id.to_owned();
     store.call(move |store| Ok(search_on(store, &campaign_id, &query, &sources, limit, offset))).await?
 }
@@ -841,6 +842,7 @@ pub async fn read_campaign_reference(
             }
         },
     };
+    let _operation = store.operation()?;
     let (campaign_id, source, path, work) =
         (campaign_id.to_owned(), source.clone(), path.clone(), store.lanes().work.clone());
     store.call(move |store| Ok(read_on(store, &work, &campaign_id, &source, &path, maximum))).await?

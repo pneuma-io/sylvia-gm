@@ -565,7 +565,7 @@ fn process_receipts_parse_like_python() {
             json!({"role": receipt.role, "handle": receipt.handle, "pid": receipt.pid,
                    "creation_time": receipt.creation_time})
         }));
-        assert_eq!(got, case["result"], "{}", case["value"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["value"]));
     }
 }
 
@@ -622,7 +622,11 @@ fn the_process_barrier_moves_like_python() {
             Ok(json!([first, outcome(barrier.all_exited().map(J::Bool))]))
         })();
         let got = json!({"result": outcome(result), "events": events.lock().unwrap().clone()});
-        assert_eq!(got, json!({"result": case["result"], "events": case["events"]}), "{}", case["receipts"]);
+        sylvia_base::testing::assert_same_json(
+            &got,
+            &json!({"result": case["result"], "events": case["events"]}),
+            format!("{}", case["receipts"]),
+        );
     }
 }
 
@@ -639,13 +643,21 @@ fn installer_commands_and_registered_versions_match_python() {
         if cfg!(windows) {
             let path = |key: &str| Path::new(case[key].as_str().unwrap()).components().collect::<PathBuf>();
             let got = outcome(installed::nsis_command_line(&path("artifact"), &path("live")).map(J::String));
-            assert_eq!(got, case["result"], "{} {}", case["artifact"], case["live"]);
+            sylvia_base::testing::assert_same_json(
+                &got,
+                &case["result"],
+                format!("{} {}", case["artifact"], case["live"]),
+            );
         }
     }
     for case in vectors()["versions"].as_array().unwrap() {
         let version = Version::parse_text(case["version"].as_str().unwrap()).unwrap();
         let got: Vec<String> = installed::registered_versions(&version).into_iter().collect();
-        assert_eq!(json!(got), case["registered"], "{}", case["version"]);
+        sylvia_base::testing::assert_same_json(
+            &json!(got),
+            &case["registered"],
+            format!("{}", case["version"]),
+        );
     }
 }
 
@@ -661,10 +673,13 @@ fn registry_values_convert_like_reg2py() {
             installed::UNINSTALL_VALUES.iter().map(|name| uninstall.get(*name).and_then(value)).collect();
         let default = (!case["product"].is_null()).then(|| value(&case["product"])).flatten();
         let got = match installed::registration_from(&values, default) {
-            Ok(row) => json!({"ok": row}),
+            // The row in its own order (Python's dict order), each value as its UTF-16 units.
+            Ok(row) => {
+                json!({"ok": J::Object(row.iter().map(|(name, units)| (name.clone(), json!(units))).collect())})
+            }
             Err(error) => json!({"error": [error.code, error.message]}),
         };
-        assert_eq!(got, case["result"], "{}", case["name"]);
+        sylvia_base::testing::assert_same_json(&got, &case["result"], format!("{}", case["name"]));
     }
 }
 
