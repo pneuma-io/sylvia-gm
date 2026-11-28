@@ -22,6 +22,7 @@ pub mod activity;
 pub mod argument_contracts;
 pub mod builder;
 pub mod campaign_memory;
+pub mod context_ledger;
 pub mod inference_identity;
 pub mod native_continuation;
 pub mod provider_resolver;

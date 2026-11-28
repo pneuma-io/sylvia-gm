@@ -36,6 +36,12 @@ pub struct ProviderSessionAdapter {
     pub(crate) campaign_plan: Option<JsonMap>,
     pub(crate) campaign_knowledge: Option<JsonMap>,
     pub(crate) context_mode: String,
+    /// `self._deferred_tool_list`: how the route defers tools, if it does.
+    pub(crate) deferred_tool_list: Option<&'static str>,
+    /// `self._fixed_tool_list`: the full catalog, opted in or implied by deferral.
+    pub(crate) fixed_tool_list: bool,
+    /// `self._one_tool_list`: one tool list for the session.
+    pub(crate) one_tool_list: bool,
     /// The owner a GM turn calls ([`ProviderSessionAdapter::with_turn_owner`]); the opening
     /// preflight's adapter has only the request assembly's reads.
     pub(crate) turn: Option<Arc<dyn TurnOwner>>,
@@ -110,11 +116,20 @@ impl ProviderSessionAdapter {
             }
         }
         let model = provider.model_info();
-        let context_mode = context_mode(
+        let (transport, provider_key) =
+            (model.map(|model| model.transport.as_str()), model.map(|model| model.provider_key.as_str()));
+        let context_mode = context_mode(environment, transport, provider_key);
+        // `deferred` declares the fixed catalog once with Ruleset mechanics deferred: `native`
+        // where the route's provider defers tools itself, else Sylvia's `loader`.
+        let deferred_tool_list = crate::context_ledger::deferred_tool_list(
             environment,
-            model.map(|model| model.transport.as_str()),
-            model.map(|model| model.provider_key.as_str()),
+            transport,
+            provider_key,
+            model.map(|model| model.wire_model_id()),
         );
+        let fixed_tool_list =
+            crate::context_ledger::fixed_tool_list(environment) || deferred_tool_list.is_some();
+        let one_tool_list = crate::context_ledger::stable_tool_list(environment, transport, provider_key);
         if let Some(plan_text) = &campaign_plan_text {
             if pystr::strip(plan_text).is_empty() || plan_text.len() > MAX_CAMPAIGN_PLAN_BYTES {
                 return Err(value_error("Provider campaign plan is empty or exceeds the usability limit"));
@@ -128,6 +143,9 @@ impl ProviderSessionAdapter {
             campaign_plan,
             campaign_knowledge,
             context_mode,
+            deferred_tool_list,
+            fixed_tool_list,
+            one_tool_list,
             turn: None,
             rank: None,
             ids: Arc::new(crate::working_context::uuid4_hex),
@@ -244,6 +262,21 @@ impl ProviderSessionAdapter {
     /// The request assembly this adapter's route uses (`self._context_mode`).
     pub fn context_mode(&self) -> &str {
         &self.context_mode
+    }
+
+    /// `self._deferred_tool_list`: `native`, `provider` or `loader`, or `None`.
+    pub fn deferred_tool_list(&self) -> Option<&'static str> {
+        self.deferred_tool_list
+    }
+
+    /// `self._fixed_tool_list`.
+    pub fn fixed_tool_list(&self) -> bool {
+        self.fixed_tool_list
+    }
+
+    /// `self._one_tool_list`.
+    pub fn one_tool_list(&self) -> bool {
+        self.one_tool_list
     }
 
     /// `_ledger_active(provider_input)`: GM play on a ledger-mode route.
