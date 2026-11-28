@@ -365,3 +365,25 @@ impl StoreHandle {
             .await
     }
 }
+
+impl StoreHandle {
+    /// `AuthorityOwner.stop_agent_session(session_id)`: under the session's campaign work, refused
+    /// while its campaign awaits a mechanics choice, then the session stopped under its session
+    /// lane (`SessionApplication.update_status`). The answer is the stopped session.
+    pub async fn stop_agent_session(&self, session_id: &str) -> StoreResult<SessionRecord> {
+        let _operation = self.operation()?;
+        let _work = self.session_campaign_work(session_id).await?;
+        let context = self.raw_context(session_id).await?;
+        if let Some(campaign_id) = context.session.campaign_id().map(str::to_owned) {
+            if self.call(move |store| store.mechanics_choice_is_pending(&campaign_id)).await? {
+                return Err(crate::actions::rejected(
+                    "Campaign is awaiting a mechanics choice",
+                    "mechanics_choice_pending",
+                ));
+            }
+        }
+        let _session = self.lanes().sessions.acquire(session_id).await;
+        let id = session_id.to_owned();
+        self.call(move |store| store.update_agent_session_status(&id, SessionStatus::Stopped)).await
+    }
+}

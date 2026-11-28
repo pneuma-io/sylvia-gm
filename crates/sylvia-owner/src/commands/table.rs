@@ -58,7 +58,7 @@ pub const REGISTRY: &[Command] = &[
     ported("snapshot", "campaigns", false, true),
     ported("display_snapshot", "campaigns", true, true),
     pending("player_projection", "campaigns", true, true),
-    pending("player_projection_page", "campaigns", true, true),
+    ported("player_projection_page", "campaigns", true, true),
     pending("campaign_panels", "actions", true, true),
     pending("action_sequence", "actions", true, true),
     pending("compose_action_sequence", "actions", true, true),

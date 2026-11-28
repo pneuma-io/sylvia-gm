@@ -25,14 +25,25 @@ pub fn project_private_tool_inputs(
     store: &AuthorityStore,
     mut snapshot: CampaignSnapshot,
 ) -> StoreResult<CampaignSnapshot> {
-    let private_keys = engine_private_keys(store, &snapshot.state.package_lock)?;
-    super::snapshots::hide_private_tool_inputs(
+    project_private_records(
+        store,
         &snapshot.state.package_lock,
-        &private_keys,
         &mut snapshot.actions,
         &mut snapshot.events,
-    );
+    )?;
     Ok(snapshot)
+}
+
+/// `_project_private_tool_inputs` on a snapshot's or a display snapshot's actions and events.
+pub(super) fn project_private_records(
+    store: &AuthorityStore,
+    lock: &sylvia_domain::authority::PackageLock,
+    actions: &mut [sylvia_domain::authority::ActionRecord],
+    events: &mut [sylvia_domain::authority::CanonicalEvent],
+) -> StoreResult<()> {
+    let private_keys = engine_private_keys(store, lock)?;
+    super::snapshots::hide_private_tool_inputs(lock, &private_keys, actions, events);
+    Ok(())
 }
 
 /// `AuthorityOwner.canonical_replay(campaign_id, acknowledged_sequence=...)`: the canonical events
@@ -100,7 +111,7 @@ fn response_action_ids(
 
 /// `_player_response_reservations(campaign_id)`: the actions saved responses already answer, and
 /// the narration attempts that are those responses.
-fn player_response_reservations(
+pub(super) fn player_response_reservations(
     store: &AuthorityStore,
     campaign_id: &str,
 ) -> StoreResult<(BTreeSet<String>, BTreeSet<String>)> {
