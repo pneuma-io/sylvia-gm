@@ -460,12 +460,14 @@ fn protocol(message: &str) -> CodedError {
 
 /// `handle_admin_full_audit_status`: `AuthorityOwner.admin_full_audit_status()`.
 pub async fn handle_admin_full_audit_status(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let _operation = super::operation(ctx)?;
     Ok(Json::Object(ctx.store.narration().admin_full_audit_status()))
 }
 
 /// `handle_set_admin_full_audit`: `set_admin_full_audit(_optional_bool(params, "enabled"))`.
 pub async fn handle_set_admin_full_audit(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let enabled = super::campaigns::optional_bool(params, "enabled")?;
+    let _operation = super::operation(ctx)?;
     Ok(Json::Object(ctx.store.narration().set_admin_full_audit(enabled)))
 }
 
@@ -473,7 +475,8 @@ pub async fn handle_set_admin_full_audit(ctx: &DispatchContext, params: &JsonMap
 /// ASCII encoding is over the live-view limit, which answers with its size instead.
 pub async fn handle_admin_full_audit_record(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
     let index = super::campaigns::required_nonnegative_int(params, "index")?;
-    // `admin_full_audit_record(index)`, under the narration lock.
+    // `admin_full_audit_record(index)`: `with self._operation(), self._narration_lock:`.
+    let _operation = super::operation(ctx)?;
     let trace = ctx.store.narration().with(|inner| {
         usize::try_from(index).ok().and_then(|index| inner.inspector_trace.get(index).cloned())
     });
@@ -623,10 +626,13 @@ pub async fn handle_export_admin_full_audit(ctx: &DispatchContext, params: &Json
             "Audit export destination is not a regular file. Choose a file in a writable folder.",
         ));
     }
-    // The snapshot, under one narration lock.
+    // The snapshot, under the owner's operation and one narration lock; the file is written
+    // after both, as Python's `with` block ends before the write.
+    let operation = super::operation(ctx)?;
     let (enabled, traces, diagnostics) = ctx.store.narration().with(|inner| {
         (inner.admin_full_audit_enabled, inner.inspector_trace.clone(), inner.mechanics_diagnostics.clone())
     });
+    drop(operation);
     let document = audit_export_document(enabled, &traces, &diagnostics);
     let written = tokio::task::spawn_blocking(move || -> std::io::Result<u64> {
         use std::io::Write;

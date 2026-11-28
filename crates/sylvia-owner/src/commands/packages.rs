@@ -12,6 +12,7 @@ fn os_error(error: &std::io::Error) -> CodedError {
 /// `handle_package_candidates`: every installed candidate, newest first
 /// (`AuthorityOwner.package_candidates`).
 pub async fn handle_package_candidates(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let _operation = super::operation(ctx)?;
     let candidates = ctx.store.call(|store| store.package_candidates()).await.map_err(store_error)?;
     Ok(Json::Array(candidates.iter().map(candidate_value).collect()))
 }

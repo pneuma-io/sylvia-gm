@@ -401,6 +401,7 @@ pub async fn handle_start_guided_campaign(ctx: &DispatchContext, params: &JsonMa
                 .map_err(|error| sylvia_base::CodedError::new("internal_error", error.to_string()))?,
             Json::String(id) if !id.is_empty() => {
                 let id = id.clone();
+                let _operation = super::operation(ctx)?;
                 let candidate =
                     ctx.store.call(move |store| store.package_candidate(&id)).await.map_err(store_error)?;
                 candidate.package_lock().clone()
@@ -784,7 +785,9 @@ pub async fn handle_begin_campaign_construction(
     )
     .await
     .map_err(store_error)?;
+    let operation = super::operation(ctx)?;
     let entries = ctx.store.call(|store| store.campaign_index_entries()).await.map_err(store_error)?;
+    drop(operation);
     let campaign =
         entries.iter().find(|entry| entry.campaign_id == campaign_id).ok_or_else(stop_iteration)?;
     let builder_session =
@@ -1150,6 +1153,7 @@ fn campaign_entry_value(entry: &sylvia_store::authority::CampaignIndexEntry) -> 
 /// `handle_campaign_index`: `ctx.bus.campaign_index()`, the application owner's campaign rail,
 /// as `_json_value` writes it. Parameters are not read.
 pub async fn handle_campaign_index(ctx: &DispatchContext, _params: &JsonMap) -> CodedResult<Json> {
+    let _operation = super::operation(ctx)?;
     let entries = ctx.store.call(|store| store.campaign_index_entries()).await.map_err(store_error)?;
     Ok(Json::Array(entries.iter().map(campaign_entry_value).collect()))
 }
@@ -1225,7 +1229,9 @@ pub async fn handle_backup_database(ctx: &DispatchContext, params: &JsonMap) -> 
     std::fs::create_dir_all(&backups).map_err(|error| {
         sylvia_base::CodedError::new("internal_error", error.to_string()).with_error_type("OSError")
     })?;
+    let operation = super::operation(ctx)?;
     ctx.store.call(move |store| store.backup_database(&target)).await.map_err(store_error)?;
+    drop(operation);
     let mut reply = JsonMap::new();
     reply.insert("backup_id".into(), backup_id.into());
     reply.insert("status".into(), "created".into());
