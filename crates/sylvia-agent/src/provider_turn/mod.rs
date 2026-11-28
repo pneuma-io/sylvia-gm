@@ -11,6 +11,7 @@
 //! phase resumes. Here a phase is given a [`TurnEvents`] sink and awaits it where Python yields,
 //! so the handling happens at the same point.
 
+pub mod actor;
 pub mod decisions;
 pub mod narration;
 pub mod round;

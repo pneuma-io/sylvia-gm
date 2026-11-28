@@ -243,6 +243,30 @@ pub trait TurnOwner: OpeningReads {
         turn_id: &'a str,
     ) -> BoxFuture<'a, CodedResult<Option<sylvia_app::actor_decisions::ActorDecisionRequest>>>;
 
+    /// `actor_context(session_id, context_id, provider_id=..., model_id=...)`: only the selected
+    /// participant's private provider-compatible history, `None` when it has none.
+    fn actor_context<'a>(
+        &'a self,
+        session_id: &'a str,
+        context_id: &'a str,
+        provider_id: &'a str,
+        model_id: &'a str,
+    ) -> BoxFuture<'a, CodedResult<Option<JsonMap>>>;
+
+    /// `actor_decision_command(request, choice_id=..., session_id=..., owner_id=...,
+    /// provider_id=..., model_id=...)`: the engine command for one offered choice, bound to the
+    /// request's authoritative actor and revision.
+    #[allow(clippy::too_many_arguments)]
+    fn actor_decision_command<'a>(
+        &'a self,
+        request: &'a sylvia_app::actor_decisions::ActorDecisionRequest,
+        choice_id: &'a str,
+        session_id: &'a str,
+        owner_id: &'a str,
+        provider_id: Option<&'a str>,
+        model_id: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<sylvia_domain::authority::ActionCommand, AuthorityFailure>>;
+
     /// `read_campaign_reference(campaign_id, source=..., path=...)`.
     fn read_campaign_reference<'a>(
         &'a self,

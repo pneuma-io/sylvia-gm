@@ -770,6 +770,53 @@ impl ProviderSessionAdapter {
         })
     }
 
+    /// `_stream_round(messages, tools, control=..., provider_override=provider, tool_choice=...)`
+    /// without a provider input: the request goes to `provider` itself (an isolated
+    /// participant's own working context), never through the session's working context or the
+    /// context ledger. `session_id` only names the stream.
+    pub(crate) fn stream_provider(
+        self: &Arc<Self>,
+        provider: Arc<dyn Provider>,
+        messages: Vec<JsonMap>,
+        tools: Vec<JsonMap>,
+        control: &Arc<ProviderControl>,
+        session_id: &str,
+        tool_choice: Option<&str>,
+    ) -> TurnResult<RoundStream> {
+        let request = self.round_request(messages, tools, tool_choice);
+        let (sender, chunks) = mpsc::unbounded_channel();
+        let progress = Arc::clone(control);
+        let task = control.admit(move || {
+            tokio::spawn(sylvia_provider::context_mode::with_ledger_request_scope(async move {
+                let _ = progress.progress.update("provider", None);
+                let mut stream = provider.generate_stream(request);
+                while let Some(item) = stream.next().await {
+                    match item {
+                        Ok(chunk) => {
+                            if sender.send(Ok(chunk)).is_err() {
+                                return;
+                            }
+                        }
+                        Err(error) if error.kind == ErrorKind::Cancelled => return,
+                        Err(error) => {
+                            let _ = sender.send(Err(error));
+                            return;
+                        }
+                    }
+                }
+            }))
+        })?;
+        Ok(RoundStream {
+            adapter: Arc::clone(self),
+            session_id: session_id.to_owned(),
+            control: Arc::clone(control),
+            bridge: None,
+            chunks,
+            task,
+            rejection: Arc::default(),
+        })
+    }
+
     /// The round's provider request (`consume`'s `output_budget` and call arguments).
     fn round_request(
         &self,
