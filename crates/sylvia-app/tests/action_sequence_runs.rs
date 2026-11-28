@@ -7,6 +7,9 @@
 //! exit around the body); the run's result or exception must be Python's, and the whole trace must
 //! be consumed.
 
+// The scripted owner's methods spell out the trait's `impl Future + Send` return type.
+#![allow(clippy::manual_async_fn)]
+
 use serde_json::{json, Value as Json};
 use std::collections::VecDeque;
 use std::future::Future;

@@ -675,7 +675,7 @@ fn consent(queue: &JsonMap) -> SequenceResult<String> {
     payload.insert("sequence_id".into(), field(queue, "sequence_id")?.clone());
     payload.insert("version".into(), field(queue, "version")?.clone());
     payload.insert("steps".into(), Json::Array(steps));
-    Ok(sylvia_base::hash::sha256_hex(&canonical_json_bytes(&Json::Object(payload))))
+    Ok(sylvia_base::hash::sha256_hex(canonical_json_bytes(&Json::Object(payload))))
 }
 
 /// `_project(queue)`: the saved queue with its confirmation and committed actions.
@@ -1103,7 +1103,7 @@ async fn compose_held<O: SequenceOwner>(
         let edit = plus_one(&request.expected_version)?;
         let operation = format!(
             "sequence-{}",
-            sylvia_base::hash::sha256_hex(&canonical_json_bytes(&serde_json::json!({
+            sylvia_base::hash::sha256_hex(canonical_json_bytes(&serde_json::json!({
                 "sequence": request.sequence_id, "step": step_id, "edit": edit, "session": request.session_id,
                 "source": source, "selection": selection,
             })))
