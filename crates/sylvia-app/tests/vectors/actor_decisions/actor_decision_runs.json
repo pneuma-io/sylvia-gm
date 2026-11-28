@@ -1,0 +1,253 @@
+{
+ "python": "3.12.11",
+ "owner_id": "isolated-test",
+ "runs": [
+  {
+   "step": {
+    "op": "request",
+    "turn": "turn",
+    "keep": "first"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "tokens",
+     "turn_id": "turn",
+     "package_id": "example.hidden-tokens",
+     "package_version": "1.0.0",
+     "package_sha256": "9666a2d6d8ac18864c4981205176dc0006df2f234d7a475330fe44624fd43ad2",
+     "actor_id": "a",
+     "actor_name": "a",
+     "revision": 0,
+     "decision_id": "86820b010524c7437053ee80badf7d218f0aa11e17b0b8fa1885eb525112a454",
+     "instructions": "Choose exactly one offered token move. Keep your token secret.",
+     "persona": "A_PERSONA_SENTINEL",
+     "observation": {
+      "public_counter": 0,
+      "secret": "A_HAND_SENTINEL"
+     },
+     "actions": [
+      {
+       "identity": "a:0",
+       "label": "Move a token",
+       "operation": "advance",
+       "arguments": {
+        "choice": "a:0"
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "request",
+    "turn": "elsewhere"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Isolated participant turn is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "b:0"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Isolated participant choice is not offered"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "unknown"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Isolated participant choice is not offered"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "a:0",
+    "actor": "b"
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Isolated participant decision is stale"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "a:0",
+    "session": "gm-missing"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "session_unavailable",
+    "message": "Agent session is unavailable"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "a:0",
+    "provider": "another"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Isolated participant session changed"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "a:0",
+    "model": "another"
+   },
+   "outcome": {
+    "error": "CommandRejected",
+    "code": "command_rejected",
+    "message": "Isolated participant session changed"
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "a:0",
+    "provider": "synthetic",
+    "model": "synthetic",
+    "keep": "command"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "tokens",
+     "action_id": "actor-action-86820b010524c7437053ee80badf7d218f0aa11e17b0b8fa1885eb525112a454",
+     "idempotency_key": "actor-action-86820b010524c7437053ee80badf7d218f0aa11e17b0b8fa1885eb525112a454",
+     "owner_id": "isolated-test",
+     "writer": "dm",
+     "expected_revision": 0,
+     "turn_id": "turn",
+     "package_id": "example.hidden-tokens",
+     "tool_name": "advance",
+     "parameters": {
+      "choice": "a:0"
+     },
+     "initiating_session_id": "gm-tokens"
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "command": "command"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "tokens",
+     "action_id": "actor-action-86820b010524c7437053ee80badf7d218f0aa11e17b0b8fa1885eb525112a454",
+     "status": "committed",
+     "result": {
+      "status": "committed",
+      "tool": "advance",
+      "context": {
+       "counter": 1,
+       "message": "A public token moved."
+      },
+      "narrative_hooks": {},
+      "narrative_directives": [],
+      "logs": []
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "execute",
+    "command": "command"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "tokens",
+     "action_id": "actor-action-86820b010524c7437053ee80badf7d218f0aa11e17b0b8fa1885eb525112a454",
+     "status": "committed",
+     "result": {
+      "context": {
+       "counter": 1,
+       "message": "A public token moved."
+      },
+      "logs": [],
+      "narrative_directives": [],
+      "narrative_hooks": {},
+      "status": "committed",
+      "tool": "advance"
+     },
+     "resulting_revision": 1
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "request",
+    "turn": "turn"
+   },
+   "outcome": {
+    "ok": {
+     "campaign_id": "tokens",
+     "turn_id": "turn",
+     "package_id": "example.hidden-tokens",
+     "package_version": "1.0.0",
+     "package_sha256": "9666a2d6d8ac18864c4981205176dc0006df2f234d7a475330fe44624fd43ad2",
+     "actor_id": "a",
+     "actor_name": "a",
+     "revision": 1,
+     "decision_id": "987cce7e37a81ec3fb8ed1b683e9fb52872593b2936ae97425d94c28f65863a7",
+     "instructions": "Choose exactly one offered token move. Keep your token secret.",
+     "persona": "A_PERSONA_SENTINEL",
+     "observation": {
+      "public_counter": 1,
+      "secret": "A_HAND_SENTINEL"
+     },
+     "actions": [
+      {
+       "identity": "a:1",
+       "label": "Move a token",
+       "operation": "advance",
+       "arguments": {
+        "choice": "a:1"
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "step": {
+    "op": "command",
+    "request": "first",
+    "choice": "a:0"
+   },
+   "outcome": {
+    "error": "StaleRevision",
+    "code": "stale_revision",
+    "message": "Isolated participant decision is stale"
+   }
+  }
+ ]
+}
