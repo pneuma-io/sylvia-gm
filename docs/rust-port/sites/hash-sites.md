@@ -25,24 +25,24 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/campaign_library_selection.py:319` | `resolve_campaign_plan_selection` | hashlib.sha256 | `install_id=f"plan-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` |  `sylvia-app` selection_vectors |
 | `application/campaign_library_selection.py:422` | `materialize_template_party` | hashlib.sha256 | `participant_namespace=hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24],` |  `sylvia-app` party_vectors |
 | `application/campaign_library_selection.py:555` | `materialize_library_party` | hashlib.sha256 | `+ hashlib.sha256(f"{operation_id}\0{artifact_id}".encode()).hexdigest()[:24]` |  `sylvia-app` party_vectors |
-| `application/character_card_import.py:168` | `_asset_uri` | hashlib.sha256 | `return "card://default/" + hashlib.sha256(uri.encode()).hexdigest()` | |
-| `application/character_card_import.py:171` | `_asset_uri` | hashlib.sha256 | `return "card://inline/" + hashlib.sha256(uri.encode()).hexdigest()` | |
-| `application/character_card_import.py:238` | `preview_character_card` | hashlib.sha256 | `digest = hashlib.sha256(source).hexdigest()` | |
-| `application/character_card_import.py:462` | `load_import_original` | hashlib.sha256 | `or hashlib.sha256(source).hexdigest() != digest` | |
-| `application/character_card_import.py:524` | `_read_pending_preview` | hashlib.sha256 | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
-| `application/character_card_import.py:535` | `_confirmed_card_result` | hashlib.sha256 | `profile_digest = hashlib.sha256(canonical_json_bytes(preview.profile)).hexdigest()` | |
-| `application/character_card_import.py:536` | `_confirmed_card_result` | hashlib.sha256 | `operation_hash = hashlib.sha256(("desktop-card:" + digest).encode()).hexdigest()[:24]` | |
+| `application/character_card_import.py:168` | `_asset_uri` | hashlib.sha256 | `return "card://default/" + hashlib.sha256(uri.encode()).hexdigest()` | yes |
+| `application/character_card_import.py:171` | `_asset_uri` | hashlib.sha256 | `return "card://inline/" + hashlib.sha256(uri.encode()).hexdigest()` | yes |
+| `application/character_card_import.py:238` | `preview_character_card` | hashlib.sha256 | `digest = hashlib.sha256(source).hexdigest()` | yes |
+| `application/character_card_import.py:462` | `load_import_original` | hashlib.sha256 | `or hashlib.sha256(source).hexdigest() != digest` | yes |
+| `application/character_card_import.py:524` | `_read_pending_preview` | hashlib.sha256 | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | yes |
+| `application/character_card_import.py:535` | `_confirmed_card_result` | hashlib.sha256 | `profile_digest = hashlib.sha256(canonical_json_bytes(preview.profile)).hexdigest()` | yes |
+| `application/character_card_import.py:536` | `_confirmed_card_result` | hashlib.sha256 | `operation_hash = hashlib.sha256(("desktop-card:" + digest).encode()).hexdigest()[:24]` | yes |
 | `application/character_profiles.py:231` | `profile_from_snapshot` | hashlib.sha256 | `if hashlib.sha256(canonical_json_bytes(profile)).hexdigest() != digest:` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:335` | `save_character_profile` | hashlib.sha256 | `digest = hashlib.sha256(encoded).hexdigest()` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:336` | `save_character_profile` | hashlib.sha256 | `operation_hash = hashlib.sha256(operation_id.encode("utf-8")).hexdigest()[:24]` |  `sylvia-app` character_profile_vectors |
 | `application/import_repair.py:124` | `_read_selected_source` | hashlib.sha256 | `return hashlib.sha256(data).hexdigest(), data` | yes |
 | `application/import_repair.py:237` | `inspect_repair_source` | hashlib.sha256 | `_read_safe_zip(snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest())` | yes |
-| `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | |
-| `application/import_repair.py:313` | `stage_repair_copy` | hashlib.sha256 | `snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest()` | |
-| `application/import_repair.py:548` | `_plan_result` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(snapshot).hexdigest()` | |
-| `application/import_repair.py:549` | `_plan_result` | hashlib.sha256 | `record["content_sha256"] = hashlib.sha256( canonical_plan + markdown.encode("utf-8") + canonical_contribution + snapshot ).hexdigest()` | |
+| `application/import_repair.py:290` | `stage_repair_copy` | hashlib.sha256 | `source_sha256=hashlib.sha256(safe.files[PLAN_SNAPSHOT_FILENAME]).hexdigest(),` | yes |
+| `application/import_repair.py:313` | `stage_repair_copy` | hashlib.sha256 | `snapshot, source_sha256=hashlib.sha256(snapshot).hexdigest()` | yes |
+| `application/import_repair.py:548` | `_plan_result` | hashlib.sha256 | `record["package_snapshot_sha256"] = hashlib.sha256(snapshot).hexdigest()` | yes |
+| `application/import_repair.py:549` | `_plan_result` | hashlib.sha256 | `record["content_sha256"] = hashlib.sha256( canonical_plan + markdown.encode("utf-8") + canonical_contribution + snapshot ).hexdigest()` | yes |
 | `application/import_repair_sessions.py:44` | `offer_import_repair` | hashlib.sha256 | `repair_id = hashlib.sha256( canonical_json_bytes([install_id, inspection.source_sha256, str(source)]) ).hexdigest()` | yes |
-| `application/import_repair_sessions.py:107` | `start_import_repair_chat` | hashlib.sha256 | `+ hashlib.sha256(canonical_json_bytes([operation_id, repair_id])).hexdigest()[:24]` | |
+| `application/import_repair_sessions.py:107` | `start_import_repair_chat` | hashlib.sha256 | `+ hashlib.sha256(canonical_json_bytes([operation_id, repair_id])).hexdigest()[:24]` | yes |
 | `application/interview_content.py:100` | `resolve_interview_content` | hashlib.sha256 | `install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}",` | |
 | `application/interview_content.py:129` | `resolve_interview_content` | hashlib.sha256 | `f"{hashlib.sha256(snapshot).hexdigest()[:24]}"` | |
 | `application/interview_content.py:141` | `resolve_interview_content` | hashlib.sha256 | `install_id=f"interview-snapshot-{hashlib.sha256(snapshot).hexdigest()[:24]}")` | |
@@ -218,7 +218,7 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
-| `agent/_actor_decisions.py:60` | `run_actor_decision` | hashlib.sha256 | `context_id = hashlib.sha256(_json(identity).encode()).hexdigest()` | |
+| `agent/_actor_decisions.py:60` | `run_actor_decision` | hashlib.sha256 | `context_id = hashlib.sha256(_json(identity).encode()).hexdigest()` | `sylvia-agent` turn_vectors (actor_decision) |
 | `agent/_builder_session.py:613` | `_builder_prompt` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(loaded_skill.text.encode("utf-8")).hexdigest()` | |
 | `agent/_builder_session.py:1298` | `_builder_skill_loader_tool.load` | hashlib.sha256 | `"sha256": hashlib.sha256(loaded.text.encode("utf-8")).hexdigest(),` | |
 | `agent/_builder_session.py:1664` | `_campaign_plan_tool` | hashlib.sha256 | `skill_sha256 = hashlib.sha256(skill.text.encode("utf-8")).hexdigest()` | `sylvia-agent` plan_tool_vectors (the tracked skill digest) |

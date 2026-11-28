@@ -41,7 +41,7 @@ Ported: 97 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `character_chat` | `character_chat.handle_character_chat` | yes | no | |
 | `send_character_chat_message` | `character_chat.handle_send_character_chat_message` | yes | no | |
 | `builder_chat_index` | `builder.handle_builder_chat_index` | yes | yes | `startup` |
-| `start_import_repair` | `builder.handle_start_import_repair` | yes | no | |
+| `start_import_repair` | `builder.handle_start_import_repair` | yes | yes | `import-repair` |
 | `create_builder_chat` | `builder.handle_create_builder_chat` | yes | yes | `builder-chat-create` |
 | `rename_builder_chat` | `builder.handle_rename_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |
 | `delete_builder_chat` | `builder.handle_delete_builder_chat` | yes | yes | `builder-chat-edit` (refusals); reply encoding against lane 3's Python run |
@@ -110,8 +110,8 @@ Ported: 97 of 137 (`shutdown`, `handshake_status`, `campaign_index`, `campaign_c
 | `reconnect_stream` | `sessions.handle_reconnect_stream` | yes | yes | `session-reads` |
 | `reconnect_provider_stream` | `providers.handle_reconnect_provider_stream` | yes | no | |
 | `install_package` | `packages.handle_install_package` | no | yes | `package-install` |
-| `confirm_character_card_import` | `packages.handle_confirm_character_card_import` | yes | no | |
-| `preview_character_card_file` | `packages.handle_confirm_character_card_import` | no | no | |
+| `confirm_character_card_import` | `packages.handle_confirm_character_card_import` | yes | yes | `card-import` |
+| `preview_character_card_file` | `packages.handle_confirm_character_card_import` | no | yes | `card-import` |
 | `install_package_file` | `packages.handle_install_package_file` | no | yes | `package-install`, `webui-package-upload` |
 | `start_guided_campaign` | `campaigns.handle_start_guided_campaign` | yes | yes | `ruleless-turn`, `stop-redirect`, `fail-retry`, `reopen` (No Ruleset; an installed Ruleset is proven by `sylvia-app/tests/guided.rs`), `srd-mechanics-turn` (a saved Plan) |
 | `create_guided_campaign_draft` | `campaigns.handle_create_guided_campaign_draft` | yes | yes | `ruleless-turn`, `stop-redirect`, `fail-retry`, `reopen` (step 2 or 3) |

@@ -19,13 +19,13 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | `application/bundled_campaign_plans.py:116` | `read_plan_catalogue` | len() against a limit | `if not isinstance(rows, list) or not 1 <= len(rows) <= 256:` |  `sylvia-app` plan_catalogue_vectors |
 | `application/bundled_starter_characters.py:117` | `bundled_starter_participants` | len() against a limit | `if len(_ROSTERS) >= 32:` | |
 | `application/campaign_library_selection.py:640` | `plan_with_interview_intent` | len() against a limit | `if not isinstance(value, str) or len(value) > 131_072:` |  `sylvia-app` selection_vectors |
-| `application/character_card_import.py:128` | `_png_json` | len() against a limit | `if len(encoded) > 350000:` | |
-| `application/character_card_import.py:154` | `_asset_uri` | len() against a limit | `if len(uri) > 4096 or "\x00" in uri or any(c.isspace() for c in uri):` | |
-| `application/character_card_import.py:193` | `preview_character_card` | len() against a limit | `if not isinstance(source, bytes) or not source or len(source) > MAX_CARD_BYTES:` | |
-| `application/character_card_import.py:223` | `preview_character_card` | len() against a limit | `if not data["name"].strip() or len(data["name"].strip()) > 160:` | |
+| `application/character_card_import.py:128` | `_png_json` | len() against a limit | `if len(encoded) > 350000:` | yes |
+| `application/character_card_import.py:154` | `_asset_uri` | len() against a limit | `if len(uri) > 4096 or "\x00" in uri or any(c.isspace() for c in uri):` | yes |
+| `application/character_card_import.py:193` | `preview_character_card` | len() against a limit | `if not isinstance(source, bytes) or not source or len(source) > MAX_CARD_BYTES:` | yes |
+| `application/character_card_import.py:223` | `preview_character_card` | len() against a limit | `if not data["name"].strip() or len(data["name"].strip()) > 160:` | yes |
 | `application/character_card_import.py:461` | `load_import_original` | len() against a limit | `or len(source) > MAX_CARD_BYTES` | |
 | `application/character_card_import.py:524` | `_read_pending_preview` | len() against a limit | `if len(source) > MAX_CARD_BYTES or hashlib.sha256(source).hexdigest() != digest:` | |
-| `application/character_card_import.py:590` | `stage_card_preview` | len() against a limit | `if len(tuple(root.iterdir())) >= MAX_PENDING_PREVIEWS:` | |
+| `application/character_card_import.py:590` | `stage_card_preview` | len() against a limit | `if len(tuple(root.iterdir())) >= MAX_PENDING_PREVIEWS:` | yes |
 | `application/character_profiles.py:70` | `_parse` | len() against a limit | `if not data or len(data) > MAX_PROFILE_BYTES:` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:170` | `validate_character_profile` | len() against a limit | `if len(canonical_json_bytes(value)) > MAX_PROFILE_BYTES:` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:254` | `validate_source_profile` | len() against a limit | `or len(name) > 160` |  `sylvia-app` character_profile_vectors |

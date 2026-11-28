@@ -38,6 +38,7 @@ pub mod campaign_plan_materializer;
 pub mod campaign_plan_sources;
 pub mod campaign_rift;
 pub mod campaign_starting_world;
+pub mod character_card_import;
 pub mod character_profiles;
 pub mod character_rules;
 pub mod compatible_character_copy;

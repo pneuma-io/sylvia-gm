@@ -68,24 +68,7 @@ pub async fn handle_create_builder_chat(ctx: &DispatchContext, params: &JsonMap)
     let operation_id = required(params, "operation_id")?;
     let session_id =
         format!("session-builder-{}", &sylvia_base::hash::sha256_hex(operation_id.as_bytes())[..24]);
-    let mut provider_id = super::campaigns::optional_text(params, "provider_id")?;
-    let mut model_id = super::campaigns::optional_text(params, "model_id")?;
-    if provider_id.is_none() || model_id.is_none() {
-        let path = super::providers::config_path(ctx);
-        let settings = super::providers::with_sources(|sources| {
-            sylvia_provider::config::provider_settings::provider_settings(sources, &path)
-        })?;
-        let settings =
-            sylvia_provider::config::reply_json(&settings).map_err(super::providers::config_error)?;
-        let Some(Json::Object(default)) = settings.get("default_model") else {
-            return Err(sylvia_base::CodedError::rejected(
-                "Configure a default model before creating a chat",
-            ));
-        };
-        provider_id = Some(required(default, "provider_id")?);
-        model_id = Some(required(default, "model_id")?);
-    }
-    let (provider_id, model_id) = (provider_id.unwrap_or_default(), model_id.unwrap_or_default());
+    let (provider_id, model_id) = chat_model(ctx, params)?;
     let start = crate::chat_start::chat_start_for(ctx, "builder", &provider_id, &model_id, params).await?;
     let replayed = crate::chat_start::session_exists(ctx, &session_id).await?;
     let display_name =
@@ -95,6 +78,57 @@ pub async fn handle_create_builder_chat(ctx: &DispatchContext, params: &JsonMap)
         .call(move |store| store.create_builder_chat(&session_id, &provider_id, &model_id, &display_name))
         .await
         .map_err(super::campaigns::store_error)?;
+    started_builder_chat(ctx, &chat, &start, replayed).await
+}
+
+/// A new chat's `provider_id` and `model_id`: both given, or else both from Settings' default
+/// model (a missing or non-object default refuses).
+fn chat_model(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<(String, String)> {
+    let provider_id = super::campaigns::optional_text(params, "provider_id")?;
+    let model_id = super::campaigns::optional_text(params, "model_id")?;
+    if let (Some(provider_id), Some(model_id)) = (provider_id, model_id) {
+        return Ok((provider_id, model_id));
+    }
+    let path = super::providers::config_path(ctx);
+    let settings = super::providers::with_sources(|sources| {
+        sylvia_provider::config::provider_settings::provider_settings(sources, &path)
+    })?;
+    let settings = sylvia_provider::config::reply_json(&settings).map_err(super::providers::config_error)?;
+    let Some(Json::Object(default)) = settings.get("default_model") else {
+        return Err(sylvia_base::CodedError::rejected("Configure a default model before creating a chat"));
+    };
+    Ok((required(default, "provider_id")?, required(default, "model_id")?))
+}
+
+/// `handle_start_import_repair`: a Builder repair chat for a failed import the player chose to
+/// fix (`start_import_repair_chat`). Its model is chosen as `create_builder_chat` chooses one and
+/// its start settings are resolved first; the chat index is read before the start, so a chat
+/// already in it is a replay, answered unchanged. `repair_id` and `operation_id` are read last.
+pub async fn handle_start_import_repair(ctx: &DispatchContext, params: &JsonMap) -> CodedResult<Json> {
+    let (provider_id, model_id) = chat_model(ctx, params)?;
+    let start = crate::chat_start::chat_start_for(ctx, "builder", &provider_id, &model_id, params).await?;
+    let existing: Vec<String> = {
+        let _operation = super::operation(ctx)?;
+        let chats = ctx
+            .store
+            .call(|store| store.builder_chat_index())
+            .await
+            .map_err(super::campaigns::store_error)?;
+        chats.iter().map(|chat| chat.session().fields().session_id.clone()).collect()
+    };
+    let repair_id = required(params, "repair_id")?;
+    let operation_id = required(params, "operation_id")?;
+    let chat = sylvia_app::import_repair_sessions::start_import_repair_chat(
+        &ctx.store,
+        &ctx.storage_root,
+        &repair_id,
+        &operation_id,
+        &provider_id,
+        &model_id,
+    )
+    .await
+    .map_err(super::campaigns::store_error)?;
+    let replayed = existing.contains(&chat.session().fields().session_id);
     started_builder_chat(ctx, &chat, &start, replayed).await
 }
 

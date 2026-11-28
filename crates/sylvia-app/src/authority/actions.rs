@@ -235,6 +235,16 @@ pub(crate) struct ExecuteOptions {
     pub(crate) player_action_origin: Option<JsonMap>,
 }
 
+/// `with self._lane(campaign_id):`, reentrant on one task as Python's `RLock` is: an action
+/// sequence's `_execute` already holds the lane when it runs a step's direct action
+/// (`sylvia_store::reentry`), and then the lane is not taken again.
+async fn owner_lane(store: &StoreHandle, campaign_id: &str) -> Option<sylvia_store::lanes::LaneGuard> {
+    if sylvia_store::reentry::holds_lane(campaign_id) {
+        return None;
+    }
+    Some(store.lanes().owner.acquire(campaign_id).await)
+}
+
 /// `AuthorityOwner._execute_action(command, ...)`, for a caller already holding the campaign's
 /// work (`execute_action`, `update_campaign_file`).
 pub(crate) async fn execute_action_in_work(
@@ -269,7 +279,7 @@ pub(crate) async fn execute_action_in_work(
         )
         .into());
     }
-    let _lane = store.lanes().owner.acquire(&command.campaign_id).await;
+    let _lane = owner_lane(store, &command.campaign_id).await;
     if command.owner_id != owner_id {
         return Err(rejected(
             "WrongOwner",
@@ -663,7 +673,7 @@ pub async fn resolve_mechanics_choice(
     if let Some(session) = &command.session_id {
         validate_authority_identity(session, "Agent session identity", false).map_err(|_| invalid())?;
     }
-    let _lane = store.lanes().owner.acquire(&command.campaign_id).await;
+    let _lane = owner_lane(store, &command.campaign_id).await;
     if command.owner_id != owner_id {
         return Err(rejected(
             "WrongOwner",

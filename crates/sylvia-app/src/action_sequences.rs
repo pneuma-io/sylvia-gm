@@ -245,6 +245,7 @@ pub fn response_reservations(
 use crate::authority::actions::ActionError;
 use crate::authority::content_reads::CatalogTool;
 use std::future::Future;
+use std::pin::Pin;
 use sylvia_domain::authority::{ActionReceipt, AwaitingChoiceReceipt, CampaignSnapshot, CanonicalEventType};
 use sylvia_domain::session::SessionStatus;
 use sylvia_domain::DomainError;
@@ -289,64 +290,45 @@ pub enum PlayerActionAnswer {
 /// The owner operations `application/action_sequences.py` calls, with Python's names. Lane 3's
 /// authority implements it; the sequence functions below are generic over it.
 ///
+/// Every operation answers a boxed `Send` future ([`SequenceFuture`]), so the sequence functions
+/// can themselves be boxed as `Send` by any caller (a `TurnOwner` method, an owner command).
+/// Returning `impl Future + Send` per method made a generic caller prove `Send` through
+/// higher-ranked opaque types, which the compiler cannot do (rust-lang/rust#100013).
+///
 /// The four guards hold across `body`, as Python's `with` blocks do: what runs inside the held
-/// region, and where an error leaves it, are Python's. `with_lane` and `with_narration_lock` are
+/// region, and where an error leaves it, are Python's. `body` is the held region's future, made
+/// but not yet run: creating it does nothing, so it starts only once the guard is held. `with_lane` and `with_narration_lock` are
 /// reentrant on one task (Python's `RLock`s): `read` runs inside `_execute`'s held lane, and
 /// `bind_narration_action` takes the narration lock `_execute` already holds.
+/// What every [`SequenceOwner`] operation answers: a boxed `Send` future.
+pub type SequenceFuture<'a, T> = Pin<Box<dyn Future<Output = SequenceResult<T>> + Send + 'a>>;
+
 pub trait SequenceOwner: Sync {
     /// `with owner._operation():`.
-    fn with_operation<'a, R, F, Fut>(
-        &'a self,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a;
+    fn with_operation<'a, R: Send + 'a>(&'a self, body: SequenceFuture<'a, R>) -> SequenceFuture<'a, R>;
 
     /// `with owner._lane(campaign_id):`.
-    fn with_lane<'a, R, F, Fut>(
+    fn with_lane<'a, R: Send + 'a>(
         &'a self,
         campaign_id: &'a str,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a;
+        body: SequenceFuture<'a, R>,
+    ) -> SequenceFuture<'a, R>;
 
     /// `with owner._direct_action_work(campaign_id):`.
-    fn with_direct_action_work<'a, R, F, Fut>(
+    fn with_direct_action_work<'a, R: Send + 'a>(
         &'a self,
         campaign_id: &'a str,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a;
+        body: SequenceFuture<'a, R>,
+    ) -> SequenceFuture<'a, R>;
 
     /// `with owner._narration_lock:`.
-    fn with_narration_lock<'a, R, F, Fut>(
-        &'a self,
-        body: F,
-    ) -> impl Future<Output = SequenceResult<R>> + Send + 'a
-    where
-        R: Send + 'a,
-        F: FnOnce() -> Fut + Send + 'a,
-        Fut: Future<Output = SequenceResult<R>> + Send + 'a;
+    fn with_narration_lock<'a, R: Send + 'a>(&'a self, body: SequenceFuture<'a, R>) -> SequenceFuture<'a, R>;
 
     /// `owner._active_dm_context(session_id)`.
-    fn active_dm_context<'a>(
-        &'a self,
-        session_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a;
+    fn active_dm_context<'a>(&'a self, session_id: &'a str) -> SequenceFuture<'a, SessionContext>;
 
     /// `owner._sessions.context(session_id)`.
-    fn session_context<'a>(
-        &'a self,
-        session_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<SessionContext>> + Send + 'a;
+    fn session_context<'a>(&'a self, session_id: &'a str) -> SequenceFuture<'a, SessionContext>;
 
     /// `owner._sessions.append_message(session_id=..., message_id=..., kind=..., content=...)`.
     fn append_session_message<'a>(
@@ -355,44 +337,32 @@ pub trait SequenceOwner: Sync {
         message_id: &'a str,
         kind: SessionMessageKind,
         content: &'a JsonMap,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a;
+    ) -> SequenceFuture<'a, ()>;
 
     /// `owner._store.snapshot(campaign_id)`.
-    fn snapshot<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<CampaignSnapshot>> + Send + 'a;
+    fn snapshot<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, CampaignSnapshot>;
 
     /// `owner._store.action_hit(campaign_id, action_id)`.
     fn action_hit<'a>(
         &'a self,
         campaign_id: &'a str,
         action_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Option<IdempotencyHit>>> + Send + 'a;
+    ) -> SequenceFuture<'a, Option<IdempotencyHit>>;
 
     /// `owner._store.pending_mechanics_action(campaign_id) is not None`.
-    fn has_pending_mechanics_action<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<bool>> + Send + 'a;
+    fn has_pending_mechanics_action<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, bool>;
 
     /// `owner._store.current_open_turn(campaign_id)`.
-    fn current_open_turn<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Option<String>>> + Send + 'a;
+    fn current_open_turn<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, Option<String>>;
 
     /// `owner._campaign_work_counts.get(campaign_id)`, `0` for `None`.
-    fn campaign_work_count<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<usize>> + Send + 'a;
+    fn campaign_work_count<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, usize>;
 
     /// `owner._store.campaign_session_contexts(campaign_id)`.
     fn campaign_session_contexts<'a>(
         &'a self,
         campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<SessionContext>>> + Send + 'a;
+    ) -> SequenceFuture<'a, Vec<SessionContext>>;
 
     /// `owner._store.player_action_markers(campaign_id, action_ids, kind)`.
     fn player_action_markers<'a>(
@@ -400,13 +370,13 @@ pub trait SequenceOwner: Sync {
         campaign_id: &'a str,
         action_ids: &'a [&'a str],
         kind: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<JsonMap>>> + Send + 'a;
+    ) -> SequenceFuture<'a, Vec<JsonMap>>;
 
     /// `owner._player_control_scope(snapshot)`.
     fn player_control_scope<'a>(
         &'a self,
         snapshot: &'a CampaignSnapshot,
-    ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a;
+    ) -> SequenceFuture<'a, Option<JsonMap>>;
 
     /// `owner._resolve_panel_control(snapshot, source, selection)`.
     fn resolve_panel_control<'a>(
@@ -414,7 +384,7 @@ pub trait SequenceOwner: Sync {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<ResolvedControl>> + Send + 'a;
+    ) -> SequenceFuture<'a, ResolvedControl>;
 
     /// `owner._resolve_card_control(snapshot, source, selection)`.
     fn resolve_card_control<'a>(
@@ -422,7 +392,7 @@ pub trait SequenceOwner: Sync {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<ResolvedControl>> + Send + 'a;
+    ) -> SequenceFuture<'a, ResolvedControl>;
 
     /// `owner._check_player_action(tool, parameters, snapshot)`.
     fn check_player_action<'a>(
@@ -430,7 +400,7 @@ pub trait SequenceOwner: Sync {
         tool: &'a CatalogTool,
         parameters: &'a JsonMap,
         snapshot: &'a CampaignSnapshot,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a;
+    ) -> SequenceFuture<'a, ()>;
 
     /// `owner._player_action_preview(tool, parameters, snapshot, source, selection)`.
     fn player_action_preview<'a>(
@@ -440,32 +410,26 @@ pub trait SequenceOwner: Sync {
         snapshot: &'a CampaignSnapshot,
         source: &'a Json,
         selection: &'a Json,
-    ) -> impl Future<Output = SequenceResult<Option<JsonMap>>> + Send + 'a;
+    ) -> SequenceFuture<'a, Option<JsonMap>>;
 
     /// `owner.campaign_panels(campaign_id)`.
-    fn campaign_panels<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<JsonMap>> + Send + 'a;
+    fn campaign_panels<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, JsonMap>;
 
     /// `owner._player_action_in_owned_work(**envelope, preview_only=...)`.
     fn player_action_in_owned_work<'a>(
         &'a self,
         request: &'a PlayerActionRequest,
-    ) -> impl Future<Output = SequenceResult<PlayerActionAnswer>> + Send + 'a;
+    ) -> SequenceFuture<'a, PlayerActionAnswer>;
 
     /// `owner._append_player_action_references(session_id, receipt)`.
     fn append_player_action_references<'a>(
         &'a self,
         session_id: &'a str,
         receipt: &'a ActionReceipt,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a;
+    ) -> SequenceFuture<'a, ()>;
 
     /// `owner._catalog(campaign_id)`.
-    fn catalog<'a>(
-        &'a self,
-        campaign_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<Vec<CatalogTool>>> + Send + 'a;
+    fn catalog<'a>(&'a self, campaign_id: &'a str) -> SequenceFuture<'a, Vec<CatalogTool>>;
 
     /// The `attempt_id`s of `owner._attempts.values()` for this campaign that are not terminal and
     /// whose `turn_id` equals `turn_id` (`None` matches none), in `_attempts` order. Called only
@@ -474,7 +438,7 @@ pub trait SequenceOwner: Sync {
         &'a self,
         campaign_id: &'a str,
         turn_id: Option<&'a str>,
-    ) -> impl Future<Output = SequenceResult<Vec<String>>> + Send + 'a;
+    ) -> SequenceFuture<'a, Vec<String>>;
 
     /// `owner.bind_narration_action(campaign_id, attempt_id, action_id)`.
     fn bind_narration_action<'a>(
@@ -482,7 +446,7 @@ pub trait SequenceOwner: Sync {
         campaign_id: &'a str,
         attempt_id: &'a str,
         action_id: &'a str,
-    ) -> impl Future<Output = SequenceResult<()>> + Send + 'a;
+    ) -> SequenceFuture<'a, ()>;
 }
 
 // ── Python's statuses and errors ───────────────────────────────────────────────────────────
@@ -820,7 +784,7 @@ pub async fn action_sequence<O: SequenceOwner>(
     session_id: &str,
     sequence_id: Option<&str>,
 ) -> SequenceResult<Option<JsonMap>> {
-    owner.with_operation(|| read_held(owner, session_id, sequence_id)).await
+    owner.with_operation(Box::pin(read_held(owner, session_id, sequence_id))).await
 }
 
 async fn read_held<O: SequenceOwner>(
@@ -836,7 +800,8 @@ async fn read_held<O: SequenceOwner>(
     if active {
         let campaign_id = text(field(&queue, "campaign_id")?)?.to_owned();
         let queue_ref = &mut queue;
-        let recovered = owner.with_lane(&campaign_id, || recover(owner, session_id, queue_ref)).await?;
+        let recovered =
+            owner.with_lane(&campaign_id, Box::pin(recover(owner, session_id, queue_ref))).await?;
         if let Some(projected) = recovered {
             return Ok(Some(projected));
         }
@@ -941,9 +906,9 @@ pub async fn compose_action_sequence<O: SequenceOwner>(
         _ => return Err(reject("An action sequence supports at most 32 declared steps")),
     };
     owner
-        .with_operation(|| {
-            owner.with_lane(&request.campaign_id, || compose_held(owner, request, steps, from_agent))
-        })
+        .with_operation(
+            owner.with_lane(&request.campaign_id, Box::pin(compose_held(owner, request, steps, from_agent))),
+        )
         .await
 }
 
@@ -1179,14 +1144,14 @@ pub async fn execute_action_sequence<O: SequenceOwner>(
         return execute_held(owner, request).await;
     }
     owner
-        .with_operation(|| {
-            owner.with_direct_action_work(&request.campaign_id, || execute_held(owner, request))
-        })
+        .with_operation(
+            owner.with_direct_action_work(&request.campaign_id, Box::pin(execute_held(owner, request))),
+        )
         .await
 }
 
 async fn execute_held<O: SequenceOwner>(owner: &O, request: &ExecuteRequest) -> SequenceResult<JsonMap> {
-    owner.with_lane(&request.campaign_id, || execute_in_lane(owner, request)).await
+    owner.with_lane(&request.campaign_id, Box::pin(execute_in_lane(owner, request))).await
 }
 
 /// The envelope a step saved, as `_player_action_in_owned_work`'s keyword arguments.
@@ -1253,7 +1218,7 @@ async fn rebind_map<O: SequenceOwner>(
 /// `_bind_execution_basis(owner, queue)`: the one live narration attempt for this turn, and the
 /// input it narrates.
 async fn bind_execution_basis<O: SequenceOwner>(owner: &O, queue: &mut JsonMap) -> SequenceResult<()> {
-    owner.with_narration_lock(|| bind_execution_basis_held(owner, queue)).await
+    owner.with_narration_lock(Box::pin(bind_execution_basis_held(owner, queue))).await
 }
 
 async fn bind_execution_basis_held<O: SequenceOwner>(owner: &O, queue: &mut JsonMap) -> SequenceResult<()> {
@@ -1434,13 +1399,13 @@ async fn execute_in_lane<O: SequenceOwner>(owner: &O, request: &ExecuteRequest) 
         let turn_id = field(&queue, "turn_id")?.as_str().map(str::to_owned);
         let action_id = receipt.action_id.clone();
         owner
-            .with_narration_lock(|| async {
+            .with_narration_lock(Box::pin(async {
                 let attempts = owner.open_narration_attempts(campaign_id, turn_id.as_deref()).await?;
                 if attempts.len() == 1 {
                     owner.bind_narration_action(campaign_id, &attempts[0], &action_id).await?;
                 }
                 Ok(())
-            })
+            }))
             .await?;
         let after = owner.snapshot(campaign_id).await?;
         set(&mut queue, "expected_revision", after.state.revision);

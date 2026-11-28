@@ -17,16 +17,16 @@ Written by `docs/rust-port/tools/site_lists.py`. A worker ticks the Done column 
 | Where | Function | Kind | Code | Done |
 | --- | --- | --- | --- | --- |
 | `application/bundled_campaign_plans.py:120` | `read_plan_catalogue` | re.fullmatch; plain | `if not isinstance(row, dict) or not isinstance(row.get("id"), str) or re.fullmatch( r"[a-z0-9]+(?:-[a-z0-9]+)*", row["id"], ) is None or row["id"] ...` |  `sylvia-app` plan_catalogue_vectors |
-| `application/character_card_import.py:435` | `_original_path` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
+| `application/character_card_import.py:435` | `_original_path` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | yes |
 | `application/character_card_import.py:558` | `_retire_completed_previews` | re.fullmatch; plain | `if re.fullmatch("[0-9a-f]{64}", target.name) is None:` | |
-| `application/character_card_import.py:611` | `confirm_card_preview` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | |
+| `application/character_card_import.py:611` | `confirm_card_preview` | re.fullmatch; plain | `if not isinstance(digest, str) or re.fullmatch("[0-9a-f]{64}", digest) is None:` | yes |
 | `application/character_profiles.py:29` | `<module>` | re.compile; plain | `PROFILE_ID = re.compile(r"character-profile-[0-9a-f]{24}-[0-9a-f]{16}")` |  `sylvia-app` character_profile_vectors |
 | `application/character_profiles.py:30` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` |  `sylvia-app` character_profile_vectors |
 | `application/character_rules.py:18` | `<module>` | re.compile; plain | `_LOCAL = re.compile(r"_[A-Za-z0-9_]+\Z")` |  `sylvia-app` character_rules_vectors |
 | `application/compatible_character_copy.py:23` | `<module>` | re.compile; plain | `_SHA256 = re.compile(r"[0-9a-f]{64}")` | |
 | `application/import_repair.py:55` | `<module>` | re.compile; plain | `_PLAN_ID_PATTERN = re.compile(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}")` | yes |
-| `application/import_repair.py:274` | `stage_repair_copy` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_sha256) is None:` | |
-| `application/import_repair_sessions.py:91` | `start_import_repair_chat` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", repair_id) is None:` | |
+| `application/import_repair.py:274` | `stage_repair_copy` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", expected_sha256) is None:` | yes |
+| `application/import_repair_sessions.py:91` | `start_import_repair_chat` | re.fullmatch; plain | `if re.fullmatch(r"[0-9a-f]{64}", repair_id) is None:` | yes |
 | `application/initial_character_state.py:33` | `<module>` | re.compile; plain | `_FIELD_PATH = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*")` |  `sylvia-app` package_library_vectors |
 | `application/plan_bundle.py:119` | `_read_bundle` | re.fullmatch; plain | `or re.fullmatch(r"campaign-plan-reusable-[0-9a-f]{24}-[0-9a-f]{16}", identity) is None` | yes |
 | `application/reusable_participants.py:48` | `<module>` | re.compile; plain | `_ARTIFACT_ID = re.compile(r"participant-[0-9a-f]{24}-[0-9a-f]{16}")` |  `sylvia-app` reusable_participant_vectors |

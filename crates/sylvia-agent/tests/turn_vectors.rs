@@ -6,7 +6,9 @@
 //!   `resume_exchange_results`, each real call and its variants. Rust starts from the same turn
 //!   locals and input, is answered every owner call Python's phase made, and must emit Python's
 //!   events and leave Python's locals (or raise its error).
-//! - `turn_vectors.json`: `_turn_events` whole, for each real GM turn. Rust is answered every
+//! - `turn_vectors.json`: `_turn_events` whole, for each real GM turn; and
+//!   `actor_decision_vectors.json` (`generate_actor_decision_vectors.py`), the same for turns on
+//!   Python's hidden-token Ruleset, with a required transition and isolated participant decisions. Rust is answered every
 //!   owner call, `uuid4` value, catalog, callback and provider stream Python's turn met, in
 //!   order; it must send Python's provider requests, emit Python's events (an action answered
 //!   with the rejection Python's loop wrote back) and end as Python's turn ended.
@@ -128,8 +130,21 @@ async fn turn_setup_matches_python() {
 
 #[tokio::test]
 async fn turns_match_python() {
-    for (index, case) in replay::cases(include_str!("vectors/turn_vectors.json")).iter().enumerate() {
-        let name = format!("{index} turn {}", case["turn_id"].as_str().unwrap());
+    replay_turns(include_str!("vectors/turn_vectors.json")).await;
+}
+
+/// T6b: whole turns with a required transition and isolated participant decisions, traced
+/// in-process on Python's hidden-token Ruleset (`generate_actor_decision_vectors.py`).
+#[tokio::test]
+async fn actor_decision_turns_match_python() {
+    replay_turns(include_str!("vectors/actor_decision_vectors.json")).await;
+}
+
+/// Each recorded turn replayed through `turn_events`, answered as Python's was.
+async fn replay_turns(vectors: &str) {
+    for (index, case) in replay::cases(vectors).iter().enumerate() {
+        let label = case["scenario"].as_str().unwrap_or_else(|| case["turn_id"].as_str().unwrap());
+        let name = format!("{index} turn {label}");
         let events = case["events"].as_array().unwrap();
         let owner = Arc::new(Recorded::new(events));
         let ids = uuids(events);
